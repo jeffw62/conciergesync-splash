@@ -134,5 +134,54 @@
     </div>
   </div>
 </div>
+  <script>
+  let termsModal = document.getElementById("termsModal");
+  let scrollable = document.getElementById("scrollableText");
+  let agreeCheckbox = document.getElementById("agreeCheckbox");
+  let acceptBtn = document.getElementById("acceptBtn");
+  let agreedToTerms = false;
+
+  function openModal() {
+    termsModal.style.display = "block";
+    agreeCheckbox.checked = false;
+    agreeCheckbox.disabled = true;
+    acceptBtn.disabled = true;
+    acceptBtn.style.cursor = "not-allowed";
+  }
+
+  function closeModal() {
+    termsModal.style.display = "none";
+  }
+
+  scrollable.addEventListener("scroll", function () {
+    let scrolledToBottom = scrollable.scrollTop + scrollable.clientHeight >= scrollable.scrollHeight;
+    if (scrolledToBottom) {
+      agreeCheckbox.disabled = false;
+    }
+  });
+
+  agreeCheckbox.addEventListener("change", function () {
+    if (agreeCheckbox.checked) {
+      acceptBtn.disabled = false;
+      acceptBtn.style.cursor = "pointer";
+    } else {
+      acceptBtn.disabled = true;
+      acceptBtn.style.cursor = "not-allowed";
+    }
+  });
+
+  function acceptTerms() {
+    closeModal();
+    agreedToTerms = true;
+  }
+
+  // 🚫 Prevent form submission unless T&C agreed
+  document.querySelector("form").addEventListener("submit", function (e) {
+    if (!agreedToTerms) {
+      alert("You must agree to the Terms & Conditions and Privacy Policy before registering.");
+      e.preventDefault();
+    }
+  });
+</script>
 </body>
 </html>
