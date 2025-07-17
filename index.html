@@ -1,76 +1,98 @@
-<!-- index.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>ConciergeSync™</title>
+  <title>ConciergeSync™ – ROI-Based Redemption Clarity</title>
   <style>
     body {
+      background-color: #000;
+      color: #fff;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      text-align: center;
       margin: 0;
       padding: 0;
-      background-color: #000;
-      color: #f0f0f0;
-      font-family: 'Segoe UI', sans-serif;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-      text-align: center;
     }
-
+    img.logo {
+      margin: 30px auto 20px;
+      display: block;
+      max-width: 180px;
+      height: auto;
+    }
     h1 {
-      font-size: 3em;
-      margin-bottom: 0.3em;
-      color: #ffcc00;
+      color: #ffc107;
+      font-size: 2em;
+      margin-bottom: 10px;
     }
-
     p {
-      font-size: 1.2em;
-      margin-bottom: 2em;
+      font-size: 1.1em;
+      margin: 0 auto 20px;
       max-width: 600px;
     }
-
-    form {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-
-    input {
-      padding: 10px;
-      margin: 5px;
-      width: 250px;
+    input[type="text"], input[type="email"] {
+      width: 80%;
+      max-width: 400px;
+      padding: 12px;
+      margin: 10px auto;
+      border: none;
+      border-radius: 6px;
       font-size: 1em;
-      border: none;
-      border-radius: 5px;
+      display: block;
     }
-
     button {
-      padding: 10px 20px;
-      margin-top: 10px;
-      background-color: #ffcc00;
+      background-color: #ffc107;
       color: black;
+      padding: 12px 20px;
       border: none;
+      border-radius: 6px;
+      font-size: 1em;
       font-weight: bold;
-      border-radius: 5px;
       cursor: pointer;
+      margin-top: 10px;
     }
-
-    button:hover {
-      background-color: #e6b800;
+    .beta-info {
+      margin: 40px auto 60px;
+      max-width: 650px;
+      padding: 0 20px;
+      line-height: 1.5;
+      font-size: 0.95em;
+      color: #ccc;
+    }
+    .beta-info h2 {
+      color: #ffc107;
+      margin-bottom: 10px;
     }
   </style>
 </head>
 <body>
-  <h1>Never waste a mile again.</h1>
-  <p>ConciergeSync™ helps you unlock the full value of your points and miles with smart, ROI-based logic. No guessing. Just clarity.</p>
 
-  <form action="https://formspree.io/f/your-form-id" method="POST">
-    <input type="text" name="name" placeholder="Your Name" required />
-    <input type="email" name="email" placeholder="Your Email" required />
+  <img src="concierge_logo.png" alt="ConciergeSync Logo" class="logo" />
+
+  <h1>Never waste a mile again.</h1>
+  <p>
+    ConciergeSync™ helps you unlock the full value of your points and miles with smart, ROI-based logic. No guessing. Just clarity.
+  </p>
+
+  <form>
+    <input type="text" placeholder="Your Name" required />
+    <input type="email" placeholder="Your Email" required />
     <button type="submit">Request Beta Access</button>
   </form>
+
+  <div class="beta-info">
+    <h2>Why We’re Inviting Beta Users</h2>
+    <p>
+      We’re building something different — a smarter way to book travel with points and miles, backed by math, not hype. As a beta user, you’ll help shape the tool from the ground up.
+    </p>
+    <h2>What You’ll Do</h2>
+    <p>
+      Try out features before anyone else. Share feedback. Tell us what works and what’s missing. We’ll make the product better — together.
+    </p>
+    <h2>What You’ll Get</h2>
+    <p>
+      Priority access. White-glove support. And when we launch paid tiers, you’ll be locked into permanent perks as a thank-you for being part of the first wave.
+    </p>
+  </div>
+
 </body>
 </html>
