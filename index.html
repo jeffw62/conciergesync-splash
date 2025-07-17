@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ConciergeSync™ – ROI-Based Redemption Clarity</title>
   <style>
     body {
@@ -38,6 +38,7 @@
       border-radius: 6px;
       font-size: 1em;
       display: block;
+      opacity: 0.5;
     }
     button {
       background-color: #ffc107;
@@ -47,8 +48,13 @@
       border-radius: 6px;
       font-size: 1em;
       font-weight: bold;
-      cursor: pointer;
+      cursor: not-allowed;
       margin-top: 10px;
+      opacity: 0.5;
+    }
+    .enabled {
+      opacity: 1 !important;
+      cursor: pointer !important;
     }
     .beta-info {
       margin: 40px auto 60px;
@@ -62,35 +68,26 @@
       color: #ffc107;
       margin-bottom: 10px;
     }
-    .tc-disclaimer {
-      font-size: 0.9em;
-      margin-top: 1rem;
-      color: #ccc;
-    }
-    .tc-disclaimer a {
+    a {
       color: #ffc107;
-      text-decoration: underline;
-      cursor: pointer;
     }
   </style>
 </head>
 <body>
   <img src="concierge_logo_NO_taglines.png" alt="ConciergeSync Logo" class="logo" />
-
   <h1>Never waste a mile again.</h1>
   <p>
-    ConciergeSync™ helps you unlock the full value of your points and miles with
-    smart, ROI-based logic. No guessing. Just clarity.
+    ConciergeSync™ helps you unlock the full value of your points and miles with smart, ROI-based logic. No guessing. Just clarity.
   </p>
 
   <form>
-    <input type="text" placeholder="Your First/Last Name" required />
-    <input type="email" placeholder="Your Email" required />
-    <button type="submit" id="submitBtn" disabled>Request Beta Access</button>
+    <input type="text" id="nameField" placeholder="Your First/Last Name" disabled required />
+    <input type="email" id="emailField" placeholder="Your Email" disabled required />
+    <button id="submitButton" type="submit" disabled>Request Beta Access</button>
   </form>
 
-  <p class="tc-disclaimer">
-    To register, please <a onclick="openModal()">review and accept our Terms & Conditions and Privacy Policy</a>.
+  <p style="font-size: 0.8rem; color: #ccc; margin-top: 1rem;">
+    To register, please <a href="#" onclick="openModal()">review and accept our Terms & Conditions and Privacy Policy</a>.
   </p>
 
   <div class="beta-info">
@@ -108,14 +105,10 @@
     </p>
   </div>
 
-  <footer style="text-align: center; padding: 2rem 0; font-size: 0.9rem; color: #888;">
-    © 2025 <span style="font-weight: bold;">ConciergeSync™</span>. All rights reserved.
-  </footer>
-
-  <!-- Modal HTML -->
-  <div id="termsModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:1000;">
-    <div style="background:#fff; color:#000; max-width:700px; margin:5% auto; padding:2rem; border-radius:8px; position:relative; text-align:left;">
-      <h2 style="text-align:center;">Terms & Conditions + Privacy Policy</h2>
+  <!-- Modal -->
+  <div id="termsModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:1000; overflow:auto;">
+    <div style="background:#fff; color:#000; max-width:700px; margin:5% auto; padding:2rem; border-radius:8px; position:relative;">
+      <h2>Terms & Conditions + Privacy Policy</h2>
       <div id="scrollableText" style="height:300px; overflow-y:scroll; border:1px solid #ccc; padding:1rem; margin:1rem 0; text-align:left;">
   <h3>Terms & Conditions</h3>
   <p><strong>ConciergeSync™ Beta Terms & Conditions</strong><br>
@@ -212,21 +205,31 @@
   For questions about this policy, contact us at: <a href="mailto:jeffw@conciergesync.ai">Contact ConciergeSync™</a></p>
 </div>
 
-      <label><input type="checkbox" id="agreeCheckbox" disabled /> I’ve read and agree to the Terms & Privacy Policy</label>
+      <label>
+        <input type="checkbox" id="agreeCheckbox" disabled>
+        I’ve read and agree to the Terms & Privacy Policy
+      </label>
       <div style="margin-top:1rem;">
-        <button id="acceptBtn" onclick="acceptTerms()" disabled style="padding: 0.5rem 1rem; background: black; color: white; border: none; border-radius: 4px; cursor: not-allowed;">I Agree</button>
+        <button onclick="acceptTerms()" id="acceptBtn" disabled style="padding: 0.5rem 1rem; background: black; color: white; border: none; border-radius: 4px; cursor: not-allowed;">I Agree</button>
         <button onclick="closeModal()" style="margin-left:1rem; padding: 0.5rem 1rem;">Cancel</button>
       </div>
     </div>
   </div>
 
+  <footer style="text-align: center; padding: 2rem 0; font-size: 0.9rem; color: #888;">
+    © 2025 <span style="font-weight: bold;">ConciergeSync™</span>. All rights reserved.
+  </footer>
+
   <script>
-    const termsModal = document.getElementById("termsModal");
-    const scrollable = document.getElementById("scrollableText");
-    const agreeCheckbox = document.getElementById("agreeCheckbox");
-    const acceptBtn = document.getElementById("acceptBtn");
-    const submitBtn = document.getElementById("submitBtn");
+    let termsModal = document.getElementById("termsModal");
+    let scrollable = document.getElementById("scrollableText");
+    let agreeCheckbox = document.getElementById("agreeCheckbox");
+    let acceptBtn = document.getElementById("acceptBtn");
     let agreedToTerms = false;
+
+    let nameField = document.getElementById("nameField");
+    let emailField = document.getElementById("emailField");
+    let submitButton = document.getElementById("submitButton");
 
     function openModal() {
       termsModal.style.display = "block";
@@ -240,26 +243,43 @@
       termsModal.style.display = "none";
     }
 
-    scrollable.addEventListener("scroll", () => {
-      const bottom = scrollable.scrollTop + scrollable.clientHeight >= scrollable.scrollHeight;
-      if (bottom) agreeCheckbox.disabled = false;
+    scrollable.addEventListener("scroll", function () {
+      let scrolledToBottom = scrollable.scrollTop + scrollable.clientHeight >= scrollable.scrollHeight;
+      if (scrolledToBottom) {
+        agreeCheckbox.disabled = false;
+      }
     });
 
-    agreeCheckbox.addEventListener("change", () => {
-      acceptBtn.disabled = !agreeCheckbox.checked;
-      acceptBtn.style.cursor = agreeCheckbox.checked ? "pointer" : "not-allowed";
+    agreeCheckbox.addEventListener("change", function () {
+      if (agreeCheckbox.checked) {
+        acceptBtn.disabled = false;
+        acceptBtn.style.cursor = "pointer";
+      } else {
+        acceptBtn.disabled = true;
+        acceptBtn.style.cursor = "not-allowed";
+      }
     });
 
     function acceptTerms() {
-      closeModal();
       agreedToTerms = true;
-      submitBtn.disabled = false;
+      closeModal();
+
+      // Enable form elements
+      nameField.disabled = false;
+      emailField.disabled = false;
+      submitButton.disabled = false;
+
+      // Remove dimming
+      nameField.classList.add("enabled");
+      emailField.classList.add("enabled");
+      submitButton.classList.add("enabled");
     }
 
-    document.querySelector("form").addEventListener("submit", e => {
+    // Prevent submission if user skipped the modal
+    document.querySelector("form").addEventListener("submit", function (e) {
       if (!agreedToTerms) {
+        alert("You must agree to the Terms & Conditions and Privacy Policy before registering.");
         e.preventDefault();
-        alert("You must agree to the Terms & Conditions and Privacy Policy first.");
       }
     });
   </script>
