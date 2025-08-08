@@ -89,20 +89,22 @@
 </iframe>
 <script>
   window.addEventListener('message', function(event) {
-    const allowedOrigin = "https://noteforms.com";
+    console.log("🔔 Message received from iframe:", event);
 
+    const allowedOrigin = "https://noteforms.com";
     if (event.origin !== allowedOrigin) return;
 
-    // Check for NoteForms submission event
     if (event.data && event.data.type === "formSubmitSuccess") {
       window.location.href = "https://conciergesync.ai/beta-thank-you.html";
     }
   });
 </script>
+
     </div>
   </div>
 </body>
 </html>
+
 
 
 
