@@ -77,43 +77,69 @@
     </div>
 
     <div class="section">
-      <h2>Apply to Join</h2>
-<a 
-  href="https://noteforms.com/forms/conciergesync-beta-8vwxob" 
-  target="_blank" 
-  rel="noopener noreferrer"
-  style="display: inline-block; padding: 12px 24px; background-color: #1f2937; color: #fff; text-decoration: none; border-radius: 6px; font-weight: bold;"
->
-  Apply to Join
-</a>
-<script>
-  console.log("🔥 NoteForms redirect script loaded");
+      <!-- ================== Apply to Join (Fillout) ================== -->
+<section id="apply" class="section">
+  <h2>Apply to Join</h2>
 
-  window.addEventListener('message', function(event) {
-    console.log("🔔 Message received from iframe:", event);
+  <!-- Fillout script embed -->
+  <div id="fillout-container"></div>
+  <script
+    src="https://cdn.fillout.com/embed.js"
+    data-form-id="YOUR_FORM_ID"
+    data-container="#fillout-container"
+    data-height="720"
+    data-width="100%"
+    defer>
+  </script>
 
-    const allowedOrigin = "https://noteforms.com";
-    if (event.origin !== allowedOrigin) return;
+  <!-- Redirect to ConciergeSync thank-you after successful submit -->
+  <script>
+  (function () {
+    var THANK_YOU_URL = 'https://conciergesync.ai/beta-thank-you.html';
 
-    try {
-      const submissionType = event.data?.submission_data?.type;
-      console.log("📦 Type:", submissionType);
+    // Fillout origins that postMessage
+    var ALLOWED = new Set([
+      'https://form.fillout.com',
+      'https://app.fillout.com',
+      'https://server.fillout.com'
+    ]);
 
-      if (submissionType && submissionType.includes("form-submitted")) {
-        console.log("✅ Redirecting...");
-        window.top.location.href = "https://conciergesync.ai/beta-thank-you.html";
+    window.addEventListener('message', function (event) {
+      if (!ALLOWED.has(event.origin)) return;
+      var d = event.data || {};
+
+      // Uncomment to debug:
+      // console.log('fillout msg:', event.origin, d);
+
+      // Handle string and object payloads Fillout may send
+      if (typeof d === 'string') {
+        var s = d.toLowerCase();
+        if (s.includes('submitted') || s.includes('submission')) {
+          window.top.location.href = THANK_YOU_URL;
+        }
+        return;
       }
-    } catch (e) {
-      console.error("Redirect failed:", e);
-    }
-  });
-</script>
 
+      if (
+        d.type === 'submissionCreated' ||
+        d.type === 'submission.completed' ||
+        d.event === 'submissionCreated' ||
+        d.message === 'formSubmitted' ||
+        d.status === 'success'
+      ) {
+        window.top.location.href = THANK_YOU_URL;
+      }
+    }, false);
+  })();
+  </script>
+</section>
+<!-- ================== /Apply to Join (Fillout) ================== -->
 
     </div>
   </div>
 </body>
 </html>
+
 
 
 
