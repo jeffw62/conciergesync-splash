@@ -88,15 +88,17 @@
   allowfullscreen>
 </iframe>
 <script>
+  console.log("🔥 NoteForms redirect script loaded");
+
   window.addEventListener('message', function(event) {
     console.log("🔔 Message received from iframe:", event);
+    console.log("📦 event.data content:", event.data);
 
     const allowedOrigin = "https://noteforms.com";
     if (event.origin !== allowedOrigin) return;
 
-    if (event.data && event.data.type === "formSubmitSuccess") {
-      window.location.href = "https://conciergesync.ai/beta-thank-you.html";
-    }
+    // TEMP: Log every event so we can see what type it is
+    // DO NOT redirect yet, just inspect
   });
 </script>
 
@@ -104,6 +106,7 @@
   </div>
 </body>
 </html>
+
 
 
 
