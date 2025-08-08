@@ -48,7 +48,7 @@
           src="https://cdn.fillout.com/embed.js"
           data-form-id="i3k1ms1uPeus"
           data-container="#fillout-container"
-          data-height="950"
+          data-height="1100"   <!-- bump this if you still see inner scroll -->
           data-width="100%"
           defer>
         </script>
@@ -58,20 +58,15 @@
       <script>
       (function () {
         var THANK_YOU_URL = 'https://conciergesync.ai/beta-thank-you.html';
-
-        // Known Fillout origins that can postMessage
         var ALLOWED = new Set([
           'https://forms.fillout.com',
           'https://form.fillout.com',
           'https://app.fillout.com',
           'https://server.fillout.com'
         ]);
-
         window.addEventListener('message', function (event) {
           if (!ALLOWED.has(event.origin)) return;
           var d = event.data || {};
-
-          // If Fillout sends a string message
           if (typeof d === 'string') {
             var s = d.toLowerCase();
             if (s.includes('submitted') || s.includes('submission')) {
@@ -79,8 +74,6 @@
             }
             return;
           }
-
-          // Handle common object payload shapes
           if (
             d.type === 'submissionCreated' ||
             d.type === 'submission.completed' ||
