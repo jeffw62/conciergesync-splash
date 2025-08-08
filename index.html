@@ -96,19 +96,26 @@
     const allowedOrigin = "https://noteforms.com";
     if (event.origin !== allowedOrigin) return;
 
-    const submission = event.data?.submission_data?.type;
-    
-    if (submission === "form-submitted") {
-      console.log("✅ Redirecting to thank-you page...");
-      window.location.href = "https://conciergesync.ai/beta-thank-you.html";
+    try {
+      const submissionType = event.data?.submission_data?.type;
+      console.log("📦 Type:", submissionType);
+
+      if (submissionType && submissionType.includes("form-submitted")) {
+        console.log("✅ Redirecting...");
+        window.top.location.href = "https://conciergesync.ai/beta-thank-you.html";
+      }
+    } catch (e) {
+      console.error("Redirect failed:", e);
     }
   });
 </script>
+
 
     </div>
   </div>
 </body>
 </html>
+
 
 
 
