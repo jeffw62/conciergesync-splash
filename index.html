@@ -92,13 +92,16 @@
 
   window.addEventListener('message', function(event) {
     console.log("🔔 Message received from iframe:", event);
-    console.log("📦 event.data content:", event.data);
 
     const allowedOrigin = "https://noteforms.com";
     if (event.origin !== allowedOrigin) return;
 
-    // TEMP: Log every event so we can see what type it is
-    // DO NOT redirect yet, just inspect
+    const submission = event.data?.submission_data?.type;
+    
+    if (submission === "form-submitted") {
+      console.log("✅ Redirecting to thank-you page...");
+      window.location.href = "https://conciergesync.ai/beta-thank-you.html";
+    }
   });
 </script>
 
@@ -106,6 +109,7 @@
   </div>
 </body>
 </html>
+
 
 
 
