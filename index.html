@@ -89,14 +89,12 @@
 </iframe>
 <script>
   window.addEventListener('message', function(event) {
-    // Only accept messages from NoteForms
     const allowedOrigin = "https://noteforms.com";
 
     if (event.origin !== allowedOrigin) return;
 
     // Check for NoteForms submission event
-    if (event.data === "formSubmitSuccess") {
-      // Redirect manually to your thank-you page
+    if (event.data && event.data.type === "formSubmitSuccess") {
       window.location.href = "https://conciergesync.ai/beta-thank-you.html";
     }
   });
@@ -105,6 +103,7 @@
   </div>
 </body>
 </html>
+
 
 
 
