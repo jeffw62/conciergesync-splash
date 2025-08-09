@@ -21,4 +21,21 @@ h1{font-size:28px;line-height:1.2;margin:0 0 8px;text-align:center}p{color:var(-
       style="width:100%;min-height:1100px;border:0;display:block;"></iframe>
   </div>
 </div>
+  <script>
+(function () {
+  var NEXT_URL = '/beta/section-2.html';
+  var ALLOWED = new Set(['https://noteforms.com','https://www.noteforms.com']);
+  window.addEventListener('message', function (e) {
+    if (!ALLOWED.has(e.origin)) return;
+    var d = e.data || {};
+    if (typeof d === 'string') d = { msg: d.toLowerCase() };
+    if (
+      (d.msg && (d.msg.includes('submitted') || d.msg.includes('submission') || d.msg.includes('formsubmitted'))) ||
+      d.type === 'submissionCreated' || d.type === 'submission.completed' ||
+      d.event === 'submissionCreated' || d.event === 'submission.completed' ||
+      d.message === 'formSubmitted' || d.status === 'success'
+    ) { window.top.location.href = NEXT_URL; }
+  }, false);
+})();
+</script>
 </body></html>
