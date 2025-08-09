@@ -15,7 +15,20 @@
     p,li{color:var(--muted);line-height:1.6}
     ul{margin:8px 0 0 22px}
     .section{margin:22px 0}
-    .form-wrap{background:var(--card);border:1px solid #e6eaf0;border-radius:16px;box-shadow:0 6px 24px rgba(15,23,42,.06);padding:16px}
+    .cta-button {
+      display:inline-block;
+      padding:12px 20px;
+      border:1px solid #e6eaf0;
+      border-radius:10px;
+      text-decoration:none;
+      font-weight:bold;
+      color:var(--ink);
+      background:var(--bg);
+      transition:background 0.2s;
+    }
+    .cta-button:hover {
+      background:#e6eaf0;
+    }
   </style>
 </head>
 <body>
@@ -35,62 +48,17 @@
           <li>All premium upgrades, forever</li>
           <li>Direct impact on features and user experience</li>
         </ul>
-        <p style="margin-top:10px">In return, we’ll ask for a short onboarding and honest feedback as we grow.</p>
+        <p style="margin-top:10px">
+          In return, we’ll ask for a short onboarding and honest feedback as we grow.
+        </p>
       </div>
     </div>
 
     <section id="apply" class="section">
       <h2>Apply to Join</h2>
-      <div class="form-wrap">
-        <!-- Fillout iframe embed -->
-        <iframe
-          id="fillout-frame"
-          src="https://forms.fillout.com/t/i3k1ms1uPeus?embed=true"
-          title="ConciergeSync Beta Application"
-          style="width:100%;min-height:1100px;border:0;display:block;"
-          loading="lazy">
-        </iframe>
+      <div class="hero" style="padding:18px;text-align:center">
+        <a href="/beta/section-1.html" class="cta-button">Begin Application</a>
       </div>
-
-      <!-- Redirect after successful submit -->
-      <script>
-        (function () {
-          var THANK_YOU_URL = 'https://conciergesync.ai/beta-thank-you.html';
-          var ALLOWED = new Set([
-            'https://forms.fillout.com',
-            'https://server.fillout.com',
-            'https://form.fillout.com',
-            'https://app.fillout.com'
-          ]);
-
-          window.addEventListener('message', function (event) {
-            if (!ALLOWED.has(event.origin)) return;
-
-            var d = event.data || {};
-
-            // Strings some versions send
-            if (typeof d === 'string') {
-              var s = d.toLowerCase();
-              if (s.includes('submission') || s.includes('submitted') || s.includes('formsubmitted')) {
-                window.top.location.href = THANK_YOU_URL;
-              }
-              return;
-            }
-
-            // Common Fillout payload variants
-            if (
-              d.type === 'submissionCreated' ||
-              d.type === 'submission.completed' ||
-              d.event === 'submissionCreated' ||
-              d.event === 'submission.completed' ||
-              d.message === 'formSubmitted' ||
-              d.status === 'success'
-            ) {
-              window.top.location.href = THANK_YOU_URL;
-            }
-          }, false);
-        })();
-      </script>
     </section>
   </div>
 </body>
