@@ -10,8 +10,6 @@
   <p>Answer these 3 quick questions to get on the Beta Interest List.</p>
 
   <form method="POST" action="https://conciergesync-portal.onrender.com/apply">
-    <input type="text" name="company" autocomplete="off"
-       style="position:absolute;left:-9999px;top:-9999px" tabindex="-1" aria-hidden="true">
   <label>First / Last Name</label>
   <input name="name" placeholder="Your name" required />
 
@@ -21,7 +19,13 @@
   <label>What frustrates you about travel?</label>
   <textarea name="message" placeholder="Tell us briefly..."></textarea>
 
+  <!-- Honeypot (add this; don't remove fields above) -->
+  <input type="text" name="company" autocomplete="off"
+         style="position:absolute; left:-9999px; top:-9999px"
+         tabindex="-1" aria-hidden="true">
+
   <button type="submit">Submit</button>
 </form>
+
 </body>
 </html>
