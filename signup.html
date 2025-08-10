@@ -9,22 +9,17 @@
   <h1>Join the ConciergeSync™ Beta</h1>
   <p>Answer these 3 quick questions to get on the Beta Interest List.</p>
 
-  <form action="https://conciergesync-portal.onrender.com/api/intake" method="POST">
-    <label for="name">First / Last Name:</label><br>
-    <input type="text" id="name" name="name" required><br><br>
+  <form method="POST" action="https://conciergesync-portal.onrender.com/apply">
+  <label>First / Last Name</label>
+  <input name="name" placeholder="Your name" required />
 
-    <label for="email">Email:</label><br>
-    <input type="email" id="email" name="email" required><br><br>
+  <label>Email</label>
+  <input type="email" name="email" placeholder="you@example.com" required />
 
-    <label for="message">
-      What frustrates you about travel right now, and what would you want ConciergeSync™ to do for you?
-    </label><br>
-    <textarea id="message" name="message" rows="6" required></textarea><br><br>
+  <label>What frustrates you about travel?</label>
+  <textarea name="message" placeholder="Tell us briefly..."></textarea>
 
-    <!-- Honeypot field -->
-    <input type="text" name="company" style="display:none">
-
-    <button type="submit">Join the Beta Interest List</button>
-  </form>
+  <button type="submit">Submit</button>
+</form>
 </body>
 </html>
