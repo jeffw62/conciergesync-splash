@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <link rel="dns-prefetch" href="//portal.conciergesync.ai">
+  <link rel="preconnect" href="https://portal.conciergesync.ai" crossorigin>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>ConciergeSync™ Beta Access</title>
@@ -61,8 +63,19 @@
       </div>
     </section>
   </div>
+  <script>
+  (function () {
+    try {
+      var img = new Image();
+      img.referrerPolicy = 'no-referrer';
+      img.src = 'https://portal.conciergesync.ai/health?ts=' + Date.now();
+    } catch (e) {}
+  })();
+</script>
+
 </body>
 </html>
+
 
 
 
