@@ -23,15 +23,6 @@
       transition:transform .12s ease, box-shadow .12s ease;
     }
     .cta-button:hover{transform:translateY(-1px);box-shadow:0 10px 22px rgba(0,0,0,.18)}
-    /* Form styles */
-    form.apply label{display:block;margin:10px 0 6px}
-    form.apply input, form.apply textarea{
-      width:100%;padding:10px;border:1px solid #e5e7eb;border-radius:10px;background:#fff
-    }
-    form.apply button{
-      margin-top:12px;padding:12px 18px;border:0;border-radius:10px;background:var(--accent);
-      color:#fff;font-weight:600;cursor:pointer
-    }
   </style>
 </head>
 <body>
@@ -85,26 +76,8 @@
     <!-- CTA -->
     <section class="section" style="text-align:center;">
       <h2 style="margin:0 0 10px;">Ready to join the beta?</h2>
-      <a href="#apply" class="cta-button">Start application</a>
+      <a href="https://portal.conciergesync.ai/apply" class="cta-button">Start application</a>
     </section>
-
-    <!-- Apply form (posts to portal) -->
-    <div class="section">
-      <div class="card">
-        <form id="apply" class="apply" method="post" action="https://portal.conciergesync.ai/apply" novalidate>
-          <h2 style="margin:0 0 6px;">Apply to join the beta</h2>
-          <label>Full name</label>
-          <input name="name" required />
-          <label>Email</label>
-          <input type="email" name="email" required />
-          <label>Message (optional)</label>
-          <textarea name="message" rows="3"></textarea>
-          <!-- Honeypot -->
-          <input type="text" name="company" style="display:none" autocomplete="off" />
-          <button type="submit">Submit application</button>
-        </form>
-      </div>
-    </div>
 
   </div>
 
