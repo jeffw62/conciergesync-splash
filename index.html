@@ -6,16 +6,23 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>ConciergeSync™ Beta Access</title>
-    <style>
-    body{margin:0;background:#f6f7fb;font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;color:#111}
-    *,*::before,*::after{box-sizing:border-box}  <!-- add this line -->
-    .wrap{max-width:720px;margin:48px auto;padding:0 16px}
-    .card{background:#fff;border:1px solid #e6eaf0;border-radius:14px;box-shadow:0 8px 30px rgba(0,0,0,.06);padding:18px}
-    h1{margin:0 0 10px}
-    label{display:block;margin:10px 0 6px}
-    input,textarea{width:100%;padding:10px;border:1px solid #e5e7eb;border-radius:10px;background:#fff}
-    small{color:#6b7280}
-    button{margin-top:12px;padding:12px 18px;border:0;border-radius:10px;background:#111;color:#fff;font-weight:600;cursor:pointer}
+  <style>
+    :root { --card:#fff; --ink:#0f172a; --muted:#475569; --bg:#f6f7fb; --accent:#111; }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif;background:var(--bg);color:var(--ink)}
+    .container{max-width:880px;margin:40px auto;padding:0 20px}
+    .card{background:var(--card);border:1px solid #e6eaf0;border-radius:16px;box-shadow:0 6px 24px rgba(15,23,42,.06);padding:28px}
+    h1{font-size:34px;line-height:1.2;margin:0 0 8px;text-align:center}
+    h2{font-size:22px;margin:18px 0;text-align:center}
+    p,li{color:var(--muted);line-height:1.6}
+    ul{margin:8px 0 0 22px}
+    .section{margin:22px 0}
+    .cta-button{
+      display:inline-block;padding:12px 20px;border-radius:10px;background:var(--accent);
+      color:#fff;font-weight:600;text-decoration:none;box-shadow:0 6px 16px rgba(0,0,0,.12);
+      transition:transform .12s ease, box-shadow .12s ease;
+    }
+    .cta-button:hover{transform:translateY(-1px);box-shadow:0 10px 22px rgba(0,0,0,.18)}
   </style>
 </head>
 <body>
@@ -86,4 +93,3 @@
   </script>
 </body>
 </html>
-
