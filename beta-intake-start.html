@@ -3,67 +3,89 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Welcome to ConciergeSync™ Beta</title>
+  <title>Join the ConciergeSync™ Beta</title>
   <style>
+    :root { --bg:#f6f8fa; --text:#222; --card:#fff; --muted:#777; --brand:#0050b3; --brand-d:#003d8a; }
+    * { box-sizing: border-box; }
     body {
-      font-family: Arial, sans-serif;
-      background-color: #f6f8fa;
-      color: #222;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji";
+      background-color: var(--bg);
+      color: var(--text);
       display: flex;
       flex-direction: column;
       align-items: center;
       padding: 40px 20px;
+      line-height: 1.5;
     }
     .container {
-      max-width: 600px;
-      background: white;
-      padding: 40px;
-      border-radius: 12px;
-      box-shadow: 0 0 12px rgba(0, 0, 0, 0.06);
-      text-align: center;
+      width: 100%;
+      max-width: 680px;
+      background: var(--card);
+      padding: 36px;
+      border-radius: 14px;
+      box-shadow: 0 0 12px rgba(0,0,0,0.06);
     }
-    h1 {
-      font-size: 28px;
-      margin-bottom: 10px;
+    h1 { font-size: 28px; margin: 0 0 8px; }
+    p.lead { font-size: 18px; margin: 0 0 18px; }
+    .facts { margin: 0 0 18px; color: var(--muted); }
+    label { display: block; font-weight: 600; margin: 14px 0 6px; }
+    input[type="text"], input[type="email"], textarea {
+      width: 100%; padding: 12px 14px; border: 1px solid #d8dee4; border-radius: 10px; font-size: 16px;
+      background: #fff;
     }
-    p {
-      font-size: 18px;
-      margin-bottom: 16px;
-      line-height: 1.6;
+    textarea { resize: vertical; min-height: 120px; }
+    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .actions { margin-top: 20px; }
+    button[type="submit"] {
+      background: var(--brand); color: #fff; border: 0; padding: 12px 18px; border-radius: 10px; font-weight: 700; font-size: 16px; cursor: pointer;
     }
-    .cta-button {
-      display: inline-block;
-      background-color: #0050b3;
-      color: white;
-      padding: 12px 24px;
-      border-radius: 8px;
-      text-decoration: none;
-      font-weight: bold;
-      font-size: 16px;
-      margin-top: 20px;
-    }
-    .cta-button:hover {
-      background-color: #003d8a;
-    }
-    footer {
-      margin-top: 40px;
-      font-size: 14px;
-      color: #777;
-    }
+    button[type="submit"]:hover { background: var(--brand-d); }
+    .small { margin-top: 10px; font-size: 13px; color: var(--muted); }
+    footer { margin-top: 22px; font-size: 14px; color: var(--muted); text-align: center; }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>🎉 Welcome to ConciergeSync™</h1>
-    <p>This quick intake will help us tailor your experience to match how you earn, redeem, and manage points and miles.</p>
-    <p>✅ Takes less than 5 minutes</p>
-    <p>🔐 Your data is secure and private</p>
-    <p>💎 You'll receive lifetime access to all future upgrades</p>
-    <a href="https://form.noteforms.com/conciergesync-intake" class="cta-button">Let’s Begin</a>
+    <h1>🎉 Join the ConciergeSync™ Beta</h1>
+    <p class="lead">Answer three quick questions to get on the Beta Interest List.</p>
+    <p class="facts">✅ Takes under 2 minutes &nbsp;&nbsp; 🔐 Your info stays private &nbsp;&nbsp; 💎 Beta gets lifetime access</p>
+
+    <form action="https://conciergesync-portal.onrender.com/api/intake" method="POST" id="betaForm" novalidate>
+      <div class="row">
+        <div>
+          <label for="name">First / Last Name</label>
+          <input type="text" id="name" name="name" required />
+        </div>
+        <div>
+          <label for="email">Email</label>
+          <input type="email" id="email" name="email" required />
+        </div>
+      </div>
+
+      <label for="message">What frustrates you about travel right now, and what would you want ConciergeSync™ to do for you?</label>
+      <textarea id="message" name="message" required></textarea>
+
+      <!-- Honeypot (leave empty) -->
+      <input type="text" name="company" style="display:none" tabindex="-1" autocomplete="off" />
+
+      <div class="actions">
+        <button type="submit" id="submitBtn">Join the Beta Interest List</button>
+        <div class="small">By submitting, you agree to be contacted about the beta. No spam, ever.</div>
+      </div>
+    </form>
   </div>
 
   <footer>
-    Questions? Email us anytime at <a href="mailto:hello@conciergesync.ai">hello@conciergesync.ai</a>
+    Questions? Email <a href="mailto:hello@conciergesync.ai">hello@conciergesync.ai</a>
   </footer>
+
+  <script>
+    // tiny UX touch: disable button on submit to prevent double posts
+    document.getElementById('betaForm').addEventListener('submit', function() {
+      const btn = document.getElementById('submitBtn');
+      btn.disabled = true;
+      btn.textContent = 'Submitting…';
+    });
+  </script>
 </body>
 </html>
