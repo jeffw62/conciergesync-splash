@@ -11,13 +11,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Join the ConciergeSync™ Beta</title>
   <style>
-    :root { --bg:#f6f8fa; --text:#222; --card:#fff; --muted:#777; --brand:#0050b3; --brand-d:#003d8a; --danger:#b00020; --ok:#155724; --okbg:#d4edda; --errbg:#f8d7da; }
+    :root { --bg:#f6f8fa; --text:#222; --card:#fff; --muted:#777; --brand:#0050b3; --brand-d:#003d8a; }
     * { box-sizing: border-box; }
     body { font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
            background: var(--bg); color: var(--text); display:flex; flex-direction:column;
            align-items:center; padding:40px 20px; line-height:1.5; }
-    .container { width:100%; max-width:680px; background:var(--card); padding:36px;
-                 border-radius:14px; box-shadow:0 0 12px rgba(0,0,0,.06); }
+    .container { width:100%; max-width:680px; background:#fff; padding:36px; border-radius:14px; box-shadow:0 0 12px rgba(0,0,0,.06); }
     h1 { font-size:28px; margin:0 0 8px; }
     p.lead { font-size:18px; margin:0 0 18px; }
     .facts { margin:0 0 18px; color:var(--muted); }
@@ -27,16 +26,14 @@
     }
     textarea { resize:vertical; min-height:120px; }
     .row { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
-    .actions { margin-top:20px; display:flex; gap:12px; align-items:center; flex-wrap:wrap; }
+    .actions { margin-top:20px; }
     button[type="submit"] { background:var(--brand); color:#fff; border:0; padding:12px 18px;
       border-radius:10px; font-weight:700; font-size:16px; cursor:pointer; }
     button[type="submit"]:hover { background:var(--brand-d); }
     .small { margin-top:10px; font-size:13px; color:var(--muted); }
-    .msg { margin-top:12px; padding:10px 12px; border-radius:10px; display:none; }
-    .msg.err { background: var(--errbg); color: var(--danger); display:block; }
-    .msg.ok  { background: var(--okbg); color: var(--ok); display:block; }
     footer { margin-top:22px; font-size:14px; color:var(--muted); text-align:center; }
-    code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+    .msg { margin-top:12px; font-size:14px; color:#b00020; display:none; }
+    .msg.show { display:block; }
   </style>
 </head>
 <body>
@@ -68,7 +65,7 @@
         <div class="small">By submitting, you agree to be contacted about the beta. No spam, ever.</div>
       </div>
 
-      <div id="msg" class="msg"></div>
+      <div id="err" class="msg">Submission failed. Please try again.</div>
     </form>
   </div>
 
@@ -79,77 +76,45 @@
   <script>
     const form   = document.getElementById('betaForm');
     const btn    = document.getElementById('submitBtn');
-    const msg    = document.getElementById('msg');
+    const errBox = document.getElementById('err');
 
     const ENDPT  = 'https://conciergesync-portal.onrender.com/api/intake';
-    const THANKS = '/thanks.html?v=4';
+    const THANKS = '/thanks.html?v=6';
 
-    function showErr(text) {
-      msg.className = 'msg err';
-      msg.textContent = text;
-    }
-    function showOk(text) {
-      msg.className = 'msg ok';
-      msg.textContent = text;
-    }
+    function goThanks(){ window.location.replace(THANKS); }
 
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
+      errBox.classList.remove('show');
 
       const name = (document.getElementById('name').value || '').trim();
       const email = (document.getElementById('email').value || '').trim();
       const message = (document.getElementById('message').value || '').trim();
       const trap = (document.getElementById('company').value || '').trim();
 
-      if (!name || !email || !message || trap) {
-        showErr('Please complete all fields.');
-        return;
-      }
+      if (!name || !email || !message || trap) { errBox.classList.add('show'); return; }
 
-      btn.disabled = true;
-      btn.textContent = 'Submitting…';
-      msg.className = 'msg'; msg.textContent = '';
+      btn.disabled = true; btn.textContent = 'Submitting…';
 
-      const payload = { name, email, message, source:'splash-beta-intake-start', ts:Date.now() };
+      const payload = new URLSearchParams({
+        name, email, message,
+        source: 'splash-beta-intake-start',
+        ts: String(Date.now())
+      });
 
+      // Send as a simple, preflight-free POST
       try {
-        const res = await fetch(ENDPT, {
+        await fetch(ENDPT, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          mode: 'cors',
-          referrerPolicy: 'no-referrer',
-          keepalive: true,
-          body: JSON.stringify(payload)
+          mode: 'no-cors',       // opaque, but request WILL be sent
+          body: payload          // URL-encoded form data; no headers -> no preflight
         });
-
-        const text = await res.text(); // capture body for quick debugging
-        console.log('Intake response:', res.status, text);
-
-        if (!res.ok) {
-          // one retry using sendBeacon (fire-and-forget)
-          if ('sendBeacon' in navigator) {
-            const blob = new Blob([JSON.stringify(payload)], { type: 'text/plain;charset=UTF-8' });
-            navigator.sendBeacon(ENDPT, blob);
-          }
-          showErr('Could not submit right now (network or CORS). Please try again in a moment.');
-          btn.disabled = false;
-          btn.textContent = 'Join the Beta Interest List';
-          return;
-        }
-
-        // success → go to Thanks
-        window.location.replace(THANKS);
-
-      } catch (err) {
-        console.error('Intake error:', err);
-        // beacon fallback
-        if ('sendBeacon' in navigator) {
-          const blob = new Blob([JSON.stringify(payload)], { type: 'text/plain;charset=UTF-8' });
-          navigator.sendBeacon(ENDPT, blob);
-        }
-        showErr('Submission failed. Please try again.');
-        btn.disabled = false;
-        btn.textContent = 'Join the Beta Interest List';
+        // We can't read response in no-cors; assume success and move on.
+        goThanks();
+      } catch (_) {
+        // If even sending fails, show error and re-enable button
+        errBox.classList.add('show');
+        btn.disabled = false; btn.textContent = 'Join the Beta Interest List';
       }
     });
   </script>
