@@ -2,42 +2,81 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <title>ConciergeSync™ — Terms & Privacy Agreement</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ConciergeSync™ — Terms & Privacy Agreement</title>
   <style>
-    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; margin: 0; }
-    .wrap { max-width: 680px; margin: 6rem auto; padding: 0 1.25rem; }
-    h1 { font-size: 1.75rem; margin: 0 0 1rem; }
-    p { line-height: 1.55; margin: 0 0 1rem; }
-    .card { border: 1px solid #ddd; border-radius: 14px; padding: 1.25rem; }
-    .actions { margin-top: 1rem; display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; }
-    button { padding: 0.8rem 1.1rem; border-radius: 12px; border: 1px solid #ccc; cursor: pointer; font-weight: 600; }
-    button[disabled] { opacity: 0.5; cursor: not-allowed; }
-    a { text-decoration: none; }
+    body {
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f6f8fa;
+      color: #222;
+    }
+    .wrap {
+      max-width: 680px;
+      margin: 4rem auto;
+      padding: 0 1.25rem;
+    }
+    h1 {
+      font-size: 1.75rem;
+      margin-bottom: 1rem;
+    }
+    p {
+      line-height: 1.5;
+      margin-bottom: 1rem;
+    }
+    ul {
+      margin: 0 0 1rem;
+      padding-left: 1.25rem;
+    }
+    li {
+      margin-bottom: 0.5rem;
+    }
+    .actions {
+      margin-top: 1.25rem;
+    }
+    label {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 1rem;
+    }
+    button {
+      margin-top: 1rem;
+      padding: 0.8rem 1.25rem;
+      border-radius: 8px;
+      border: none;
+      background-color: #0050b3;
+      color: #fff;
+      font-weight: bold;
+      cursor: pointer;
+      font-size: 1rem;
+    }
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
   </style>
 </head>
 <body>
   <main class="wrap">
-    <h1>Terms &amp; Conditions + Privacy Policy</h1>
-    <div class="card">
-      <p>Please review our documents below before proceeding:</p>
-      <ul>
-        <li><a href="TERMS_URL_HERE" target="_blank" rel="noopener">Terms &amp; Conditions</a></li>
-        <li><a href="PRIVACY_URL_HERE" target="_blank" rel="noopener">Privacy Policy</a></li>
-      </ul>
-      <div class="actions">
-        <label>
-          <input type="checkbox" id="agreeBox" />
-          I agree to the Terms &amp; Conditions and Privacy Policy
-        </label>
-        <button id="continueBtn" disabled>Continue to ConciergeSync™ Onboarding</button>
-      </div>
+    <h1>Before You Begin</h1>
+    <p>Please review our Terms &amp; Conditions and Privacy Policy before proceeding with the ConciergeSync™ Beta Onboarding.</p>
+    <ul>
+      <li><a href="https://conciergesync.ai/terms" target="_blank" rel="noopener">Terms &amp; Conditions</a></li>
+      <li><a href="https://conciergesync.ai/privacy" target="_blank" rel="noopener">Privacy Policy</a></li>
+    </ul>
+    <div class="actions">
+      <label>
+        <input type="checkbox" id="agreeBox" />
+        I agree to the Terms &amp; Conditions and Privacy Policy
+      </label>
+      <button id="continueBtn" disabled>Continue to ConciergeSync™ Onboarding</button>
     </div>
   </main>
 
   <script>
-    // SET THIS to your actual Welcome/Splash URL path:
-    const NEXT_URL = '/welcome'; // e.g. '/welcome' or '/' or '/start'
+    const NEXT_URL = '/beta-intake-start.html';
 
     const agree = document.getElementById('agreeBox');
     const btn = document.getElementById('continueBtn');
@@ -48,11 +87,9 @@
 
     btn.addEventListener('click', () => {
       if (!agree.checked) return;
-      // mark agreement for this session so we can optionally gate the next page
       sessionStorage.setItem('cs_agreed', '1');
       window.location.href = NEXT_URL;
     });
   </script>
 </body>
 </html>
-
