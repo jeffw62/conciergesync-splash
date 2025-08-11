@@ -11,12 +11,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Join the ConciergeSync™ Beta</title>
   <style>
-    :root { --bg:#f6f8fa; --text:#222; --card:#fff; --muted:#777; --brand:#0050b3; --brand-d:#003d8a; }
+    :root { --bg:#f6f8fa; --text:#222; --card:#fff; --muted:#777; --brand:#0050b3; --brand-d:#003d8a; --danger:#b00020; --ok:#155724; --okbg:#d4edda; --errbg:#f8d7da; }
     * { box-sizing: border-box; }
     body { font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
            background: var(--bg); color: var(--text); display:flex; flex-direction:column;
            align-items:center; padding:40px 20px; line-height:1.5; }
-    .container { width:100%; max-width:680px; background:#fff; padding:36px; border-radius:14px; box-shadow:0 0 12px rgba(0,0,0,.06); }
+    .container { width:100%; max-width:680px; background:var(--card); padding:36px;
+                 border-radius:14px; box-shadow:0 0 12px rgba(0,0,0,.06); }
     h1 { font-size:28px; margin:0 0 8px; }
     p.lead { font-size:18px; margin:0 0 18px; }
     .facts { margin:0 0 18px; color:var(--muted); }
@@ -26,14 +27,14 @@
     }
     textarea { resize:vertical; min-height:120px; }
     .row { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
-    .actions { margin-top:20px; }
+    .actions { margin-top:20px; display:flex; gap:12px; align-items:center; flex-wrap:wrap; }
     button[type="submit"] { background:var(--brand); color:#fff; border:0; padding:12px 18px;
       border-radius:10px; font-weight:700; font-size:16px; cursor:pointer; }
     button[type="submit"]:hover { background:var(--brand-d); }
     .small { margin-top:10px; font-size:13px; color:var(--muted); }
+    .msg { margin-top:12px; padding:10px 12px; border-radius:10px; display:none; }
+    .msg.err { background: var(--errbg); color: var(--danger); display:block; }
     footer { margin-top:22px; font-size:14px; color:var(--muted); text-align:center; }
-    .msg { margin-top:12px; font-size:14px; color:#b00020; display:none; }
-    .msg.show { display:block; }
   </style>
 </head>
 <body>
@@ -65,7 +66,7 @@
         <div class="small">By submitting, you agree to be contacted about the beta. No spam, ever.</div>
       </div>
 
-      <div id="err" class="msg">Submission failed. Please try again.</div>
+      <div id="msg" class="msg err">Submission failed. Please try again.</div>
     </form>
   </div>
 
@@ -76,45 +77,48 @@
   <script>
     const form   = document.getElementById('betaForm');
     const btn    = document.getElementById('submitBtn');
-    const errBox = document.getElementById('err');
+    const msg    = document.getElementById('msg');
 
     const ENDPT  = 'https://conciergesync-portal.onrender.com/api/intake';
-    const THANKS = '/thanks.html?v=6';
-
-    function goThanks(){ window.location.replace(THANKS); }
+    const THANKS = '/thanks.html?v=10';
 
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
-      errBox.classList.remove('show');
+      msg.style.display = 'none';
 
       const name = (document.getElementById('name').value || '').trim();
       const email = (document.getElementById('email').value || '').trim();
       const message = (document.getElementById('message').value || '').trim();
       const trap = (document.getElementById('company').value || '').trim();
 
-      if (!name || !email || !message || trap) { errBox.classList.add('show'); return; }
+      if (!name || !email || !message || trap) {
+        msg.style.display = 'block';
+        return;
+      }
 
-      btn.disabled = true; btn.textContent = 'Submitting…';
+      btn.disabled = true;
+      btn.textContent = 'Submitting…';
 
-      const payload = new URLSearchParams({
-        name, email, message,
-        source: 'splash-beta-intake-start',
-        ts: String(Date.now())
-      });
-
-      // Send as a simple, preflight-free POST
       try {
-        await fetch(ENDPT, {
+        const res = await fetch(ENDPT, {
           method: 'POST',
-          mode: 'no-cors',       // opaque, but request WILL be sent
-          body: payload          // URL-encoded form data; no headers -> no preflight
+          headers: { 'Content-Type': 'application/json' },
+          mode: 'cors',
+          body: JSON.stringify({
+            name, email, message,
+            source: 'splash-beta-intake-start',
+            ts: Date.now()
+          })
         });
-        // We can't read response in no-cors; assume success and move on.
-        goThanks();
-      } catch (_) {
-        // If even sending fails, show error and re-enable button
-        errBox.classList.add('show');
-        btn.disabled = false; btn.textContent = 'Join the Beta Interest List';
+
+        if (!res.ok) throw new Error('Bad status ' + res.status);
+        // Success → Thanks
+        window.location.replace(THANKS);
+      } catch (err) {
+        console.error('Submit error:', err);
+        msg.style.display = 'block';
+        btn.disabled = false;
+        btn.textContent = 'Join the Beta Interest List';
       }
     });
   </script>
