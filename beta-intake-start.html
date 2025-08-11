@@ -73,9 +73,28 @@
   <script>
     const form   = document.getElementById('betaForm');
     const btn    = document.getElementById('submitBtn');
-    const THANKS = '/thanks.html?v=2';   // <-- redirect here after submit
+    const THANKS = '/thanks.html?v=3';
+    const ENDPT  = 'https://conciergesync-portal.onrender.com/api/intake';
 
     function goThanks(){ window.location.replace(THANKS); }
+
+    async function postWithFetch(payload) {
+      // keepalive allows the request to finish even if we navigate
+      return fetch(ENDPT, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        mode: 'cors',
+        keepalive: true,
+        body: JSON.stringify(payload)
+      });
+    }
+
+    function postWithBeacon(payload) {
+      try {
+        const blob = new Blob([JSON.stringify(payload)], { type: 'text/plain;charset=UTF-8' });
+        return navigator.sendBeacon(ENDPT, blob);
+      } catch { return false; }
+    }
 
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -84,25 +103,33 @@
       const email = (document.getElementById('email').value || '').trim();
       const message = (document.getElementById('message').value || '').trim();
       const trap = (document.getElementById('company').value || '').trim();
-
       if (!name || !email || !message || trap) return;
 
       btn.disabled = true; btn.textContent = 'Submitting…';
 
-      // Fail-safe: go to Thank You even if network stalls
-      const timer = setTimeout(goThanks, 1500);
+      const payload = { name, email, message, source: 'splash-beta-intake-start', ts: Date.now() };
+
+      // hard 3s safety so users never hang
+      const safety = setTimeout(goThanks, 3000);
 
       try {
-        await fetch('https://conciergesync-portal.onrender.com/api/intake', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          mode: 'cors',
-          body: JSON.stringify({ name, email, message, source:'splash-beta-intake-start', ts:Date.now() })
-        });
-        clearTimeout(timer);
+        let ok = false;
+
+        // 1) try fetch+keepalive
+        try {
+          const r = await postWithFetch(payload);
+          ok = r && r.ok;
+        } catch {}
+
+        // 2) if fetch failed, try beacon (fire-and-forget)
+        if (!ok && 'sendBeacon' in navigator) {
+          ok = postWithBeacon(payload);
+        }
+
+        clearTimeout(safety);
         goThanks();
-      } catch (e2) {
-        clearTimeout(timer);
+      } catch {
+        clearTimeout(safety);
         goThanks();
       }
     });
