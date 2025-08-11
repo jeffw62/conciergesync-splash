@@ -13,21 +13,23 @@
   <style>
     :root { --bg:#f6f8fa; --text:#222; --card:#fff; --muted:#777; --brand:#0050b3; --brand-d:#003d8a; }
     * { box-sizing: border-box; }
-    body {
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji";
-      background-color: var(--bg); color: var(--text);
-      display:flex; flex-direction:column; align-items:center; padding:40px 20px; line-height:1.5;
-    }
-    .container { width:100%; max-width:680px; background:var(--card); padding:36px; border-radius:14px; box-shadow:0 0 12px rgba(0,0,0,.06); }
+    body { font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+           background: var(--bg); color: var(--text); display:flex; flex-direction:column;
+           align-items:center; padding:40px 20px; line-height:1.5; }
+    .container { width:100%; max-width:680px; background:var(--card); padding:36px;
+                 border-radius:14px; box-shadow:0 0 12px rgba(0,0,0,.06); }
     h1 { font-size:28px; margin:0 0 8px; }
     p.lead { font-size:18px; margin:0 0 18px; }
     .facts { margin:0 0 18px; color:var(--muted); }
     label { display:block; font-weight:600; margin:14px 0 6px; }
-    input[type="text"], input[type="email"], textarea { width:100%; padding:12px 14px; border:1px solid #d8dee4; border-radius:10px; font-size:16px; background:#fff; }
+    input[type="text"], input[type="email"], textarea {
+      width:100%; padding:12px 14px; border:1px solid #d8dee4; border-radius:10px; font-size:16px; background:#fff;
+    }
     textarea { resize:vertical; min-height:120px; }
     .row { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
     .actions { margin-top:20px; }
-    button[type="submit"] { background:var(--brand); color:#fff; border:0; padding:12px 18px; border-radius:10px; font-weight:700; font-size:16px; cursor:pointer; }
+    button[type="submit"] { background:var(--brand); color:#fff; border:0; padding:12px 18px;
+      border-radius:10px; font-weight:700; font-size:16px; cursor:pointer; }
     button[type="submit"]:hover { background:var(--brand-d); }
     .small { margin-top:10px; font-size:13px; color:var(--muted); }
     footer { margin-top:22px; font-size:14px; color:var(--muted); text-align:center; }
@@ -69,12 +71,11 @@
   </footer>
 
   <script>
-    // Submit to Portal, then move to Section 1 regardless
-    const form = document.getElementById('betaForm');
-    const btn  = document.getElementById('submitBtn');
-    const NEXT = '/beta/section-1.html';
+    const form   = document.getElementById('betaForm');
+    const btn    = document.getElementById('submitBtn');
+    const THANKS = '/thanks.html?v=2';   // <-- redirect here after submit
 
-    function goNext(){ window.location.href = NEXT; }
+    function goThanks(){ window.location.replace(THANKS); }
 
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -84,12 +85,12 @@
       const message = (document.getElementById('message').value || '').trim();
       const trap = (document.getElementById('company').value || '').trim();
 
-      if (!name || !email || !message || trap) return; // simple front-end validation
+      if (!name || !email || !message || trap) return;
 
       btn.disabled = true; btn.textContent = 'Submitting…';
 
-      // Fail-safe: advance even if network is slow (1.5s)
-      const timer = setTimeout(goNext, 1500);
+      // Fail-safe: go to Thank You even if network stalls
+      const timer = setTimeout(goThanks, 1500);
 
       try {
         await fetch('https://conciergesync-portal.onrender.com/api/intake', {
@@ -99,10 +100,10 @@
           body: JSON.stringify({ name, email, message, source:'splash-beta-intake-start', ts:Date.now() })
         });
         clearTimeout(timer);
-        goNext();
-      } catch(e) {
+        goThanks();
+      } catch (e2) {
         clearTimeout(timer);
-        goNext();
+        goThanks();
       }
     });
   </script>
