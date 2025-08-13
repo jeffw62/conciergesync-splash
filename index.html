@@ -15,13 +15,17 @@
       --accent: #111;
     }
 
-    * { box-sizing: border-box }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
     body {
-      margin: 0;
       font-family: system-ui, -apple-system, Segoe UI, Roboto, Inter, Arial, sans-serif;
       background: var(--bg);
       color: var(--ink);
+      line-height: 1.6;
     }
 
     .container {
@@ -36,13 +40,14 @@
       border-radius: 16px;
       box-shadow: 0 6px 24px rgba(15, 23, 42, 0.06);
       padding: 28px;
+      margin-bottom: 24px;
     }
 
     h1 {
       font-size: 34px;
       line-height: 1.2;
-      margin: 0 0 8px;
       text-align: center;
+      margin-bottom: 8px;
     }
 
     h2 {
@@ -58,21 +63,16 @@
 
     p, li {
       color: var(--muted);
-      line-height: 1.6;
     }
 
     ul {
-      margin: 8px 0 0 22px;
-    }
-
-    .section {
-      margin: 22px 0;
+      margin: 8px 0 0 24px;
     }
 
     .cta-button {
       display: inline-block;
-      padding: 12px 20px;
-      border-radius: 10px;
+      padding: 14px 24px;
+      border-radius: 12px;
       background: var(--accent);
       color: #fff;
       font-weight: 600;
@@ -85,63 +85,62 @@
       transform: translateY(-1px);
       box-shadow: 0 10px 22px rgba(0, 0, 0, 0.18);
     }
+
+    .centered {
+      text-align: center;
+    }
   </style>
 </head>
 
 <body>
   <div class="container">
 
-    <!-- Hero -->
+    <!-- Hero Card -->
     <div class="card">
       <h1>Welcome to ConciergeSync™</h1>
-      <p style="text-align:center;margin:6px 0 0">
-        Your personal travel rewards strategist — earn, manage, and redeem points with clarity.
+      <p class="centered">Your personal travel rewards strategist — earn, manage, and redeem points with clarity.</p>
+    </div>
+
+    <!-- Beta User Details -->
+    <div class="card">
+      <h2>Why we’re inviting beta users</h2>
+      <p>
+        ConciergeSync™ turns confusing points & miles rules into clear, dollar-value decisions.
+        To make it rock-solid, we need real travelers and real itineraries — not lab data.
+      </p>
+
+      <h3>Your role as a Beta User Client (BUC)</h3>
+      <ul>
+        <li><strong>Onboard (5–7 min):</strong> share your travel goals and programs.</li>
+        <li><strong>Use ConciergeSync on 1–2 upcoming trips (next 30 days):</strong> run searches, compare cash vs miles, sanity-check picks.</li>
+        <li><strong>Give quick feedback:</strong> if something’s confusing or off, reply to our 2–3 min prompts (we’ll ping you).</li>
+      </ul>
+
+      <h3>How this helps ConciergeSync</h3>
+      <ul>
+        <li>Validate our true-cost math (fees, surcharges, effective miles burned).</li>
+        <li>Surface airline/partner quirks (phantom space, mixed cabins, transfer timing).</li>
+        <li>Prioritize the roadmap around what actually saves you time or money.</li>
+        <li>Harden reliability across devices, emails, and real booking flows.</li>
+      </ul>
+
+      <h3>What you get for helping us build ConciergeSync™</h3>
+      <ul>
+        <li><strong>Lifetime access</strong> — all premium upgrades included.*</li>
+        <li>Early access to new features & partner integrations.</li>
+        <li>Priority support and a direct line to the team.</li>
+      </ul>
+
+      <p style="font-size: 0.9rem; color: #666; margin-top: 10px;">
+        *Lifetime access limited to one account per user. No bank logins required; you can opt out anytime.
       </p>
     </div>
 
-    <!-- Why / Role / Value -->
-    <div class="section">
-      <div class="card">
-        <h2>Why we’re inviting beta users</h2>
-        <p style="margin:0 0 12px;color:#444;">
-          ConciergeSync™ turns confusing points & miles rules into clear, dollar-value decisions.
-          To make it rock-solid, we need real travelers and real itineraries—not lab data.
-        </p>
-
-        <h3>Your role as a Beta User Client (BUC)</h3>
-        <ul>
-          <li><strong>Onboard (5–7 min):</strong> share your travel goals and programs.</li>
-          <li><strong>Use ConciergeSync on 1–2 upcoming trips (next 30 days):</strong> run searches, compare cash vs miles, sanity-check picks.</li>
-          <li><strong>Give quick feedback:</strong> if something’s confusing or off, reply to our 2–3 min prompts (we’ll ping you).</li>
-        </ul>
-
-        <h3>How this helps ConciergeSync</h3>
-        <ul>
-          <li>Validate our true-cost math (fees, surcharges, effective miles burned).</li>
-          <li>Surface airline/partner quirks (phantom space, mixed cabins, transfer timing).</li>
-          <li>Prioritize the roadmap around what actually saves you time or money.</li>
-          <li>Harden reliability across devices, emails, and real booking flows.</li>
-        </ul>
-
-        <h3>What you get for helping us build ConciergeSync™</h3>
-        <ul>
-          <li><strong>Lifetime access</strong> — all premium upgrades included.*</li>
-          <li>Early access to new features & partner integrations.</li>
-          <li>Priority support and a direct line to the team.</li>
-        </ul>
-
-        <p style="margin:10px 0 0;color:#777;font-size:.9rem;">
-          *Lifetime access limited to one account per user. No bank logins required; you can opt out anytime.
-        </p>
-      </div>
-    </div>
-
-    <!-- CTA -->
-    <section class="section" style="text-align:center;">
-      <h2 style="margin:0 0 10px;">Ready to join the beta?</h2>
+    <!-- CTA Button -->
+    <div class="centered">
+      <h2>Ready to join the beta?</h2>
       <a href="/agree.html" class="cta-button">Begin Your ConciergeSync™ Journey</a>
-    </section>
-
+    </div>
   </div>
 
   <!-- Pre-warm the portal to avoid cold starts -->
