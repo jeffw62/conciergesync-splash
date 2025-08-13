@@ -1,52 +1,78 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>ConciergeSync™ — Terms & Privacy Agreement</title>
+  <meta charset="UTF-8">
+  <title>Before We Begin – ConciergeSync™ Beta Agreement</title>
   <style>
-    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; margin: 0; background: #f6f8fa; color: #222; }
-    .wrap { max-width: 680px; margin: 4rem auto; padding: 0 1.25rem; }
-    h1 { font-size: 1.75rem; margin-bottom: 1rem; }
-    p { line-height: 1.5; margin-bottom: 1rem; }
-    ul { margin: 0 0 1rem; padding-left: 1.25rem; }
-    li { margin-bottom: 0.5rem; }
-    .actions { margin-top: 1.25rem; }
-    label { display: flex; align-items: center; gap: 0.5rem; font-size: 1rem; }
-    button { margin-top: 1rem; padding: 0.8rem 1.25rem; border-radius: 8px; border: none; background: #0050b3; color: #fff; font-weight: 700; cursor: pointer; font-size: 1rem; }
-    button:disabled { opacity:.5; cursor:not-allowed; }
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 700px;
+      margin: 40px auto;
+      padding: 20px;
+      line-height: 1.6;
+    }
+
+    h1 {
+      font-size: 24px;
+    }
+
+    .scroll-box {
+      border: 1px solid #ccc;
+      padding: 15px;
+      height: 300px;
+      overflow-y: scroll;
+      margin-bottom: 20px;
+      background: #f9f9f9;
+    }
+
+    .checkbox-wrapper {
+      margin-bottom: 20px;
+    }
+
+    button {
+      padding: 12px 24px;
+      font-size: 16px;
+      background-color: #0052cc;
+      color: white;
+      border: none;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+
+    button:disabled {
+      background-color: #ccc;
+      cursor: not-allowed;
+    }
   </style>
 </head>
 <body>
-  <main class="wrap">
-    <h1>Before You Begin</h1>
-    <p>Please review our Terms &amp; Conditions and Privacy Policy before proceeding with the ConciergeSync™ Beta Onboarding.</p>
-    <ul>
-      <li><a href="/terms.html" target="_blank" rel="noopener">Terms &amp; Conditions</a></li>
-      <li><a href="/privacy.html" target="_blank" rel="noopener">Privacy Policy</a></li>
-    </ul>
-    <div class="actions">
-      <label>
-        <input type="checkbox" id="agreeBox" />
-        I agree to the Terms &amp; Conditions and Privacy Policy
-      </label>
-      <button id="continueBtn" disabled>Continue</button>
-    </div>
-  </main>
+
+  <h1>Before We Begin...</h1>
+
+  <div class="scroll-box">
+    <!-- Load Terms and Privacy via iframe -->
+    <iframe src="terms.html" width="100%" height="400" style="border:none;"></iframe>
+    <hr />
+    <iframe src="privacy.html" width="100%" height="400" style="border:none;"></iframe>
+  </div>
+
+  <div class="checkbox-wrapper">
+    <label>
+      <input type="checkbox" id="agreeCheckbox">
+      I have read and agree to the <strong>Terms & Conditions</strong> and <strong>Privacy Policy</strong>.
+    </label>
+  </div>
+
+  <button id="continueBtn" disabled onclick="window.location.href='03-intake-start.html'">Continue</button>
 
   <script>
-    // Send to capture page
-    const NEXT_URL = '/beta-intake-start.html';
+    const checkbox = document.getElementById('agreeCheckbox');
+    const button = document.getElementById('continueBtn');
 
-    const agree = document.getElementById('agreeBox');
-    const btn = document.getElementById('continueBtn');
-
-    agree.addEventListener('change', () => { btn.disabled = !agree.checked; });
-    btn.addEventListener('click', () => {
-      if (!agree.checked) return;
-      localStorage.setItem('cs_agreed', '1');   // persist across tabs
-      window.location.href = NEXT_URL;
+    checkbox.addEventListener('change', () => {
+      button.disabled = !checkbox.checked;
     });
   </script>
+
 </body>
 </html>
