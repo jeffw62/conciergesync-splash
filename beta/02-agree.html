@@ -5,38 +5,60 @@
   <title>Before We Begin – ConciergeSync™ Beta Agreement</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f7f7f7;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .container {
+      background: white;
       max-width: 700px;
-      margin: 40px auto;
-      padding: 20px;
-      line-height: 1.6;
+      margin-top: 60px;
+      padding: 40px;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+      border-radius: 14px;
+      width: 90%;
+    }
+
+    .logo {
+      display: block;
+      margin: 0 auto 20px;
+      max-width: 180px;
     }
 
     h1 {
-      font-size: 24px;
+      font-size: 26px;
+      margin-bottom: 25px;
+      text-align: center;
     }
 
     .scroll-box {
-      border: 1px solid #ccc;
-      padding: 15px;
-      height: 300px;
+      border: 1px solid #ddd;
+      height: 360px;
       overflow-y: scroll;
-      margin-bottom: 20px;
-      background: #f9f9f9;
+      padding: 20px;
+      margin-bottom: 30px;
+      background: #fefefe;
+      border-radius: 8px;
     }
 
-    .checkbox-wrapper {
-      margin-bottom: 20px;
+    .button-wrapper {
+      text-align: center;
     }
 
     button {
-      padding: 12px 24px;
-      font-size: 16px;
-      background-color: #0052cc;
+      background-color: #10172A;
       color: white;
+      padding: 14px 28px;
+      font-size: 16px;
       border: none;
+      border-radius: 8px;
       cursor: pointer;
-      border-radius: 5px;
+      transition: background-color 0.2s ease-in-out;
     }
 
     button:disabled {
@@ -47,30 +69,32 @@
 </head>
 <body>
 
-  <h1>Before We Begin...</h1>
+  <div class="container">
+    <img src="concierge_logo.png" alt="ConciergeSync Logo" class="logo">
 
-  <div class="scroll-box">
-    <!-- Load Terms and Privacy via iframe -->
-    <iframe src="terms.html" width="100%" height="400" style="border:none;"></iframe>
-    <hr />
-    <iframe src="privacy.html" width="100%" height="400" style="border:none;"></iframe>
+    <h1>Before We Begin...</h1>
+
+    <div class="scroll-box" id="termsBox">
+      <!-- Inline load full terms and policy content -->
+      <iframe src="terms.html" width="100%" height="800" style="border:none;"></iframe>
+      <hr />
+      <iframe src="privacy.html" width="100%" height="800" style="border:none;"></iframe>
+    </div>
+
+    <div class="button-wrapper">
+      <button id="agreeBtn" disabled onclick="window.location.href='03-intake-start.html'">
+        I Agree
+      </button>
+    </div>
   </div>
-
-  <div class="checkbox-wrapper">
-    <label>
-      <input type="checkbox" id="agreeCheckbox">
-      I have read and agree to the <strong>Terms & Conditions</strong> and <strong>Privacy Policy</strong>.
-    </label>
-  </div>
-
-  <button id="continueBtn" disabled onclick="window.location.href='03-intake-start.html'">Continue</button>
 
   <script>
-    const checkbox = document.getElementById('agreeCheckbox');
-    const button = document.getElementById('continueBtn');
+    const scrollBox = document.getElementById('termsBox');
+    const agreeBtn = document.getElementById('agreeBtn');
 
-    checkbox.addEventListener('change', () => {
-      button.disabled = !checkbox.checked;
+    scrollBox.addEventListener('scroll', () => {
+      const atBottom = scrollBox.scrollTop + scrollBox.clientHeight >= scrollBox.scrollHeight;
+      agreeBtn.disabled = !atBottom;
     });
   </script>
 
