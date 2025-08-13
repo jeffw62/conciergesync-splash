@@ -70,38 +70,45 @@
 <body>
 
   <div class="container">
-    <img src="concierge_logo.png" alt="ConciergeSync Logo" class="logo">
+  <!-- Logo REMOVED for now -->
 
-    <h1>Before We Begin...</h1>
+  <h1>Before We Begin...</h1>
 
-    <div class="scroll-box" id="termsBox">
-      <!-- Inline include (copy/paste full merged terms + privacy) -->
-      <!-- REPLACE BELOW with merged HTML from terms-and-privacy.html -->
-      <h2>Terms & Conditions — ConciergeSync™</h2>
-      <p><em>Last updated: 8/13/2025</em></p>
-      <p>[ Terms content... ]</p>
-      <hr />
-      <h2>Privacy Policy — ConciergeSync™</h2>
-      <p><em>Last updated: 8/13/2025</em></p>
-      <p>[ Privacy content... ]</p>
-    </div>
+  <p style="text-align:center; font-size: 16px; margin-bottom: 25px; color: #333;">
+    Please review the Terms & Conditions and Privacy Policy below. <br />
+    You must scroll to the bottom to unlock the <strong>"I Agree"</strong> button and continue.
+  </p>
 
-    <div class="button-wrapper">
-      <button id="agreeBtn" disabled onclick="window.location.href='03-intake-start.html'">
-        I Agree
-      </button>
-    </div>
+  <div class="scroll-box" id="termsBox">
+    <!-- 🧠 DROP FULL CONTENT HERE (merged terms + privacy) -->
+    <h2>Terms & Conditions — ConciergeSync™</h2>
+    <p><em>Last updated: 8/13/2025</em></p>
+    <p>[ Insert Terms content here... ]</p>
+
+    <hr />
+
+    <h2>Privacy Policy — ConciergeSync™</h2>
+    <p><em>Last updated: 8/13/2025</em></p>
+    <p>[ Insert Privacy content here... ]</p>
   </div>
 
-  <script>
-    const scrollBox = document.getElementById('termsBox');
-    const agreeBtn = document.getElementById('agreeBtn');
+  <div class="button-wrapper">
+    <button id="agreeBtn" disabled onclick="window.location.href='03-intake-start.html'">
+      I Agree
+    </button>
+  </div>
+</div>
 
-    scrollBox.addEventListener('scroll', () => {
-      const atBottom = scrollBox.scrollTop + scrollBox.clientHeight >= scrollBox.scrollHeight;
-      agreeBtn.disabled = !atBottom;
-    });
-  </script>
+<script>
+  const scrollBox = document.getElementById('termsBox');
+  const agreeBtn = document.getElementById('agreeBtn');
+
+  scrollBox.addEventListener('scroll', () => {
+    const atBottom = scrollBox.scrollTop + scrollBox.clientHeight >= scrollBox.scrollHeight;
+    agreeBtn.disabled = !atBottom;
+  });
+</script>
+
 
 </body>
 </html>
