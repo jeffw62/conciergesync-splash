@@ -1,124 +1,177 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <!-- Gate: must have agreed -->
-  <script>
-    if (!localStorage.getItem('cs_agreed')) {
-      window.location.href = '/agree.html';
-    }
-  </script>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Join the ConciergeSync™ Beta</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <style>
-    :root { --bg:#f6f8fa; --text:#222; --card:#fff; --muted:#777; --brand:#0050b3; --brand-d:#003d8a; --danger:#b00020; --ok:#155724; --okbg:#d4edda; --errbg:#f8d7da; }
-    * { box-sizing: border-box; }
-    body { font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
-           background: var(--bg); color: var(--text); display:flex; flex-direction:column;
-           align-items:center; padding:40px 20px; line-height:1.5; }
-    .container { width:100%; max-width:680px; background:var(--card); padding:36px;
-                 border-radius:14px; box-shadow:0 0 12px rgba(0,0,0,.06); }
-    h1 { font-size:28px; margin:0 0 8px; }
-    p.lead { font-size:18px; margin:0 0 18px; }
-    .facts { margin:0 0 18px; color:var(--muted); }
-    label { display:block; font-weight:600; margin:14px 0 6px; }
-    input[type="text"], input[type="email"], textarea {
-      width:100%; padding:12px 14px; border:1px solid #d8dee4; border-radius:10px; font-size:16px; background:#fff;
+    :root{
+      --card-bg:#ffffff;
+      --bg:#f7f7f7;
+      --text:#0f172a;
+      --muted:#64748b;
+      --primary:#0b3b9e; /* deep blue */
+      --primary-dk:#0a2f7c;
+      --success:#16a34a;
+      --warning:#ca8a04;
+      --danger:#dc2626;
+      --border:#e5e7eb;
+      --radius:16px;
+      --shadow:0 10px 30px rgba(2,6,23,.08);
     }
-    textarea { resize:vertical; min-height:120px; }
-    .row { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
-    .actions { margin-top:20px; display:flex; gap:12px; align-items:center; flex-wrap:wrap; }
-    button[type="submit"] { background:var(--brand); color:#fff; border:0; padding:12px 18px;
-      border-radius:10px; font-weight:700; font-size:16px; cursor:pointer; }
-    button[type="submit"]:hover { background:var(--brand-d); }
-    .small { margin-top:10px; font-size:13px; color:var(--muted); }
-    .msg { margin-top:12px; padding:10px 12px; border-radius:10px; display:none; }
-    .msg.err { background: var(--errbg); color: var(--danger); display:block; }
-    footer { margin-top:22px; font-size:14px; color:var(--muted); text-align:center; }
+    *{box-sizing:border-box}
+    body{
+      margin:0; background:var(--bg); color:var(--text);
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Inter, "Helvetica Neue",
+                   Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+    }
+    .wrap{
+      max-width:760px; margin:40px auto; padding:0 16px;
+    }
+    .card{
+      background:var(--card-bg); border-radius:var(--radius); box-shadow:var(--shadow);
+      padding:28px 28px 24px;
+    }
+    h1{
+      font-size:32px; margin:4px 0 8px; text-align:left;
+    }
+    .sub{
+      color:var(--muted); margin:0 0 18px; font-size:18px;
+    }
+    .badges{ display:flex; gap:12px; align-items:center; margin:4px 0 24px; flex-wrap:wrap;}
+    .badge{ font-size:14px; padding:6px 10px; border-radius:999px; background:#eef2ff; border:1px solid #e2e8f0; display:flex; align-items:center; gap:6px;}
+    form{ display:grid; gap:16px; }
+    label{ font-weight:600; }
+    input, textarea{
+      width:100%; border:1px solid var(--border); border-radius:10px; padding:12px 14px; font-size:16px;
+      background:#fff; outline:none;
+    }
+    textarea{ min-height:140px; resize:vertical; }
+    input:focus, textarea:focus{ border-color:#cbd5e1; box-shadow:0 0 0 3px rgba(59,130,246,.15);}
+    .row{ display:grid; grid-template-columns:1fr 1fr; gap:16px;}
+    @media (max-width:640px){ .row{ grid-template-columns:1fr; } }
+
+    .hint{ font-size:13px; color:var(--muted); margin-top:2px;}
+    .actions{ margin-top:6px; display:flex; flex-direction:column; gap:10px; }
+    .btn{
+      border:none; border-radius:10px; padding:14px 18px; font-size:16px; font-weight:600;
+      background:var(--primary); color:#fff; cursor:pointer;
+    }
+    .btn:hover{ background:var(--primary-dk); }
+    .btn:disabled{ opacity:.6; cursor:not-allowed; }
+    .fine{ font-size:12px; color:var(--muted); }
+
+    .alert{
+      margin-top:8px; padding:12px 14px; border-radius:10px; background:#fee2e2; color:var(--danger);
+      border:1px solid #fecaca; display:none;
+    }
+    .alert.show{ display:block; }
+
+    .footer{
+      text-align:center; color:var(--muted); font-size:14px; margin-top:16px;
+    }
+    .footer a{ color:var(--primary); text-decoration:none; }
+    .footer a:hover{ text-decoration:underline; }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>🎉 Join the ConciergeSync™ Beta</h1>
-    <p class="lead">Answer three quick questions to get on the Beta Interest List.</p>
-    <p class="facts">✅ Takes under 2 minutes &nbsp;&nbsp; 🔐 Your info stays private &nbsp;&nbsp; 💎 Beta gets lifetime access</p>
+  <div class="wrap">
+    <div class="card">
+      <h1>Join the ConciergeSync™ Beta</h1>
+      <p class="sub">Answer three quick questions to get on the Beta Interest List.</p>
 
-    <form id="betaForm" novalidate>
-      <div class="row">
-        <div>
-          <label for="name">First / Last Name</label>
-          <input type="text" id="name" name="name" required />
-        </div>
-        <div>
-          <label for="email">Email</label>
-          <input type="email" id="email" name="email" required />
-        </div>
+      <div class="badges">
+        <span class="badge">✅ Takes under 2 minutes</span>
+        <span class="badge">🔒 Your info stays private</span>
+        <span class="badge">💎 Beta gets lifetime access</span>
       </div>
 
-      <label for="message">What frustrates you about travel right now, and what would you want ConciergeSync™ to do for you?</label>
-      <textarea id="message" name="message" required></textarea>
+      <form id="betaForm" novalidate>
+        <div class="row">
+          <div>
+            <label for="name">First / Last Name</label>
+            <input id="name" name="name" type="text" autocomplete="name" required />
+          </div>
+          <div>
+            <label for="email">Email</label>
+            <input id="email" name="email" type="email" autocomplete="email" required />
+          </div>
+        </div>
 
-      <!-- Honeypot (leave empty) -->
-      <input type="text" name="company" id="company" style="display:none" tabindex="-1" autocomplete="off" />
+        <div>
+          <label for="message">What frustrates you about travel right now, and what would you want ConciergeSync™ to do for you?</label>
+          <textarea id="message" name="message" required></textarea>
+          <div class="hint">Required. A sentence or two is great.</div>
+        </div>
 
-      <div class="actions">
-        <button type="submit" id="submitBtn">Join the Beta Interest List</button>
-        <div class="small">By submitting, you agree to be contacted about the beta. No spam, ever.</div>
-      </div>
+        <div class="actions">
+          <button class="btn" id="submitBtn" type="submit">Join the Beta Interest List</button>
+          <div class="fine">By submitting, you agree to be contacted about the beta. No spam, ever.</div>
+          <div id="errorBar" class="alert">Submission failed. Please try again.</div>
+        </div>
+      </form>
+    </div>
 
-      <div id="msg" class="msg err">Submission failed. Please try again.</div>
-    </form>
+    <div class="footer">
+      Questions? Email <a href="mailto:hello@conciergesync.ai">hello@conciergesync.ai</a>
+    </div>
   </div>
 
-  <footer>
-    Questions? Email <a href="mailto:hello@conciergesync.ai">hello@conciergesync.ai</a>
-  </footer>
-
   <script>
-    const form   = document.getElementById('betaForm');
-    const btn    = document.getElementById('submitBtn');
-    const msg    = document.getElementById('msg');
+    // === Configure this ===
+    const ENDPOINT_URL = "/api/beta-interest"; // <- your Render/Next/FastAPI route or Formspree endpoint
+    const REDIRECT_SUCCESS = "04-intake-thank-you.html";
+    const REDIRECT_IF_POST_FAILS = false; // set to true temporarily for demos
 
-    const ENDPT  = 'https://conciergesync-portal.onrender.com/api/intake';
-    const THANKS = '/thanks.html?v=10';
+    const form = document.getElementById("betaForm");
+    const btn  = document.getElementById("submitBtn");
+    const err  = document.getElementById("errorBar");
 
-    form.addEventListener('submit', async (e) => {
+    function validEmail(v){
+      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+    }
+
+    form.addEventListener("submit", async (e) => {
       e.preventDefault();
-      msg.style.display = 'none';
+      err.classList.remove("show");
 
-      const name = (document.getElementById('name').value || '').trim();
-      const email = (document.getElementById('email').value || '').trim();
-      const message = (document.getElementById('message').value || '').trim();
-      const trap = (document.getElementById('company').value || '').trim();
+      const name = (document.getElementById("name").value || "").trim();
+      const email = (document.getElementById("email").value || "").trim();
+      const message = (document.getElementById("message").value || "").trim();
 
-      if (!name || !email || !message || trap) {
-        msg.style.display = 'block';
+      // Client-side validation (Q3 required)
+      if(!name || !email || !message || !validEmail(email)){
+        err.textContent = "Please complete all fields with a valid email.";
+        err.classList.add("show");
         return;
       }
 
       btn.disabled = true;
-      btn.textContent = 'Submitting…';
+      btn.textContent = "Submitting…";
 
-      try {
-        const res = await fetch(ENDPT, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          mode: 'cors',
-          body: JSON.stringify({
-            name, email, message,
-            source: 'splash-beta-intake-start',
-            ts: Date.now()
-          })
+      try{
+        const payload = { name, email, message, source: "beta-landing" };
+
+        const resp = await fetch(ENDPOINT_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
         });
 
-        if (!res.ok) throw new Error('Bad status ' + res.status);
-        // Success → Thanks
-        window.location.replace(THANKS);
-      } catch (err) {
-        console.error('Submit error:', err);
-        msg.style.display = 'block';
+        if(resp.ok){
+          window.location.href = REDIRECT_SUCCESS;
+          return;
+        }
+        throw new Error("Non-200 status");
+      }catch(_){
+        if(REDIRECT_IF_POST_FAILS){
+          window.location.href = REDIRECT_SUCCESS;
+          return;
+        }
+        err.textContent = "Submission failed. Please try again.";
+        err.classList.add("show");
         btn.disabled = false;
-        btn.textContent = 'Join the Beta Interest List';
+        btn.textContent = "Join the Beta Interest List";
       }
     });
   </script>
