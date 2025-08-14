@@ -25,9 +25,10 @@
       <p class="sub">Complete the form below. When you submit, you’ll be taken to Section 2 automatically.</p>
 
       <!-- Embed Section 1 -->
-      <iframe
-        <iframe id="nf1" class="embed" title="ConciergeSync – Section 1"
-  src="https://noteforms.com/forms/https://noteforms.com/forms/beta-user-tracker-conciergesync-b4yxaf"></iframe>
+      <!-- Embed Section 1 -->
+<iframe id="nf1" class="embed" title="ConciergeSync – Section 1"
+  src="https://noteforms.com/forms/beta-user-tracker-conciergesync-b4yxaf"
+  style="width:100%; height:1200px; border:0;"></iframe>
 
 <script>
 (function () {
@@ -38,7 +39,7 @@
     if (typeof data === "string") { try { data = JSON.parse(data); } catch(_) {} }
     if (typeof data === "string") return data.toLowerCase().includes("form-success");
     var ev = (data && (data.event||data.type||data.status)||"").toLowerCase();
-    return ["form-success","nf_submit_success","success","submitted"].some(k => ev.includes(k));
+    return ["form-success","nf_submit_success","success","submitted"].some(function(k){ return ev.includes(k); });
   }
 
   window.addEventListener("message", function(e){
@@ -47,6 +48,7 @@
   });
 })();
 </script>
+
 
       </iframe>
 
