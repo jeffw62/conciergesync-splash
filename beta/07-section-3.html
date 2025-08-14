@@ -27,14 +27,30 @@
 
       <div class="banner">✅ Section 2 completed — continue with Section 3 below.</div>
 
-      <iframe class="embed" title="ConciergeSync — Section 3" 
-        src="https://noteforms.com/forms/section-3-loyalty-program-overview-40ya0y"></iframe>
-      <script>
-window.addEventListener("message", function(event) {
-    if (event.data === "formSubmitted") {
-        window.location.href = "08-section-4.html";
-    }
-});
+      <iframe id="nf3" class="embed"
+        title="ConciergeSync – Section 3"
+        src="https://noteforms.com/forms/section-3-loyalty-program-overview-40ya0y">
+</iframe>
+
+<script>
+(function () {
+  var NEXT = "/beta/08-section-4.html";
+  var iframe = document.getElementById("nf3");
+
+  function isSuccessPayload(data) {
+    if (typeof data === "string") { try { data = JSON.parse(data); } catch(_) {} }
+    if (typeof data === "string") return data.toLowerCase().includes("form-success");
+    var ev = (data && (data.event || data.type || data.status) || "").toLowerCase();
+    return ["form-success","nf_submit_success","success","submitted"].some(function(k){ return ev.includes(k); });
+  }
+
+  window.addEventListener("message", function(e){
+    if (e.source !== (iframe && iframe.contentWindow)) return; // only this iframe
+    if (isSuccessPayload(e.data)) window.location.replace(NEXT);
+  });
+})();
+</script>
+
 </script>
 
 
