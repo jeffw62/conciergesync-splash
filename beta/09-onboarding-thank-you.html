@@ -191,48 +191,39 @@
       <div class="section">
   <h3>Sneak peek: your upcoming dashboard</h3>
   <div class="teaser">
-  <iframe id="dashboardFrame" src="" width="100%" height="600px" style="border: none;"></iframe>
-</div>
-<p class="muted">This is your personalized ConciergeSync™ dashboard preview. Live version coming soon.</p>
+  <iframe
+  id="buc-dashboard"
+  src=""
+  width="100%"
+  height="600px"
+  style="border: none;"
+  allowfullscreen
+></iframe>
 
-</div>
-
-      <div class="section">
-        <h3>Explore while you wait</h3>
-        <div class="grid">
-          <a class="cta" href="/beta/examples.html">See real redemption examples →</a>
-          <a class="cta" href="/beta/how-it-works.html">Learn how ConciergeSync™ works →</a>
-        </div>
-      </div>
-
-      <p class="footer">Need help? <a href="mailto:hello@conciergesync.ai">hello@conciergesync.ai</a></p>
-    </section>
-  </main>
-
-  <!-- Optional confetti burst -->
 <script>
+  // Extract the user's unique ID from the URL query string
   const urlParams = new URLSearchParams(window.location.search);
-  const user = urlParams.get("user");
+  const bucId = urlParams.get('id');  // e.g., "0007"
 
-  const embed = document.getElementById("dashboardEmbed");
-
-  const fileMap = {
-    "Lindsay": "Lindsay-BUC-0001.pdf",
-    "Misha": "Misha-BUC-0002.pdf",
-    "Brett": "Brett-BUC-0003.pdf",
-    "Athena": "Athena-BUC-0004.pdf",
-    "Kendall": "Kendall-BUC-0005.pdf",
-    "Alin": "Alin-BUC-0006.pdf",
-    "Iryna": "Iryna-BUC-0007.pdf",
-    "Jeffrey": "Jeffrey-BUC-0008.pdf"
+  // Map BUC IDs to filenames
+  const dashboardMap = {
+    "0001": "Lindsay-BUC-0001.pdf",
+    "0002": "Misha-BUC-0002.pdf",
+    "0003": "Brett-BUC-0003.pdf",
+    "0004": "Athena-BUC-0004.pdf",
+    "0005": "Kendall-BUC-0005.pdf",
+    "0006": "Alin-BUC-0006.pdf",
+    "0007": "Iryna-BUC-0007.pdf",
+    "0008": "Jeffrey-BUC-0008.pdf"
   };
 
-  if (user && fileMap[user]) {
-    embed.src = `/beta/buc_dashboards/${fileMap[user]}`;
-  } else {
-    embed.replaceWith("Dashboard not found. Please contact support.");
-  }
+  const filename = dashboardMap[bucId] || "placeholder.txt";
+  const dashboardPath = `/beta/buc_dashboards/${filename}`;
+
+  // Set iframe src if valid
+  document.getElementById("buc-dashboard").src = dashboardPath;
 </script>
+
 
 
 </body>
