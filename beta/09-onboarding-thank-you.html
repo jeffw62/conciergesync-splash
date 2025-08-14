@@ -189,12 +189,13 @@
       </div>
 
       <div class="section">
-        <h3>Sneak peek: your upcoming dashboard</h3>
-        <div class="teaser">
-          <img src="/beta/assets/dashboard-teaser.png" alt="ConciergeSync dashboard teaser (coming soon)">
-        </div>
-        <p class="muted">A first look at where your insights, redemption opportunities, and travel strategies will live.</p>
-      </div>
+  <h3>Sneak peek: your upcoming dashboard</h3>
+  <div class="teaser">
+  <iframe id="dashboardFrame" src="" width="100%" height="600px" style="border: none;"></iframe>
+</div>
+<p class="muted">This is your personalized ConciergeSync™ dashboard preview. Live version coming soon.</p>
+
+</div>
 
       <div class="section">
         <h3>Explore while you wait</h3>
@@ -209,36 +210,31 @@
   </main>
 
   <!-- Optional confetti burst -->
-  <script>
-    (function(){
-      function confetti(){
-        for(let i = 0; i < 50; i++){
-          const s = document.createElement('span');
-          Object.assign(s.style, {
-            position: 'fixed',
-            left: (Math.random() * 100) + 'vw',
-            top: '-10px',
-            width: '6px',
-            height: '10px',
-            background: `hsl(${Math.random() * 360} 90% 60%)`,
-            transform: `rotate(${Math.random() * 360}deg)`,
-            borderRadius: '2px',
-            transition: 'transform 1.2s ease-out, top 1.2s ease-out, opacity 1.2s',
-            zIndex: 9999,
-            opacity: 1,
-            pointerEvents: 'none'
-          });
-          document.body.appendChild(s);
-          requestAnimationFrame(() => {
-            s.style.top = '110vh';
-            s.style.transform += ' translateY(100vh)';
-            s.style.opacity = '0';
-          });
-          setTimeout(() => s.remove(), 1400);
-        }
-      }
-      window.addEventListener('load', confetti, { once: true });
-    })();
-  </script>
+<script>
+  const urlParams = new URLSearchParams(window.location.search);
+  const user = urlParams.get('user');
+
+  // Map of allowed users and their PDF filenames
+  const allowedUsers = {
+    "Lindsay": "Lindsay-BUC-0001.pdf",
+    "Misha": "Misha-BUC-0002.pdf",
+    "Brett": "Brett-BUC-0003.pdf",
+    "Athena": "Athena-BUC-0004.pdf",
+    "Kendall": "Kendall-BUC-0005.pdf",
+    "Alin": "Alin-BUC-0006.pdf",
+    "Iryna": "Iryna-BUC-0007.pdf",
+    "Jeffrey": "Jeffrey-BUC-0008.pdf"
+  };
+
+  const fileName = allowedUsers[user];
+  const iframe = document.getElementById("dashboardFrame");
+
+  if (fileName) {
+    iframe.src = `/beta/buc_dashboards/${fileName}`;
+  } else {
+    iframe.outerHTML = `<p style="color:red; text-align:center;">Dashboard not found or invalid user ID in URL.</p>`;
+  }
+</script>
+
 </body>
 </html>
