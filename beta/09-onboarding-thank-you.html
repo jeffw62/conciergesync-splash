@@ -1,10 +1,17 @@
-<iframe id="dashboardFrame" width="100%" height="800px" style="border:none;"></iframe>
+<div class="section">
+  <h3>What happens next</h3>
+  <p>Here's your <strong>personalized ConciergeSync™ dashboard</strong> — a preview of where your insights, redemption opportunities, and travel strategies will soon come to life.</p>
+</div>
+
+<div class="section">
+  <h3>Sneak peek: your upcoming dashboard</h3>
+  <iframe id="dashboardFrame" width="100%" height="800px" style="border:none;"></iframe>
+</div>
 
 <script>
   const urlParams = new URLSearchParams(window.location.search);
   const user = urlParams.get('user');
 
-  // Basic security: allow only known users
   const allowedUsers = {
     "Lindsay": "Lindsay-BUC-0001.pdf",
     "Misha": "Misha-BUC-0002.pdf",
@@ -25,3 +32,18 @@
   }
 </script>
 
+<div class="section">
+  <p class="muted">This is your personalized ConciergeSync™ dashboard, live version coming soon.</p>
+</div>
+
+<div class="section">
+  <h3>Explore while you wait</h3>
+  <div class="grid">
+    <a class="cta" href="/beta/examples.html">See real redemption examples →</a>
+    <a class="cta" href="/beta/learn.html">Learn how ConciergeSync™ works →</a>
+  </div>
+</div>
+
+<div class="section" style="text-align:center; margin-top: 40px;">
+  <small>Need help? <a href="mailto:hello@conciergesync.ai">hello@conciergesync.ai</a></small>
+</div>
