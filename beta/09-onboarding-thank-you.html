@@ -1,49 +1,97 @@
-<div class="section">
-  <h3>What happens next</h3>
-  <p>Here's your <strong>personalized ConciergeSync™ dashboard</strong> — a preview of where your insights, redemption opportunities, and travel strategies will soon come to life.</p>
-</div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Your Personalized ConciergeSync™ Dashboard</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 40px;
+      color: #333;
+    }
+    h2 {
+      color: #004aad;
+    }
+    iframe {
+      width: 100%;
+      height: 800px;
+      border: none;
+      margin-top: 20px;
+    }
+    .footer {
+      margin-top: 20px;
+      font-size: 0.9em;
+      color: #666;
+      text-align: center;
+    }
+    .btn-row {
+      margin-top: 30px;
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+    }
+    .btn-row a {
+      background-color: #004aad;
+      color: white;
+      padding: 12px 20px;
+      text-decoration: none;
+      border-radius: 5px;
+      font-weight: bold;
+    }
+    .btn-row a:hover {
+      background-color: #002e6e;
+    }
+  </style>
+</head>
+<body>
 
-<div class="section">
-  <h3>Sneak peek: your upcoming dashboard</h3>
-  <iframe id="dashboardFrame" width="100%" height="800px" style="border:none;"></iframe>
-</div>
+  <h2>What happens next</h2>
+  <p>
+    We're preparing your <strong>personalized ConciergeSync™ dashboard</strong> — a preview of where your insights, redemption opportunities, and travel strategies will soon come to life.
+  </p>
 
-<script>
-  const urlParams = new URLSearchParams(window.location.search);
-  const user = urlParams.get('user');
+  <h2>Sneak peek: your upcoming dashboard</h2>
 
-  const allowedUsers = {
-    "Lindsay": "Lindsay-BUC-0001.pdf",
-    "Misha": "Misha-BUC-0002.pdf",
-    "Brett": "Brett-BUC-0003.pdf",
-    "Athena": "Athena-BUC-0004.pdf",
-    "Kendall": "Kendall-BUC-0005.pdf",
-    "Alin": "Alin-BUC-0006.pdf",
-    "Iryna": "Iryna-BUC-0007.pdf",
-    "Jeffrey": "Jeffrey-BUC-0008.pdf"
-  };
+  <iframe id="dashboardFrame"></iframe>
 
-  const fileName = allowedUsers[user];
-
-  if (fileName) {
-    document.getElementById("dashboardFrame").src = `/buc_dashboards/${fileName}`;
-  } else {
-    document.getElementById("dashboardFrame").outerHTML = "<p style='color:red; text-align:center;'>Invalid or missing user parameter.</p>";
-  }
-</script>
-
-<div class="section">
-  <p class="muted">This is your personalized ConciergeSync™ dashboard, live version coming soon.</p>
-</div>
-
-<div class="section">
-  <h3>Explore while you wait</h3>
-  <div class="grid">
-    <a class="cta" href="/beta/examples.html">See real redemption examples →</a>
-    <a class="cta" href="/beta/learn.html">Learn how ConciergeSync™ works →</a>
+  <div class="footer">
+    This is your personalized ConciergeSync™ dashboard, live version coming soon.
   </div>
-</div>
 
-<div class="section" style="text-align:center; margin-top: 40px;">
-  <small>Need help? <a href="mailto:hello@conciergesync.ai">hello@conciergesync.ai</a></small>
-</div>
+  <div class="btn-row">
+    <a href="#">See real redemption examples →</a>
+    <a href="#">Learn how ConciergeSync™ works →</a>
+  </div>
+
+  <div class="footer">
+    Need help? <a href="mailto:hello@conciergesync.ai">hello@conciergesync.ai</a>
+  </div>
+
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const user = urlParams.get('user');
+
+    const allowedUsers = {
+      "Lindsay": "Lindsay-BUC-0001.pdf",
+      "Misha": "Misha-BUC-0002.pdf",
+      "Brett": "Brett-BUC-0003.pdf",
+      "Athena": "Athena-BUC-0004.pdf",
+      "Kendall": "Kendall-BUC-0005.pdf",
+      "Alin": "Alin-BUC-0006.pdf",
+      "Iryna": "Iryna-BUC-0007.pdf",
+      "Jeffrey": "Jeffrey-BUC-0008.pdf"
+    };
+
+    const fileName = allowedUsers[user];
+
+    if (fileName) {
+      document.getElementById("dashboardFrame").src = `/beta/buc_dashboards/${fileName}`;
+    } else {
+      document.getElementById("dashboardFrame").outerHTML =
+        "<p style='color:red; text-align:center;'>Invalid or missing user parameter.</p>";
+    }
+  </script>
+
+</body>
+</html>
