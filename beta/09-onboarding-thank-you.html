@@ -1,1 +1,27 @@
+<iframe id="dashboardFrame" width="100%" height="800px" style="border:none;"></iframe>
+
+<script>
+  const urlParams = new URLSearchParams(window.location.search);
+  const user = urlParams.get('user');
+
+  // Basic security: allow only known users
+  const allowedUsers = {
+    "Lindsay": "Lindsay-BUC-0001.pdf",
+    "Misha": "Misha-BUC-0002.pdf",
+    "Brett": "Brett-BUC-0003.pdf",
+    "Athena": "Athena-BUC-0004.pdf",
+    "Kendall": "Kendall-BUC-0005.pdf",
+    "Alin": "Alin-BUC-0006.pdf",
+    "Iryna": "Iryna-BUC-0007.pdf",
+    "Jeffrey": "Jeffrey-BUC-0008.pdf"
+  };
+
+  const fileName = allowedUsers[user];
+
+  if (fileName) {
+    document.getElementById("dashboardFrame").src = `/beta/buc_dashboards/${fileName}`;
+  } else {
+    document.getElementById("dashboardFrame").outerHTML = "<p style='color:red; text-align:center;'>Invalid or missing user parameter.</p>";
+  }
+</script>
 
