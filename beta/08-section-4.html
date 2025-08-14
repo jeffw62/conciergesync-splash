@@ -20,17 +20,52 @@
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <div class="card">
-      <h1>Section 4</h1>
-      <p class="sub">Final step — submit to finish.</p>
 
-      <div class="banner">✅ Section 3 completed — complete Section 4 below.</div>
+<div class="wrap">
+  <div class="card">
 
-      <iframe class="embed" title="ConciergeSync — Section 4" src="https://noteforms.com/forms/section-4-transferable-points-programs-wp4ujy"></iframe>
+    <iframe id="nf4" class="embed" title="ConciergeSync – Section 4"
+      src="https://noteforms.com/forms/section-4-transferable-points-programs-wp4ujy"></iframe>
 
-      <div class="footer">Questions? Email <a href="mailto:hello@conciergesync.ai">hello@conciergesync.ai</a></div>
+    <script>
+    (function () {
+      var THANK_YOU = "/beta/09-onboarding-thank-you.html";
+      var iframe = document.getElementById("nf4");
+
+      function isSuccessPayload(data) {
+        if (typeof data === "string") {
+          try { data = JSON.parse(data); } catch (_) {}
+        }
+        if (typeof data === "string") {
+          var s = data.toLowerCase();
+          return s.includes("form-success") || s.includes("submit_success") || s.includes("success");
+        }
+        if (data && typeof data === "object") {
+          var ev = (data.event || data.type || data.status || "").toString().toLowerCase();
+          return ["form-success","nf_submit_success","success","submitted"]
+            .some(function (k){return ev.includes(k);});
+        }
+        return false;
+      }
+
+      window.addEventListener("message", function (e) {
+        if (e.source !== (iframe && iframe.contentWindow)) return;
+        // Optional origin check:
+        // if (!/^https:\/\/(www\.)?noteforms\.com$/i.test(e.origin)) return;
+
+        if (isSuccessPayload(e.data)) {
+          window.location.replace(THANK_YOU);
+        }
+      });
+    })();
+    </script>
+
+    <div class="footer">
+      Questions? Email <a href="mailto:hello@conciergesync.ai">hello@conciergesync.ai</a>
     </div>
+
   </div>
+</div>
+
 </body>
 </html>
