@@ -19,7 +19,7 @@
   const fileName = allowedUsers[user];
 
   if (fileName) {
-    document.getElementById("dashboardFrame").src = `/beta/buc_dashboards/${fileName}`;
+    document.getElementById("dashboardFrame").src = `/buc_dashboards/${fileName}`;
   } else {
     document.getElementById("dashboardFrame").outerHTML = "<p style='color:red; text-align:center;'>Invalid or missing user parameter.</p>";
   }
