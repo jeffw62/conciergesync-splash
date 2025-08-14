@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>ConciergeSync™ — Section 1</title>
+  <title>Section 1 — Beta Application • ConciergeSync™</title>
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <style>
     :root{
@@ -12,94 +12,67 @@
       --shadow:0 10px 30px rgba(2,6,23,.08);
     }
     *{box-sizing:border-box}
-    body{margin:0;background:var(--bg);color:var(--text);
+    body{
+      margin:0;background:var(--bg);color:var(--text);
       font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,"Helvetica Neue",Arial,"Noto Sans",
-      "Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol";}
-    .wrap{max-width:760px;margin:40px auto;padding:0 16px;}
-    .card{background:var(--card-bg);border-radius:var(--radius);box-shadow:var(--shadow);padding:28px 28px 24px;}
-    h1{font-size:32px;margin:4px 0 8px;text-align:left}
-    .sub{color:var(--muted);margin:0 0 18px;font-size:18px}
-    form{display:grid;gap:16px}
-    label{font-weight:600}
-    input[type="text"], textarea, select{
-      width:100%;border:1px solid var(--border);border-radius:10px;padding:12px 14px;font-size:16px;background:#fff;outline:none;
+      "Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol";
     }
-    textarea{min-height:120px;resize:vertical}
-    .choices{display:flex;gap:10px;flex-wrap:wrap}
-    .chip{border:1px solid var(--border);border-radius:999px;padding:8px 12px;cursor:pointer;user-select:none}
-    .chip input{display:none}
-    .chip.selected{background:#eef2ff;border-color:#c7d2fe}
-    .actions{margin-top:10px;display:flex;gap:10px;justify-content:flex-end}
-    .btn{border:none;border-radius:10px;padding:14px 18px;font-size:16px;font-weight:600;background:var(--primary);color:#fff;cursor:pointer}
-    .btn:hover{background:var(--primary-dk)}
-    .btn:disabled{opacity:.6;cursor:not-allowed}
+    .wrap{max-width:760px;margin:40px auto;padding:0 16px;}
+    .card{background:var(--card-bg);border-radius:var(--radius);box-shadow:var(--shadow);padding:28px;}
+    h1{font-size:32px;margin:4px 0 8px;text-align:center}
+    .sub{color:var(--muted);margin:0 0 18px;text-align:center;font-size:16px}
+    .body p{margin:0 0 14px;line-height:1.6}
     .hint{font-size:13px;color:var(--muted)}
+    .actions{margin-top:18px;display:flex;gap:10px;justify-content:center}
+    .btn{
+      border:none;border-radius:10px;padding:14px 18px;font-size:16px;font-weight:600;
+      background:var(--primary);color:#fff;cursor:pointer
+    }
+    .btn:hover{background:var(--primary-dk)}
+    .footer{margin-top:22px;text-align:center;font-size:14px;color:var(--muted)}
+    .footer a{color:var(--primary);text-decoration:none}
+    .footer a:hover{text-decoration:underline}
   </style>
 </head>
 <body>
   <div class="wrap">
     <div class="card">
-      <h1>Section 1 — Basics</h1>
-      <p class="sub">A couple of quick questions so we can tailor ConciergeSync™ for you.</p>
+      <h1>Section 1 — Beta Application</h1>
+      <p class="sub">Start here. When you submit, you'll be taken to Section 2.</p>
 
-      <form id="s1">
-        <div>
-          <label for="homeAirport">What’s your home airport? <span class="hint">(e.g., DFW, LAX)</span></label>
-          <input id="homeAirport" name="homeAirport" type="text" placeholder="Enter IATA code or city" required />
-        </div>
+      <div class="body">
+        <p><strong>Section 1 Complete — Profile Initialized</strong></p>
+        <p>Your travel profile and card strategy details have been securely submitted. This is the foundation of your optimization journey—where guesswork ends and tailored, high-value decisions begin.</p>
+        <p>Next up, add an authorized user and current credit card details so we can sync and personalize recommendations.</p>
 
-        <div>
-          <label>How often do you travel?</label>
-          <div class="choices" id="freqChoices">
-            <label class="chip"><input type="radio" name="freq" value="Weekly" />Weekly</label>
-            <label class="chip"><input type="radio" name="freq" value="Monthly" />Monthly</label>
-            <label class="chip"><input type="radio" name="freq" value="Few times a year" />Few times a year</label>
-            <label class="chip"><input type="radio" name="freq" value="Rarely" />Rarely</label>
-          </div>
-        </div>
+        <p class="hint"><strong>Use the same email address</strong> you entered in Section 1 so we can keep everything under one profile.</p>
 
         <div class="actions">
-          <button class="btn" id="nextBtn" type="button" disabled>Next</button>
+          <button id="continueBtn" class="btn" type="button">Continue to Section 2</button>
         </div>
-      </form>
+
+        <p class="hint" style="text-align:center;margin-top:10px;">
+          Having trouble? You can also paste this into your browser:<br>
+          <span id="fallbackUrl"></span>
+        </p>
+      </div>
+
+      <div class="footer">
+        Questions? Email <a href="mailto:hello@conciergesync.ai">hello@conciergesync.ai</a>
+      </div>
     </div>
   </div>
 
   <script>
-    // same-tab flow: go straight to section 2 when valid
-    const form = document.getElementById('s1');
-    const nextBtn = document.getElementById('nextBtn');
-    const airport = document.getElementById('homeAirport');
-    const chips = Array.from(document.querySelectorAll('.chip'));
+    // Single source of truth for Section 2 URL (same tab)
+    const NOTEFORMS_URL = "https://noteforms.com/forms/section-2-authorized-user-card-setup-conciergesync-xnkw5k";
 
-    // chip UI selection
-    chips.forEach(chip => {
-      chip.addEventListener('click', () => {
-        chips.forEach(c => c.classList.remove('selected'));
-        chip.classList.add('selected');
-        chip.querySelector('input').checked = true;
-        validate();
-      });
+    document.getElementById("continueBtn").addEventListener("click", () => {
+      window.location.href = NOTEFORMS_URL; // same tab navigation
     });
 
-    function validate(){
-      const hasAirport = airport.value.trim().length > 0;
-      const hasFreq = !!document.querySelector('input[name="freq"]:checked');
-      nextBtn.disabled = !(hasAirport && hasFreq);
-    }
-
-    airport.addEventListener('input', validate);
-
-    nextBtn.addEventListener('click', () => {
-      if(nextBtn.disabled) return;
-      // (Optional) Save to localStorage if you want to recall later sections
-      // localStorage.setItem('homeAirport', airport.value.trim());
-      // localStorage.setItem('freq', document.querySelector('input[name="freq"]:checked').value);
-      window.location.href = "06-section-2.html"; // same tab
-    });
-
-    // init
-    validate();
+    // Show plain URL as a copyable fallback (no <a target="_blank"> anywhere)
+    document.getElementById("fallbackUrl").textContent = NOTEFORMS_URL;
   </script>
 </body>
 </html>
