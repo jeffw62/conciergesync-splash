@@ -212,10 +212,11 @@
   <!-- Optional confetti burst -->
 <script>
   const urlParams = new URLSearchParams(window.location.search);
-  const user = urlParams.get('user');
+  const user = urlParams.get("user");
 
-  // Map of allowed users and their PDF filenames
-  const allowedUsers = {
+  const embed = document.getElementById("dashboardEmbed");
+
+  const fileMap = {
     "Lindsay": "Lindsay-BUC-0001.pdf",
     "Misha": "Misha-BUC-0002.pdf",
     "Brett": "Brett-BUC-0003.pdf",
@@ -226,15 +227,13 @@
     "Jeffrey": "Jeffrey-BUC-0008.pdf"
   };
 
-  const fileName = allowedUsers[user];
-  const iframe = document.getElementById("dashboardFrame");
-
-  if (fileName) {
-    iframe.src = `/beta/buc_dashboards/${fileName}`;
+  if (user && fileMap[user]) {
+    embed.src = `/beta/buc_dashboards/${fileMap[user]}`;
   } else {
-    iframe.outerHTML = `<p style="color:red; text-align:center;">Dashboard not found or invalid user ID in URL.</p>`;
+    embed.replaceWith("Dashboard not found. Please contact support.");
   }
 </script>
+
 
 </body>
 </html>
