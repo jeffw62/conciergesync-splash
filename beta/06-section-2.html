@@ -1,41 +1,43 @@
-<!DOCTYPE html><html lang="en"><head>
-<meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>ConciergeSync™ — Section 2</title>
-<style>
-:root{--card:#fff;--ink:#0f172a;--muted:#475569;--bg:#f6f7fb}
-*{box-sizing:border-box}body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif;background:var(--bg);color:var(--ink)}
-.container{max-width:880px;margin:40px auto;padding:0 20px}
-.hero{background:var(--card);border:1px solid #e6eaf0;border-radius:16px;box-shadow:0 6px 24px rgba(15,23,42,.06);padding:28px}
-h1{font-size:28px;line-height:1.2;margin:0 0 8px;text-align:center}p{color:var(--muted);text-align:center;margin:6px 0 0}
-.form-wrap{background:var(--card);border:1px solid #e6eaf0;border-radius:16px;box-shadow:0 6px 24px rgba(15,23,42,.06);padding:16px;margin-top:22px}
-</style></head><body>
-<div class="container">
-  <div class="hero">
-    <h1>Section 2 — Authorized User & Card Setup</h1>
-    <p>Submit to continue to Section 3.</p>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Section 2 — Authorized User & Cards • ConciergeSync™</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <style>
+    :root{--card-bg:#fff;--bg:#f7f7f7;--text:#0f172a;--primary:#0b3b9e;--muted:#64748b;--radius:16px;--shadow:0 10px 30px rgba(2,6,23,.08)}
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,"Helvetica Neue",Arial}
+    .wrap{max-width:760px;margin:40px auto;padding:0 16px}
+    .card{background:var(--card-bg);border-radius:var(--radius);box-shadow:var(--shadow);padding:28px}
+    h1{font-size:32px;margin:4px 0 8px;text-align:center}
+    .sub{color:var(--muted);margin:0 0 18px;text-align:center;font-size:16px}
+    .banner{background:#eef2ff;border:1px solid #c7d2fe;color:#1e3a8a;border-radius:10px;padding:10px 14px;margin-bottom:14px;text-align:center;font-weight:600}
+    .embed{width:100%;min-height:1400px;border:0;border-radius:12px;background:#fff}
+    .footer{margin-top:18px;text-align:center;font-size:14px;color:var(--muted)}
+    .footer a{color:#0b3b9e;text-decoration:none}
+    .footer a:hover{text-decoration:underline}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <h1>Section 2 — Authorized User & Credit Cards</h1>
+      <p class="sub">Add your AU and card details so we can sync and personalize recommendations.</p>
+
+      <div class="banner">✅ Section 1 completed — continue with Section 2 below.</div>
+
+      <!-- Embed Section 2 -->
+      <iframe
+        class="embed"
+        title="ConciergeSync — Section 2"
+        src="https://noteforms.com/forms/section-2-authorized-user-card-setup-conciergesync-xnkw5k">
+      </iframe>
+
+      <div class="footer">
+        Questions? Email <a href="mailto:hello@conciergesync.ai">hello@conciergesync.ai</a>
+      </div>
+    </div>
   </div>
-  <div class="form-wrap">
-    <iframe
-      src="https://noteforms.com/forms/section-2-authorized-user-card-setup-<PASTE-ID>"
-      title="ConciergeSync Section 2" loading="lazy"
-      style="width:100%;min-height:1100px;border:0;display:block;"></iframe>
-  </div>
-</div>
-  <script>
-(function () {
-  var NEXT_URL = '/beta/section-3.html';
-  var ALLOWED = new Set(['https://noteforms.com','https://www.noteforms.com']);
-  window.addEventListener('message', function (e) {
-    if (!ALLOWED.has(e.origin)) return;
-    var d = e.data || {};
-    if (typeof d === 'string') d = { msg: d.toLowerCase() };
-    if (
-      (d.msg && (d.msg.includes('submitted') || d.msg.includes('submission') || d.msg.includes('formsubmitted'))) ||
-      d.type === 'submissionCreated' || d.type === 'submission.completed' ||
-      d.event === 'submissionCreated' || d.event === 'submission.completed' ||
-      d.message === 'formSubmitted' || d.status === 'success'
-    ) { window.top.location.href = NEXT_URL; }
-  }, false);
-})();
-</script>
-</body></html>
+</body>
+</html>
