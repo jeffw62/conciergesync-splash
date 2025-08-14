@@ -26,9 +26,28 @@
 
       <!-- Embed Section 1 -->
       <iframe
-        class="embed"
-        title="ConciergeSync — Section 1"
-        src="https://noteforms.com/forms/beta-user-tracker-conciergesync-b4yxaf">
+        <iframe id="nf1" class="embed" title="ConciergeSync – Section 1"
+  src="https://noteforms.com/forms/<YOUR-SECTION-1-FORM-ID>"></iframe>
+
+<script>
+(function () {
+  var NEXT = "https://noteforms.com/forms/section-2-authorized-user-card-setup-conciergesync-xnkw5k";
+  var iframe = document.getElementById("nf1");
+
+  function ok(data){
+    if (typeof data === "string") { try { data = JSON.parse(data); } catch(_) {} }
+    if (typeof data === "string") return data.toLowerCase().includes("form-success");
+    var ev = (data && (data.event||data.type||data.status)||"").toLowerCase();
+    return ["form-success","nf_submit_success","success","submitted"].some(k => ev.includes(k));
+  }
+
+  window.addEventListener("message", function(e){
+    if (e.source !== (iframe && iframe.contentWindow)) return;
+    if (ok(e.data)) window.location.replace(NEXT);
+  });
+})();
+</script>
+
       </iframe>
 
       <div class="footer">
