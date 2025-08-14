@@ -1,55 +1,150 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>You're In – ConciergeSync™ Beta</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>ConciergeSync™ • Onboarding Complete</title>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
-    body {
-      font-family: sans-serif;
-      background-color: #f4f4f4;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      margin: 0;
-      padding: 2rem;
-      text-align: center;
+    :root{
+      --bg:#f6f7fb;
+      --card:#ffffff;
+      --text:#1f2937;
+      --muted:#6b7280;
+      --brand:#3b82f6;       /* primary */
+      --brand-ink:#0f3d8c;   /* darker accent */
+      --success:#22c55e;
+      --border:#e5e7eb;
+      --shadow:0 10px 30px rgba(17,24,39,.08);
+      --radius:18px;
     }
-    .container {
-      background: white;
-      padding: 2rem 3rem;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-      max-width: 600px;
+    *{box-sizing:border-box}
+    body{
+      margin:0; background:var(--bg); color:var(--text);
+      font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
     }
-    h1 {
-      margin-bottom: 1rem;
-      color: #2c3e50;
+    a{color:var(--brand); text-decoration:none}
+    a:hover{text-decoration:underline}
+    .wrap{max-width:820px; margin:48px auto; padding:0 16px}
+    .card{
+      background:var(--card); border-radius:var(--radius); box-shadow:var(--shadow);
+      padding:32px 28px;
     }
-    p {
-      color: #555;
-      line-height: 1.5;
+    .ribbon{
+      display:inline-flex; align-items:center; gap:8px;
+      background:linear-gradient(90deg, var(--brand) 0%, #60a5fa 100%);
+      color:#fff; padding:8px 14px; border-radius:999px; font-weight:600; font-size:14px;
     }
-    .highlight {
-      font-weight: bold;
-      color: #1a73e8;
+    .ribbon .dot{width:8px;height:8px;border-radius:50%;background:#fff;opacity:.9}
+    h1{
+      margin:20px 0 10px; font-size:28px; line-height:1.2; letter-spacing:-0.01em;
+      display:flex; align-items:center; gap:10px;
     }
+    .sub{color:var(--muted); margin:0 0 20px}
+    .kudos{
+      display:inline-flex; align-items:center; gap:8px; color:#065f46; background:#ecfdf5;
+      border:1px solid #a7f3d0; padding:10px 12px; border-radius:12px; font-weight:600; width:max-content;
+      margin:12px 0 8px;
+    }
+    .section{margin:22px 0}
+    .section h3{
+      margin:0 0 8px; font-size:16px; text-transform:uppercase; letter-spacing:.06em; color:var(--brand-ink)
+    }
+    .list{margin:8px 0 0; padding-left:18px}
+    .list li{margin:6px 0}
+    .teaser{
+      margin:14px 0 6px; border-radius:14px; overflow:hidden; border:1px solid var(--border);
+    }
+    .teaser img{width:100%; display:block; filter:blur(2px) saturate(.95); transform:scale(1.01)}
+    .muted{color:var(--muted); font-size:14px}
+    .grid{margin-top:10px; display:grid; grid-template-columns:1fr 1fr; gap:14px}
+    .cta{
+      display:inline-flex; align-items:center; justify-content:center; gap:10px; text-decoration:none; font-weight:600;
+      background:#f3f4f6; color:#111827; padding:12px 14px; border-radius:12px; border:1px solid var(--border);
+    }
+    .cta:hover{background:#eef2ff; border-color:#e0e7ff}
+    .footer{margin-top:22px; color:var(--muted); font-size:13px; text-align:center}
+    @media (max-width:640px){ .grid{grid-template-columns:1fr} }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>You're In! 🎉</h1>
-    <p>
-      Thank you for applying to join the <span class="highlight">ConciergeSync™ Beta Program</span>.
-    </p>
-    <p>
-      We're reviewing your submission. Once completed, you’ll receive an email with next-step instructions.
-    </p>
-    <p>
-      We're excited to have you on board. Let’s make your points & miles work smarter.
-    </p>
-  </div>
+  <main class="wrap">
+    <section class="card">
+      <span class="ribbon" aria-label="Profile complete badge"><span class="dot"></span>Profile 100% Complete • Beta User Client</span>
+      <h1>🎉 Onboarding Complete</h1>
+      <p class="sub">Your ConciergeSync™ profile is fully set. Welcome to the inner circle.</p>
+
+      <div class="kudos">✅ Nice work — your blueprint is locked.</div>
+
+      <div class="section">
+        <h3>Your role as a Beta User Client</h3>
+        <ul class="list">
+          <li>Use ConciergeSync™ with real trips and everyday points activity.</li>
+          <li>Share quick, honest feedback when something feels unclear or could be better.</li>
+          <li>Your input directly shapes what future members will experience.</li>
+        </ul>
+      </div>
+
+      <div class="section">
+        <h3>What you’ve unlocked</h3>
+        <ul class="list">
+          <li>Smart transfer guidance across your points ecosystems and pooling preferences.</li>
+          <li>Family pooling strategies and guardrails to avoid costly redemption mistakes.</li>
+          <li>A clean data foundation for personalized insights and recommendations.</li>
+        </ul>
+      </div>
+
+      <div class="section">
+        <h3>What happens next</h3>
+        <p>We’re preparing your <strong>personalized insights</strong> based on everything you shared. We’ll let you know the moment they’re ready — it won’t be long.</p>
+      </div>
+
+      <div class="section">
+        <h3>Sneak peek: your upcoming dashboard</h3>
+        <div class="teaser">
+          <!-- Replace src when ready -->
+          <img src="/beta/assets/dashboard-teaser.png" alt="ConciergeSync dashboard teaser (coming soon)">
+        </div>
+        <p class="muted">A first look at where your insights, redemption opportunities, and travel strategies will live.</p>
+      </div>
+
+      <div class="section">
+        <h3>Explore while you wait</h3>
+        <div class="grid">
+          <a class="cta" href="/beta/examples.html">See real redemption examples →</a>
+          <a class="cta" href="/beta/how-it-works.html">Learn how ConciergeSync™ works →</a>
+        </div>
+      </div>
+
+      <p class="footer">Need help? <a href="mailto:hello@conciergesync.ai">hello@conciergesync.ai</a></p>
+    </section>
+  </main>
+
+  <!-- Optional confetti burst -->
+  <script>
+    (function(){
+      function confetti(){
+        for(let i=0;i<50;i++){
+          const s=document.createElement('span');
+          Object.assign(s.style,{
+            position:'fixed',left:(Math.random()*100)+'vw',top:'-10px',
+            width:'6px',height:'10px',background:`hsl(${Math.random()*360} 90% 60%)`,
+            transform:`rotate(${Math.random()*360}deg)`,borderRadius:'2px',
+            transition:'transform 1.2s ease-out, top 1.2s ease-out, opacity 1.2s',
+            zIndex:9999,opacity:1,pointerEvents:'none'
+          });
+          document.body.appendChild(s);
+          requestAnimationFrame(()=>{
+            s.style.top='110vh';
+            s.style.transform += ' translateY(100vh)';
+            s.style.opacity='0';
+          });
+          setTimeout(()=>s.remove(),1400);
+        }
+      }
+      window.addEventListener('load', confetti, { once:true });
+    })();
+  </script>
 </body>
 </html>
