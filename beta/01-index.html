@@ -1,180 +1,223 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <link rel="dns-prefetch" href="//portal.conciergesync.ai">
-  <link rel="preconnect" href="https://portal.conciergesync.ai" crossorigin>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>ConciergeSync™ Beta Access</title>
-  <style>
-    :root {
-      --card: #fff;
-      --ink: #0f172a;
-      --muted: #475569;
-      --bg: #f6f7fb;
-      --accent: #111;
+<!-- Console Controls -->
+<button id="enterConsole" class="console-btn">Enter Console</button>
+<button id="exitConsole" class="console-exit" hidden aria-label="Exit Console">×</button>
+
+<!-- Backdrop layers -->
+<div id="backdrop" class="backdrop">
+  <div class="backdrop-image" id="backdropImage"></div>
+  <div class="backdrop-overlay" id="backdropOverlay"></div>
+</div>
+
+<style>
+  :root{
+    --bg-brightness: 1.15;   /* base lift */
+    --bg-contrast: 1.05;
+    --overlay: 0.28;         /* will auto-tune per image */
+    --overlay-grad-top: rgba(0,0,0,0.35);
+    --overlay-grad-bottom: rgba(0,0,0,0.55);
+    --vh: 100vh;             /* fixed on iOS below */
+    --z-ui: 40;
+  }
+
+  /* Backdrop fills the page and sits under your glass tiles */
+  .backdrop{
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: var(--vh);
+    overflow: hidden;
+    z-index: 0;
+  }
+  .backdrop-image{
+    position: absolute;
+    inset: 0;
+    background-position: center center;
+    background-size: cover;
+    filter: brightness(var(--bg-brightness)) contrast(var(--bg-contrast));
+    transform: scale(1.02); /* tiny crop to avoid edges on resize */
+    will-change: transform, filter;
+  }
+  .backdrop-overlay{
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background:
+      linear-gradient(to bottom,
+        var(--overlay-grad-top),
+        var(--overlay-grad-bottom));
+    opacity: var(--overlay);
+    transition: opacity 220ms ease;
+  }
+
+  /* Buttons */
+  .console-btn{
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: var(--z-ui);
+    padding: 12px 16px;
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,0.35);
+    background: rgba(20,20,20,0.45);
+    backdrop-filter: blur(8px) saturate(1.1);
+    color: #fff;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .console-btn:hover{ background: rgba(20,20,20,0.6); }
+
+  .console-exit{
+    position: fixed;
+    top: 18px;
+    right: 18px;
+    z-index: var(--z-ui);
+    width: 40px; height: 40px;
+    border-radius: 10px;
+    border: 1px solid rgba(255,255,255,0.35);
+    background: rgba(20,20,20,0.45);
+    color: #fff;
+    font-size: 28px; line-height: 36px;
+    text-align: center;
+    cursor: pointer;
+    backdrop-filter: blur(8px) saturate(1.1);
+  }
+  .console-exit:hover{ background: rgba(20,20,20,0.6); }
+
+  /* Pseudo-fullscreen on iOS */
+  .pseudo-fullscreen{
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: var(--vh);
+    overflow: hidden;
+    background: #000;
+  }
+
+  /* Optional: when in (real or pseudo) fullscreen, hide the enter button */
+  .in-console #enterConsole{ display: none; }
+  .in-console #exitConsole{ display: inline-block; }
+</style>
+
+<script>
+(function(){
+  // ---- Config: add your images here (DFW + Secrets Royal Beach, etc.) ----
+  const IMAGES = [
+    // Use WebP/JPG ~2400px wide; add as many as you like
+    '/assets/bg/bg-dfw-001.webp',
+    '/assets/bg/bg-secrets-royal-001.webp',
+    '/assets/bg/bg-secrets-royal-002.webp',
+    '/assets/bg/bg-dfw-002.webp'
+  ];
+
+  // ---- Utilities ----
+  // iOS detection (for pseudo-fullscreen)
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || 
+                (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+
+  // Fix 100vh on mobile toolbars
+  function setVhVar(){
+    const vh = window.innerHeight * 0.01;
+    document.documentElement.style.setProperty('--vh', `${vh*100}px`);
+  }
+  setVhVar(); window.addEventListener('resize', setVhVar);
+
+  // Choose a random image not equal to last shown
+  function pickImage(){
+    const last = Number(localStorage.getItem('last_bg_idx') ?? '-1');
+    let idx = Math.floor(Math.random() * IMAGES.length);
+    if (IMAGES.length > 1 && idx === last) {
+      idx = (idx + 1) % IMAGES.length;
     }
+    localStorage.setItem('last_bg_idx', String(idx));
+    return { src: IMAGES[idx], idx };
+  }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
+  // Preload helper
+  function preload(src){
+    const img = new Image();
+    img.src = src;
+    return img;
+  }
+
+  // Quick luminance estimate to auto-tune overlay
+  function estimateLuminance(imgEl){
+    try{
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      const w = canvas.width = 64;
+      const h = canvas.height = 64;
+      ctx.drawImage(imgEl, 0, 0, w, h);
+      const data = ctx.getImageData(0,0,w,h).data;
+      let sum = 0, count = 0;
+      for(let i=0;i<data.length;i+=4){
+        const r = data[i], g = data[i+1], b = data[i+2];
+        // Rec. 709 luma
+        const y = 0.2126*r + 0.7152*g + 0.0722*b;
+        sum += y; count++;
+      }
+      return sum / count; // 0..255
+    }catch(e){
+      return 140; // safe mid
     }
+  }
 
-    body {
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Inter, Arial, sans-serif;
-      background: var(--bg);
-      color: var(--ink);
-      line-height: 1.6;
+  function setOverlayForLuma(luma){
+    // map luma to overlay opacity (brighter bg -> stronger overlay)
+    // luma ~ 0..255
+    const t = Math.min(1, Math.max(0, (luma - 110) / (220 - 110))); // normalize
+    const opacity = 0.22 + (0.42 - 0.22)*t; // 0.22..0.42
+    document.documentElement.style.setProperty('--overlay', opacity.toFixed(3));
+  }
+
+  // ---- Apply background ----
+  const backdropImage = document.getElementById('backdropImage');
+  const backdropOverlay = document.getElementById('backdropOverlay');
+  const { src: chosenSrc } = pickImage();
+  // Preload chosen + a random next for instant paint
+  const img = preload(chosenSrc);
+  img.onload = () => {
+    backdropImage.style.backgroundImage = `url("${chosenSrc}")`;
+    // measure luminance and tune overlay
+    setOverlayForLuma(estimateLuminance(img));
+  };
+
+  // ---- Fullscreen / Console Mode ----
+  const enterBtn = document.getElementById('enterConsole');
+  const exitBtn  = document.getElementById('exitConsole');
+
+  function enterConsole(){
+    document.body.classList.add('in-console');
+    // Try real fullscreen if supported & allowed
+    const rootEl = document.documentElement;
+    if (!isIOS && rootEl.requestFullscreen) {
+      rootEl.requestFullscreen().then(()=>{
+        exitBtn.hidden = false;
+      }).catch(()=>{
+        // fallback to pseudo
+        document.documentElement.classList.add('pseudo-fullscreen');
+        exitBtn.hidden = false;
+      });
+    } else {
+      document.documentElement.classList.add('pseudo-fullscreen');
+      exitBtn.hidden = false;
     }
+  }
 
-    .container {
-      max-width: 880px;
-      margin: 40px auto;
-      padding: 0 20px;
+  function exitConsole(){
+    document.body.classList.remove('in-console');
+    exitBtn.hidden = true;
+    document.documentElement.classList.remove('pseudo-fullscreen');
+    if (document.fullscreenElement) {
+      document.exitFullscreen();
     }
+  }
 
-    .card {
-      background: var(--card);
-      border: 1px solid #e6eaf0;
-      border-radius: 16px;
-      box-shadow: 0 6px 24px rgba(15, 23, 42, 0.06);
-      padding: 28px;
-      margin-bottom: 24px;
-    }
+  enterBtn.addEventListener('click', enterConsole);
+  exitBtn.addEventListener('click', exitConsole);
 
-    h1 {
-      font-size: 34px;
-      line-height: 1.2;
-      text-align: center;
-      margin-bottom: 8px;
-    }
-
-    h2 {
-      font-size: 22px;
-      margin: 18px 0;
-      text-align: center;
-    }
-
-    h3 {
-      font-size: 18px;
-      margin: 16px 0 10px;
-    }
-
-    p, li {
-      color: var(--muted);
-    }
-
-    ul {
-      margin: 8px 0 0 24px;
-    }
-
-    .cta-button {
-      display: inline-block;
-      padding: 14px 24px;
-      border-radius: 12px;
-      background: var(--accent);
-      color: #fff;
-      font-weight: 600;
-      text-decoration: none;
-      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
-      transition: transform 0.12s ease, box-shadow 0.12s ease;
-    }
-
-    .cta-button:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 10px 22px rgba(0, 0, 0, 0.18);
-    }
-
-    .centered {
-      text-align: center;
-    }
-  </style>
-</head>
-
-<body>
-  <div class="container">
-
-    <!-- Hero Card -->
-    <div class="card">
-      <h1>Welcome to ConciergeSync™</h1>
-      <p class="centered">Your personal travel rewards strategist — earn, manage, and redeem points with clarity.</p>
-    </div>
-
-    <!-- Why / Role / Value -->
-    <div class="section">
-      <div class="card">
-        <h2>Why We’re Inviting Beta Users</h2>
-        <p style="margin:0 0 12px;color:#444;">
-          <strong>ConciergeSync™ turns confusing points & miles rules into clear, dollar-value decisions.</strong>
-          But to make it rock-solid, we need real travelers and real itineraries—not lab data.
-        </p>
-
-        <p style="margin:0 0 12px;color:#444;">
-          We built ConciergeSync™ because the world of points and miles is broken for most people.
-          The best rewards, the biggest wins, the true premium experiences — they’re hidden behind complexity,
-          endless fine print, and hours of research.
-        </p>
-
-        <p style="margin:0 0 12px;color:#444;">
-          Most platforms either give you generic advice or try to sell you into their partners.
-          <strong>ConciergeSync is different.</strong> We’re creating a tool that thinks like a strategist,
-          works like your personal travel concierge, and is completely on your side — no kickbacks,
-          no fluff, just maximizing <em>your</em> value.
-        </p>
-
-        <p style="margin:0 0 20px;color:#444;">
-          You’re here at the very beginning, helping us fine-tune this so it becomes the go-to tool for travelers
-          who want the best without wasting time. <strong>The feedback you share today will literally shape what
-          ConciergeSync becomes tomorrow.</strong>
-        </p>
-
-        <h3 style="margin:12px 0 8px;">Your Role as a Beta User Client (BUC)</h3>
-        <ul style="margin:0 0 14px 22px;">
-          <li><strong>Onboard (5–7 min):</strong> share your travel goals and programs.</li>
-          <li><strong>Explore ConciergeSync™ as it evolves:</strong> we’ll invite you to test features as they’re released and sanity-check how they work.</li>
-          <li><strong>Give quick feedback:</strong> if something’s confusing or off, reply to our 2–3 min prompts (we’ll ping you).</li>
-        </ul>
-
-        <h3 style="margin:8px 0 8px;">How This Helps ConciergeSync™</h3>
-        <ul style="margin:0 0 14px 22px;">
-          <li>Validate our true-cost math (fees, surcharges, effective miles burned).</li>
-          <li>Surface airline/partner quirks (phantom space, mixed cabins, transfer timing).</li>
-          <li>Prioritize the roadmap around what actually saves you time or money.</li>
-          <li>Harden reliability across devices, emails, and real booking flows.</li>
-        </ul>
-
-        <h3 style="margin:8px 0 8px;">What You Get for Helping Us Build ConciergeSync™</h3>
-        <ul style="margin:0 0 6px 22px;">
-          <li><strong>Lifetime access</strong> — all premium upgrades included.*</li>
-          <li>Early access to new features & partner integrations.</li>
-          <li>Priority support and a direct line to the team.</li>
-        </ul>
-
-        <p style="margin:10px 0 0;color:#777;font-size:.9rem;">
-          *Lifetime access limited to one account per user. No bank logins required; you can opt out anytime.
-        </p>
-      </div>
-    </div>
-
-    <!-- CTA Button -->
-    <div class="centered" style="margin-top: 40px;">
-      <h2>Ready to join the beta?</h2>
-      <a href="/beta/02-agree.html" class="cta-button">Begin Your ConciergeSync™ Journey</a>
-    </div>
-  </div>
-
-  <!-- Pre-warm the portal to avoid cold starts -->
-  <script>
-    (function () {
-      try {
-        var img = new Image();
-        img.referrerPolicy = 'no-referrer';
-        img.src = 'https://portal.conciergesync.ai/health?ts=' + Date.now();
-      } catch (e) {}
-    })();
-  </script>
-</body>
-</html>
-
-
+  // ESC to exit
+  window.addEventListener('keydown', (e)=>{
+    if (e.key === 'Escape') exitConsole();
+  });
+})();
+</script>
