@@ -177,7 +177,8 @@
     background-size: cover;
     filter: brightness(var(--bg-brightness)) contrast(var(--bg-contrast));
     transform: scale(1.02); /* slight crop to avoid edge gaps */
-    will-change: transform, filter;
+    will-change: transform, opacity;
+      transform: translateZ(0);   /* new: promote to its own layer for smoother slides */
   }
   .backdrop-overlay{
     position: absolute;
@@ -566,21 +567,30 @@ function flipAnimate(container, changeDomSync){
   });
 
   last.forEach((rLast, el) => {
-    const rFirst = first.get(el);
-    if (!rFirst) return; // new element gets its own entry animation
-    const dx = rFirst.left - rLast.left;
-    const dy = rFirst.top  - rLast.top;
-    if (dx || dy) {
-      el.style.transform = `translate(${dx}px, ${dy}px)`;
-      el.style.transition = 'transform 0s';
-      void el.getBoundingClientRect(); // force reflow
-      el.style.transition = 'transform 320ms cubic-bezier(.16,1,.3,1)';
-      el.style.transform = '';
-      el.addEventListener('transitionend', () => { el.style.transition = ''; }, {once:true});
-    }
-  });
-}
+  const rFirst = first.get(el);
+  if (!rFirst) return; // new element: its own entry animation handles it
+  const dx = rFirst.left - rLast.left;
+  const dy = rFirst.top  - rLast.top;
+  if (dx || dy) {
+    // jump to "first"
+    el.style.willChange = 'transform';
+    el.style.transition = 'transform 0s';
+    el.style.transform = `translate(${dx}px, ${dy}px)`;
 
+    // double RAF so the browser commits the starting transform
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        // animate to "last"
+        el.style.transition = 'transform 520ms cubic-bezier(.16,1,.3,1)';
+        el.style.transform = '';
+        el.addEventListener('transitionend', () => {
+          el.style.transition = '';
+          el.style.willChange = '';
+        }, { once: true });
+      });
+    });
+  }
+});
 
   // Store open order so selected + current stay centered in row 1
   const openKeys = new Set(); // insertion order matters
@@ -737,6 +747,7 @@ function flipAnimate(container, changeDomSync){
 
 </body>
 </html>
+
 
 
 
