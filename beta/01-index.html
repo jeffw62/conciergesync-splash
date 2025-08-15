@@ -469,6 +469,12 @@
     overflow: auto;
     padding: 6px;
   }
+  /* Center a single tile perfectly */
+.cs-tiles.single{
+  grid-template-columns: minmax(360px, 520px); /* exactly one column */
+  justify-content: center;
+}
+
 
   /* Tile (glass) */
   .cs-tile{
@@ -534,6 +540,11 @@
 
   const tabs = document.querySelectorAll('.cs-tab');
   const tilesWrap = document.getElementById('cs-tiles');
+  function updateWrapClass(){
+  const count = tilesWrap.querySelectorAll('.cs-tile').length;
+  tilesWrap.classList.toggle('single', count === 1);
+}
+
   // ---- FLIP animation helper: smoothly animate tile reordering ----
 function flipAnimate(container, changeDomSync){
   // 1) measure "first" positions
@@ -611,6 +622,7 @@ function flipAnimate(container, changeDomSync){
       openKeys.delete(key);
       openKeys.add(key);
       applyOrder();
+      updateWrapClass();
       existing.focus({preventScroll:true});
       return;
     }
@@ -626,9 +638,12 @@ function flipAnimate(container, changeDomSync){
       <div class="cs-tile-body"><p>${key} tile.</p></div>`))();
     addTileHandlers(sec);
     // add to DOM and order
+    flipAnimate(tilesWrap, () => {
     tilesWrap.appendChild(sec);
     openKeys.add(key);
+    });
     applyOrder();
+    updateWrapClass();
     sec.focus({preventScroll:true});
   }
 
@@ -653,6 +668,7 @@ function flipAnimate(container, changeDomSync){
       el.remove();
       if (openKeys.has(key)) openKeys.delete(key);
       applyOrder();
+      updateWrapClass();
     }, {once:true});
   }
 
@@ -712,6 +728,8 @@ function flipAnimate(container, changeDomSync){
 
   // Ensure the initial tile has handlers
   document.querySelectorAll('.cs-tile').forEach(addTileHandlers);
+  updateWrapClass();
+
 
 })();
 </script>
@@ -719,6 +737,7 @@ function flipAnimate(container, changeDomSync){
 
 </body>
 </html>
+
 
 
 
