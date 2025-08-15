@@ -1,25 +1,26 @@
-<!-- Console Controls -->
+<!-- ============= CONSOLE BACKDROP + FULLSCREEN CONTROLS ============= -->
+<!-- Controls -->
 <button id="enterConsole" class="console-btn">Enter Console</button>
 <button id="exitConsole" class="console-exit" hidden aria-label="Exit Console">×</button>
 
-<!-- Backdrop layers -->
-<div id="backdrop" class="backdrop">
+<!-- Backdrop layers (sit behind your glass tiles) -->
+<div id="csBackdrop" class="backdrop">
   <div class="backdrop-image" id="backdropImage"></div>
   <div class="backdrop-overlay" id="backdropOverlay"></div>
 </div>
 
-<style>
+<style id="cs-console-styles">
   :root{
     --bg-brightness: 1.15;   /* base lift */
     --bg-contrast: 1.05;
-    --overlay: 0.28;         /* will auto-tune per image */
+    --overlay: 0.28;         /* auto-tuned per image */
     --overlay-grad-top: rgba(0,0,0,0.35);
     --overlay-grad-bottom: rgba(0,0,0,0.55);
-    --vh: 100vh;             /* fixed on iOS below */
-    --z-ui: 40;
+    --vh: 100vh;             /* fixed on iOS */
+    --z-ui: 4000;            /* ensure buttons sit above your tiles */
   }
 
-  /* Backdrop fills the page and sits under your glass tiles */
+  /* Backdrop fills the viewport and lives under your content */
   .backdrop{
     position: fixed;
     inset: 0;
@@ -34,7 +35,7 @@
     background-position: center center;
     background-size: cover;
     filter: brightness(var(--bg-brightness)) contrast(var(--bg-contrast));
-    transform: scale(1.02); /* tiny crop to avoid edges on resize */
+    transform: scale(1.02); /* slight crop to avoid edge gaps */
     will-change: transform, filter;
   }
   .backdrop-overlay{
@@ -49,7 +50,7 @@
     transition: opacity 220ms ease;
   }
 
-  /* Buttons */
+  /* Console buttons */
   .console-btn{
     position: fixed;
     bottom: 24px;
@@ -93,53 +94,47 @@
     background: #000;
   }
 
-  /* Optional: when in (real or pseudo) fullscreen, hide the enter button */
+  /* When in console mode, hide the Enter button, show Exit */
   .in-console #enterConsole{ display: none; }
   .in-console #exitConsole{ display: inline-block; }
 </style>
 
-<script>
+<script id="cs-console-script">
 (function(){
-  // ---- Config: add your images here (DFW + Secrets Royal Beach, etc.) ----
+  // ====== CONFIG: add/adjust your images here ======
   const IMAGES = [
-    // Use WebP/JPG ~2400px wide; add as many as you like
     '/assets/bg/bg-dfw-001.webp',
     '/assets/bg/bg-secrets-royal-001.webp',
     '/assets/bg/bg-secrets-royal-002.webp',
     '/assets/bg/bg-dfw-002.webp'
   ];
 
-  // ---- Utilities ----
-  // iOS detection (for pseudo-fullscreen)
-  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || 
+  // ====== Helpers ======
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
                 (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 
-  // Fix 100vh on mobile toolbars
   function setVhVar(){
     const vh = window.innerHeight * 0.01;
     document.documentElement.style.setProperty('--vh', `${vh*100}px`);
   }
-  setVhVar(); window.addEventListener('resize', setVhVar);
+  setVhVar();
+  window.addEventListener('resize', setVhVar);
 
-  // Choose a random image not equal to last shown
   function pickImage(){
     const last = Number(localStorage.getItem('last_bg_idx') ?? '-1');
     let idx = Math.floor(Math.random() * IMAGES.length);
-    if (IMAGES.length > 1 && idx === last) {
-      idx = (idx + 1) % IMAGES.length;
-    }
+    if (IMAGES.length > 1 && idx === last) idx = (idx + 1) % IMAGES.length;
     localStorage.setItem('last_bg_idx', String(idx));
-    return { src: IMAGES[idx], idx };
+    return IMAGES[idx];
   }
 
-  // Preload helper
   function preload(src){
     const img = new Image();
+    img.crossOrigin = 'anonymous';
     img.src = src;
     return img;
   }
 
-  // Quick luminance estimate to auto-tune overlay
   function estimateLuminance(imgEl){
     try{
       const canvas = document.createElement('canvas');
@@ -151,52 +146,45 @@
       let sum = 0, count = 0;
       for(let i=0;i<data.length;i+=4){
         const r = data[i], g = data[i+1], b = data[i+2];
-        // Rec. 709 luma
-        const y = 0.2126*r + 0.7152*g + 0.0722*b;
+        const y = 0.2126*r + 0.7152*g + 0.0722*b; // Rec.709
         sum += y; count++;
       }
       return sum / count; // 0..255
     }catch(e){
-      return 140; // safe mid
+      return 140; // safe mid if cross-origin blocks canvas
     }
   }
 
   function setOverlayForLuma(luma){
-    // map luma to overlay opacity (brighter bg -> stronger overlay)
-    // luma ~ 0..255
-    const t = Math.min(1, Math.max(0, (luma - 110) / (220 - 110))); // normalize
+    // brighter image => stronger overlay
+    const t = Math.min(1, Math.max(0, (luma - 110) / (220 - 110)));
     const opacity = 0.22 + (0.42 - 0.22)*t; // 0.22..0.42
     document.documentElement.style.setProperty('--overlay', opacity.toFixed(3));
   }
 
-  // ---- Apply background ----
+  // ====== Apply background ======
   const backdropImage = document.getElementById('backdropImage');
-  const backdropOverlay = document.getElementById('backdropOverlay');
-  const { src: chosenSrc } = pickImage();
-  // Preload chosen + a random next for instant paint
+  const chosenSrc = pickImage();
   const img = preload(chosenSrc);
   img.onload = () => {
     backdropImage.style.backgroundImage = `url("${chosenSrc}")`;
-    // measure luminance and tune overlay
     setOverlayForLuma(estimateLuminance(img));
   };
 
-  // ---- Fullscreen / Console Mode ----
+  // ====== Fullscreen / Console Mode ======
   const enterBtn = document.getElementById('enterConsole');
   const exitBtn  = document.getElementById('exitConsole');
 
   function enterConsole(){
     document.body.classList.add('in-console');
-    // Try real fullscreen if supported & allowed
     const rootEl = document.documentElement;
     if (!isIOS && rootEl.requestFullscreen) {
-      rootEl.requestFullscreen().then(()=>{
-        exitBtn.hidden = false;
-      }).catch(()=>{
-        // fallback to pseudo
-        document.documentElement.classList.add('pseudo-fullscreen');
-        exitBtn.hidden = false;
-      });
+      rootEl.requestFullscreen()
+        .then(()=>{ exitBtn.hidden = false; })
+        .catch(()=>{
+          document.documentElement.classList.add('pseudo-fullscreen');
+          exitBtn.hidden = false;
+        });
     } else {
       document.documentElement.classList.add('pseudo-fullscreen');
       exitBtn.hidden = false;
@@ -207,17 +195,12 @@
     document.body.classList.remove('in-console');
     exitBtn.hidden = true;
     document.documentElement.classList.remove('pseudo-fullscreen');
-    if (document.fullscreenElement) {
-      document.exitFullscreen();
-    }
+    if (document.fullscreenElement) document.exitFullscreen();
   }
 
   enterBtn.addEventListener('click', enterConsole);
   exitBtn.addEventListener('click', exitConsole);
-
-  // ESC to exit
-  window.addEventListener('keydown', (e)=>{
-    if (e.key === 'Escape') exitConsole();
-  });
+  window.addEventListener('keydown', (e)=>{ if (e.key === 'Escape') exitConsole(); });
 })();
 </script>
+<!-- ========================== /END CONSOLE BLOCK ========================== -->
