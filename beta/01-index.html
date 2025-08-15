@@ -472,6 +472,7 @@
 
   /* Tile (glass) */
   .cs-tile{
+    will-change: transform;
     background: rgba(255,255,255,.12);
     border: 1px solid rgba(255,255,255,.28);
     border-radius: 18px;
@@ -481,12 +482,17 @@
     display: grid; grid-template-rows: auto 1fr;
     min-height: 260px; max-height: 65vh;
     overflow: hidden;
-    /* entrance animation baseline */
-    transform: translateY(20px) scale(.98);
-    opacity: 0;
-    animation: cs-pop 260ms ease forwards;
-    touch-action: pan-y; /* allow horizontal swipe */
+      /* NEW: slower, more obvious entry */
+  transform: translateY(24px) scale(.94);
+  opacity: 0;
+  animation: cs-pop 420ms cubic-bezier(.16,1,.3,1) forwards; /* nice ease-out */
+  touch-action: pan-y; /* allow horizontal swipe */
   }
+  /* NEW: punchier pop with tiny overshoot */
+@keyframes cs-pop {
+  60% { opacity: 1; transform: translateY(0) scale(1.02); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
   .cs-tile-head{
     display: flex; align-items: center; justify-content: space-between;
     padding: 12px 14px; background: rgba(0,0,0,.18);
@@ -528,6 +534,42 @@
 
   const tabs = document.querySelectorAll('.cs-tab');
   const tilesWrap = document.getElementById('cs-tiles');
+  // ---- FLIP animation helper: smoothly animate tile reordering ----
+function flipAnimate(container, changeDomSync){
+  // 1) measure "first" positions
+  const children = Array.from(container.children);
+  const first = new Map();
+  children.forEach(el => {
+    const r = el.getBoundingClientRect();
+    first.set(el, r);
+  });
+
+  // 2) DOM change (append/reorder/remove)
+  changeDomSync();
+
+  // 3) measure "last" positions and animate from first->last
+  const last = new Map();
+  Array.from(container.children).forEach(el => {
+    const r = el.getBoundingClientRect();
+    last.set(el, r);
+  });
+
+  last.forEach((rLast, el) => {
+    const rFirst = first.get(el);
+    if (!rFirst) return; // new element gets its own entry animation
+    const dx = rFirst.left - rLast.left;
+    const dy = rFirst.top  - rLast.top;
+    if (dx || dy) {
+      el.style.transform = `translate(${dx}px, ${dy}px)`;
+      el.style.transition = 'transform 0s';
+      void el.getBoundingClientRect(); // force reflow
+      el.style.transition = 'transform 320ms cubic-bezier(.16,1,.3,1)';
+      el.style.transform = '';
+      el.addEventListener('transitionend', () => { el.style.transition = ''; }, {once:true});
+    }
+  });
+}
+
 
   // Store open order so selected + current stay centered in row 1
   const openKeys = new Set(); // insertion order matters
@@ -592,15 +634,16 @@
 
   // Maintain centered first row with the last two opened tiles
   function applyOrder(){
-    // we want the **last two** in Set to be visually first (row 1), so reorder DOM
-    const keys = Array.from(openKeys);
-    // Re-append last two keys to end (they'll appear first due to grid flow & available width rule)
-    const focused = keys.slice(-2);
-    focused.forEach(k=>{
+  const keys = Array.from(openKeys);
+  const focused = keys.slice(-2); // last two opened should sit together, centered
+  flipAnimate(tilesWrap, () => {
+    focused.forEach(k => {
       const el = tilesWrap.querySelector(`.cs-tile[data-key="${k}"]`);
-      if (el) tilesWrap.appendChild(el);
+      if (el) tilesWrap.appendChild(el); // re-append moves them forward
     });
-  }
+  });
+}
+
 
   // Close tile
   function closeTile(el){
@@ -676,6 +719,7 @@
 
 </body>
 </html>
+
 
 
 
