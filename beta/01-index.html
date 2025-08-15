@@ -548,49 +548,45 @@
 
   // ---- FLIP animation helper: smoothly animate tile reordering ----
 function flipAnimate(container, changeDomSync){
+  // Respect reduced motion
+  const REDUCED = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (REDUCED) { changeDomSync(); return; }
+
   // 1) measure "first" positions
   const children = Array.from(container.children);
   const first = new Map();
-  children.forEach(el => {
-    const r = el.getBoundingClientRect();
-    first.set(el, r);
-  });
+  children.forEach(el => first.set(el, el.getBoundingClientRect()));
 
   // 2) DOM change (append/reorder/remove)
   changeDomSync();
 
-  // 3) measure "last" positions and animate from first->last
+  // 3) measure "last" and animate first -> last
   const last = new Map();
-  Array.from(container.children).forEach(el => {
-    const r = el.getBoundingClientRect();
-    last.set(el, r);
-  });
+  Array.from(container.children).forEach(el => last.set(el, el.getBoundingClientRect()));
 
   last.forEach((rLast, el) => {
-  const rFirst = first.get(el);
-  if (!rFirst) return; // new element: its own entry animation handles it
-  const dx = rFirst.left - rLast.left;
-  const dy = rFirst.top  - rLast.top;
-  if (dx || dy) {
-    // jump to "first"
-    el.style.willChange = 'transform';
-    el.style.transition = 'transform 0s';
-    el.style.transform = `translate(${dx}px, ${dy}px)`;
-
-    // double RAF so the browser commits the starting transform
-    requestAnimationFrame(() => {
+    const rFirst = first.get(el);
+    if (!rFirst) return; // new element: its own entry animation will handle it
+    const dx = rFirst.left - rLast.left;
+    const dy = rFirst.top  - rLast.top;
+    if (dx || dy) {
+      el.style.willChange = 'transform';
+      el.style.transition = 'transform 0s';
+      el.style.transform = `translate(${dx}px, ${dy}px)`;
+      // double RAF so the browser commits the starting transform
       requestAnimationFrame(() => {
-        // animate to "last"
-        el.style.transition = 'transform 520ms cubic-bezier(.16,1,.3,1)';
-        el.style.transform = '';
-        el.addEventListener('transitionend', () => {
-          el.style.transition = '';
-          el.style.willChange = '';
-        }, { once: true });
+        requestAnimationFrame(() => {
+          el.style.transition = 'transform 520ms cubic-bezier(.16,1,.3,1)';
+          el.style.transform = '';
+          el.addEventListener('transitionend', () => {
+            el.style.transition = '';
+            el.style.willChange = '';
+          }, { once: true });
+        });
       });
-    });
-  }
-});
+    }
+  });
+}
 
   // Store open order so selected + current stay centered in row 1
   const openKeys = new Set(); // insertion order matters
@@ -649,12 +645,12 @@ function flipAnimate(container, changeDomSync){
     addTileHandlers(sec);
     // add to DOM and order
     flipAnimate(tilesWrap, () => {
-    tilesWrap.appendChild(sec);
-    openKeys.add(key);
-    });
-    applyOrder();
-    updateWrapClass();
-    sec.focus({preventScroll:true});
+  tilesWrap.appendChild(sec);
+  openKeys.add(key);
+  });
+  applyOrder();
+  updateWrapClass();
+  sec.focus({preventScroll:true});
   }
 
   // Maintain centered first row with the last two opened tiles
@@ -664,7 +660,7 @@ function flipAnimate(container, changeDomSync){
   flipAnimate(tilesWrap, () => {
     focused.forEach(k => {
       const el = tilesWrap.querySelector(`.cs-tile[data-key="${k}"]`);
-      if (el) tilesWrap.appendChild(el); // re-append moves them forward
+      if (el) tilesWrap.appendChild(el);
     });
   });
 }
@@ -672,15 +668,18 @@ function flipAnimate(container, changeDomSync){
 
   // Close tile
   function closeTile(el){
-    const key = el.dataset.key;
-    el.classList.add('cs-exit');
-    el.addEventListener('animationend', ()=>{
-      el.remove();
+  const key = el.dataset.key;
+  el.classList.add('cs-exit');
+  el.addEventListener('animationend', () => {
+    // Animate the layout change while removing this tile
+    flipAnimate(tilesWrap, () => {
       if (openKeys.has(key)) openKeys.delete(key);
-      applyOrder();
-      updateWrapClass();
-    }, {once:true});
-  }
+      el.remove();
+    });
+    applyOrder();
+    updateWrapClass();
+  }, { once: true });
+}
 
   // Swipe-to-dismiss handlers
   function addTileHandlers(tile){
@@ -747,6 +746,7 @@ function flipAnimate(container, changeDomSync){
 
 </body>
 </html>
+
 
 
 
