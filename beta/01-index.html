@@ -260,6 +260,44 @@
   box-shadow: 0 2px 10px rgba(0,0,0,.35);
   border-color: rgba(255,255,255,.5);
 }
+  /* vars for the reveal */
+:root{
+  /* keep your existing vars… */
+  --bg-blur: 6px;          /* start slightly soft */
+  --bg-scale: 1.03;        /* start slightly zoomed */
+}
+
+/* start state (before console) */
+.backdrop-image{
+  opacity: 0;
+  transform: scale(var(--bg-scale));
+  /* keep your existing brightness/contrast, just append blur */
+  filter: brightness(var(--bg-brightness)) contrast(var(--bg-contrast)) blur(var(--bg-blur));
+  transition: opacity 600ms ease, transform 900ms ease, filter 900ms ease;
+}
+
+/* reveal state (after Enter Console) */
+.in-console{
+  --bg-blur: 0px;
+  --bg-scale: 1.00;
+}
+.in-console .backdrop-image{
+  opacity: 1;
+}
+
+/* keep content hidden in console (you already have this) */
+.in-console .container{
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 250ms ease;
+}
+
+/* keep the × readable */
+.in-console .console-exit{
+  box-shadow: 0 2px 10px rgba(0,0,0,.35);
+  border-color: rgba(255,255,255,.5);
+}
+
 </style>
 
 <script id="cs-console-script">
@@ -638,6 +676,7 @@
 
 </body>
 </html>
+
 
 
 
