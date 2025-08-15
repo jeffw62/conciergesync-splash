@@ -238,16 +238,24 @@
   /* When in console mode, hide the Enter button, show Exit */
   .in-console #enterConsole{ display: none; }
   .in-console #exitConsole{ display: inline-block; }
+
+  /* Immersive console mode */
+.in-console .container {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 250ms ease;
+}
+
 </style>
 
 <script id="cs-console-script">
 (function(){
   // ====== CONFIG: add/adjust your images here ======
   const IMAGES = [
-    '/assets/bg/bg-dfw-001.webp',
-    '/assets/bg/bg-secrets-royal-001.webp',
-    '/assets/bg/bg-secrets-royal-002.webp',
-    '/assets/bg/bg-dfw-002.webp'
+    '/beta/assets/bg/dfw-hero.jpg',
+    '/beta/assets/bg/bg-secrets-royal-001.webp',
+    '/beta/assets/bg/bg-secrets-royal-002.webp',
+    '/beta/assets/bg/bg-dfw-002.webp'
   ];
 
   // ====== Helpers ======
@@ -348,3 +356,4 @@
 
 </body>
 </html>
+
