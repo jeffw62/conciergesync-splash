@@ -364,9 +364,281 @@
 })();
 </script>
 <!-- ========================== /END CONSOLE BLOCK ========================== -->
+<!-- ===================== TILE CONSOLE (centered, sliding, swipe-to-dismiss) ===================== -->
+<div id="cs-console">
+  <!-- Tabs -->
+  <div class="cs-tabs" aria-label="Console Tabs">
+    <button class="cs-tab" data-key="overview">Overview</button>
+    <button class="cs-tab" data-key="itinerary">Itinerary</button>
+    <button class="cs-tab" data-key="values">Value Calc</button>
+  </div>
+
+  <!-- Tiles area -->
+  <div id="cs-tiles" class="cs-tiles" aria-live="polite">
+    <!-- initial tile example -->
+    <section class="cs-tile" data-key="overview" tabindex="0">
+      <header class="cs-tile-head">
+        <h4>Overview</h4>
+        <button class="cs-close" aria-label="Close">×</button>
+      </header>
+      <div class="cs-tile-body">
+        <p>This is your overview tile. Add your glass UI here.</p>
+      </div>
+    </section>
+  </div>
+</div>
+
+<style>
+  /* Layout */
+  #cs-console{
+    position: absolute; inset: 0;
+    display: grid; grid-template-rows: auto 1fr;
+    padding: 24px; pointer-events: auto;
+    /* keep this above backdrop */
+    z-index: 10;
+  }
+
+  /* Tabs */
+  .cs-tabs{
+    display: flex; justify-content: center; gap: 10px;
+    padding: 10px 12px;
+    backdrop-filter: blur(8px) saturate(1.1);
+    background: rgba(20,20,20,.3);
+    border-radius: 14px;
+    border: 1px solid rgba(255,255,255,.25);
+    width: max-content; margin: 0 auto 14px;
+  }
+  .cs-tab{
+    padding: 10px 14px; border-radius: 10px;
+    color: #fff; background: rgba(255,255,255,.06);
+    border: 1px solid rgba(255,255,255,.18);
+    cursor: pointer; font-weight: 600;
+  }
+  .cs-tab:hover{ background: rgba(255,255,255,.12); }
+
+  /* Tiles grid: center rows, wrap when needed */
+  .cs-tiles{
+    position: relative;
+    display: grid;
+    grid-auto-flow: row dense;
+    grid-auto-rows: 1fr;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 420px));
+    gap: 18px;
+    /* centering magic */
+    justify-content: center;
+    align-content: start;
+    height: 100%;
+    overflow: auto;
+    padding: 6px;
+  }
+
+  /* Tile (glass) */
+  .cs-tile{
+    background: rgba(255,255,255,.12);
+    border: 1px solid rgba(255,255,255,.28);
+    border-radius: 18px;
+    box-shadow: 0 10px 30px rgba(0,0,0,.18);
+    backdrop-filter: blur(12px) saturate(1.2);
+    color: #f5f7fb;
+    display: grid; grid-template-rows: auto 1fr;
+    min-height: 260px; max-height: 65vh;
+    overflow: hidden;
+    /* entrance animation baseline */
+    transform: translateY(20px) scale(.98);
+    opacity: 0;
+    animation: cs-pop 260ms ease forwards;
+    touch-action: pan-y; /* allow horizontal swipe */
+  }
+  .cs-tile-head{
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 12px 14px; background: rgba(0,0,0,.18);
+    border-bottom: 1px solid rgba(255,255,255,.18);
+  }
+  .cs-tile-head h4{ margin: 0; font-size: 15px; font-weight: 700; letter-spacing:.2px; }
+  .cs-close{
+    width: 30px; height: 30px; border-radius: 8px;
+    background: rgba(255,255,255,.12);
+    color: #fff; border: 1px solid rgba(255,255,255,.25);
+    cursor: pointer; font-size: 18px; line-height: 28px; text-align:center;
+  }
+  .cs-close:hover{ background: rgba(255,255,255,.2); }
+  .cs-tile-body{ padding: 14px; overflow: auto; }
+
+  /* two-tile centering trick: first row centers content; we prefer max two tiles per row when space allows */
+  @media (min-width: 1040px){
+    .cs-tiles{ grid-template-columns: repeat(2, minmax(360px, 520px)); }
+  }
+
+  /* Entrance/exit & reorder transitions */
+  @keyframes cs-pop{
+    to{ opacity:1; transform: translateY(0) scale(1); }
+  }
+  .cs-exit{
+    animation: cs-exit 220ms ease forwards;
+  }
+  @keyframes cs-exit{
+    to{ opacity:0; transform: translateY(8px) scale(.96); }
+  }
+
+  /* Swipe feedback */
+  .cs-swiping{ transition: none !important; }
+  .cs-tile{ transition: transform 160ms ease, opacity 160ms ease; }
+</style>
+
+<script>
+(()=>{
+
+  const tabs = document.querySelectorAll('.cs-tab');
+  const tilesWrap = document.getElementById('cs-tiles');
+
+  // Store open order so selected + current stay centered in row 1
+  const openKeys = new Set(); // insertion order matters
+
+  // Map of tile blueprints (you can replace innerHTML per tile)
+  const TILE_TEMPLATES = {
+    overview: () => `
+      <header class="cs-tile-head">
+        <h4>Overview</h4>
+        <button class="cs-close" aria-label="Close">×</button>
+      </header>
+      <div class="cs-tile-body">
+        <p>Overview content goes here.</p>
+      </div>`,
+    itinerary: () => `
+      <header class="cs-tile-head">
+        <h4>Itinerary</h4>
+        <button class="cs-close" aria-label="Close">×</button>
+      </header>
+      <div class="cs-tile-body">
+        <p>Trip segments, dates, carriers.</p>
+      </div>`,
+    values: () => `
+      <header class="cs-tile-head">
+        <h4>Value Calc</h4>
+        <button class="cs-close" aria-label="Close">×</button>
+      </header>
+      <div class="cs-tile-body">
+        <p>CPP, cash vs award, transfer hints.</p>
+      </div>`
+  };
+
+  // Create/open tile by key
+  function openTile(key){
+    // if already open, bring it to the "focused pair" (row 1 center)
+    const existing = tilesWrap.querySelector(`.cs-tile[data-key="${key}"]`);
+    if (existing){
+      // reorder: keep only last two keys as "focus" by moving this to end
+      openKeys.delete(key);
+      openKeys.add(key);
+      applyOrder();
+      existing.focus({preventScroll:true});
+      return;
+    }
+    // create tile
+    const sec = document.createElement('section');
+    sec.className = 'cs-tile';
+    sec.dataset.key = key;
+    sec.innerHTML = (TILE_TEMPLATES[key] || (()=>`
+      <header class="cs-tile-head">
+        <h4>${key}</h4>
+        <button class="cs-close" aria-label="Close">×</button>
+      </header>
+      <div class="cs-tile-body"><p>${key} tile.</p></div>`))();
+    addTileHandlers(sec);
+    // add to DOM and order
+    tilesWrap.appendChild(sec);
+    openKeys.add(key);
+    applyOrder();
+    sec.focus({preventScroll:true});
+  }
+
+  // Maintain centered first row with the last two opened tiles
+  function applyOrder(){
+    // we want the **last two** in Set to be visually first (row 1), so reorder DOM
+    const keys = Array.from(openKeys);
+    // Re-append last two keys to end (they'll appear first due to grid flow & available width rule)
+    const focused = keys.slice(-2);
+    focused.forEach(k=>{
+      const el = tilesWrap.querySelector(`.cs-tile[data-key="${k}"]`);
+      if (el) tilesWrap.appendChild(el);
+    });
+  }
+
+  // Close tile
+  function closeTile(el){
+    const key = el.dataset.key;
+    el.classList.add('cs-exit');
+    el.addEventListener('animationend', ()=>{
+      el.remove();
+      if (openKeys.has(key)) openKeys.delete(key);
+      applyOrder();
+    }, {once:true});
+  }
+
+  // Swipe-to-dismiss handlers
+  function addTileHandlers(tile){
+    // close button
+    tile.querySelector('.cs-close').addEventListener('click', ()=>closeTile(tile));
+    // swipe
+    let startX=0, currentX=0, dragging=false;
+
+    const onDown = (e)=>{
+      dragging = true;
+      startX = (e.touches ? e.touches[0].clientX : e.clientX);
+      tile.classList.add('cs-swiping');
+    };
+    const onMove = (e)=>{
+      if(!dragging) return;
+      currentX = (e.touches ? e.touches[0].clientX : e.clientX);
+      const dx = currentX - startX;
+      // slight resistance
+      tile.style.transform = `translateX(${dx}px) rotate(${dx*0.02}deg)`;
+      tile.style.opacity = String(Math.max(0.4, 1 - Math.abs(dx)/600));
+    };
+    const onUp = ()=>{
+      if(!dragging) return;
+      dragging = false;
+      tile.classList.remove('cs-swiping');
+      const dx = currentX - startX;
+      const threshold = 160; // swipe distance to dismiss
+      if (Math.abs(dx) > threshold){
+        // fling out
+        tile.style.transition = 'transform 220ms ease, opacity 220ms ease';
+        tile.style.transform = `translateX(${dx>0?600:-600}px) rotate(${dx>0?8:-8}deg)`;
+        tile.style.opacity = '0';
+        setTimeout(()=>closeTile(tile), 200);
+      }else{
+        // snap back
+        tile.style.transition = 'transform 180ms ease, opacity 180ms ease';
+        tile.style.transform = '';
+        tile.style.opacity = '';
+        setTimeout(()=>{ tile.style.transition=''; }, 180);
+      }
+    };
+
+    tile.addEventListener('mousedown', onDown);
+    tile.addEventListener('touchstart', onDown, {passive:true});
+    window.addEventListener('mousemove', onMove);
+    window.addEventListener('touchmove', onMove, {passive:true});
+    window.addEventListener('mouseup', onUp);
+    window.addEventListener('touchend', onUp);
+  }
+
+  // Wire tabs
+  tabs.forEach(btn=>{
+    btn.addEventListener('click', ()=> openTile(btn.dataset.key));
+  });
+
+  // Ensure the initial tile has handlers
+  document.querySelectorAll('.cs-tile').forEach(addTileHandlers);
+
+})();
+</script>
+<!-- =================== /END TILE CONSOLE =================== -->
 
 </body>
 </html>
+
 
 
 
