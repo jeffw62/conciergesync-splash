@@ -699,6 +699,20 @@
       tilesWrap.appendChild(sec);
       openKeys.add(key);
     });
+    // If we're in free mode, freeze position and make this new tile draggable, too
+{
+  const consoleEl = document.getElementById('cs-console');
+  if (consoleEl && consoleEl.classList.contains('cs-free')) {
+    const gridRect = tilesWrap.getBoundingClientRect();
+    const r = sec.getBoundingClientRect();
+    const x = r.left - gridRect.left + tilesWrap.scrollLeft;
+    const y = r.top  - gridRect.top  + tilesWrap.scrollTop;
+    sec.style.setProperty('--x', x + 'px');
+    sec.style.setProperty('--y', y + 'px');
+    makeDraggable(sec, tilesWrap);
+  }
+}
+
     applyOrder();
     updateWrapClass();
     sec.focus({preventScroll:true});
@@ -915,6 +929,7 @@ function makeDraggable(tile, container){
 
 </body>
 </html>
+
 
 
 
