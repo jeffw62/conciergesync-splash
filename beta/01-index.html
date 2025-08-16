@@ -551,7 +551,10 @@
   .cs-tile-body{ padding: 14px; overflow: auto; }
 
   /* Free-mode: tiles are freely placed and draggable (JS will toggle .cs-free) */
-#cs-console.cs-free .cs-tiles { position: relative; }
+#cs-console.cs-free .cs-tiles {
+  position: relative;
+  scrollbar-gutter: stable both-edges;
+}
 
 #cs-console.cs-free .cs-tile  {
   position: absolute;
@@ -1026,6 +1029,7 @@ document.addEventListener('pointerup', function (e) {
 
 </body>
 </html>
+
 
 
 
