@@ -769,7 +769,7 @@ function makeDraggable(tile, container){
   dx = dy = 0; vx = vy = 0;
   lastT = performance.now();
   tile.setPointerCapture?.(e.pointerId);
-  tile.style.transition = '';  // immediate
+  tile.style.transition = 'none';  // hard-disable transitions while dragging
 };
 
 
@@ -929,6 +929,7 @@ function makeDraggable(tile, container){
 
 </body>
 </html>
+
 
 
 
