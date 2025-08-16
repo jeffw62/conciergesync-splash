@@ -989,14 +989,12 @@ tabs.forEach((btn) => {
 <!-- =================== /END TILE CONSOLE =================== -->
 <script>
 document.addEventListener('pointerup', function (e) {
-  const tile = e.target.closest('.cs-tile');
-  if (!tile) return;
-
-  // Open the tile directly
-  tile.classList.add('is-open');
-  tile.setAttribute('aria-expanded', 'true');
-}, true); // capture = true ensures we catch it even if other handlers interfere
+  const topEl = document.elementFromPoint(e.clientX, e.clientY);
+  if (topEl) topEl.click();  // simulate a click
+}, true);
 </script>
+
 
 </body>
 </html>
+
