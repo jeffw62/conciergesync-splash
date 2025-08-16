@@ -518,12 +518,11 @@
 
 /* Entrance pop */
 @keyframes cs-pop {
+  0%   { opacity: 0; transform: translateY(24px) scale(.94); }
+  60%  { opacity: 1; transform: translateY(0)    scale(1.02); }
+  100% { opacity: 1; transform: translateY(0)    scale(1); }
+}
 
-  /* Entrance pop */
-  @keyframes cs-pop {
-    60% { opacity: 1; transform: translateY(0) scale(1.02); }
-    100% { opacity: 1; transform: translateY(0) scale(1); }
-  }
 /* Close (X) animation */
 .cs-exit{
   animation: cs-exit var(--cs-time) var(--cs-ease) forwards;
@@ -1027,6 +1026,7 @@ document.addEventListener('pointerup', function (e) {
 
 </body>
 </html>
+
 
 
 
