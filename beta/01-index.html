@@ -128,18 +128,18 @@
     </div>
   </div>
 
-  <!-- Pre-warm the portal to avoid cold starts -->
-  <script>
-    (function () {
-      try {
-        var img = new Image();
-        img.referrerPolicy = 'no-referrer';
-        img.src = 'https://portal.conciergesync.ai/health?ts=' + Date.now();
-      } catch (e) {}
-    })();
-  </script>
+<!-- Pre-warm the portal to avoid cold starts -->
+<script>
+(function () {
+  try {
+    var img = new Image();
+    img.referrerPolicy = 'no-referrer';
+    img.src = 'https://portal.conciergesync.ai/health?ts=' + Date.now();
+  } catch (e) {}
+})();
+</script>
 
-  <!-- ============= CONSOLE BACKDROP + FULLSCREEN CONTROLS ============= -->
+<!-- ============= CONSOLE BACKDROP + FULLSCREEN CONTROLS ============= -->
 <!-- Controls -->
 <button id="enterConsole" class="console-btn">Enter Console</button>
 <button id="exitConsole" class="console-exit" hidden aria-label="Exit Console">×</button>
@@ -152,6 +152,7 @@
 
 <style id="cs-console-styles">
   :root{
+    /* Theme vars */
     --bg-brightness: 1.15;   /* base lift */
     --bg-contrast: 1.05;
     --overlay: 0.28;         /* auto-tuned per image */
@@ -159,6 +160,23 @@
     --overlay-grad-bottom: rgba(0,0,0,0.55);
     --vh: 100vh;             /* fixed on iOS */
     --z-ui: 4000;            /* ensure buttons sit above your tiles */
+
+    /* Calm motion vars — single source of truth */
+    --cs-time: 640ms;                               /* general motion */
+    --cs-time-out: 900ms;                           /* dismiss/exit slower */
+    --cs-ease: cubic-bezier(.22, 1, .36, 1);        /* mellow ease-out */
+
+    /* Backdrop reveal */
+    --bg-blur: 6px;          /* start slightly soft */
+    --bg-scale: 1.03;        /* start slightly zoomed */
+  }
+
+  /* Respect reduced motion users */
+  @media (prefers-reduced-motion: reduce){
+    :root{
+      --cs-time: 0ms;
+      --cs-time-out: 0ms;
+    }
   }
 
   /* Backdrop fills the viewport and lives under your content */
@@ -175,10 +193,11 @@
     inset: 0;
     background-position: center center;
     background-size: cover;
-    filter: brightness(var(--bg-brightness)) contrast(var(--bg-contrast));
-    transform: scale(1.02); /* slight crop to avoid edge gaps */
-    will-change: transform, opacity;
-      transform: translateZ(0);   /* new: promote to its own layer for smoother slides */
+    filter: brightness(var(--bg-brightness)) contrast(var(--bg-contrast)) blur(var(--bg-blur));
+    transform: scale(var(--bg-scale)) translateZ(0); /* promote to its own layer */
+    will-change: transform, opacity, filter;
+    transition: opacity 600ms ease, transform 900ms ease, filter 900ms ease;
+    opacity: 0; /* start hidden */
   }
   .backdrop-overlay{
     position: absolute;
@@ -241,72 +260,30 @@
   .in-console #exitConsole{ display: inline-block; }
 
   /* Immersive console mode */
-.in-console .container {
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 250ms ease;
-}
+  .in-console .container {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 250ms ease;
+  }
 
-/* Smooth reveal */
-.backdrop-image { 
-  opacity: 0; 
-  transition: opacity 280ms ease; 
-}
-.in-console .backdrop-image { 
-  opacity: 1; 
-}
+  /* Backdrop reveal when console enters */
+  .in-console .backdrop-image { opacity: 1; }
+  .in-console{
+    --bg-blur: 0px;
+    --bg-scale: 1.00;
+  }
 
-/* Ensure the close button stays readable */
-.in-console .console-exit {
-  box-shadow: 0 2px 10px rgba(0,0,0,.35);
-  border-color: rgba(255,255,255,.5);
-}
-  /* vars for the reveal */
-:root{
-  /* keep your existing vars… */
-  --bg-blur: 6px;          /* start slightly soft */
-  --bg-scale: 1.03;        /* start slightly zoomed */
-}
-
-/* start state (before console) */
-.backdrop-image{
-  opacity: 0;
-  transform: scale(var(--bg-scale));
-  /* keep your existing brightness/contrast, just append blur */
-  filter: brightness(var(--bg-brightness)) contrast(var(--bg-contrast)) blur(var(--bg-blur));
-  transition: opacity 600ms ease, transform 900ms ease, filter 900ms ease;
-}
-
-/* reveal state (after Enter Console) */
-.in-console{
-  --bg-blur: 0px;
-  --bg-scale: 1.00;
-}
-.in-console .backdrop-image{
-  opacity: 1;
-}
-
-/* keep content hidden in console (you already have this) */
-.in-console .container{
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 250ms ease;
-}
-
-/* keep the × readable */
-.in-console .console-exit{
-  box-shadow: 0 2px 10px rgba(0,0,0,.35);
-  border-color: rgba(255,255,255,.5);
-}
-
+  /* Ensure the close button stays readable */
+  .in-console .console-exit {
+    box-shadow: 0 2px 10px rgba(0,0,0,.35);
+    border-color: rgba(255,255,255,.5);
+  }
 </style>
 
 <script id="cs-console-script">
 (function(){
   // ====== CONFIG: add/adjust your images here ======
-  const IMAGES = [
-    '/beta/assets/bg/dfw-hero.jpg',
-      ];
+  const IMAGES = ['/beta/assets/bg/dfw-hero.jpg'];
 
   // ====== Helpers ======
   const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
@@ -403,6 +380,7 @@
 })();
 </script>
 <!-- ========================== /END CONSOLE BLOCK ========================== -->
+
 <!-- ===================== TILE CONSOLE (centered, sliding, swipe-to-dismiss) ===================== -->
 <div id="cs-console">
   <!-- Tabs -->
@@ -429,28 +407,11 @@
 
 <style>
   /* Layout */
-  :root{
-  --cs-time: 640ms;                               /* slower = calmer */
-  --cs-ease: cubic-bezier(.22, 1, .36, 1);        /* mellow ease-out */
-}
-
-.cs-tile {
-  /* …existing styles… */
-  animation: cs-pop var(--cs-time) var(--cs-ease) forwards;
-}
-
-.cs-tile.cs-dismissing {
-  transition: transform var(--cs-time) var(--cs-ease),
-              opacity   var(--cs-time) var(--cs-ease);
-  opacity: 0;
-}
-
   #cs-console{
     position: absolute; inset: 0;
     display: grid; grid-template-rows: auto 1fr;
     padding: 24px; pointer-events: auto;
-    /* keep this above backdrop */
-    z-index: 10;
+    z-index: 10; /* keep this above backdrop */
   }
 
   /* Tabs */
@@ -479,89 +440,76 @@
     grid-auto-rows: 1fr;
     grid-template-columns: repeat(auto-fit, minmax(320px, 420px));
     gap: 18px;
-    /* centering magic */
-    justify-content: center;
+    justify-content: center;   /* centering magic */
     align-content: start;
     height: 100%;
     overflow: auto;
     padding: 6px;
   }
   /* Center a single tile perfectly */
-.cs-tiles.single{
-  grid-template-columns: minmax(360px, 520px); /* exactly one column */
-  justify-content: center;
-}
+  .cs-tiles.single{
+    grid-template-columns: minmax(360px, 520px); /* exactly one column */
+    justify-content: center;
+  }
 
- /* Tile (glass) */
-.cs-tile{
-  /* perf hints */
-  will-change: transform, opacity;
-  transform: translateZ(0);
+  /* Tile (glass) */
+  .cs-tile{
+    /* perf hints */
+    will-change: transform, opacity;
+    transform: translateZ(0);
 
-  /* look */
-  background: rgba(255,255,255,.12);
-  border: 1px solid rgba(255,255,255,.28);
-  border-radius: 18px;
-  box-shadow: 0 10px 30px rgba(0,0,0,.18);
-  backdrop-filter: blur(12px) saturate(1.2);
-  color: #f5f7fb;
+    /* look */
+    background: rgba(255,255,255,.12);
+    border: 1px solid rgba(255,255,255,.28);
+    border-radius: 18px;
+    box-shadow: 0 10px 30px rgba(0,0,0,.18);
+    backdrop-filter: blur(12px) saturate(1.2);
+    color: #f5f7fb;
 
-  /* layout */
-  display: grid; 
-  grid-template-rows: auto 1fr;
-  min-height: 260px; 
-  max-height: 65vh;
-  overflow: hidden;
+    /* layout */
+    display: grid; 
+    grid-template-rows: auto 1fr;
+    min-height: 260px; 
+    max-height: 65vh;
+    overflow: hidden;
 
-  /* entry animation (soft pop) */
-  transform: translateY(24px) scale(.94);
-  opacity: 0;
-  animation: cs-pop 420ms cubic-bezier(.16,1,.3,1) forwards;
+    /* entry animation (soft pop) */
+    transform: translateY(24px) scale(.94);
+    opacity: 0;
+    animation: cs-pop var(--cs-time) var(--cs-ease) forwards;
 
-  /* allow horizontal swipe on touch */
-  touch-action: pan-y;
-}
+    /* allow horizontal swipe on touch */
+    touch-action: pan-y;
+  }
 
-/* Focused tile: a touch brighter with a soft lift */
-.cs-tile.is-focused{
-  box-shadow: 0 16px 44px rgba(0,0,0,.28),
-              0 0 0 1px rgba(255,255,255,.20) inset;
-  backdrop-filter: blur(12px) saturate(1.25);
-  transform: translateZ(0);
-}
+  /* Focused tile: a touch brighter with a soft lift */
+  .cs-tile.is-focused{
+    box-shadow: 0 16px 44px rgba(0,0,0,.28),
+                0 0 0 1px rgba(255,255,255,.20) inset;
+    backdrop-filter: blur(12px) saturate(1.25);
+    transform: translateZ(0);
+  }
 
-/* While FLIP is running or you're swiping, lighten effects for smoothness */
-.cs-tile.moving,
-.cs-tile.cs-swiping{
-  backdrop-filter: blur(8px) saturate(1.1);
-  box-shadow: 0 8px 22px rgba(0,0,0,.16);
-}
+  /* While FLIP is running or you're swiping, lighten effects for smoothness */
+  .cs-tile.moving,
+  .cs-tile.cs-swiping{
+    backdrop-filter: blur(8px) saturate(1.1);
+    box-shadow: 0 8px 22px rgba(0,0,0,.16);
+  }
 
-/* Smooth swipe-away when we commit the dismiss */
-.cs-tile.cs-dismissing{
-  transition: transform 520ms cubic-bezier(.16,1,.3,1),
-              opacity 520ms cubic-bezier(.16,1,.3,1);
-  opacity: 0;
-}
+  /* Smooth swipe-away when we commit the dismiss (calm timing) */
+  .cs-tile.cs-dismissing{
+    transition: transform var(--cs-time-out) var(--cs-ease),
+                opacity   var(--cs-time-out) var(--cs-ease);
+    opacity: 0;
+  }
 
-/* While FLIP is running or you’re swiping, lighten the effects for smoothness */
-.cs-tile.moving,
-.cs-tile.cs-swiping{
-  backdrop-filter: blur(8px) saturate(1.1);
-  box-shadow: 0 8px 22px rgba(0,0,0,.16);
-}
+  /* Entrance pop */
+  @keyframes cs-pop {
+    60% { opacity: 1; transform: translateY(0) scale(1.02); }
+    100% { opacity: 1; transform: translateY(0) scale(1); }
+  }
 
-/* Smooth swipe-away when we commit the dismiss */
-.cs-tile.cs-dismissing{
-  transition: transform 520ms cubic-bezier(.16,1,.3,1), opacity 520ms cubic-bezier(.16,1,.3,1);
-  opacity: 0;
-}
-
-  /* NEW: punchier pop with tiny overshoot */
-@keyframes cs-pop {
-  60% { opacity: 1; transform: translateY(0) scale(1.02); }
-  100% { opacity: 1; transform: translateY(0) scale(1); }
-}
   .cs-tile-head{
     display: flex; align-items: center; justify-content: space-between;
     padding: 12px 14px; background: rgba(0,0,0,.18);
@@ -577,78 +525,106 @@
   .cs-close:hover{ background: rgba(255,255,255,.2); }
   .cs-tile-body{ padding: 14px; overflow: auto; }
 
-  /* two-tile centering trick: first row centers content; we prefer max two tiles per row when space allows */
+  /* Prefer two tiles per row at wide widths */
   @media (min-width: 1040px){
     .cs-tiles{ grid-template-columns: repeat(2, minmax(360px, 520px)); }
   }
 
-  /* Entrance/exit & reorder transitions */
-  @keyframes cs-pop{
-    to{ opacity:1; transform: translateY(0) scale(1); }
-  }
-  .cs-exit{
-    animation: cs-exit 220ms ease forwards;
-  }
-  @keyframes cs-exit{
-    to{ opacity:0; transform: translateY(8px) scale(.96); }
-  }
-
-  /* Swipe feedback */
+  /* Swipe feedback defaults */
   .cs-swiping{ transition: none !important; }
   .cs-tile{ transition: transform 160ms ease, opacity 160ms ease; }
 </style>
 
 <script>
 (()=>{
-
   const tabs = document.querySelectorAll('.cs-tab');
   const tilesWrap = document.getElementById('cs-tiles');
+
   function updateWrapClass(){
-  const count = tilesWrap.querySelectorAll('.cs-tile').length;
-  tilesWrap.classList.toggle('single', count === 1);
-}
+    const count = tilesWrap.querySelectorAll('.cs-tile').length;
+    tilesWrap.classList.toggle('single', count === 1);
+  }
 
   // ---- FLIP animation helper: smoothly animate tile reordering ----
-function flipAnimate(container, changeDomSync){
-  // Respect reduced motion
-  const REDUCED = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  if (REDUCED) { changeDomSync(); return; }
+  function flipAnimate(container, changeDomSync){
+    // Respect reduced motion
+    const REDUCED = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (REDUCED) { changeDomSync(); return; }
 
-  // 1) measure "first" positions
-  const children = Array.from(container.children);
-  const first = new Map();
-  children.forEach(el => first.set(el, el.getBoundingClientRect()));
+    // 1) measure "first" positions
+    const children = Array.from(container.children);
+    const first = new Map();
+    children.forEach(el => first.set(el, el.getBoundingClientRect()));
 
-  // 2) DOM change (append/reorder/remove)
-  changeDomSync();
+    // 2) DOM change (append/reorder/remove)
+    changeDomSync();
 
-  // 3) measure "last" and animate first -> last
-  const last = new Map();
-  Array.from(container.children).forEach(el => last.set(el, el.getBoundingClientRect()));
+    // 3) measure "last" and animate first -> last
+    const last = new Map();
+    Array.from(container.children).forEach(el => last.set(el, el.getBoundingClientRect()));
 
-  last.forEach((rLast, el) => {
-    const rFirst = first.get(el);
-    if (!rFirst) return; // new element: its own entry animation will handle it
-    const dx = rFirst.left - rLast.left;
-    const dy = rFirst.top  - rLast.top;
-    if (dx || dy) {
-      el.style.willChange = 'transform';
-      el.style.transition = 'transform 0s';
-      el.style.transform = `translate(${dx}px, ${dy}px)`;
-      // double RAF so the browser commits the starting transform
-      requestAnimationFrame(() => {
+    last.forEach((rLast, el) => {
+      const rFirst = first.get(el);
+      if (!rFirst) return; // new element: its own entry animation will handle it
+      const dx = rFirst.left - rLast.left;
+      const dy = rFirst.top  - rLast.top;
+      if (dx || dy) {
+        el.style.willChange = 'transform';
+        el.style.transition = 'transform 0s';
+        el.style.transform = `translate(${dx}px, ${dy}px)`;
+        // double RAF so the browser commits the starting transform
         requestAnimationFrame(() => {
-          el.style.transition = 'transform var(--cs-time) var(--cs-ease)';
-          el.style.transform = '';
-          el.addEventListener('transitionend', () => {
-            el.style.transition = '';
-            el.style.willChange = '';
-          }, { once: true });
+          requestAnimationFrame(() => {
+            el.style.transition = 'transform var(--cs-time) var(--cs-ease)';
+            el.style.transform = '';
+            el.addEventListener('transitionend', () => {
+              el.style.transition = '';
+              el.style.willChange = '';
+            }, { once: true });
+          });
         });
-      });
-    }
-  });
-}
+      }
+    });
+  }
+
+  // -------------------------------------------
+  // Calm dismiss helper (global to this module)
+  // -------------------------------------------
+  function calmDismiss(tile, direction = 1){
+    const off = (window.innerWidth * 0.5) * direction; // 50vw
+    tile.classList.add('cs-dismissing');               // uses --cs-time-out easing
+    tile.style.transform = `translateX(${off}px) rotate(${off*0.002}deg)`;
+    tile.addEventListener('transitionend', () => {
+      tile.remove();
+    }, { once: true });
+  }
+
+  // Dismiss focused tile on backdrop / outside click with a calm glide
+  const consoleEl  = document.getElementById('cs-console');
+  const backdropEl = document.querySelector('#csBackdrop, .backdrop');
+
+  function isOutsideConsole(target){
+    return consoleEl && !consoleEl.contains(target);
+  }
+
+  // Backdrop click/tap
+  if (backdropEl) {
+    backdropEl.addEventListener('pointerdown', (e) => {
+      const active = document.querySelector('.cs-tile.is-focused');
+      if (!active) return;
+      const dir = (e.clientX >= window.innerWidth/2) ? 1 : -1;
+      calmDismiss(active, dir);
+    });
+  }
+
+  // Generic click-out anywhere outside the console
+  window.addEventListener('pointerdown', (e) => {
+    if (!isOutsideConsole(e.target)) return;
+    const active = document.querySelector('.cs-tile.is-focused');
+    if (!active) return;
+    const dir = (e.clientX >= window.innerWidth/2) ? 1 : -1;
+    calmDismiss(active, dir);
+  }, { capture: true });
 
   // Store open order so selected + current stay centered in row 1
   const openKeys = new Set(); // insertion order matters
@@ -686,7 +662,6 @@ function flipAnimate(container, changeDomSync){
     // if already open, bring it to the "focused pair" (row 1 center)
     const existing = tilesWrap.querySelector(`.cs-tile[data-key="${key}"]`);
     if (existing){
-      // reorder: keep only last two keys as "focus" by moving this to end
       openKeys.delete(key);
       openKeys.add(key);
       applyOrder();
@@ -707,46 +682,46 @@ function flipAnimate(container, changeDomSync){
     addTileHandlers(sec);
     // add to DOM and order
     flipAnimate(tilesWrap, () => {
-  tilesWrap.appendChild(sec);
-  openKeys.add(key);
-  });
-  applyOrder();
-  updateWrapClass();
-  sec.focus({preventScroll:true});
+      tilesWrap.appendChild(sec);
+      openKeys.add(key);
+    });
+    applyOrder();
+    updateWrapClass();
+    sec.focus({preventScroll:true});
   }
 
   // Maintain centered first row with the last two opened tiles
   function applyOrder(){
-  const keys = Array.from(openKeys);
-  const focused = keys.slice(-2); // last two opened should sit together, centered
-  flipAnimate(tilesWrap, () => {
-    focused.forEach(k => {
-      const el = tilesWrap.querySelector(`.cs-tile[data-key="${k}"]`);
-      if (el) tilesWrap.appendChild(el);
-    });
-  });
-}
-
-
-  // Close tile
-  function closeTile(el){
-  const key = el.dataset.key;
-  el.classList.add('cs-exit');
-  el.addEventListener('animationend', () => {
-    // Animate the layout change while removing this tile
+    const keys = Array.from(openKeys);
+    const focused = keys.slice(-2); // last two opened should sit together, centered
     flipAnimate(tilesWrap, () => {
-      if (openKeys.has(key)) openKeys.delete(key);
-      el.remove();
+      focused.forEach(k => {
+        const el = tilesWrap.querySelector(`.cs-tile[data-key="${k}"]`);
+        if (el) tilesWrap.appendChild(el);
+      });
     });
-    applyOrder();
-    updateWrapClass();
-  }, { once: true });
-}
+  }
 
-  // Swipe-to-dismiss handlers
+  // Close tile (animated)
+  function closeTile(el){
+    const key = el.dataset.key;
+    el.classList.add('cs-exit');
+    el.addEventListener('animationend', () => {
+      // Animate the layout change while removing this tile
+      flipAnimate(tilesWrap, () => {
+        if (openKeys.has(key)) openKeys.delete(key);
+        el.remove();
+      });
+      applyOrder();
+      updateWrapClass();
+    }, { once: true });
+  }
+
+  // Swipe-to-dismiss handlers (calm tuning)
   function addTileHandlers(tile){
     // close button
     tile.querySelector('.cs-close').addEventListener('click', ()=>closeTile(tile));
+
     // swipe
     let startX=0, currentX=0, dragging=false;
 
@@ -755,32 +730,34 @@ function flipAnimate(container, changeDomSync){
       startX = (e.touches ? e.touches[0].clientX : e.clientX);
       tile.classList.add('cs-swiping');
     };
+
     const onMove = (e)=>{
       if(!dragging) return;
       currentX = (e.touches ? e.touches[0].clientX : e.clientX);
       const dx = currentX - startX;
-      // slight resistance
-      tile.style.transform = `translateX(${dx}px) rotate(${dx*0.02}deg)`;
+      tile.style.transform = `translateX(${dx}px) rotate(${dx*0.008}deg)`; // calmer rotation
       tile.style.opacity = String(Math.max(0.4, 1 - Math.abs(dx)/600));
     };
+
     const onUp = ()=>{
       if(!dragging) return;
       dragging = false;
       tile.classList.remove('cs-swiping');
       const dx = currentX - startX;
-      const threshold = 160; // swipe distance to dismiss
-      if (Math.abs(dx) > threshold){
-        // fling out
-        tile.style.transition = 'transform 220ms ease, opacity 220ms ease';
-        tile.style.transform = `translateX(${dx>0?600:-600}px) rotate(${dx>0?8:-8}deg)`;
-        tile.style.opacity = '0';
-        setTimeout(()=>closeTile(tile), 200);
+      const direction = dx >= 0 ? 1 : -1;
+
+      const DISMISS_DIST  = 160;                         // farther swipe required
+      const off = (window.innerWidth * 0.5) * direction; // calmer 50vw push
+
+      if (Math.abs(dx) > DISMISS_DIST){
+        calmDismiss(tile, direction);                    // glide out with calm timing
       }else{
         // snap back
-        tile.style.transition = 'transform 180ms ease, opacity 180ms ease';
+        tile.style.transition = `transform var(--cs-time) var(--cs-ease)`;
         tile.style.transform = '';
-        tile.style.opacity = '';
-        setTimeout(()=>{ tile.style.transition=''; }, 180);
+        tile.addEventListener('transitionend', () => {
+          tile.style.transition = '';
+        }, { once: true });
       }
     };
 
@@ -800,22 +777,9 @@ function flipAnimate(container, changeDomSync){
   // Ensure the initial tile has handlers
   document.querySelectorAll('.cs-tile').forEach(addTileHandlers);
   updateWrapClass();
-
-
 })();
 </script>
 <!-- =================== /END TILE CONSOLE =================== -->
 
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
