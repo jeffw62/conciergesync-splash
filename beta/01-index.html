@@ -819,9 +819,6 @@ function makeDraggable(tile, container){
   window.addEventListener('pointermove', onMove,  {capture:true});
   window.addEventListener('pointerup',   onUp,    {capture:true});
 
-  tile.addEventListener('touchstart', onDown, {passive:false, capture:true});
-  window.addEventListener('touchmove', onMove, {passive:false, capture:true});
-  window.addEventListener('touchend',  onUp,   {capture:true});
 }
 
   // Maintain centered first row with the last two opened tiles
@@ -929,6 +926,7 @@ function makeDraggable(tile, container){
 
 </body>
 </html>
+
 
 
 
