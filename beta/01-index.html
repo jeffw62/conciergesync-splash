@@ -562,6 +562,30 @@
   /* Swipe feedback defaults */
   .cs-swiping{ transition: none !important; }
   .cs-tile{ transition: transform 160ms ease, opacity 160ms ease; }
+
+  /* --- TEMP: force taps through overlays to tiles --- */
+.cs-overlay,
+.cs-scrim,
+.cs-glow,
+.cs-shadow,
+.cs-bling,
+[data-overlay],
+[aria-hidden="true"]{
+  pointer-events: none !important;
+}
+
+/* Ensure the tiles themselves can still receive taps */
+.cs-tile,
+.cs-tile *{
+  pointer-events: auto;
+}
+
+/* Improve touch behavior on the tap targets */
+.cs-tile{
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
 </style>
 
 <script>
@@ -966,6 +990,7 @@ tabs.forEach((btn) => {
 
 </body>
 </html>
+
 
 
 
