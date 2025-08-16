@@ -746,27 +746,28 @@
       tile.style.opacity = String(Math.max(0.4, 1 - Math.abs(dx)/600));
     };
 
-    const onUp = ()=>{
-      if(!dragging) return;
-      dragging = false;
-      tile.classList.remove('cs-swiping');
-      const dx = currentX - startX;
-      const direction = dx >= 0 ? 1 : -1;
+    const onUp = () => {
+  if (!dragging) return;
+  dragging = false;
+  tile.classList.remove('cs-swiping');
 
-      const DISMISS_DIST  = 160;                         // farther swipe required
-      const off = (window.innerWidth * 0.5) * direction; // calmer 50vw push
+  const dx = currentX - startX;
+  const direction = dx >= 0 ? 1 : -1;
+  const DISMISS_DIST = 160; // try 140 if you want easier dismiss
 
-      if (Math.abs(dx) > DISMISS_DIST){
-        calmDismiss(tile, direction);                    // glide out with calm timing
-      }else{
-        // snap back
-        tile.style.transition = `transform var(--cs-time) var(--cs-ease)`;
-        tile.style.transform = '';
-        tile.addEventListener('transitionend', () => {
-          tile.style.transition = '';
-        }, { once: true });
-      }
-    };
+  if (Math.abs(dx) > DISMISS_DIST) {
+    // Use the calm glide-off
+    calmDismiss(tile, direction);
+  } else {
+    // Snap back gently
+    tile.style.transition = `transform var(--cs-time) var(--cs-ease)`;
+    tile.style.transform = '';
+    tile.addEventListener('transitionend', () => {
+      tile.style.transition = '';
+    }, { once: true });
+  }
+};
+
 
     tile.addEventListener('mousedown', onDown);
     tile.addEventListener('touchstart', onDown, {passive:true});
@@ -790,4 +791,5 @@
 
 </body>
 </html>
+
 
