@@ -987,9 +987,34 @@ tabs.forEach((btn) => {
 })();
 </script>
 <!-- =================== /END TILE CONSOLE =================== -->
+<script>
+(function () {
+  const tag = document.createElement('div');
+  Object.assign(tag.style, {
+    position: 'fixed', left: '12px', bottom: '12px',
+    padding: '8px 10px', font: '12px system-ui,Segoe UI,Roboto,Arial',
+    background: 'rgba(0,0,0,.8)', color: '#fff', borderRadius: '8px',
+    zIndex: 2147483647, pointerEvents: 'none'
+  });
+  tag.textContent = 'tap a tile…';
+  document.body.appendChild(tag);
+
+  function nameOf(el){
+    if(!el) return 'null';
+    const cls = (el.className && String(el.className).trim()) ? '.'+String(el.className).trim().replace(/\s+/g,'.') : '';
+    return el.tagName.toLowerCase()+cls;
+  }
+
+  window.addEventListener('pointerup', function (e) {
+    const topEl = document.elementFromPoint(e.clientX, e.clientY);
+    tag.textContent = 'top@point: ' + nameOf(topEl);
+  }, {passive:true});
+})();
+</script>
 
 </body>
 </html>
+
 
 
 
