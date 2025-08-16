@@ -597,6 +597,14 @@
 (()=>{
   const tabs = document.querySelectorAll('.cs-tab');
   const tilesWrap = document.getElementById('cs-tiles');
+    // Always close on X (delegated, so it works for new tiles too)
+  tilesWrap.addEventListener('click', (e) => {
+    const x = e.target.closest('.cs-close');
+    if (!x) return;
+    const tile = x.closest('.cs-tile');
+    if (tile) closeTile(tile);
+  });
+
 
   function updateWrapClass(){
     const count = tilesWrap.querySelectorAll('.cs-tile').length;
@@ -1024,6 +1032,7 @@ document.addEventListener('pointerup', function (e) {
 
 </body>
 </html>
+
 
 
 
