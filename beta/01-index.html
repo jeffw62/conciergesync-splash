@@ -466,7 +466,7 @@
     /* entry animation (soft pop) */
     transform: translateY(24px) scale(.94);
     opacity: 0;
-    animation: cs-pop var(--cs-time) var(--cs-ease) forwards;
+    animation: cs-pop var(--cs-time) var(--cs-ease) both;
 
     /* allow horizontal swipe on touch */
     touch-action: pan-y;
@@ -741,16 +741,16 @@
       </header>
       <div class="cs-tile-body"><p>${key} tile.</p></div>`))();
    addTileHandlers(sec);
+addTileHandlers(sec);
 
-// TEMP: bypass FLIP — append without transition, then restore after pop-in
-sec.style.transition = 'none';
-tilesWrap.appendChild(sec);
-sec.addEventListener('animationend', () => {
-  sec.style.transition = '';
-}, { once: true });
-
+// Restore FLIP so the tile animates in smoothly (no flicker)
+flipAnimate(tilesWrap, () => {
+  tilesWrap.appendChild(sec);
+  openKeys.add(key);
+});
+applyOrder();
 updateWrapClass();
-return; // stop here for the test
+
 
 {
   const consoleEl = document.getElementById('cs-console');
@@ -1022,6 +1022,7 @@ document.addEventListener('pointerup', function (e) {
 
 </body>
 </html>
+
 
 
 
