@@ -988,32 +988,20 @@ tabs.forEach((btn) => {
 </script>
 <!-- =================== /END TILE CONSOLE =================== -->
 <script>
-document.addEventListener('pointerup', function (e) {
+/* Force touch → click for .cs-tab buttons */
+document.addEventListener('touchend', function (e) {
   const btn = e.target.closest('.cs-tab');
   if (!btn) return;
 
-  const info = {
-    id: btn.id || '(none)',
-    text: (btn.textContent || '').trim(),
-    ariaControls: btn.getAttribute('aria-controls') || '(none)',
-    dataTarget: btn.getAttribute('data-target') || '(none)',
-    href: btn.getAttribute('href') || '(none)',
-    hasOnclick: !!btn.onclick
-  };
-  alert(
-    'cs-tab info:\n' +
-    'id: ' + info.id + '\n' +
-    'text: ' + info.text + '\n' +
-    'aria-controls: ' + info.ariaControls + '\n' +
-    'data-target: ' + info.dataTarget + '\n' +
-    'href: ' + info.href + '\n' +
-    'onclick handler: ' + info.hasOnclick
-  );
-}, true);
+  e.preventDefault(); // stop ghost click delay
+  btn.click();        // trigger the framework's normal click handler
+}, {passive:false});
 </script>
+
 
 </body>
 </html>
+
 
 
 
