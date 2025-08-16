@@ -532,10 +532,16 @@
   .cs-close:hover{ background: rgba(255,255,255,.2); }
   .cs-tile-body{ padding: 14px; overflow: auto; }
 
-  /* Prefer two tiles per row at wide widths */
-  @media (min-width: 1040px){
-    .cs-tiles{ grid-template-columns: repeat(2, minmax(360px, 520px)); }
-  }
+  /* Free-mode: tiles are freely placed and draggable (JS will toggle .cs-free) */
+#cs-console.cs-free .cs-tiles { position: relative; }
+
+#cs-console.cs-free .cs-tile {
+  position: absolute;
+  left: var(--x, 0px);
+  top: var(--y, 0px);
+  will-change: left, top, transform;
+  transition: transform var(--cs-time) var(--cs-ease), box-shadow 180ms ease;
+}
 
   /* Swipe feedback defaults */
   .cs-swiping{ transition: none !important; }
@@ -696,6 +702,96 @@
     updateWrapClass();
     sec.focus({preventScroll:true});
   }
+// ---------- FREE MODE: drag anywhere + swipe-off ----------
+function enableFreeMode(){
+  const consoleEl = document.getElementById('cs-console');
+  const grid = document.getElementById('cs-tiles');
+  if (!consoleEl || !grid) return;
+  consoleEl.classList.add('cs-free');
+
+  // Freeze each tile where it currently sits (convert grid pos -> absolute)
+  const gridRect = grid.getBoundingClientRect();
+  Array.from(grid.children).forEach(tile => {
+    const r = tile.getBoundingClientRect();
+    const x = r.left - gridRect.left + grid.scrollLeft;
+    const y = r.top  - gridRect.top  + grid.scrollTop;
+    tile.style.setProperty('--x', x + 'px');
+    tile.style.setProperty('--y', y + 'px');
+    makeDraggable(tile, grid);
+  });
+}
+
+function makeDraggable(tile, container){
+  let sx=0, sy=0, startX=0, startY=0, dx=0, dy=0, dragging=false, lastT=0, vx=0, vy=0;
+
+  const getVar = (name) => {
+    const v = getComputedStyle(tile).getPropertyValue(name);
+    return parseFloat(v) || 0;
+  };
+
+  const onDown = (e) => {
+    const p = ('touches' in e) ? e.touches[0] : e;
+    e.preventDefault();               // follow finger exactly
+    e.stopPropagation();              // avoid old swipe listeners
+    dragging = true;
+    sx = p.clientX; sy = p.clientY;
+    startX = getVar('--x'); startY = getVar('--y');
+    dx = dy = 0; vx = vy = 0;
+    lastT = performance.now();
+    tile.setPointerCapture?.(e.pointerId);
+    tile.style.transition = '';       // immediate
+  };
+
+  const onMove = (e) => {
+    if (!dragging) return;
+    const p = ('touches' in e) ? e.touches[0] : e;
+    dx = p.clientX - sx;
+    dy = p.clientY - sy;
+
+    // simple velocity estimate
+    const now = performance.now();
+    const dt = Math.max(16, now - lastT);
+    vx = (dx - (tile._lastDx || 0)) / dt;
+    vy = (dy - (tile._lastDy || 0)) / dt;
+    tile._lastDx = dx; tile._lastDy = dy; lastT = now;
+
+    tile.style.transform = `translate(${dx}px, ${dy}px) rotate(${dx*0.008}deg)`;
+  };
+
+  const onUp = () => {
+    if (!dragging) return;
+    dragging = false;
+
+    const newX = startX + dx;
+    const newY = startY + dy;
+
+    // swipe-off if far or fast enough (mainly horizontal)
+    const dismiss = Math.abs(dx) > 160 || (Math.hypot(vx, vy) > 0.8 && Math.abs(dx) > 100);
+    if (dismiss){
+      const dir = dx >= 0 ? 1 : -1;
+      calmDismiss(tile, dir);
+    } else {
+      tile.style.transition = `transform var(--cs-time) var(--cs-ease)`;
+      tile.style.setProperty('--x', Math.max(0, newX) + 'px');
+      tile.style.setProperty('--y', Math.max(0, newY) + 'px');
+      requestAnimationFrame(() => { tile.style.transform = ''; });
+      tile.addEventListener('transitionend', () => {
+        tile.style.transition = '';
+      }, { once: true });
+    }
+
+    tile._lastDx = tile._lastDy = 0;
+  };
+
+  // pointer + touch (capture to win over existing handlers)
+  tile.addEventListener('pointerdown', onDown, {capture:true});
+  window.addEventListener('pointermove', onMove,  {capture:true});
+  window.addEventListener('pointerup',   onUp,    {capture:true});
+
+  tile.addEventListener('touchstart', onDown, {passive:false, capture:true});
+  window.addEventListener('touchmove', onMove, {passive:false, capture:true});
+  window.addEventListener('touchend',  onUp,   {capture:true});
+}
 
   // Maintain centered first row with the last two opened tiles
   function applyOrder(){
@@ -785,11 +881,13 @@
   // Ensure the initial tile has handlers
   document.querySelectorAll('.cs-tile').forEach(addTileHandlers);
   updateWrapClass();
+  enableFreeMode();
 })();
 </script>
 <!-- =================== /END TILE CONSOLE =================== -->
 
 </body>
 </html>
+
 
 
