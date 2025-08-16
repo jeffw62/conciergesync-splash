@@ -775,9 +775,17 @@ function makeDraggable(tile, container){
 
   const onMove = (e) => {
     if (!dragging) return;
+    e.preventDefault();
     const p = ('touches' in e) ? e.touches[0] : e;
     dx = p.clientX - sx;
     dy = p.clientY - sy;
+    // immediate visual update, batched to the next frame (prevents jank)
+if (!tile._raf) {
+  tile._raf = requestAnimationFrame(() => {
+    tile.style.transform = `translate(${dx}px, ${dy}px) rotate(${dx*0.008}deg)`;
+    tile._raf = null;
+  });
+}
 
     // simple velocity estimate
     const now = performance.now();
@@ -926,6 +934,7 @@ function makeDraggable(tile, container){
 
 </body>
 </html>
+
 
 
 
