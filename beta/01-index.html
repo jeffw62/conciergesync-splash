@@ -743,14 +743,10 @@
       </header>
       <div class="cs-tile-body"><p>${key} tile.</p></div>`))();
     addTileHandlers(sec);
-    // add to DOM and order
-    flipAnimate(tilesWrap, () => {
-      tilesWrap.appendChild(sec);
-      openKeys.add(key);
-    });
-   applyOrder();
-  updateWrapClass();
-
+    // TEMP: bypass FLIP — just append so we can SEE it
+    tilesWrap.appendChild(sec);
+    updateWrapClass();
+    return; // stop here for the test
 // Center + init drag when in free mode
 {
   const consoleEl = document.getElementById('cs-console');
@@ -1029,6 +1025,7 @@ document.addEventListener('pointerup', function (e) {
 
 </body>
 </html>
+
 
 
 
