@@ -944,16 +944,17 @@ if (!tile._raf) {
     window.addEventListener('touchend', onUp);
   }
 
-  // Wire tabs — respond immediately to touch/mouse
+  // Wire tabs — fire immediately on touch/mouse
 tabs.forEach((btn) => {
-  const handler = (e) => {
-    e.preventDefault();                  // avoid mobile click delay / ghost click
+  const onTap = (e) => {
+    // prevent the mobile delay / ghost click when it's touch or pen
+    if (e.pointerType === 'touch' || e.pointerType === 'pen') e.preventDefault();
     openTile(btn.dataset.key);
   };
-  btn.addEventListener('pointerup', handler, { passive: false });
-  btn.addEventListener('click', handler); // fallback for older browsers
-});
 
+  btn.addEventListener('pointerdown', onTap, { passive: false }); // earliest, reliable
+  btn.addEventListener('click', (e) => onTap(e));                  // fallback for mouse-only/older
+});
 
   // Ensure the initial tile has handlers
   document.querySelectorAll('.cs-tile').forEach(addTileHandlers);
@@ -965,6 +966,7 @@ tabs.forEach((btn) => {
 
 </body>
 </html>
+
 
 
 
