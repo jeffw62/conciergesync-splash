@@ -509,6 +509,13 @@
     60% { opacity: 1; transform: translateY(0) scale(1.02); }
     100% { opacity: 1; transform: translateY(0) scale(1); }
   }
+/* Close (X) animation */
+.cs-exit{
+  animation: cs-exit var(--cs-time) var(--cs-ease) forwards;
+}
+@keyframes cs-exit{
+  to { opacity: 0; transform: translateY(8px) scale(.96); }
+}
 
   .cs-tile-head{
     display: flex; align-items: center; justify-content: space-between;
@@ -783,3 +790,4 @@
 
 </body>
 </html>
+
