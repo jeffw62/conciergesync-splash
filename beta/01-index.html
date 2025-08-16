@@ -745,6 +745,8 @@
     addTileHandlers(sec);
     // TEMP: bypass FLIP — just append so we can SEE it
     tilesWrap.appendChild(sec);
+    sec.style.cssText += 'background:red !important; opacity:1 !important; min-height:220px; transform:none !important; animation:none !important; z-index:9999;';
+    alert('tiles in DOM: ' + tilesWrap.children.length);
     updateWrapClass();
     return; // stop here for the test
 // Center + init drag when in free mode
@@ -1025,6 +1027,7 @@ document.addEventListener('pointerup', function (e) {
 
 </body>
 </html>
+
 
 
 
