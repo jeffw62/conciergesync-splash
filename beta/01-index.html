@@ -988,19 +988,30 @@ tabs.forEach((btn) => {
 </script>
 <!-- =================== /END TILE CONSOLE =================== -->
 <script>
-/* Force touch → click for .cs-tab buttons */
-document.addEventListener('touchend', function (e) {
+// Fallback: when a .cs-tab is tapped, force-reveal the panel right after it
+document.addEventListener('pointerup', function (e) {
   const btn = e.target.closest('.cs-tab');
   if (!btn) return;
 
-  e.preventDefault(); // stop ghost click delay
-  btn.click();        // trigger the framework's normal click handler
-}, {passive:false});
-</script>
+  const tile = btn.closest('.cs-tile');
+  const panel = btn.nextElementSibling; // many UIs put the panel right after the tab
 
+  if (tile) tile.classList.add('is-open');
+
+  if (panel) {
+    panel.removeAttribute('hidden');
+    panel.setAttribute('aria-hidden','false');
+    panel.style.display = 'block';
+    panel.style.opacity = '1';
+    panel.style.maxHeight = '100vh';
+    panel.style.visibility = 'visible';
+  }
+}, true);
+</script>
 
 </body>
 </html>
+
 
 
 
