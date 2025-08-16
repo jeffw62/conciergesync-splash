@@ -988,31 +988,15 @@ tabs.forEach((btn) => {
 </script>
 <!-- =================== /END TILE CONSOLE =================== -->
 <script>
-(function () {
-  // Tiny on-screen counter so you can SEE if taps are detected at all
-  const tag = document.createElement('div');
-  tag.id = 'tap-counter';
-  tag.textContent = 'taps: 0';
-  Object.assign(tag.style, {
-    position: 'fixed', left: '12px', bottom: '12px',
-    padding: '8px 10px', font: '12px system-ui,Segoe UI,Roboto,Arial',
-    background: 'rgba(0,0,0,.8)', color: '#fff', borderRadius: '8px',
-    zIndex: 2147483647, pointerEvents: 'none'
-  });
-  document.body.appendChild(tag);
+document.addEventListener('pointerup', function (e) {
+  const tile = e.target.closest('.cs-tile');
+  if (!tile) return;
 
-  let n = 0;
-  document.addEventListener('pointerup', function (e) {
-    n++;
-    tag.textContent = 'taps: ' + n + ' | top: ' + (document.elementFromPoint(e.clientX, e.clientY)?.tagName?.toLowerCase() || 'none');
-  }, true); // capture phase to catch before something cancels it
-})();
+  // Open the tile directly
+  tile.classList.add('is-open');
+  tile.setAttribute('aria-expanded', 'true');
+}, true); // capture = true ensures we catch it even if other handlers interfere
 </script>
-
-
-
-
 
 </body>
 </html>
-
