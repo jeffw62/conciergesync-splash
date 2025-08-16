@@ -990,11 +990,16 @@ tabs.forEach((btn) => {
 <script>
 document.addEventListener('pointerup', function (e) {
   const topEl = document.elementFromPoint(e.clientX, e.clientY);
-  if (topEl) topEl.click();  // simulate a click
+  if (topEl) {
+    console.log('Tapped element:', topEl.tagName, topEl.className);
+    alert('Tapped: ' + topEl.tagName + ' .' + topEl.className);
+  }
 }, true);
 </script>
 
 
+
 </body>
 </html>
+
 
