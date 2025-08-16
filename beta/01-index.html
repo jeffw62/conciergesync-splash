@@ -535,12 +535,13 @@
   /* Free-mode: tiles are freely placed and draggable (JS will toggle .cs-free) */
 #cs-console.cs-free .cs-tiles { position: relative; }
 
-#cs-console.cs-free .cs-tile {
+#cs-console.cs-free .cs-tile  {
   position: absolute;
   left: var(--x, 0px);
-  top: var(--y, 0px);
+  top:  var(--y, 0px);
   will-change: left, top, transform;
   transition: transform var(--cs-time) var(--cs-ease), box-shadow 180ms ease;
+  touch-action: none; /* let our handler capture both X & Y without browser scrolling */
 }
 
   /* Swipe feedback defaults */
@@ -888,6 +889,7 @@ function makeDraggable(tile, container){
 
 </body>
 </html>
+
 
 
 
