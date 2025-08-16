@@ -435,6 +435,10 @@
     height: 100%;
     overflow: auto;
     padding: 6px;
+    contain: layout paint;
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    will-change: contents;
   }
   /* Center a single tile perfectly */
   .cs-tiles.single{
@@ -1022,6 +1026,7 @@ document.addEventListener('pointerup', function (e) {
 
 </body>
 </html>
+
 
 
 
