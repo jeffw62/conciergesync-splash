@@ -18,7 +18,7 @@
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Inter, Arial, sans-serif;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Inter, Arial, sans-serif;sec.style.opacity
       background: var(--bg);
       color: var(--ink);
       line-height: 1.6;
@@ -740,12 +740,18 @@
         <button class="cs-close" aria-label="Close">×</button>
       </header>
       <div class="cs-tile-body"><p>${key} tile.</p></div>`))();
-    addTileHandlers(sec);
-    // TEMP: bypass FLIP — just append so we can SEE it
-    tilesWrap.appendChild(sec);
-        updateWrapClass();
-    return; // stop here for the test
-// Center + init drag when in free mode
+   addTileHandlers(sec);
+
+// TEMP: bypass FLIP — append without transition, then restore after pop-in
+sec.style.transition = 'none';
+tilesWrap.appendChild(sec);
+sec.addEventListener('animationend', () => {
+  sec.style.transition = '';
+}, { once: true });
+
+updateWrapClass();
+return; // stop here for the test
+
 {
   const consoleEl = document.getElementById('cs-console');
   if (consoleEl && consoleEl.classList.contains('cs-free')) {
@@ -1016,6 +1022,7 @@ document.addEventListener('pointerup', function (e) {
 
 </body>
 </html>
+
 
 
 
