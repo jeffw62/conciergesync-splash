@@ -988,18 +988,24 @@ tabs.forEach((btn) => {
 </script>
 <!-- =================== /END TILE CONSOLE =================== -->
 <script>
+/* Fire the full tap/click sequence specifically for .cs-tab buttons */
 document.addEventListener('pointerup', function (e) {
-  const topEl = document.elementFromPoint(e.clientX, e.clientY);
-  if (topEl) {
-    console.log('Tapped element:', topEl.tagName, topEl.className);
-    alert('Tapped: ' + topEl.tagName + ' .' + topEl.className);
-  }
+  const btn = e.target.closest('.cs-tab');
+  if (!btn) return;
+
+  const opts = {bubbles:true, cancelable:true, view:window, clientX:e.clientX, clientY:e.clientY};
+
+  // Many UIs listen on pointerdown/mousedown rather than click
+  btn.dispatchEvent(new PointerEvent('pointerdown', opts));
+  btn.dispatchEvent(new MouseEvent('mousedown', opts));
+  btn.dispatchEvent(new MouseEvent('mouseup', opts));
+  btn.dispatchEvent(new PointerEvent('pointerup', opts));
+  btn.dispatchEvent(new MouseEvent('click', opts));
 }, true);
 </script>
 
-
-
 </body>
 </html>
+
 
 
