@@ -839,6 +839,16 @@ function makeDraggable(tile, container){
 
   // Swipe-to-dismiss handlers (calm tuning)
   function addTileHandlers(tile){
+    // If we're in free mode, skip attaching the grid-swipe handlers.
+// Still wire the X button.
+{
+  const consoleEl = document.getElementById('cs-console');
+  if (consoleEl && consoleEl.classList.contains('cs-free')) {
+    tile.querySelector('.cs-close')?.addEventListener('click', () => closeTile(tile));
+    return; // prevent conflicting swipe listeners
+  }
+}
+
     // close button
     tile.querySelector('.cs-close').addEventListener('click', ()=>closeTile(tile));
 
@@ -905,6 +915,7 @@ function makeDraggable(tile, container){
 
 </body>
 </html>
+
 
 
 
