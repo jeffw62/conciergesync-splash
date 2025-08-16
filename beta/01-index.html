@@ -731,17 +731,33 @@ function makeDraggable(tile, container){
   };
 
   const onDown = (e) => {
-    const p = ('touches' in e) ? e.touches[0] : e;
-    e.preventDefault();               // follow finger exactly
-    e.stopPropagation();              // avoid old swipe listeners
-    dragging = true;
-    sx = p.clientX; sy = p.clientY;
-    startX = getVar('--x'); startY = getVar('--y');
-    dx = dy = 0; vx = vy = 0;
-    lastT = performance.now();
-    tile.setPointerCapture?.(e.pointerId);
-    tile.style.transition = '';       // immediate
-  };
+  // 1) Let interactive elements work normally (Close button, links, inputs)
+  const tgt = e.target;
+  if (
+    tgt.closest('.cs-close') ||
+    tgt.closest('button') ||
+    tgt.closest('a') ||
+    tgt.closest('input, textarea, select')
+  ) {
+    return; // don't start a drag — allow the click to go through
+  }
+
+  // 2) Only primary button/pointer should drag
+  if ('button' in e && e.button !== 0) return;
+
+  // 3) Start drag
+  const p = ('touches' in e) ? e.touches[0] : e;
+  e.preventDefault();          // follow finger exactly
+  e.stopPropagation();         // avoid old swipe listeners
+  dragging = true;
+  sx = p.clientX; sy = p.clientY;
+  startX = getVar('--x'); startY = getVar('--y');
+  dx = dy = 0; vx = vy = 0;
+  lastT = performance.now();
+  tile.setPointerCapture?.(e.pointerId);
+  tile.style.transition = '';  // immediate
+};
+
 
   const onMove = (e) => {
     if (!dragging) return;
@@ -889,6 +905,7 @@ function makeDraggable(tile, container){
 
 </body>
 </html>
+
 
 
 
