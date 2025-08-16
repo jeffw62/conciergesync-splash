@@ -990,14 +990,7 @@ tabs.forEach((btn) => {
   document.querySelectorAll('.cs-tile').forEach(addTileHandlers);
   updateWrapClass();
   enableFreeMode();
-  try {
-  openTile('overview');
-  alert('openTile() ran');
-} catch (err) {
-  alert('openTile() error: ' + err.message);
-  console.error(err);
-}
-
+  
 })();
 </script>
 <!-- =================== /END TILE CONSOLE =================== -->
@@ -1025,6 +1018,7 @@ document.addEventListener('pointerup', function (e) {
 
 </body>
 </html>
+
 
 
 
