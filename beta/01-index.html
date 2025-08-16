@@ -476,25 +476,71 @@
   justify-content: center;
 }
 
+ /* Tile (glass) */
+.cs-tile{
+  /* perf hints */
+  will-change: transform, opacity;
+  transform: translateZ(0);
 
-  /* Tile (glass) */
-  .cs-tile{
-    will-change: transform;
-    background: rgba(255,255,255,.12);
-    border: 1px solid rgba(255,255,255,.28);
-    border-radius: 18px;
-    box-shadow: 0 10px 30px rgba(0,0,0,.18);
-    backdrop-filter: blur(12px) saturate(1.2);
-    color: #f5f7fb;
-    display: grid; grid-template-rows: auto 1fr;
-    min-height: 260px; max-height: 65vh;
-    overflow: hidden;
-      /* NEW: slower, more obvious entry */
+  /* look */
+  background: rgba(255,255,255,.12);
+  border: 1px solid rgba(255,255,255,.28);
+  border-radius: 18px;
+  box-shadow: 0 10px 30px rgba(0,0,0,.18);
+  backdrop-filter: blur(12px) saturate(1.2);
+  color: #f5f7fb;
+
+  /* layout */
+  display: grid; 
+  grid-template-rows: auto 1fr;
+  min-height: 260px; 
+  max-height: 65vh;
+  overflow: hidden;
+
+  /* entry animation (soft pop) */
   transform: translateY(24px) scale(.94);
   opacity: 0;
-  animation: cs-pop 420ms cubic-bezier(.16,1,.3,1) forwards; /* nice ease-out */
-  touch-action: pan-y; /* allow horizontal swipe */
-  }
+  animation: cs-pop 420ms cubic-bezier(.16,1,.3,1) forwards;
+
+  /* allow horizontal swipe on touch */
+  touch-action: pan-y;
+}
+
+/* Focused tile: a touch brighter with a soft lift */
+.cs-tile.is-focused{
+  box-shadow: 0 16px 44px rgba(0,0,0,.28),
+              0 0 0 1px rgba(255,255,255,.20) inset;
+  backdrop-filter: blur(12px) saturate(1.25);
+  transform: translateZ(0);
+}
+
+/* While FLIP is running or you're swiping, lighten effects for smoothness */
+.cs-tile.moving,
+.cs-tile.cs-swiping{
+  backdrop-filter: blur(8px) saturate(1.1);
+  box-shadow: 0 8px 22px rgba(0,0,0,.16);
+}
+
+/* Smooth swipe-away when we commit the dismiss */
+.cs-tile.cs-dismissing{
+  transition: transform 520ms cubic-bezier(.16,1,.3,1),
+              opacity 520ms cubic-bezier(.16,1,.3,1);
+  opacity: 0;
+}
+
+/* While FLIP is running or you’re swiping, lighten the effects for smoothness */
+.cs-tile.moving,
+.cs-tile.cs-swiping{
+  backdrop-filter: blur(8px) saturate(1.1);
+  box-shadow: 0 8px 22px rgba(0,0,0,.16);
+}
+
+/* Smooth swipe-away when we commit the dismiss */
+.cs-tile.cs-dismissing{
+  transition: transform 520ms cubic-bezier(.16,1,.3,1), opacity 520ms cubic-bezier(.16,1,.3,1);
+  opacity: 0;
+}
+
   /* NEW: punchier pop with tiny overshoot */
 @keyframes cs-pop {
   60% { opacity: 1; transform: translateY(0) scale(1.02); }
@@ -746,6 +792,7 @@ function flipAnimate(container, changeDomSync){
 
 </body>
 </html>
+
 
 
 
