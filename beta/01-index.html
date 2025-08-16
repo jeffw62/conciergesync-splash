@@ -988,32 +988,25 @@ tabs.forEach((btn) => {
 </script>
 <!-- =================== /END TILE CONSOLE =================== -->
 <script>
-(function () {
-  const tag = document.createElement('div');
-  Object.assign(tag.style, {
-    position: 'fixed', left: '12px', bottom: '12px',
-    padding: '8px 10px', font: '12px system-ui,Segoe UI,Roboto,Arial',
-    background: 'rgba(0,0,0,.8)', color: '#fff', borderRadius: '8px',
-    zIndex: 2147483647, pointerEvents: 'none'
-  });
-  tag.textContent = 'tap a tile…';
-  document.body.appendChild(tag);
+/* Open a tile on simple tap */
+window.addEventListener('pointerup', function (e) {
+  const tile = e.target.closest && e.target.closest('.cs-tile');
+  if (!tile) return;
 
-  function nameOf(el){
-    if(!el) return 'null';
-    const cls = (el.className && String(el.className).trim()) ? '.'+String(el.className).trim().replace(/\s+/g,'.') : '';
-    return el.tagName.toLowerCase()+cls;
-  }
+  // 1) Try clicking an obvious opener inside the tile
+  const opener = tile.querySelector('button,[role="button"],a,[data-open],[data-toggle]');
+  if (opener) { opener.click(); return; }
 
-  window.addEventListener('pointerup', function (e) {
-    const topEl = document.elementFromPoint(e.clientX, e.clientY);
-    tag.textContent = 'top@point: ' + nameOf(topEl);
-  }, {passive:true});
-})();
+  // 2) Fallback: add an "is-open" state & aria hint
+  tile.classList.add('is-open');
+  tile.setAttribute('aria-expanded','true');
+}, {passive:true});
 </script>
+
 
 </body>
 </html>
+
 
 
 
