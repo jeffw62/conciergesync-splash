@@ -944,10 +944,16 @@ if (!tile._raf) {
     window.addEventListener('touchend', onUp);
   }
 
-  // Wire tabs
-  tabs.forEach(btn=>{
-    btn.addEventListener('click', ()=> openTile(btn.dataset.key));
-  });
+  // Wire tabs — respond immediately to touch/mouse
+tabs.forEach((btn) => {
+  const handler = (e) => {
+    e.preventDefault();                  // avoid mobile click delay / ghost click
+    openTile(btn.dataset.key);
+  };
+  btn.addEventListener('pointerup', handler, { passive: false });
+  btn.addEventListener('click', handler); // fallback for older browsers
+});
+
 
   // Ensure the initial tile has handlers
   document.querySelectorAll('.cs-tile').forEach(addTileHandlers);
@@ -959,6 +965,7 @@ if (!tile._raf) {
 
 </body>
 </html>
+
 
 
 
