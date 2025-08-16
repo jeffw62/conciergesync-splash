@@ -988,24 +988,20 @@ tabs.forEach((btn) => {
 </script>
 <!-- =================== /END TILE CONSOLE =================== -->
 <script>
-/* Open a tile on simple tap */
-window.addEventListener('pointerup', function (e) {
-  const tile = e.target.closest && e.target.closest('.cs-tile');
-  if (!tile) return;
-
-  // 1) Try clicking an obvious opener inside the tile
-  const opener = tile.querySelector('button,[role="button"],a,[data-open],[data-toggle]');
-  if (opener) { opener.click(); return; }
-
-  // 2) Fallback: add an "is-open" state & aria hint
-  tile.classList.add('is-open');
-  tile.setAttribute('aria-expanded','true');
+/* Force tiles to open on tap by toggling a class */
+document.addEventListener('pointerup', function (e) {
+  const tile = e.target.closest('.cs-tile');
+  if (tile) {
+    tile.classList.toggle('is-open');
+  }
 }, {passive:true});
 </script>
 
 
+
 </body>
 </html>
+
 
 
 
