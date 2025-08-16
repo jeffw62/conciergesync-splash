@@ -392,16 +392,6 @@
 
   <!-- Tiles area -->
   <div id="cs-tiles" class="cs-tiles" aria-live="polite">
-    <!-- initial tile example -->
-    <section class="cs-tile" data-key="overview" tabindex="0">
-      <header class="cs-tile-head">
-        <h4>Overview</h4>
-        <button class="cs-close" aria-label="Close">×</button>
-      </header>
-      <div class="cs-tile-body">
-        <p>This is your overview tile. Add your glass UI here.</p>
-      </div>
-    </section>
   </div>
 </div>
 
@@ -503,6 +493,31 @@
                 opacity   var(--cs-time-out) var(--cs-ease);
     opacity: 0;
   }
+  /* === Free-mode tile positioning === */
+  .cs-free .cs-tile {
+  position: absolute;
+  transform: translate(var(--x, 0), var(--y, 0));
+  will-change: transform, box-shadow;
+  touch-action: none; /* keeps drag under the finger on touch */
+
+  /* smooth when snapping/centering; JS sets 'none' during active drag */
+ transition: transform 480ms cubic-bezier(.22, 1, .36, 1), 
+            box-shadow 320ms cubic-bezier(.22, 1, .36, 1);
+  }
+  }  /* closes .cs-free .cs-tile  (line 506) */
+
+/* Tiny settle pulse after a move */
+@keyframes cs-land {
+  0%   { transform: translate(var(--x, 0), var(--y, 0)) scale(1.015); }
+  60%  { transform: translate(var(--x, 0), var(--y, 0)) scale(0.995); }
+  100% { transform: translate(var(--x, 0), var(--y, 0)) scale(1); }
+}
+.cs-free .cs-tile.cs-landing {
+  animation: cs-land 420ms cubic-bezier(.22, 1, .36, 1);
+}
+
+/* Entrance pop */
+@keyframes cs-pop {
 
   /* Entrance pop */
   @keyframes cs-pop {
@@ -699,23 +714,28 @@
       tilesWrap.appendChild(sec);
       openKeys.add(key);
     });
-    // If we're in free mode, freeze position and make this new tile draggable, too
+   applyOrder();
+  updateWrapClass();
+
+// Center + init drag when in free mode
 {
   const consoleEl = document.getElementById('cs-console');
   if (consoleEl && consoleEl.classList.contains('cs-free')) {
-    const gridRect = tilesWrap.getBoundingClientRect();
-    const r = sec.getBoundingClientRect();
-    const x = r.left - gridRect.left + tilesWrap.scrollLeft;
-    const y = r.top  - gridRect.top  + tilesWrap.scrollTop;
-    sec.style.setProperty('--x', x + 'px');
-    sec.style.setProperty('--y', y + 'px');
+    const wrapRect = tilesWrap.getBoundingClientRect();
+    const tileRect = sec.getBoundingClientRect();
+
+    const x = tilesWrap.scrollLeft + (wrapRect.width  - tileRect.width)  / 2;
+    const y = tilesWrap.scrollTop  + (wrapRect.height - tileRect.height) / 2;
+
+    sec.style.setProperty('--x', `${Math.max(0, x)}px`);
+    sec.style.setProperty('--y', `${Math.max(0, y)}px`);
+
     makeDraggable(sec, tilesWrap);
   }
 }
 
-    applyOrder();
-    updateWrapClass();
-    sec.focus({preventScroll:true});
+sec.focus({ preventScroll: true });
+
   }
 // ---------- FREE MODE: drag anywhere + swipe-off ----------
 function enableFreeMode(){
@@ -795,6 +815,11 @@ function makeDraggable(tile, container){
 
     const newX = startX + dx;
     const newY = startY + dy;
+    
+    tile.classList.add('cs-landing');
+    tile.addEventListener('animationend', () => {
+      tile.classList.remove('cs-landing');
+    }, { once: true });
 
     // swipe-off if far or fast enough (mainly horizontal)
     const dismiss = Math.abs(dx) > 160 || (Math.hypot(vx, vy) > 0.8 && Math.abs(dx) > 100);
@@ -926,6 +951,7 @@ function makeDraggable(tile, container){
 
 </body>
 </html>
+
 
 
 
