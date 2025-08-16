@@ -16,6 +16,29 @@
     .footer{margin-top:18px;text-align:center;font-size:14px;color:var(--muted)}
     .footer a{color:#0b3b9e;text-decoration:none}
     .footer a:hover{text-decoration:underline}
+    /* --- TEMP: force taps through overlays to tiles --- */
+.cs-overlay,
+.cs-scrim,
+.cs-glow,
+.cs-shadow,
+.cs-bling,
+[data-overlay],
+[aria-hidden="true"]{
+  pointer-events: none !important;
+}
+
+/* Ensure the tiles themselves can still receive taps */
+.cs-tile,
+.cs-tile *{
+  pointer-events: auto;
+}
+
+/* Improve touch behavior on the tap targets */
+.cs-tile{
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
   </style>
 </head>
 <body>
