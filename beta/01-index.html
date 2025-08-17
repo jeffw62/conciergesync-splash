@@ -1080,7 +1080,6 @@ tabs.forEach((btn) => {
     // swipe-to-dismiss (horizontal)
     let startX=0, currentX=0, dragging=false, pointerId=null;
     function onDown(e){
-      if (e.type === 'touchstart' && e.cancelable) e.preventDefault();
       
       // block swipe-to-dismiss when the touched tile is already open
       const t = e.target.closest('.cs-tile');
@@ -1268,6 +1267,7 @@ if (sec && sec.classList.contains('is-open')) {
 
 </body>
 </html>
+
 
 
 
