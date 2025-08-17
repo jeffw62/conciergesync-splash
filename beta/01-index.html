@@ -1082,12 +1082,14 @@ tabs.forEach((btn) => {
     function onDown(e){
       // block swipe-to-dismiss on large (opened) tiles
       const t = e.target.closest('.cs-tile');
-      if (t) console.log('TILE classes →', t.className);
       if (t) {
+      sec = t;                               // track the active tile
       const w = t.getBoundingClientRect().width;
-      console.log('tile width:', Math.round(w));
-      if (w >= 420) return;   // block swipe on large (opened) tiles
-      // or just comment the line out
+      if (w >= 420) {                        // OPEN tile → enter drag mode
+      startX = e.clientX;                  // remember finger start (needed by onMove)
+      // startY = e.clientY;               // add if you later do vertical drag
+      return;                              // don’t start swipe-to-dismiss
+      }
     }
 
       if (document.getElementById('cs-console').classList.contains('arrange-on')) return;
@@ -1271,6 +1273,7 @@ if (sec && sec.classList.contains('is-open')) {
 
 </body>
 </html>
+
 
 
 
