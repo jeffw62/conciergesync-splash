@@ -1092,7 +1092,6 @@ tabs.forEach((btn) => {
 
       dragging = true;
       // ...
-    }
 
       if (document.getElementById('cs-console').classList.contains('arrange-on')) return; // no swipe in Arrange
       if (e.target.closest('.cs-close,button,a,input,textarea,select')) return;
@@ -1102,7 +1101,6 @@ tabs.forEach((btn) => {
       startX = e.clientX;
       sec.classList.add('cs-swiping');
       sec.style.touchAction = 'none';
-      e.preventDefault?.();
     }
     function onMove(e){
       // If the current tile is OPEN, drag = reposition (horizontal only for now)
@@ -1270,6 +1268,7 @@ if (sec && sec.classList.contains('is-open')) {
 
 </body>
 </html>
+
 
 
 
