@@ -152,7 +152,12 @@
 <!-- ============= CONSOLE BACKDROP + FULLSCREEN CONTROLS ============= -->
 <!-- Controls -->
 <button id="enterConsole" class="console-btn">Enter Console</button>
-<button id="exitConsole" class="console-exit" hidden aria-label="Exit Console">×</button>
+<button id="exitConsole"
+        class="console-exit"
+        aria-label="Exit Console"
+        type="button"
+        onclick="window.location.href='exit.html'">×</button>
+
 
 <!-- Backdrop layers (sit behind your glass tiles) -->
 <div id="csBackdrop" class="backdrop">
@@ -1364,6 +1369,7 @@ if (sec && sec.classList.contains('is-open')) {
 
 </body>
 </html>
+
 
 
 
