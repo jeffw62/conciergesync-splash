@@ -1274,7 +1274,9 @@ if (sec && sec.classList.contains('is-open')) {
   // 1) Hide the console UI while on the splash
   var style = document.createElement('style');
   style.id = 'splash-hide-console';
-  style.textContent = 'body.splash-mode #cs-console{display:none!important}';
+  style.textContent =
+  'body.splash-mode #cs-console{display:none!important} ' +
+  'body.splash-mode .console-btn:not(#enterConsole){display:none!important}';
   document.head.appendChild(style);
   document.body.classList.add('splash-mode');
 
@@ -1290,6 +1292,7 @@ if (sec && sec.classList.contains('is-open')) {
 
 </body>
 </html>
+
 
 
 
