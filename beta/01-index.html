@@ -1313,36 +1313,49 @@ if (sec && sec.classList.contains('is-open')) {
 })();
 </script>
 <script>
-/* Auto-enter console when URL has ?enter=1 (used by exit.html re-entry) */
 (function () {
-  if (new URLSearchParams(location.search).get('enter') === '1') {
-    // ensure the splash script has run first, then reveal console
-    requestAnimationFrame(function () {
-      document.body.classList.remove('splash-mode');
-      var cs = document.getElementById('cs-console');
-      if (cs && cs.scrollIntoView) cs.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    });
+  // Splash logic: hide console until Enter is pressed — and auto-enter on ?enter=1
+  var btn = document.getElementById('enterConsole');
+  if (!btn) return;
+
+  // Hide console UI on splash
+  var style = document.getElementById('splash-hide-console');
+  if (!style) {
+    style = document.createElement('style');
+    style.id = 'splash-hide-console';
+    style.textContent =
+      'body.splash-mode #cs-console{display:none!important}' +
+      ' body.splash-mode .console-btn:not(#enterConsole){display:none!important}';
+    document.head.appendChild(style);
   }
-})();
-</script>
-<script>
-(function () {
-  // If coming from exit.html (?enter=1), reveal and force-scroll to #cs-console
+  document.body.classList.add('splash-mode');
+
+  // Enter button → reveal console + scroll to it
+  btn.addEventListener('click', function (e) {
+    e.preventDefault();
+    document.body.classList.remove('splash-mode');
+    var cs = document.getElementById('cs-console');
+    if (cs && cs.scrollIntoView) {
+      requestAnimationFrame(function () {
+        cs.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+    }
+  });
+
+  // Auto-enter when coming from exit.html (01-index.html?enter=1[#cs-console])
   if (new URLSearchParams(location.search).get('enter') === '1') {
-    requestAnimationFrame(function () {
-      document.body.classList.remove('splash-mode');
-      var cs = document.getElementById('cs-console');
-      if (!cs) return;
-      // set hash and force the scroll after layout
-      location.hash = '#cs-console';
-      setTimeout(function () {
-        window.scrollTo({ top: cs.getBoundingClientRect().top + window.scrollY - 12, left: 0, behavior: 'smooth' });
-      }, 0);
-    });
+    document.body.classList.remove('splash-mode');
+    var cs = document.getElementById('cs-console');
+    if (cs && cs.scrollIntoView) {
+      requestAnimationFrame(function () {
+        cs.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+    }
   }
 })();
 </script>
 
 </body>
 </html>
+
 
