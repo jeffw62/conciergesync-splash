@@ -1313,31 +1313,11 @@ document.addEventListener('click', function () {
   }, 0);
 }, true); // capture so we always see the click
 </script>
-<script>
-/* After you've ENTERed the console, any return to splash-mode redirects to exit.html */
-(function () {
-  var entered = false, redirected = false;
 
-  // Mark as "entered" when the Enter button is used or via ?enter=1 re-entry
-  document.getElementById('enterConsole')?.addEventListener('click', function () {
-    entered = true;
-  });
-  if (new URLSearchParams(location.search).get('enter') === '1') {
-    entered = true;
-  }
-
-  // Watch for the body switching back to splash-mode (what your X does)
-  new MutationObserver(function () {
-    if (entered && !redirected && document.body.classList.contains('splash-mode')) {
-      redirected = true;
-      location.href = 'exit.html';
-    }
-  }).observe(document.body, { attributes: true, attributeFilter: ['class'] });
-})();
-</script>
 
 </body>
 </html>
+
 
 
 
