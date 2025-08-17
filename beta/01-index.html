@@ -1302,21 +1302,21 @@ if (sec && sec.classList.contains('is-open')) {
 })();
 </script>
 <script>
-/* Send the top-right X to exit.html */
-document.addEventListener('click', function (e) {
-  const x = e.target.closest(
-    '#cs-console .cs-close, #cs-console .console-close, #cs-console .top-close, ' +
-    '#cs-console .x-close, #cs-console [aria-label="Close"], #cs-console [data-action="close"]'
-  );
-  if (!x) return;
-  e.preventDefault();
-  e.stopPropagation();
-  window.location.assign('exit.html');
-});
+/* If any click returns the page to splash-mode, send user to exit.html */
+document.addEventListener('click', function () {
+  var wasSplash = document.body.classList.contains('splash-mode');
+  setTimeout(function () {
+    var isSplash = document.body.classList.contains('splash-mode');
+    if (!wasSplash && isSplash) {
+      window.location.replace('exit.html');
+    }
+  }, 0);
+}, true); // capture so we always see the click
 </script>
 
 
 </body>
 </html>
+
 
 
