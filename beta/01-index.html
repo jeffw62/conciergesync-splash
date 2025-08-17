@@ -1093,6 +1093,22 @@ tabs.forEach((btn) => {
       e.preventDefault?.();
     }
     function onMove(e){
+      // If the current tile is OPEN, drag = reposition (horizontal only for now)
+if (sec && sec.classList.contains('is-open')) {
+  const x = e.touches ? e.touches[0].clientX : e.clientX;
+  const dx = x - startX;
+
+  const baseX = parseFloat(sec.dataset.x || 0);
+  const baseY = parseFloat(sec.dataset.y || 0); // keep Y as-is for now
+
+  sec.classList.add('moving');
+  sec.style.transition = 'none';
+  sec.style.transform = `translate(${baseX + dx}px, ${baseY}px)`;
+
+  if (e.cancelable) e.preventDefault();
+  return; // don't run swipe-to-dismiss logic
+}
+
       if (!dragging) return;
       currentX = e.clientX;
       const dx = currentX - startX;
@@ -1242,6 +1258,7 @@ tabs.forEach((btn) => {
 
 </body>
 </html>
+
 
 
 
