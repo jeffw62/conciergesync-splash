@@ -1085,7 +1085,8 @@ tabs.forEach((btn) => {
       if (t) {
       const w = t.getBoundingClientRect().width;
       console.log('tile width:', Math.round(w));
-      if (w >= 420) return; // adjust threshold later if needed
+      if (w >= 9999) return; // TEMP: effectively disabled
+      // or just comment the line out
     }
 
       if (document.getElementById('cs-console').classList.contains('arrange-on')) return;
@@ -1269,6 +1270,7 @@ if (sec && sec.classList.contains('is-open')) {
 
 </body>
 </html>
+
 
 
 
