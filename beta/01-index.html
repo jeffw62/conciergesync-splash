@@ -1058,120 +1058,49 @@ document.addEventListener('pointerup', function (e) {
 }, true);
 </script>
 <script>
-(function(){
-  try {
-    const grid = document.getElementById('cs-tiles');
-    const consoleEl = document.getElementById('cs-console');
-    if (!grid || !consoleEl) return;
+/* Fallback opener: makes .cs-tab open a tile even if the main script isn't running */
+(function () {
+  document.addEventListener('click', function (e) {
+    const btn = e.target.closest('.cs-tab');
+    if (!btn) return;
 
-    // Scoped CSS for arrange mode
-    const css = document.createElement('style');
-    css.textContent = `
-      #cs-console.arrange-on .cs-tiles { position: relative; }
-      #cs-console.arrange-on .cs-tile  {
-        position: absolute !important;
-        transform: none !important;
-        transition: none !important;
-        touch-action: none !important;
-        left: var(--x, 0px);
-        top:  var(--y, 0px);
+    // If your original function exists, use it.
+    try {
+      if (typeof openTile === 'function') {
+        openTile(btn.dataset.key);
+        return;
       }
+    } catch (_) {}
+
+    // Otherwise, create a simple tile so you can keep moving.
+    const wrap = document.getElementById('cs-tiles');
+    if (!wrap) return;
+
+    // Avoid duplicates
+    const key = btn.dataset.key || 'tile';
+    if (wrap.querySelector('.cs-tile[data-key="'+key+'"]')) return;
+
+    const sec = document.createElement('section');
+    sec.className = 'cs-tile';
+    sec.dataset.key = key;
+    sec.innerHTML = `
+      <header class="cs-tile-head">
+        <h4>${key.charAt(0).toUpperCase()+key.slice(1)}</h4>
+        <button class="cs-close" aria-label="Close">×</button>
+      </header>
+      <div class="cs-tile-body"><p>${key} tile.</p></div>
     `;
-    document.head.appendChild(css);
+    wrap.appendChild(sec);
 
-    // Arrange / Done button
-    const btn = document.createElement('button');
-    btn.id = 'arrangeToggle';
-    btn.className = 'console-btn';
-    btn.style.right = '140px';
-    btn.textContent = 'Arrange';
-    document.body.appendChild(btn);
-
-    // Helpers to freeze grid positions to left/top and clear them
-    function freezeToAbsolute(){
-      const wrap = grid.getBoundingClientRect();
-      for (const tile of grid.children){
-        const r = tile.getBoundingClientRect();
-        tile.style.left = (r.left - wrap.left + grid.scrollLeft) + 'px';
-        tile.style.top  = (r.top  - wrap.top  + grid.scrollTop ) + 'px';
-      }
-    }
-    function clearAbsolute(){
-      for (const tile of grid.children){
-        tile.style.left = '';
-        tile.style.top  = '';
-        tile.style.transition = '';
-        tile.style.transform  = '';
-      }
-    }
-
-    // Drag state
-    let dragging = null, offX = 0, offY = 0;
-
-    function pd(e){ if (e && e.cancelable) e.preventDefault(); }
-
-    function onPointerDown(e){
-      if (!consoleEl.classList.contains('arrange-on')) return;
-      const tile = e.target.closest('.cs-tile');
-      if (!tile) return;
-      if (e.target.closest('.cs-close,button,a,input,textarea,select')) return;
-
-      const rect = tile.getBoundingClientRect();
-      const wrap = grid.getBoundingClientRect();
-      offX = e.clientX - rect.left;
-      offY = e.clientY - rect.top;
-
-      dragging = tile;
-      tile.style.transition = 'none';
-      if (tile.setPointerCapture && e.pointerId != null) {
-        try { tile.setPointerCapture(e.pointerId); } catch (_) {}
-      }
-      pd(e);
-    }
-
-    function onPointerMove(e){
-      if (!dragging) return;
-      const wrap = grid.getBoundingClientRect();
-      let x = e.clientX - wrap.left + grid.scrollLeft - offX;
-      let y = e.clientY - wrap.top  + grid.scrollTop  - offY;
-      x = Math.max(0, Math.min(x, grid.scrollWidth  - dragging.offsetWidth));
-      y = Math.max(0, Math.min(y, grid.scrollHeight - dragging.offsetHeight));
-      dragging.style.left = x + 'px';
-      dragging.style.top  = y + 'px';
-      pd(e);
-    }
-
-    function onPointerUp(){
-      if (!dragging) return;
-      dragging.style.transition = '';
-      dragging = null;
-    }
-
-    // Toggle Arrange mode
-    btn.addEventListener('click', () => {
-      const turnOn = !consoleEl.classList.contains('arrange-on');
-      if (turnOn){
-        consoleEl.classList.add('arrange-on');
-        freezeToAbsolute();
-        grid.addEventListener('pointerdown', onPointerDown, { capture: true });
-        window.addEventListener('pointermove', onPointerMove, { passive: false });
-        window.addEventListener('pointerup',   onPointerUp);
-        btn.textContent = 'Done';
-      } else {
-        consoleEl.classList.remove('arrange-on');
-        grid.removeEventListener('pointerdown', onPointerDown, { capture: true });
-        window.removeEventListener('pointermove', onPointerMove, { passive: false });
-        window.removeEventListener('pointerup',   onPointerUp);
-        clearAbsolute();
-        btn.textContent = 'Arrange';
-      }
+    // Close handler
+    sec.querySelector('.cs-close')?.addEventListener('click', function(){
+      sec.remove();
     });
-  } catch (err) {
-    console.error('Arrange script error:', err);
-  }
+  }, { capture: true }); // capture to beat any interceptors
 })();
 </script>
 
 </body>
 </html>
+
 
