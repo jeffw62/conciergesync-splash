@@ -894,17 +894,23 @@ function makeDraggable(tile, container){
 
 
   const onMove = (e) => {
-    if (!dragging) return;
-    e.preventDefault();
-    const p = ('touches' in e) ? e.touches[0] : e;
-    dx = p.clientX - sx;
-    dy = p.clientY - sy;
-    // immediate visual update, batched to the next frame (prevents jank)
-if (!tile._raf) {
-  tile._raf = requestAnimationFrame(() => {
-    tile.style.transform = `translate(${dx}px, ${dy}px) rotate(${dx*0.008}deg)`;
-    tile._raf = null;
-  });
+  if (!dragging) return;
+  if (e.cancelable) e.preventDefault();
+  const p = ('touches' in e) ? e.touches[0] : e;
+
+  dx = p.clientX - sx;
+  dy = p.clientY - sy;
+
+  // move with left/top via CSS vars so it sticks to your finger
+  const nx = Math.max(0, startX + dx);
+  const ny = Math.max(0, startY + dy);
+  tile.style.setProperty('--x', nx + 'px');
+  tile.style.setProperty('--y', ny + 'px');
+
+  // ensure transforms don't fight left/top during drag
+  tile.style.transform = 'none';
+};
+
 }
 
     // simple velocity estimate
@@ -1090,6 +1096,7 @@ document.addEventListener('pointerup', function (e) {
 
 </body>
 </html>
+
 
 
 
