@@ -263,10 +263,15 @@ html { scrollbar-gutter: stable; }
   .in-console #exitConsole{ display: inline-block; }
 
   /* Immersive console mode */
-  .in-console .container {
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 250ms ease;
+.in-console .container {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 250ms ease;
+}
+
+/* Hide outer page scrollbars while console is active */
+.in-console { overflow: hidden; }
+
   }
 
   /* Backdrop reveal when console enters */
@@ -1040,6 +1045,7 @@ document.addEventListener('pointerup', function (e) {
 
 </body>
 </html>
+
 
 
 
