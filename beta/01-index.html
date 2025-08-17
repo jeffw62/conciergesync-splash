@@ -750,11 +750,16 @@
    addTileHandlers(sec);
 addTileHandlers(sec);
 
-// Restore FLIP so the tile animates in smoothly (no flicker)
+/// Smooth add: disable the tile's CSS entry animation for this frame (avoid conflict with FLIP)
 flipAnimate(tilesWrap, () => {
+  sec.style.animation = 'none';
+  sec.style.opacity = '1';
   openKeys.add(key);
   tilesWrap.appendChild(sec);
-  });
+});
+
+// Re-enable animations on the next tick so close (cs-exit) still works
+setTimeout(() => { sec.style.animation = ''; }, 0);
 
 updateWrapClass();
 
@@ -1028,6 +1033,7 @@ document.addEventListener('pointerup', function (e) {
 
 </body>
 </html>
+
 
 
 
