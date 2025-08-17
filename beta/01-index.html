@@ -1057,9 +1057,120 @@ document.addEventListener('pointerup', function (e) {
   }
 }, true);
 </script>
+<script>
+(() => {
+  // ===== Simple, self-contained Arrange mode (no edits elsewhere) =====
+  const grid   = document.getElementById('cs-tiles');
+  if (!grid) return;
+
+  // 1) Small CSS shim (scoped) so tiles use left/top in arrange mode
+  const css = document.createElement('style');
+  css.textContent = `
+    #cs-console.arrange-on .cs-tiles { position: relative; }
+    #cs-console.arrange-on .cs-tile  {
+      position: absolute !important;
+      transition: none !important;         /* no tween while dragging */
+      transform: none !important;          /* avoid transform vs left/top fights */
+      touch-action: none !important;       /* keep finger glued */
+    }
+  `;
+  document.head.appendChild(css);
+
+  // 2) Add the Arrange / Done button
+  const btn = document.createElement('button');
+  btn.id = 'arrangeToggle';
+  btn.className = 'console-btn';
+  btn.style.right = '140px';
+  btn.textContent = 'Arrange';
+  document.body.appendChild(btn);
+
+  const consoleEl = document.getElementById('cs-console');
+
+  // Helpers to freeze current grid positions into left/top
+  function freezeToAbsolute() {
+    const wrapRect = grid.getBoundingClientRect();
+    Array.from(grid.children).forEach(tile => {
+      const r = tile.getBoundingClientRect();
+      const left = r.left - wrapRect.left + grid.scrollLeft;
+      const top  = r.top  - wrapRect.top  + grid.scrollTop;
+      tile.style.left = left + 'px';
+      tile.style.top  = top  + 'px';
+    });
+  }
+  function clearAbsolute() {
+    Array.from(grid.children).forEach(tile => {
+      tile.style.left = '';
+      tile.style.top  = '';
+      tile.style.transition = '';
+      tile.style.transform = '';
+    });
+  }
+
+  // Drag state
+  let dragging = null;
+  let offX = 0, offY = 0;
+
+  function onPointerDown(e){
+    if (!consoleEl.classList.contains('arrange-on')) return;
+    const tile = e.target.closest('.cs-tile');
+    if (!tile) return;
+    // let the close button, links, inputs, etc. work normally
+    if (e.target.closest('.cs-close,button,a,input,textarea,select')) return;
+
+    const rect = tile.getBoundingClientRect();
+    const wrap = grid.getBoundingClientRect();
+    offX = e.clientX - rect.left;
+    offY = e.clientY - rect.top;
+
+    // capture and prep
+    dragging = tile;
+    tile.style.transition = 'none';
+    tile.setPointerCapture?.(e.pointerId);
+    e.preventDefault();
+  }
+
+  function onPointerMove(e){
+    if (!dragging) return;
+    const wrap = grid.getBoundingClientRect();
+    // constrain within grid area
+    let x = e.clientX - wrap.left + grid.scrollLeft - offX;
+    let y = e.clientY - wrap.top  + grid.scrollTop  - offY;
+    x = Math.max(0, Math.min(x, grid.scrollWidth  - dragging.offsetWidth));
+    y = Math.max(0, Math.min(y, grid.scrollHeight - dragging.offsetHeight));
+    dragging.style.left = x + 'px';
+    dragging.style.top  = y + 'px';
+    e.preventDefault();
+  }
+
+  function onPointerUp(){
+    if (!dragging) return;
+    dragging.style.transition = '';
+    dragging = null;
+  }
+
+  // Toggle
+  btn.addEventListener('click', () => {
+    const on = consoleEl.classList.toggle('arrange-on');
+    if (on) {
+      btn.textContent = 'Done';
+      freezeToAbsolute();
+      grid.addEventListener('pointerdown', onPointerDown, { capture: true });
+      window.addEventListener('pointermove', onPointerMove, { passive: false });
+      window.addEventListener('pointerup',   onPointerUp);
+    } else {
+      btn.textContent = 'Arrange';
+      grid.removeEventListener('pointerdown', onPointerDown, { capture: true });
+      window.removeEventListener('pointermove', onPointerMove, { passive: false });
+      window.removeEventListener('pointerup',   onPointerUp);
+      clearAbsolute(); // return to normal grid layout
+    }
+  });
+})();
+</script>
 
 </body>
 </html>
+
 
 
 
