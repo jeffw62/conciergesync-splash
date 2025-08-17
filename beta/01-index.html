@@ -1265,9 +1265,32 @@ if (sec && sec.classList.contains('is-open')) {
   });
 })();
 </script>
+<script>
+(function () {
+  // Only run on the splash page (where the button exists)
+  var btn = document.getElementById('enterConsole');
+  if (!btn) return;
+
+  // 1) Hide the console UI while on the splash
+  var style = document.createElement('style');
+  style.id = 'splash-hide-console';
+  style.textContent = 'body.splash-mode #cs-console{display:none!important}';
+  document.head.appendChild(style);
+  document.body.classList.add('splash-mode');
+
+  // 2) On click, reveal the console and scroll to it
+  btn.addEventListener('click', function (e) {
+    e.preventDefault();
+    document.body.classList.remove('splash-mode');
+    var cs = document.getElementById('cs-console');
+    if (cs && cs.scrollIntoView) cs.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+})();
+</script>
 
 </body>
 </html>
+
 
 
 
