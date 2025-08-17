@@ -1312,50 +1312,6 @@ if (sec && sec.classList.contains('is-open')) {
   });
 })();
 </script>
-<script>
-(function () {
-  // Splash logic: hide console until Enter is pressed — and auto-enter on ?enter=1
-  var btn = document.getElementById('enterConsole');
-  if (!btn) return;
-
-  // Hide console UI on splash
-  var style = document.getElementById('splash-hide-console');
-  if (!style) {
-    style = document.createElement('style');
-    style.id = 'splash-hide-console';
-    style.textContent =
-      'body.splash-mode #cs-console{display:none!important}' +
-      ' body.splash-mode .console-btn:not(#enterConsole){display:none!important}';
-    document.head.appendChild(style);
-  }
-  document.body.classList.add('splash-mode');
-
-  // Enter button → reveal console + scroll to it
-  btn.addEventListener('click', function (e) {
-    e.preventDefault();
-    document.body.classList.remove('splash-mode');
-    var cs = document.getElementById('cs-console');
-    if (cs && cs.scrollIntoView) {
-      requestAnimationFrame(function () {
-        cs.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      });
-    }
-  });
-
-  // Auto-enter when coming from exit.html (01-index.html?enter=1[#cs-console])
-  if (new URLSearchParams(location.search).get('enter') === '1') {
-    document.body.classList.remove('splash-mode');
-    var cs = document.getElementById('cs-console');
-    if (cs && cs.scrollIntoView) {
-      requestAnimationFrame(function () {
-        cs.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      });
-    }
-  }
-})();
-</script>
 
 </body>
 </html>
-
-
