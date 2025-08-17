@@ -1037,70 +1037,198 @@ tabs.forEach((btn) => {
 </script>
 <!-- =================== /END TILE CONSOLE =================== -->
 <script>
-// Fallback: when a .cs-tab is tapped, force-reveal the panel right after it
-document.addEventListener('pointerup', function (e) {
-  const btn = e.target.closest('.cs-tab');
-  if (!btn) return;
+(function(){
+  // If the main opener exists, let it handle things.
+  // (This fallback only runs when the main script isn't wiring tiles.)
+  const wrap = document.getElementById('cs-tiles');
+  const consoleEl = document.getElementById('cs-console');
+  if (!wrap || !consoleEl) return;
 
-  const tile = btn.closest('.cs-tile');
-  const panel = btn.nextElementSibling; // many UIs put the panel right after the tab
+  // Small CSS shim for swipe + arrange (scoped, non-invasive)
+  const css = document.createElement('style');
+  css.textContent = `
+    .cs-swiping { transition: none !important; }
+    #cs-console.arrange-on .cs-tiles { position: relative; }
+    #cs-console.arrange-on .cs-tile  {
+      position: absolute !important;
+      transform: none !important;
+      transition: none !important;
+      touch-action: none !important;
+      left: var(--x, 0px);
+      top:  var(--y, 0px);
+    }
+  `;
+  document.head.appendChild(css);
 
-  if (tile) tile.classList.add('is-open');
+  // --- Helpers ---------------------------------------------------------
+  function titleize(s){ return s ? s.charAt(0).toUpperCase() + s.slice(1) : 'Tile'; }
 
-  if (panel) {
-    panel.removeAttribute('hidden');
-    panel.setAttribute('aria-hidden','false');
-    panel.style.display = 'block';
-    panel.style.opacity = '1';
-    panel.style.maxHeight = '100vh';
-    panel.style.visibility = 'visible';
-  }
-}, true);
-</script>
-<script>
-/* Fallback opener: makes .cs-tab open a tile even if the main script isn't running */
-(function () {
-  document.addEventListener('click', function (e) {
-    const btn = e.target.closest('.cs-tab');
-    if (!btn) return;
+  function wireTile(sec){
+    // close (X)
+    sec.querySelector('.cs-close')?.addEventListener('click', () => sec.remove());
 
-    // If your original function exists, use it.
-    try {
-      if (typeof openTile === 'function') {
-        openTile(btn.dataset.key);
-        return;
+    // swipe-to-dismiss (horizontal)
+    let startX=0, currentX=0, dragging=false, pointerId=null;
+    function onDown(e){
+      if (e.target.closest('.cs-close,button,a,input,textarea,select')) return;
+      dragging = true;
+      pointerId = e.pointerId;
+      sec.setPointerCapture?.(pointerId);
+      startX = e.clientX;
+      sec.classList.add('cs-swiping');
+      sec.style.touchAction = 'none';
+      e.preventDefault?.();
+    }
+    function onMove(e){
+      if (!dragging) return;
+      currentX = e.clientX;
+      const dx = currentX - startX;
+      sec.style.transform = `translateX(${dx}px) rotate(${dx*0.008}deg)`;
+      sec.style.opacity = String(Math.max(0.4, 1 - Math.abs(dx)/600));
+      e.preventDefault?.();
+    }
+    function onUp(){
+      if (!dragging) return;
+      dragging = false;
+      sec.classList.remove('cs-swiping');
+      sec.style.touchAction = '';
+      const dx = currentX - startX;
+      if (Math.abs(dx) > 160){
+        // calm dismiss
+        const dir = dx >= 0 ? 1 : -1;
+        const off = (window.innerWidth * 0.5) * dir;
+        sec.style.transition = 'transform 900ms cubic-bezier(.22,1,.36,1), opacity 900ms cubic-bezier(.22,1,.36,1)';
+        sec.style.transform = `translateX(${off}px) rotate(${off*0.002}deg)`;
+        sec.style.opacity = '0';
+        sec.addEventListener('transitionend', () => sec.remove(), { once:true });
+      } else {
+        sec.style.transition = 'transform 640ms cubic-bezier(.22,1,.36,1), opacity 640ms cubic-bezier(.22,1,.36,1)';
+        sec.style.transform = '';
+        sec.addEventListener('transitionend', () => { sec.style.transition = ''; sec.style.opacity = ''; }, { once:true });
       }
-    } catch (_) {}
+    }
+    sec.addEventListener('pointerdown', onDown, { capture:true });
+    window.addEventListener('pointermove', onMove, { passive:false });
+    window.addEventListener('pointerup',   onUp);
+  }
 
-    // Otherwise, create a simple tile so you can keep moving.
-    const wrap = document.getElementById('cs-tiles');
-    if (!wrap) return;
-
-    // Avoid duplicates
-    const key = btn.dataset.key || 'tile';
+  function createTile(key){
+    // avoid duplicates
     if (wrap.querySelector('.cs-tile[data-key="'+key+'"]')) return;
-
     const sec = document.createElement('section');
     sec.className = 'cs-tile';
     sec.dataset.key = key;
     sec.innerHTML = `
       <header class="cs-tile-head">
-        <h4>${key.charAt(0).toUpperCase()+key.slice(1)}</h4>
+        <h4>${titleize(key)}</h4>
         <button class="cs-close" aria-label="Close">×</button>
       </header>
       <div class="cs-tile-body"><p>${key} tile.</p></div>
     `;
     wrap.appendChild(sec);
+    wireTile(sec);
+  }
 
-    // Close handler
-    sec.querySelector('.cs-close')?.addEventListener('click', function(){
-      sec.remove();
-    });
-  }, { capture: true }); // capture to beat any interceptors
+  // Tabs → open
+  document.addEventListener('click', function(e){
+    const btn = e.target.closest('.cs-tab');
+    if (!btn) return;
+
+    // If your original openTile exists, use it; else fallback create
+    try {
+      if (typeof openTile === 'function') { openTile(btn.dataset.key); return; }
+    } catch(_) {}
+    createTile(btn.dataset.key || 'tile');
+  }, { capture:true });
+
+  // --- Arrange mode (toggle button) -----------------------------------
+  let arrangeBtn = document.getElementById('arrangeToggle');
+  if (!arrangeBtn){
+    arrangeBtn = document.createElement('button');
+    arrangeBtn.id = 'arrangeToggle';
+    arrangeBtn.className = 'console-btn';
+    arrangeBtn.style.right = '140px';
+    arrangeBtn.textContent = 'Arrange';
+    document.body.appendChild(arrangeBtn);
+  }
+
+  function freezeToAbsolute(){
+    const wrapRect = wrap.getBoundingClientRect();
+    for (const sec of wrap.children){
+      const r = sec.getBoundingClientRect();
+      const left = r.left - wrapRect.left + wrap.scrollLeft;
+      const top  = r.top  - wrapRect.top  + wrap.scrollTop;
+      sec.style.left = left + 'px';
+      sec.style.top  = top  + 'px';
+    }
+  }
+  function clearAbsolute(){
+    for (const sec of wrap.children){
+      sec.style.left = '';
+      sec.style.top  = '';
+      sec.style.transition = '';
+      sec.style.transform = '';
+    }
+  }
+
+  // drag in arrange mode
+  let dragging=null, offX=0, offY=0;
+  function onADown(e){
+    if (!consoleEl.classList.contains('arrange-on')) return;
+    const sec = e.target.closest('.cs-tile');
+    if (!sec) return;
+    if (e.target.closest('.cs-close,button,a,input,textarea,select')) return;
+
+    const rect = sec.getBoundingClientRect();
+    const wrapRect = wrap.getBoundingClientRect();
+    offX = e.clientX - rect.left;
+    offY = e.clientY - rect.top;
+
+    dragging = sec;
+    sec.style.transition = 'none';
+    sec.setPointerCapture?.(e.pointerId);
+    e.preventDefault?.();
+  }
+  function onAMove(e){
+    if (!dragging) return;
+    const wrapRect = wrap.getBoundingClientRect();
+    let x = e.clientX - wrapRect.left + wrap.scrollLeft - offX;
+    let y = e.clientY - wrapRect.top  + wrap.scrollTop  - offY;
+    x = Math.max(0, Math.min(x, wrap.scrollWidth  - dragging.offsetWidth));
+    y = Math.max(0, Math.min(y, wrap.scrollHeight - dragging.offsetHeight));
+    dragging.style.left = x + 'px';
+    dragging.style.top  = y + 'px';
+    e.preventDefault?.();
+  }
+  function onAUp(){
+    if (!dragging) return;
+    dragging.style.transition = '';
+    dragging = null;
+  }
+
+  arrangeBtn.addEventListener('click', () => {
+    const turnOn = !consoleEl.classList.contains('arrange-on');
+    if (turnOn){
+      consoleEl.classList.add('arrange-on');
+      freezeToAbsolute();
+      wrap.addEventListener('pointerdown', onADown, { capture:true });
+      window.addEventListener('pointermove', onAMove, { passive:false });
+      window.addEventListener('pointerup',   onAUp);
+      arrangeBtn.textContent = 'Done';
+    } else {
+      consoleEl.classList.remove('arrange-on');
+      wrap.removeEventListener('pointerdown', onADown, { capture:true });
+      window.removeEventListener('pointermove', onAMove, { passive:false });
+      window.removeEventListener('pointerup',   onAUp);
+      clearAbsolute();
+      arrangeBtn.textContent = 'Arrange';
+    }
+  });
 })();
 </script>
 
 </body>
 </html>
+
 
 
