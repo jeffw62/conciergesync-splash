@@ -1312,33 +1312,19 @@ if (sec && sec.classList.contains('is-open')) {
   });
 })();
 </script>
+<script>
+/* Auto-enter console when URL has ?enter=1 (used by exit.html re-entry) */
+(function () {
+  if (new URLSearchParams(location.search).get('enter') === '1') {
+    // ensure the splash script has run first, then reveal console
+    requestAnimationFrame(function () {
+      document.body.classList.remove('splash-mode');
+      var cs = document.getElementById('cs-console');
+      if (cs && cs.scrollIntoView) cs.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  }
+})();
+</script>
 
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
