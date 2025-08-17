@@ -1075,6 +1075,8 @@ tabs.forEach((btn) => {
     // swipe-to-dismiss (horizontal)
     let startX=0, currentX=0, dragging=false, pointerId=null;
     function onDown(e){
+      if (e.type === 'touchstart' && e.cancelable) e.preventDefault();
+
       if (document.getElementById('cs-console').classList.contains('arrange-on')) return; // no swipe in Arrange
       if (e.target.closest('.cs-close,button,a,input,textarea,select')) return;
       dragging = true;
@@ -1235,6 +1237,7 @@ tabs.forEach((btn) => {
 
 </body>
 </html>
+
 
 
 
