@@ -1314,41 +1314,37 @@ document.addEventListener('click', function () {
 }, true); // capture so we always see the click
 </script>
 <script>
-/* If the console gets hidden/closed, go to exit.html */
-(function () {
-  var cs = document.getElementById('cs-console');
-  if (!cs) return;
-
-  function isVisible(el) {
-    if (!el) return false;
-    var s = getComputedStyle(el);
-    return s.display !== 'none' && s.visibility !== 'hidden' && el.offsetParent !== null;
+/* Force any “close/X” click inside the console to go to exit.html */
+document.addEventListener('click', function (e) {
+  // walk up from the click target and look for a “close-like” element in the console
+  var el = e.target;
+  var inConsole = false;
+  while (el && el !== document.body) {
+    if (el.id === 'cs-console') { inConsole = true; break; }
+    el = el.parentElement;
   }
+  if (!inConsole) return;
 
-  function arm() {
-    // Only arm when we're actually in the console view (not splash)
-    if (!isVisible(cs) || document.body.classList.contains('splash-mode')) return;
-
-    var obs = new MutationObserver(function () {
-      if (!document.body.contains(cs) || !isVisible(cs)) {
-        obs.disconnect();
-        location.href = 'exit.html';
-      }
-    });
-    obs.observe(document.body, { attributes: true, childList: true, subtree: true });
+  // re-start at the original target and look for a button/link with a "close" hint
+  var n = e.target;
+  while (n && n !== document.body && n.id !== 'cs-console') {
+    var cls = (n.className || '').toString();
+    var aria = (n.getAttribute && n.getAttribute('aria-label')) || '';
+    var role = (n.getAttribute && n.getAttribute('role')) || '';
+    if (/close/i.test(cls) || /close/i.test(aria) || (role === 'button' && (n.textContent||'').trim() === '×')) {
+      e.preventDefault();
+      e.stopPropagation();
+      window.location.assign('exit.html');
+      return;
+    }
+    n = n.parentElement;
   }
-
-  // Arm after page load and after pressing Enter Console
-  window.addEventListener('load', arm);
-  document.getElementById('enterConsole')?.addEventListener('click', function () {
-    setTimeout(arm, 0);
-  });
-})();
+}, true); // capture so we run before other handlers
 </script>
-
 
 </body>
 </html>
+
 
 
 
