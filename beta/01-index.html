@@ -1313,10 +1313,43 @@ document.addEventListener('click', function () {
   }, 0);
 }, true); // capture so we always see the click
 </script>
+<script>
+/* If the console gets hidden/closed, go to exit.html */
+(function () {
+  var cs = document.getElementById('cs-console');
+  if (!cs) return;
+
+  function isVisible(el) {
+    if (!el) return false;
+    var s = getComputedStyle(el);
+    return s.display !== 'none' && s.visibility !== 'hidden' && el.offsetParent !== null;
+  }
+
+  function arm() {
+    // Only arm when we're actually in the console view (not splash)
+    if (!isVisible(cs) || document.body.classList.contains('splash-mode')) return;
+
+    var obs = new MutationObserver(function () {
+      if (!document.body.contains(cs) || !isVisible(cs)) {
+        obs.disconnect();
+        location.href = 'exit.html';
+      }
+    });
+    obs.observe(document.body, { attributes: true, childList: true, subtree: true });
+  }
+
+  // Arm after page load and after pressing Enter Console
+  window.addEventListener('load', arm);
+  document.getElementById('enterConsole')?.addEventListener('click', function () {
+    setTimeout(arm, 0);
+  });
+})();
+</script>
 
 
 </body>
 </html>
+
 
 
 
