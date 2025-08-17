@@ -1460,10 +1460,40 @@ if (sec && sec.classList.contains('is-open')) {
   });
 })();
 </script>
+<script>
+/* Robust handlers for the Full Screen overlay buttons */
+document.addEventListener('click', function (e) {
+  // Handle "Go Full Screen"
+  var go = e.target.closest('#fs-go');
+  if (go) {
+    e.preventDefault(); e.stopPropagation();
+    var el  = document.documentElement;
+    var req = el.requestFullscreen || el.webkitRequestFullscreen || el.msRequestFullscreen || el.mozRequestFullScreen;
+
+    if (req) {
+      Promise.resolve(req.call(el))
+        .catch(function(){ alert('On desktop, press F11 for full screen.'); })
+        .finally(function(){ document.getElementById('fs-overlay')?.remove(); });
+    } else {
+      alert('On desktop, press F11. On iPhone, use “Add to Home Screen” for true full screen.');
+      document.getElementById('fs-overlay')?.remove();
+    }
+    return;
+  }
+
+  // Handle "Skip"
+  var skip = e.target.closest('#fs-skip');
+  if (skip) {
+    e.preventDefault(); e.stopPropagation();
+    document.getElementById('fs-overlay')?.remove();
+  }
+}, true); // capture to run before any other click handlers
+</script>
 
 
 </body>
 </html>
+
 
 
 
