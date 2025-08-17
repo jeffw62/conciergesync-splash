@@ -18,7 +18,7 @@
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Inter, Arial, sans-serif;sec.style.opacity
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Inter, Arial, sans-serif;
       background: var(--bg);
       color: var(--ink);
       line-height: 1.6;
@@ -26,11 +26,6 @@
     /* Step 1: touch friction fix */
 .cs-tile {
   touch-action: pan-y;
-  -webkit-tap-highlight-color: transparent;
-}
-/* TEMP: lock gestures to the tile and its children (diagnostic) */
-.cs-tile, .cs-tile * {
-  touch-action: none;
   -webkit-tap-highlight-color: transparent;
 }
 
@@ -1423,6 +1418,7 @@ if (sec && sec.classList.contains('is-open')) {
 
 </body>
 </html>
+
 
 
 
