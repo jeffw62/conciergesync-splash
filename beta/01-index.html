@@ -1371,40 +1371,54 @@ if (sec && sec.classList.contains('is-open')) {
   // Show only when coming from exit.html (?enter=1)
   if (new URLSearchParams(location.search).get('enter') !== '1') return;
 
+  // Don't show again on this device
+  if (localStorage.getItem('cs_fs_seen') === '1') return;
+
   // Overlay UI
   var o = document.createElement('div');
   o.id = 'fs-overlay';
   o.style.cssText = 'position:fixed;inset:0;display:grid;place-items:center;background:rgba(0,0,0,.55);z-index:99999';
-  o.innerHTML = '<div style="background:#111;color:#fff;padding:16px 20px;border-radius:14px;box-shadow:0 8px 28px rgba(0,0,0,.35);font:600 16px system-ui;text-align:center;">'
-              +   '<div style="margin-bottom:10px;font-weight:800;">Best view is Full Screen</div>'
-              +   '<div style="display:flex;gap:8px;justify-content:center">'
-              +     '<button id="fs-go" style="padding:10px 14px;border-radius:12px;background:#fff;color:#111;font-weight:700">Go Full Screen</button>'
-              +     '<button id="fs-skip" style="padding:10px 14px;border-radius:12px;background:transparent;border:1px solid rgba(255,255,255,.6);color:#fff">Skip</button>'
-              +   '</div>'
-              + '</div>';
+  o.innerHTML =
+    '<div style="background:#111;color:#fff;padding:16px 20px;border-radius:14px;box-shadow:0 8px 28px rgba(0,0,0,.35);font:600 16px system-ui;text-align:center;">' +
+      '<div style="margin-bottom:10px;font-weight:800;">Best view is Full Screen</div>' +
+      '<div style="display:flex;gap:8px;justify-content:center">' +
+        '<button id="fs-go" style="padding:10px 14px;border-radius:12px;background:#fff;color:#111;font-weight:700">Go Full Screen</button>' +
+        '<button id="fs-skip" style="padding:10px 14px;border-radius:12px;background:transparent;border:1px solid rgba(255,255,255,.6);color:#fff">Skip</button>' +
+      '</div>' +
+    '</div>';
   document.body.appendChild(o);
 
   function close(){ try{o.remove();}catch(e){} }
 
-  // Request fullscreen on user tap; fallback instructs if the API is unavailable/blocked
+  // Go Full Screen
   document.getElementById('fs-go').addEventListener('click', function(e){
     e.preventDefault();
     var el = document.documentElement;
     var req = el.requestFullscreen || el.webkitRequestFullscreen || el.msRequestFullscreen || el.mozRequestFullScreen;
     if (req) {
-      Promise.resolve(req.call(el)).catch(function(){ alert('Press F11 to enter full screen.'); }).finally(close);
+      Promise.resolve(req.call(el))
+        .catch(function(){ alert('Press F11 to enter full screen.'); })
+        .finally(function(){ localStorage.setItem('cs_fs_seen','1'); close(); });
     } else {
       alert('Press F11 to enter full screen (or “Add to Home Screen” on iPhone).');
+      localStorage.setItem('cs_fs_seen','1');
       close();
     }
   });
 
-  document.getElementById('fs-skip').addEventListener('click', function(e){ e.preventDefault(); close(); });
+  // Skip (and don’t show again)
+  document.getElementById('fs-skip').addEventListener('click', function(e){
+    e.preventDefault();
+    localStorage.setItem('cs_fs_seen','1');
+    close();
+  });
 })();
 </script>
 
+
 </body>
 </html>
+
 
 
 
