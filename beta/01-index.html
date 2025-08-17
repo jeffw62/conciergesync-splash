@@ -857,7 +857,7 @@ function enableFreeMode(){
 }
 
 function makeDraggable(tile, container){
-  let sx=0, sy=0, startX=0, startY=0, dx=0, dy=0, dragging=false, lastT=0, vx=0, vy=0;
+  let sx=0, sy=0, startX=0, startY=0, dx=0, dy=0, dragging=false;
 
   const getVar = (name) => {
     const v = getComputedStyle(tile).getPropertyValue(name);
@@ -865,99 +865,63 @@ function makeDraggable(tile, container){
   };
 
   const onDown = (e) => {
-  // 1) Let interactive elements work normally (Close button, links, inputs)
-  const tgt = e.target;
-  if (
-    tgt.closest('.cs-close') ||
-    tgt.closest('button') ||
-    tgt.closest('a') ||
-    tgt.closest('input, textarea, select')
-  ) {
-    return; // don't start a drag — allow the click to go through
-  }
+    // let controls/links work
+    const tgt = e.target;
+    if (
+      tgt.closest('.cs-close') ||
+      tgt.closest('button') ||
+      tgt.closest('a') ||
+      tgt.closest('input, textarea, select')
+    ) return;
 
-  // 2) Only primary button/pointer should drag
-  if ('button' in e && e.button !== 0) return;
+    if ('button' in e && e.button !== 0) return; // primary only
 
-  // 3) Start drag
-  const p = ('touches' in e) ? e.touches[0] : e;
-  e.preventDefault();          // follow finger exactly
-  e.stopPropagation();         // avoid old swipe listeners
-  dragging = true;
-  sx = p.clientX; sy = p.clientY;
-  startX = getVar('--x'); startY = getVar('--y');
-  dx = dy = 0; vx = vy = 0;
-  lastT = performance.now();
-  tile.setPointerCapture?.(e.pointerId);
-  tile.style.transition = 'none';  // hard-disable transitions while dragging
-};
+    const p = ('touches' in e) ? e.touches[0] : e;
+    if (e.cancelable) e.preventDefault();
+    e.stopPropagation();
 
+    dragging = true;
+    sx = p.clientX; sy = p.clientY;
+    startX = getVar('--x'); startY = getVar('--y');
+    dx = dy = 0;
+
+    tile.style.transition = 'none';   // no tween during drag
+    tile.style.transform  = 'none';   // left/top owns position
+    tile.classList.add('cs-swiping');
+  };
 
   const onMove = (e) => {
-  if (!dragging) return;
-  if (e.cancelable) e.preventDefault();
-  const p = ('touches' in e) ? e.touches[0] : e;
+    if (!dragging) return;
+    const p = ('touches' in e) ? e.touches[0] : e;
+    if (e.cancelable) e.preventDefault();
 
-  dx = p.clientX - sx;
-  dy = p.clientY - sy;
+    dx = p.clientX - sx;
+    dy = p.clientY - sy;
 
-  // move with left/top via CSS vars so it sticks to your finger
-  const nx = Math.max(0, startX + dx);
-  const ny = Math.max(0, startY + dy);
-  tile.style.setProperty('--x', nx + 'px');
-  tile.style.setProperty('--y', ny + 'px');
-
-  // ensure transforms don't fight left/top during drag
-  tile.style.transform = 'none';
-};
-
-}
-
-    // simple velocity estimate
-    const now = performance.now();
-    const dt = Math.max(16, now - lastT);
-    vx = (dx - (tile._lastDx || 0)) / dt;
-    vy = (dy - (tile._lastDy || 0)) / dt;
-    tile._lastDx = dx; tile._lastDy = dy; lastT = now;
-
-    tile.style.transform = `translate(${dx}px, ${dy}px) rotate(${dx*0.008}deg)`;
+    // move with left/top via CSS vars so it sticks to your finger
+    const nx = Math.max(0, startX + dx);
+    const ny = Math.max(0, startY + dy);
+    tile.style.setProperty('--x', nx + 'px');
+    tile.style.setProperty('--y', ny + 'px');
+    tile.style.transform = 'none';
   };
 
   const onUp = () => {
     if (!dragging) return;
     dragging = false;
+    tile.classList.remove('cs-swiping');
 
-    const newX = startX + dx;
-    const newY = startY + dy;
-    
-    tile.classList.add('cs-landing');
-    tile.addEventListener('animationend', () => {
-      tile.classList.remove('cs-landing');
-    }, { once: true });
-
-    // swipe-off if far or fast enough (mainly horizontal)
-    const dismiss = Math.abs(dx) > 160 || (Math.hypot(vx, vy) > 0.8 && Math.abs(dx) > 100);
-    if (dismiss){
-      const dir = dx >= 0 ? 1 : -1;
-      calmDismiss(tile, dir);
-    } else {
-      tile.style.transition = `transform var(--cs-time) var(--cs-ease)`;
-      tile.style.setProperty('--x', Math.max(0, newX) + 'px');
-      tile.style.setProperty('--y', Math.max(0, newY) + 'px');
-      requestAnimationFrame(() => { tile.style.transform = ''; });
-      tile.addEventListener('transitionend', () => {
-        tile.style.transition = '';
-      }, { once: true });
-    }
-
-    tile._lastDx = tile._lastDy = 0;
+    // restore gentle transitions after drop
+    tile.style.transition = '';
   };
 
-  // pointer + touch (capture to win over existing handlers)
-  tile.addEventListener('pointerdown', onDown, {capture:true});
-  window.addEventListener('pointermove', onMove,  {capture:true});
-  window.addEventListener('pointerup',   onUp,    {capture:true});
-
+  tile.addEventListener('mousedown', onDown);
+  tile.addEventListener('touchstart', onDown, { passive: false });
+  window.addEventListener('mousemove', onMove,  { passive: false });
+  window.addEventListener('touchmove', onMove,  { passive: false });
+  window.addEventListener('mouseup',   onUp);
+  window.addEventListener('touchend',  onUp);
+}
 }
 
   // Maintain centered first row with the last two opened tiles
@@ -1096,6 +1060,7 @@ document.addEventListener('pointerup', function (e) {
 
 </body>
 </html>
+
 
 
 
