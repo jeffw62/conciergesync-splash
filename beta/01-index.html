@@ -1366,9 +1366,32 @@ if (sec && sec.classList.contains('is-open')) {
 })();
 </script>
 
+<script>
+(function () {
+  if (new URLSearchParams(location.search).get('enter') !== '1') return;
+
+  // Little one-time Full Screen button
+  var b = document.createElement('button');
+  b.id = 'goFull';
+  b.textContent = 'Full Screen';
+  b.style.cssText =
+    'position:fixed;right:16px;bottom:72px;z-index:10000;padding:10px 14px;' +
+    'border-radius:12px;background:#111;color:#fff;font:600 14px system-ui;' +
+    'box-shadow:0 8px 20px rgba(0,0,0,.25)';
+  document.body.appendChild(b);
+
+  b.addEventListener('click', function (e) {
+    e.preventDefault();
+    var el = document.documentElement;
+    (el.requestFullscreen || el.webkitRequestFullscreen || el.msRequestFullscreen || el.mozRequestFullScreen)?.call(el);
+    b.remove(); // hide after use
+  });
+})();
+</script>
 
 </body>
 </html>
+
 
 
 
