@@ -37,5 +37,27 @@
   <script>
     // (No logic needed yet; link goes back to your splash. Next step will auto-enter.)
   </script>
+  <script>
+    document.addEventListener('click', function (e) {
+    const el = e.target.closest('button, a');
+
+    // Top-right X (adjust selectors if yours differ)
+    if (el && el.matches('.cs-close, .console-close, [aria-label="Close"], .x-close')) {
+    e.preventDefault();
+    location.href = 'exit.html';
+    return;
+  }
+
+    // Any “Exit Console” control
+    if (el) {
+    const txt = (el.textContent || '').trim().toLowerCase();
+    if (txt === 'exit console' || el.id === 'exitConsole' || el.classList.contains('console-exit')) {
+      e.preventDefault();
+      location.href = 'exit.html';
+    }
+  }
+});
+</script>
+
 </body>
 </html>
