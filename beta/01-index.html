@@ -433,10 +433,9 @@
     justify-content: start;   /* centering magic */
     align-content: start;
     height: 100%;
-    overflow-y: scroll;          /* always reserve vertical scrollbar space */
-    overflow-x: hidden;          /* avoid horizontal jolt */
-    scrollbar-gutter: stable both-edges;  /* stop edge flash on open/close */
-    padding: 6px;
+overflow: visible;              /* ← remove inner scrollbar */
+scrollbar-gutter: auto;         /* reset from the stable setting */
+padding: 6px;
   }
   /* Center a single tile perfectly */
   .cs-tiles.single{
@@ -1038,6 +1037,7 @@ document.addEventListener('pointerup', function (e) {
 
 </body>
 </html>
+
 
 
 
