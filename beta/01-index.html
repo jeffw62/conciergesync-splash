@@ -923,7 +923,7 @@ function makeDraggable(tile, container){
   tile.addEventListener('mousedown', onDown);
   tile.addEventListener('touchstart', onDown, { passive: false });
   window.addEventListener('mousemove', onMove,  { passive: false });
-  window.addEventListener('touchmove', onMove,  { passive: false });
+  window.addEventListener('touchmove', onMove, { passive: false, capture: true });
   window.addEventListener('mouseup',   onUp);
   window.addEventListener('touchend',  onUp);
 }
@@ -1235,6 +1235,7 @@ tabs.forEach((btn) => {
 
 </body>
 </html>
+
 
 
 
