@@ -591,6 +591,13 @@
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
 }
+/* OVERRIDE: let FLIP handle movement; entry animation fades only */
+.cs-tile{ transform: none; }  /* cancel the translateY/scale on entry */
+
+@keyframes cs-pop{
+  0%   { opacity: 0; }
+  100% { opacity: 1; }
+}
 
 </style>
 
@@ -1033,6 +1040,7 @@ document.addEventListener('pointerup', function (e) {
 
 </body>
 </html>
+
 
 
 
