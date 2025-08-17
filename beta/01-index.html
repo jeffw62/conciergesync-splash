@@ -1314,36 +1314,31 @@ document.addEventListener('click', function () {
 }, true); // capture so we always see the click
 </script>
 <script>
-/* Force any “close/X” click inside the console to go to exit.html */
-document.addEventListener('click', function (e) {
-  // walk up from the click target and look for a “close-like” element in the console
-  var el = e.target;
-  var inConsole = false;
-  while (el && el !== document.body) {
-    if (el.id === 'cs-console') { inConsole = true; break; }
-    el = el.parentElement;
-  }
-  if (!inConsole) return;
+/* After you've ENTERed the console, any return to splash-mode redirects to exit.html */
+(function () {
+  var entered = false, redirected = false;
 
-  // re-start at the original target and look for a button/link with a "close" hint
-  var n = e.target;
-  while (n && n !== document.body && n.id !== 'cs-console') {
-    var cls = (n.className || '').toString();
-    var aria = (n.getAttribute && n.getAttribute('aria-label')) || '';
-    var role = (n.getAttribute && n.getAttribute('role')) || '';
-    if (/close/i.test(cls) || /close/i.test(aria) || (role === 'button' && (n.textContent||'').trim() === '×')) {
-      e.preventDefault();
-      e.stopPropagation();
-      window.location.assign('exit.html');
-      return;
-    }
-    n = n.parentElement;
+  // Mark as "entered" when the Enter button is used or via ?enter=1 re-entry
+  document.getElementById('enterConsole')?.addEventListener('click', function () {
+    entered = true;
+  });
+  if (new URLSearchParams(location.search).get('enter') === '1') {
+    entered = true;
   }
-}, true); // capture so we run before other handlers
+
+  // Watch for the body switching back to splash-mode (what your X does)
+  new MutationObserver(function () {
+    if (entered && !redirected && document.body.classList.contains('splash-mode')) {
+      redirected = true;
+      location.href = 'exit.html';
+    }
+  }).observe(document.body, { attributes: true, attributeFilter: ['class'] });
+})();
 </script>
 
 </body>
 </html>
+
 
 
 
