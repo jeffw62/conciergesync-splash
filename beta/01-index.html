@@ -595,6 +595,12 @@ animation: none;
   0%   { opacity: 0; }
   100% { opacity: 1; }
 }
+/* Fix free-mode conflict: use left/top only (disable old transform approach) */
+.cs-free .cs-tile{
+  transform: none !important;      /* stop double-transform drift */
+  left: var(--x, 0px) !important;  /* left/top positioning wins */
+  top:  var(--y, 0px) !important;
+}
 
 </style>
 
@@ -1084,6 +1090,7 @@ document.addEventListener('pointerup', function (e) {
 
 </body>
 </html>
+
 
 
 
