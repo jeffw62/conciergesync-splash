@@ -1301,11 +1301,70 @@ if (sec && sec.classList.contains('is-open')) {
   });
 })();
 </script>
+<script>
+/* Force-bind any "close / X" control inside #cs-console to exit.html */
+(function () {
+  var CS_ID = 'cs-console';
+  var DEST = 'exit.html';
 
+  function isCloseLike(el) {
+    if (!el) return false;
+    var label = ((el.getAttribute && (el.getAttribute('aria-label') || el.getAttribute('data-action'))) || '') +
+                ' ' + (el.id || '') +
+                ' ' + (el.className || '') +
+                ' ' + ((el.textContent || '').trim());
+    return /close|×|exit/i.test(label);
+  }
+
+  function rebind(root) {
+    if (!root) return;
+    var nodes = root.querySelectorAll('a,button,[role="button"],[data-action],[aria-label]');
+    nodes.forEach(function (el) {
+      if (!isCloseLike(el)) return;
+
+      // Remove any existing behavior and force our exit
+      try { el.removeAttribute('href'); } catch(e){}
+      try { el.onclick = null; } catch(e){}
+      el.addEventListener('click', function (ev) {
+        ev.preventDefault(); ev.stopPropagation();
+        window.location.assign(DEST);
+      }, true); // capture to run before other handlers
+    });
+  }
+
+  function arm() {
+    var cs = document.getElementById(CS_ID);
+    if (!cs) return;
+
+    // Rebind now…
+    rebind(cs);
+
+    // …and keep re-binding briefly to catch late-renders
+    var count = 0, max = 20;
+    var tick = setInterval(function () {
+      rebind(cs);
+      if (++count >= max) clearInterval(tick);
+    }, 150);
+
+    // Also observe for DOM changes inside the console
+    var mo = new MutationObserver(function () { rebind(cs); });
+    mo.observe(cs, { subtree: true, childList: true, attributes: true });
+    // Stop after a while to avoid running forever
+    setTimeout(function(){ try{ mo.disconnect(); }catch(e){} }, 5000);
+  }
+
+  // Arm on load and whenever the Enter Console button is pressed
+  window.addEventListener('load', arm);
+  document.getElementById('enterConsole')?.addEventListener('click', function () {
+    setTimeout(arm, 0);
+  });
+})();
+</script>
 
 
 </body>
 </html>
+
 
 
 
