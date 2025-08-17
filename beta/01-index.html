@@ -1018,7 +1018,7 @@ window.addEventListener('mousemove', onMove);
 window.addEventListener('touchmove', onMove, { passive: false }); // was true
 window.addEventListener('mouseup', onUp);
 window.addEventListener('touchend', onUp);
-
+window.addEventListener('touchcancel', onUp);
   }
 
   // Wire tabs — fire immediately on touch/mouse
@@ -1235,6 +1235,7 @@ tabs.forEach((btn) => {
 
 </body>
 </html>
+
 
 
 
