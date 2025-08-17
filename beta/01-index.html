@@ -433,12 +433,10 @@
     justify-content: start;   /* centering magic */
     align-content: start;
     height: 100%;
-    overflow: auto;
+    overflow-y: scroll;          /* always reserve vertical scrollbar space */
+    overflow-x: hidden;          /* avoid horizontal jolt */
+    scrollbar-gutter: stable both-edges;  /* stop edge flash on open/close */
     padding: 6px;
-    contain: layout paint;
-    transform: translateZ(0);
-    backface-visibility: hidden;
-    will-change: contents;
   }
   /* Center a single tile perfectly */
   .cs-tiles.single{
@@ -1040,6 +1038,7 @@ document.addEventListener('pointerup', function (e) {
 
 </body>
 </html>
+
 
 
 
