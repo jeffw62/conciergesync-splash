@@ -1301,22 +1301,12 @@ if (sec && sec.classList.contains('is-open')) {
   });
 })();
 </script>
-<script>
-/* If any click returns the page to splash-mode, send user to exit.html */
-document.addEventListener('click', function () {
-  var wasSplash = document.body.classList.contains('splash-mode');
-  setTimeout(function () {
-    var isSplash = document.body.classList.contains('splash-mode');
-    if (!wasSplash && isSplash) {
-      window.location.replace('exit.html');
-    }
-  }, 0);
-}, true); // capture so we always see the click
-</script>
+
 
 
 </body>
 </html>
+
 
 
 
