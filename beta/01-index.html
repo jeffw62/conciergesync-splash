@@ -1290,28 +1290,19 @@ if (sec && sec.classList.contains('is-open')) {
 })();
 </script>
 <script>
+/* Re-enter: if ?enter=1 is present, programmatically click the existing Enter button */
 (function () {
-  // Create a tiny Exit Console button (visible only when NOT in splash-mode)
-  var exit = document.createElement('button');
-  exit.id = 'exitConsole';
-  exit.className = 'console-btn';
-  exit.textContent = 'Exit Console';
-  exit.style.cssText = 'position:fixed;right:16px;bottom:16px;z-index:9999;padding:10px 14px;border-radius:12px;background:#555;color:#fff;font:600 14px system-ui;box-shadow:0 8px 20px rgba(0,0,0,.25)';
-  document.body.appendChild(exit);
-
-  // Show/hide based on splash-mode
-  var s = document.createElement('style');
-  s.textContent = 'body.splash-mode #exitConsole{display:none!important} body:not(.splash-mode) #exitConsole{display:inline-flex}';
-  document.head.appendChild(s);
-
-  // Click: return to splash view
-  exit.addEventListener('click', function (e) {
-    e.preventDefault();
-    document.body.classList.add('splash-mode');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+  if (new URLSearchParams(location.search).get('enter') !== '1') return;
+  window.addEventListener('DOMContentLoaded', function () {
+    document.getElementById('enterConsole')?.click();
+    // ensure the console is in view
+    const cs = document.getElementById('cs-console');
+    cs?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   });
 })();
 </script>
 
+
 </body>
 </html>
+
