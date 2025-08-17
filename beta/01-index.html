@@ -947,51 +947,53 @@ if (!tile._raf) {
     tile.querySelector('.cs-close').addEventListener('click', ()=>closeTile(tile));
 
     // swipe
-    let startX=0, currentX=0, dragging=false;
+let startX = 0, currentX = 0, dragging = false;
 
-    const onDown = (e)=>{
-      dragging = true;
-      startX = (e.touches ? e.touches[0].clientX : e.clientX);
-      tile.classList.add('cs-swiping');
-    };
+const onDown = (e) => {
+  dragging = true;
+  const p = e.touches ? e.touches[0] : e;
+  startX = p.clientX;
+  tile.classList.add('cs-swiping');
+  if (e.cancelable) e.preventDefault(); // lock to finger immediately
+};
 
-    const onMove = (e)=>{
-      if(!dragging) return;
-      currentX = (e.touches ? e.touches[0].clientX : e.clientX);
-      const dx = currentX - startX;
-      tile.style.transform = `translateX(${dx}px) rotate(${dx*0.008}deg)`; // calmer rotation
-      tile.style.opacity = String(Math.max(0.4, 1 - Math.abs(dx)/600));
-    };
+const onMove = (e) => {
+  if (!dragging) return;
+  if (e.cancelable) e.preventDefault(); // stop page scroll during swipe
+  const p = e.touches ? e.touches[0] : e;
+  currentX = p.clientX;
+  const dx = currentX - startX;
+  tile.style.transform = `translateX(${dx}px) rotate(${dx * 0.008}deg)`;
+  tile.style.opacity = String(Math.max(0.4, 1 - Math.abs(dx) / 600));
+};
 
-    const onUp = () => {
+const onUp = () => {
   if (!dragging) return;
   dragging = false;
   tile.classList.remove('cs-swiping');
 
   const dx = currentX - startX;
   const direction = dx >= 0 ? 1 : -1;
-  const DISMISS_DIST = 160; // try 140 if you want easier dismiss
+  const DISMISS_DIST = 160;
 
   if (Math.abs(dx) > DISMISS_DIST) {
-    // Use the calm glide-off
-    calmDismiss(tile, direction);
+    calmDismiss(tile, direction);     // commit dismiss
   } else {
-    // Snap back gently
     tile.style.transition = `transform var(--cs-time) var(--cs-ease)`;
-    tile.style.transform = '';
+    tile.style.transform = '';        // snap back smoothly
     tile.addEventListener('transitionend', () => {
       tile.style.transition = '';
     }, { once: true });
   }
 };
 
+tile.addEventListener('mousedown', onDown);
+tile.addEventListener('touchstart', onDown, { passive: false }); // was true
+window.addEventListener('mousemove', onMove);
+window.addEventListener('touchmove', onMove, { passive: false }); // was true
+window.addEventListener('mouseup', onUp);
+window.addEventListener('touchend', onUp);
 
-    tile.addEventListener('mousedown', onDown);
-    tile.addEventListener('touchstart', onDown, {passive:true});
-    window.addEventListener('mousemove', onMove);
-    window.addEventListener('touchmove', onMove, {passive:true});
-    window.addEventListener('mouseup', onUp);
-    window.addEventListener('touchend', onUp);
   }
 
   // Wire tabs — fire immediately on touch/mouse
@@ -1037,6 +1039,7 @@ document.addEventListener('pointerup', function (e) {
 
 </body>
 </html>
+
 
 
 
