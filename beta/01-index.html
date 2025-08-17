@@ -602,6 +602,50 @@ animation: none;
 (()=>{
   const tabs = document.querySelectorAll('.cs-tab');
   const tilesWrap = document.getElementById('cs-tiles');
+  // === Arrange mode toggle (tap to enable free-drag, tap again to exit) ===
+(function addArrangeToggle(){
+  // Create the button next to your Console button
+  const btn = document.createElement('button');
+  btn.id = 'arrangeToggle';
+  btn.className = 'console-btn';
+  btn.style.right = '140px';    // sits left of "Enter Console"
+  btn.textContent = 'Arrange';
+  document.body.appendChild(btn);
+
+  btn.addEventListener('click', () => {
+    const consoleEl = document.getElementById('cs-console');
+    const isFree = consoleEl.classList.contains('cs-free');
+    if (!isFree) {
+      // enter arrange mode (uses your existing enableFreeMode)
+      enableFreeMode();
+      btn.textContent = 'Done';
+    } else {
+      // exit arrange mode cleanly
+      disableFreeMode();
+      btn.textContent = 'Arrange';
+    }
+  });
+})();
+
+// Return tiles from free-mode back to grid (smoothly)
+function disableFreeMode(){
+  const consoleEl = document.getElementById('cs-console');
+  const grid = document.getElementById('cs-tiles');
+  if (!consoleEl || !grid) return;
+
+  const tiles = Array.from(grid.children);
+
+  // Animate back to grid with FLIP so there's no jump
+  flipAnimate(grid, () => {
+    tiles.forEach(tile => {
+      tile.style.removeProperty('--x');
+      tile.style.removeProperty('--y');
+      tile.style.transform = '';
+    });
+    consoleEl.classList.remove('cs-free');
+  });
+}
+
     // Always close on X (delegated, so it works for new tiles too)
   tilesWrap.addEventListener('click', (e) => {
     const x = e.target.closest('.cs-close');
@@ -1040,6 +1084,7 @@ document.addEventListener('pointerup', function (e) {
 
 </body>
 </html>
+
 
 
 
