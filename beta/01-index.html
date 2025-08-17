@@ -1367,30 +1367,45 @@ if (sec && sec.classList.contains('is-open')) {
 </script>
 
 <script>
-(function () {
+(function(){
+  // Show only when coming from exit.html (?enter=1)
   if (new URLSearchParams(location.search).get('enter') !== '1') return;
 
-  // Little one-time Full Screen button
-  var b = document.createElement('button');
-  b.id = 'goFull';
-  b.textContent = 'Full Screen';
-  b.style.cssText =
-    'position:fixed;right:16px;bottom:72px;z-index:10000;padding:10px 14px;' +
-    'border-radius:12px;background:#111;color:#fff;font:600 14px system-ui;' +
-    'box-shadow:0 8px 20px rgba(0,0,0,.25)';
-  document.body.appendChild(b);
+  // Overlay UI
+  var o = document.createElement('div');
+  o.id = 'fs-overlay';
+  o.style.cssText = 'position:fixed;inset:0;display:grid;place-items:center;background:rgba(0,0,0,.55);z-index:99999';
+  o.innerHTML = '<div style="background:#111;color:#fff;padding:16px 20px;border-radius:14px;box-shadow:0 8px 28px rgba(0,0,0,.35);font:600 16px system-ui;text-align:center;">'
+              +   '<div style="margin-bottom:10px;font-weight:800;">Best view is Full Screen</div>'
+              +   '<div style="display:flex;gap:8px;justify-content:center">'
+              +     '<button id="fs-go" style="padding:10px 14px;border-radius:12px;background:#fff;color:#111;font-weight:700">Go Full Screen</button>'
+              +     '<button id="fs-skip" style="padding:10px 14px;border-radius:12px;background:transparent;border:1px solid rgba(255,255,255,.6);color:#fff">Skip</button>'
+              +   '</div>'
+              + '</div>';
+  document.body.appendChild(o);
 
-  b.addEventListener('click', function (e) {
+  function close(){ try{o.remove();}catch(e){} }
+
+  // Request fullscreen on user tap; fallback instructs if the API is unavailable/blocked
+  document.getElementById('fs-go').addEventListener('click', function(e){
     e.preventDefault();
     var el = document.documentElement;
-    (el.requestFullscreen || el.webkitRequestFullscreen || el.msRequestFullscreen || el.mozRequestFullScreen)?.call(el);
-    b.remove(); // hide after use
+    var req = el.requestFullscreen || el.webkitRequestFullscreen || el.msRequestFullscreen || el.mozRequestFullScreen;
+    if (req) {
+      Promise.resolve(req.call(el)).catch(function(){ alert('Press F11 to enter full screen.'); }).finally(close);
+    } else {
+      alert('Press F11 to enter full screen (or “Add to Home Screen” on iPhone).');
+      close();
+    }
   });
+
+  document.getElementById('fs-skip').addEventListener('click', function(e){ e.preventDefault(); close(); });
 })();
 </script>
 
 </body>
 </html>
+
 
 
 
