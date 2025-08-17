@@ -74,6 +74,20 @@ body.splash-mode #exitConsole,
 body.splash-mode .console-exit {
   display: none !important;
 }
+    /* Default: open tiles are LARGE; small only in Arrange mode */
+#cs-console:not(.arrange-on) .cs-tile {
+  width: 420px !important;
+  min-width: 420px !important;
+  max-width: 92vw;
+  height: min(78vh, 760px) !important;
+}
+
+#cs-console.arrange-on .cs-tile {
+  width: 128px !important;
+  min-width: 128px !important;
+  height: 100px !important;
+}
+
   </style>
 </head>
 <body>
@@ -1493,6 +1507,7 @@ if (sec && sec.classList.contains('is-open')) {
 
 </body>
 </html>
+
 
 
 
