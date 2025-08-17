@@ -1081,10 +1081,16 @@ tabs.forEach((btn) => {
     let startX=0, currentX=0, dragging=false, pointerId=null;
     function onDown(e){
       if (e.type === 'touchstart' && e.cancelable) e.preventDefault();
-
+      
       // block swipe-to-dismiss when the touched tile is already open
       const t = e.target.closest('.cs-tile');
-      if (t && (t.classList.contains('is-focused') || t.classList.contains('is-open'))) return;
+      // Do NOT start swipe-to-dismiss on large (opened) tiles
+const t = e.target.closest('.cs-tile');
+if (t) {
+  const w = t.getBoundingClientRect().width;
+  if (w > 420) return;   // threshold = “opened” size; adjust if needed
+}
+
 
       if (document.getElementById('cs-console').classList.contains('arrange-on')) return; // no swipe in Arrange
       if (e.target.closest('.cs-close,button,a,input,textarea,select')) return;
@@ -1262,6 +1268,7 @@ if (sec && sec.classList.contains('is-open')) {
 
 </body>
 </html>
+
 
 
 
