@@ -1086,7 +1086,7 @@ tabs.forEach((btn) => {
       if (t) {
       const w = t.getBoundingClientRect().width;
       console.log('tile width:', Math.round(w));
-      if (w >= 9999) return; // TEMP: effectively disabled
+      if (w >= 420) return;   // block swipe on large (opened) tiles
       // or just comment the line out
     }
 
@@ -1271,6 +1271,7 @@ if (sec && sec.classList.contains('is-open')) {
 
 </body>
 </html>
+
 
 
 
