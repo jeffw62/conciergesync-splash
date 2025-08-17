@@ -465,10 +465,10 @@
     max-height: 65vh;
     overflow: hidden;
 
-    /* entry animation (soft pop) */
-    transform: translateY(24px) scale(.94);
-    opacity: 0;
-    animation: cs-pop var(--cs-time) var(--cs-ease) both;
+    /* entry animation disabled to remove flicker */
+transform: none;
+opacity: 1;
+animation: none;
 
     /* allow horizontal swipe on touch */
     touch-action: pan-y;
@@ -1038,6 +1038,7 @@ document.addEventListener('pointerup', function (e) {
 
 </body>
 </html>
+
 
 
 
