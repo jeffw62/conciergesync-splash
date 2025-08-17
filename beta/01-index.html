@@ -1083,14 +1083,9 @@ tabs.forEach((btn) => {
       // block swipe-to-dismiss on large (opened) tiles
       const t = e.target.closest('.cs-tile');
       if (t) {
-      sec = t;                               // track the active tile
-      const w = t.getBoundingClientRect().width;
-      if (w >= 420) {                        // OPEN tile → enter drag mode
-      startX = e.clientX;                  // remember finger start (needed by onMove)
-      // startY = e.clientY;               // add if you later do vertical drag
-      return;                              // don’t start swipe-to-dismiss
+      sec = t;  // track the active tile
+      // no width-based return here
       }
-    }
 
       if (document.getElementById('cs-console').classList.contains('arrange-on')) return;
       if (e.target.closest('.cs-close,button,a,input,textarea,select')) return;
@@ -1273,6 +1268,7 @@ if (sec && sec.classList.contains('is-open')) {
 
 </body>
 </html>
+
 
 
 
