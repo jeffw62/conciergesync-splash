@@ -1082,6 +1082,7 @@ tabs.forEach((btn) => {
     function onDown(e){
       // block swipe-to-dismiss on large (opened) tiles
       const t = e.target.closest('.cs-tile');
+      if (t) console.log('TILE classes →', t.className);
       if (t) {
       const w = t.getBoundingClientRect().width;
       console.log('tile width:', Math.round(w));
@@ -1270,6 +1271,7 @@ if (sec && sec.classList.contains('is-open')) {
 
 </body>
 </html>
+
 
 
 
