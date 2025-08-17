@@ -1325,6 +1325,24 @@ if (sec && sec.classList.contains('is-open')) {
   }
 })();
 </script>
+<script>
+(function () {
+  // If coming from exit.html (?enter=1), reveal and force-scroll to #cs-console
+  if (new URLSearchParams(location.search).get('enter') === '1') {
+    requestAnimationFrame(function () {
+      document.body.classList.remove('splash-mode');
+      var cs = document.getElementById('cs-console');
+      if (!cs) return;
+      // set hash and force the scroll after layout
+      location.hash = '#cs-console';
+      setTimeout(function () {
+        window.scrollTo({ top: cs.getBoundingClientRect().top + window.scrollY - 12, left: 0, behavior: 'smooth' });
+      }, 0);
+    });
+  }
+})();
+</script>
 
 </body>
 </html>
+
