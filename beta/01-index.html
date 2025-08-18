@@ -736,23 +736,23 @@ body.splash-mode .console-exit {
     }, { once: true });
   }
 
-// Natural drag (press→move→release). Light horizontal whisk = dismiss.
+// Super-soft whisk: dismiss left OR right. Drag stays natural.
 function addTileHandlers(tile){
   // X closes
   tile.querySelector('.cs-close')?.addEventListener('click', () => closeTile(tile));
 
-  // Softer thresholds
-  const SLOP = 4;               // px before we decide gesture
-  const H_ANGLE = 55;           // degrees cone for "horizontal" swipe
-  const FLICK_V = 0.22;         // px/ms ≈ 220 px/s  ← very easy
-  const DISMISS_MIN = 40;       // px absolute minimum travel
-  const DISMISS_FRAC = 0.12;    // 12% of tile width  ← easy
-  const COMMIT_FRAC = 0.45;     // release commit at ~45% of threshold
+  // Very forgiving thresholds
+  const SLOP = 3;               // px before deciding gesture
+  const H_ANGLE = 65;           // degrees cone from horizontal (both left/right)
+  const FLICK_V = 0.14;         // px/ms ≈ 140 px/s  ← very easy
+  const DISMISS_MIN = 28;       // px absolute minimum travel
+  const DISMISS_FRAC = 0.08;    // 8% of tile width   ← very easy
+  const COMMIT_FRAC = 0.35;     // commit after ~35% of threshold on release
 
   let isDown=false, activeId=null, mode=null; // null|'drag'|'swipe'
   let t0=0, startX=0, startY=0, lastX=0, lastY=0, baseX=0, baseY=0;
 
-  // keep a short trail of recent positions to measure instantaneous speed
+  // recent positions to measure instantaneous velocity (~120ms window)
   let trail = []; // [{t, x}]
 
   const getVar = (name, el=tile) => {
@@ -760,7 +760,8 @@ function addTileHandlers(tile){
     return v.trim()==='' ? NaN : parseFloat(v);
   };
   const clamp = (n, a, b)=>Math.max(a, Math.min(b, n));
-  const deg = (dx,dy)=>Math.abs(Math.atan2(dy,dx))*180/Math.PI;
+  // ✅ angle to the *axis*, independent of direction (left or right)
+  const hdeg = (dx,dy)=>Math.atan2(Math.abs(dy), Math.abs(dx)) * 180/Math.PI;
   const dismissPx = () => Math.max(DISMISS_MIN, tile.offsetWidth * DISMISS_FRAC);
 
   function beginDrag(){
@@ -805,7 +806,7 @@ function addTileHandlers(tile){
     const dy = lastY - startY;
     const dist = Math.hypot(dx,dy);
 
-    // record trail (last ~120ms)
+    // record trail (keep last ~120ms)
     const now = performance.now();
     trail.push({ t: now, x: lastX });
     while (trail.length && now - trail[0].t > 120) trail.shift();
@@ -818,10 +819,10 @@ function addTileHandlers(tile){
     // Decide gesture
     if (!mode){
       if (dist < SLOP) return;
-      const angle = deg(dx,dy);
+      const angle = hdeg(dx,dy);         // ← direction-agnostic
       const thr   = dismissPx();
 
-      // More forgiving: mostly horizontal + (fast OR already 30% of threshold)
+      // mostly horizontal + (fast OR already 30% of threshold) => swipe
       if (angle <= H_ANGLE && (vxRecent > FLICK_V || Math.abs(dx) > thr * 0.3)){
         mode = 'swipe';
       } else {
@@ -834,14 +835,14 @@ function addTileHandlers(tile){
       if (e.cancelable) e.preventDefault();
       tile.classList.add('cs-swiping');
       const thr = dismissPx();
-      // earlier, smoother fade; cap at ~0.72
-      const fade = Math.min(0.72, Math.abs(dx) / (thr * 0.9));
+      // smooth, earlier fade; tops out ~0.75 opacity loss
+      const fade = Math.min(0.75, Math.abs(dx) / (thr * 0.85));
       tile.style.transform = `translateX(${dx}px) rotate(${dx*0.008}deg)`;
       tile.style.opacity   = String(1 - fade);
       return;
     }
 
-    // drag
+    // drag (free move)
     if (e.cancelable) e.preventDefault();
     const maxX = tilesWrap.scrollWidth  - tile.offsetWidth;
     const maxY = tilesWrap.scrollHeight - tile.offsetHeight;
@@ -862,7 +863,6 @@ function addTileHandlers(tile){
 
     const dx = lastX - startX;
     const now = performance.now();
-    // instantaneous velocity from recent trail
     while (trail.length && now - trail[0].t > 120) trail.shift();
     const vxRecent = (() => {
       if (trail.length < 2) return 0;
@@ -872,7 +872,7 @@ function addTileHandlers(tile){
     const thr = dismissPx();
 
     if (mode === 'swipe'){
-      // Commit if far enough OR fast enough (both very easy now)
+      // Commit if far OR fast (both are easy now) — works left and right
       if (Math.abs(dx) >= thr * COMMIT_FRAC || vxRecent >= FLICK_V){
         calmDismiss(tile, dx>=0?1:-1);
       } else {
@@ -1166,6 +1166,7 @@ function openTile(key){
 
 </body>
 </html>
+
 
 
 
