@@ -519,11 +519,10 @@ body.splash-mode .console-exit {
   opacity: 0;
 }
 
-/* Tiny settle pulse after a move */
+/* Kill the settle pulse */
 @keyframes cs-land {
-  0%   { transform: scale(1.015); }
-  60%  { transform: scale(0.995); }
-  100% { transform: scale(1); }
+  0%   { transform: none; }
+  100% { transform: none; }
 }
 .cs-free .cs-tile.cs-landing {
   animation: cs-land 420ms cubic-bezier(.22, 1, .36, 1);
@@ -731,164 +730,189 @@ body.splash-mode .console-exit {
 
   // Long-press to drag; quick swipe to dismiss
   function addTileHandlers(tile){
-    tile.querySelector('.cs-close')?.addEventListener('click', () => closeTile(tile));
+  // X button closes
+  tile.querySelector('.cs-close')?.addEventListener('click', () => closeTile(tile));
 
-    const HOLD_MS = 280, SLOP = 10, DISMISS_DIST = 160;
+  // Tunables
+  const SLOP = 10;            // movement before we decide
+  const DISMISS_DIST = 160;   // px to trigger dismiss
+  const H_ANGLE = 20;         // degrees from horizontal to count as "horizontal"
+  const FLICK_MS = 180;       // flick window
+  const FLICK_V = 1.2;        // px/ms (≈1200 px/s)
 
-    let holdTimer = null;
-    let holdMode  = false;     // true => dragging (no dismiss)
-    let isDown    = false;     // gate movement to active press
-    let activeId  = null;
+  let isDown=false, activeId=null, mode=null; // mode: null|'drag'|'swipe'
+  let t0=0, startX=0, startY=0, lastX=0, lastY=0, baseX=0, baseY=0;
 
-    let startX = 0, startY = 0;
-    let lastX  = 0, lastY  = 0;
-    let baseX  = 0, baseY  = 0;
-    let moved  = false;
+  const getVar = (name, el=tile) => {
+    const v = getComputedStyle(el).getPropertyValue(name);
+    return v.trim()==='' ? NaN : parseFloat(v);
+  };
+  const clamp = (n, a, b)=>Math.max(a, Math.min(b, n));
+  const deg = (dx,dy)=>Math.abs(Math.atan2(dy,dx))*180/Math.PI;
 
-    const getVar = (name, el = tile) => {
-      const v = getComputedStyle(el).getPropertyValue(name);
-      return v.trim() === '' ? NaN : parseFloat(v);
-    };
-    const clamp = (n, min, max) => Math.max(min, Math.min(max, n));
+  function beginDrag(){
+    // Ensure free mode and figure starting offsets
+    enableFreeMode();
 
-    function primeHold(){
-      enableFreeMode(); // ensure --x/--y exist
+    const wrapRect = tilesWrap.getBoundingClientRect();
+    const r = tile.getBoundingClientRect();
+    const vx = getVar('--x'), vy = getVar('--y');
 
-      const wrapRect = tilesWrap.getBoundingClientRect();
-      const r = tile.getBoundingClientRect();
-      const vx = getVar('--x');
-      const vy = getVar('--y');
+    baseX = Number.isNaN(vx) ? (r.left - wrapRect.left + tilesWrap.scrollLeft) : vx;
+    baseY = Number.isNaN(vy) ? (r.top  - wrapRect.top  + tilesWrap.scrollTop) : vy;
 
-      baseX = Number.isNaN(vx) ? (r.left - wrapRect.left + tilesWrap.scrollLeft) : vx;
-      baseY = Number.isNaN(vy) ? (r.top  - wrapRect.top  + tilesWrap.scrollTop) : vy;
+    tile.classList.add('is-focused','cs-swiping');
+    tile.style.transition = 'none';
+    tile.style.transform  = 'none';
+  }
 
-      tile.classList.add('is-focused', 'cs-swiping');
-      tile.style.transition = 'none';
-      holdMode = true;
-    }
+  function onDown(e){
+    if ('button' in e && e.button !== 0) return;
+    if (e.target.closest('.cs-close,button,a,input,textarea,select')) return;
 
-    function onDown(e){
-      if ('button' in e && e.button !== 0) return; // primary only
-      if (e.target.closest('.cs-close,button,a,input,textarea,select')) return;
+    isDown   = true;
+    activeId = e.pointerId ?? null;
+    t0 = performance.now();
 
-      isDown   = true;
-      activeId = e.pointerId ?? null;
+    startX = lastX = e.clientX;
+    startY = lastY = e.clientY;
+    mode   = null;
 
-      startX = lastX = e.clientX;
-      startY = lastY = e.clientY;
-      moved  = false;
-      holdMode = false;
+    try { tile.setPointerCapture?.(activeId); } catch {}
+    if (e.cancelable) e.preventDefault();
+  }
 
-      clearTimeout(holdTimer);
-      holdTimer = setTimeout(primeHold, HOLD_MS);
+  function onMove(e){
+    if (!isDown) return;
+    if (activeId!=null && e.pointerId!=null && e.pointerId!==activeId) return;
 
-      try { tile.setPointerCapture?.(activeId); } catch {}
-      if (e.cancelable) e.preventDefault();
-    }
+    lastX = e.clientX; lastY = e.clientY;
+    const dx = lastX - startX;
+    const dy = lastY - startY;
+    const dist = Math.hypot(dx,dy);
 
-    function onMove(e){
-      if (!isDown) return;
-      if (activeId != null && e.pointerId != null && e.pointerId !== activeId) return;
+    // Decide gesture
+    if (!mode){
+      if (dist < SLOP) return;
+      const angle = deg(dx,dy);
+      const dt    = Math.max(1, performance.now()-t0);
+      const vx    = Math.abs(dx)/dt; // px/ms along X
 
-      lastX = e.clientX; lastY = e.clientY;
-      const dx = lastX - startX;
-      const dy = lastY - startY;
-
-      if (!holdMode){
-        if (Math.hypot(dx, dy) > SLOP){
-          moved = true;
-          clearTimeout(holdTimer); // treat as swipe
-        }
-        if (moved){
-          if (e.cancelable) e.preventDefault();
-          tile.classList.add('cs-swiping');
-          tile.style.transform = `translateX(${dx}px) rotate(${dx * 0.008}deg)`;
-          tile.style.opacity = String(Math.max(0.4, 1 - Math.abs(dx) / 600));
-        }
-        return;
+      // Quick, mostly-horizontal → swipe; otherwise → drag
+      if (angle <= H_ANGLE && (vx > FLICK_V || (Math.abs(dx) > DISMISS_DIST && dt < 300))){
+        mode = 'swipe';
+      } else {
+        mode = 'drag';
+        beginDrag();
       }
-
-      // Drag mode
-      if (e.cancelable) e.preventDefault();
-      const maxX = tilesWrap.scrollWidth  - tile.offsetWidth;
-      const maxY = tilesWrap.scrollHeight - tile.offsetHeight;
-      const nx = clamp(baseX + dx, 0, Math.max(0, maxX));
-      const ny = clamp(baseY + dy, 0, Math.max(0, maxY));
-
-      tile.style.setProperty('--x', nx + 'px');
-      tile.style.setProperty('--y', ny + 'px');
-      tile.style.transform = 'none';
     }
 
-    function onUp(){
-      if (!isDown) return;
+    if (mode === 'swipe'){
+      if (e.cancelable) e.preventDefault();
+      tile.classList.add('cs-swiping');
+      tile.style.transform = `translateX(${dx}px) rotate(${dx*0.008}deg)`;
+      tile.style.opacity   = String(Math.max(0.4, 1 - Math.abs(dx)/600));
+      return;
+    }
 
-      clearTimeout(holdTimer);
-      isDown = false;
+    // drag
+    if (e.cancelable) e.preventDefault();
+    const maxX = tilesWrap.scrollWidth  - tile.offsetWidth;
+    const maxY = tilesWrap.scrollHeight - tile.offsetHeight;
+    const nx = clamp(baseX + dx, 0, Math.max(0, maxX));
+    const ny = clamp(baseY + dy, 0, Math.max(0, maxY));
+    tile.style.setProperty('--x', nx + 'px');
+    tile.style.setProperty('--y', ny + 'px');
+  }
 
-      try { if (activeId != null) tile.releasePointerCapture?.(activeId); } catch {}
-      activeId = null;
+  function onUp(){
+    if (!isDown) return;
+    isDown = false;
 
-      tile.classList.remove('cs-swiping', 'is-focused');
+    try { if (activeId!=null) tile.releasePointerCapture?.(activeId); } catch {}
+    activeId = null;
 
-      if (holdMode){
-  tile.style.transition = '';
-  tile.style.transform = 'none';   // ensure no residual transform
-  void tile.offsetWidth;           // reflow to commit the base state
-  tile.classList.add('cs-landing');
-  tile.addEventListener('animationend', () => tile.classList.remove('cs-landing'), { once:true });
-  holdMode = false;
-  return;
-}
+    tile.classList.remove('cs-swiping','is-focused');
 
-      const dx = lastX - startX;
-      if (Math.abs(dx) > DISMISS_DIST){
-        calmDismiss(tile, dx >= 0 ? 1 : -1);
+    const dx = lastX - startX;
+    const dt = Math.max(1, performance.now()-t0);
+    const vx = Math.abs(dx)/dt;
+
+    if (mode === 'swipe'){
+      if (Math.abs(dx) > DISMISS_DIST || vx > FLICK_V){
+        calmDismiss(tile, dx>=0?1:-1);
       } else {
         tile.style.transition = `transform var(--cs-time) var(--cs-ease), opacity var(--cs-time) var(--cs-ease)`;
         tile.style.transform = '';
         tile.style.opacity = '';
-        tile.addEventListener('transitionend', () => { tile.style.transition = ''; }, { once: true });
+        tile.addEventListener('transitionend', () => { tile.style.transition=''; }, { once:true });
       }
+    } else if (mode === 'drag'){
+      // No pulse; just leave it where it is
+      tile.style.transition = '';
+      tile.style.transform  = 'none';
+    } else {
+      // tap/no-op
     }
 
-    tile.addEventListener('pointerdown', onDown, { passive:false });
-    window.addEventListener('pointermove', onMove,  { passive:false });
-    window.addEventListener('pointerup',   onUp);
-    window.addEventListener('pointercancel', onUp);
+    mode = null;
   }
+
+  tile.addEventListener('pointerdown', onDown, { passive:false });
+  window.addEventListener('pointermove', onMove,  { passive:false });
+  window.addEventListener('pointerup',   onUp);
+  window.addEventListener('pointercancel', onUp);
+}
 
   function openTile(key){
-    const existing = tilesWrap.querySelector(`.cs-tile[data-key="${key}"]`);
-    if (existing){
-      openKeys.delete(key);
-      openKeys.add(key);
-      applyOrder();
-      updateWrapClass();
-      existing.focus?.({preventScroll:true});
-      return;
-    }
-    const sec = document.createElement('section');
-    sec.className = 'cs-tile';
-    sec.dataset.key = key;
-    sec.innerHTML = (TILE_TEMPLATES[key] || (()=>`
-      <header class="cs-tile-head">
-        <h4>${key}</h4>
-        <button class="cs-close" aria-label="Close">×</button>
-      </header>
-      <div class="cs-tile-body"><p>${key} tile.</p></div>`))();
-
-    addTileHandlers(sec);
-
-    flipAnimate(tilesWrap, () => {
-      openKeys.add(key);
-      tilesWrap.appendChild(sec);
-      updateWrapClass();
-    });
-
-    sec.focus?.({ preventScroll: true });
+  const existing = tilesWrap.querySelector(`.cs-tile[data-key="${key}"]`);
+  if (existing){
+    openKeys.delete(key);
+    openKeys.add(key);
+    applyOrder();
+    updateWrapClass();
+    existing.focus?.({preventScroll:true});
+    return;
   }
 
+  const sec = document.createElement('section');
+  sec.className = 'cs-tile';
+  sec.dataset.key = key;
+  sec.innerHTML = (TILE_TEMPLATES[key] || (()=>`
+    <header class="cs-tile-head">
+      <h4>${key}</h4>
+      <button class="cs-close" aria-label="Close">×</button>
+    </header>
+    <div class="cs-tile-body"><p>${key} tile.</p></div>`))();
+
+  addTileHandlers(sec);
+
+  flipAnimate(tilesWrap, () => {
+    openKeys.add(key);
+    tilesWrap.appendChild(sec);
+    updateWrapClass();
+  });
+
+  // If we're already in free mode, center the new tile and offset it slightly
+  if (consoleEl.classList.contains('cs-free')){
+    // measure after it's in the DOM
+    requestAnimationFrame(() => {
+      const wrapRect = tilesWrap.getBoundingClientRect();
+      const r = sec.getBoundingClientRect();
+      const count = tilesWrap.querySelectorAll('.cs-tile').length;
+      const offset = (count-1) * 24; // small cascade so they don't stack
+
+      const x = tilesWrap.scrollLeft + Math.max(0, (wrapRect.width  - r.width )/2 + offset);
+      const y = tilesWrap.scrollTop  + Math.max(0, (wrapRect.height - r.height)/2 + offset);
+
+      sec.style.setProperty('--x', x + 'px');
+      sec.style.setProperty('--y', y + 'px');
+      sec.style.transform = 'none';
+    });
+  }
+
+  sec.focus?.({ preventScroll: true });
+}
   // Tabs: immediate fire
   tabs.forEach((btn) => {
     const onTap = (e) => {
@@ -1109,6 +1133,7 @@ body.splash-mode .console-exit {
 
 </body>
 </html>
+
 
 
 
