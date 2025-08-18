@@ -736,21 +736,24 @@ body.splash-mode .console-exit {
     }, { once: true });
   }
 
-// Super-soft whisk: dismiss left OR right. Drag stays natural.
+// Natural drag (press→move→release).
+// Softer *start drag* + slightly firmer *whisk-to-dismiss* (left & right).
 function addTileHandlers(tile){
   // X closes
   tile.querySelector('.cs-close')?.addEventListener('click', () => closeTile(tile));
 
-  // Very forgiving thresholds
-  const SLOP = 3;               // px before deciding gesture
-  const H_ANGLE = 65;           // degrees cone from horizontal (both left/right)
-  const FLICK_V = 0.14;         // px/ms ≈ 140 px/s  ← very easy
-  const DISMISS_MIN = 28;       // px absolute minimum travel
-  const DISMISS_FRAC = 0.08;    // 8% of tile width   ← very easy
-  const COMMIT_FRAC = 0.35;     // commit after ~35% of threshold on release
+  // ── Tunables ───────────────────────────────────────────────────────────
+  const SLOP = 2;               // px before we decide gesture (was 3–4)
+  const PRESS_TO_DRAG_MS = 120; // short hold starts drag even without moving
+  const H_ANGLE = 60;           // degrees cone for "horizontal" swipe
+  const FLICK_V = 0.20;         // px/ms ≈ 200 px/s (slightly firmer than before)
+  const DISMISS_MIN = 36;       // px absolute minimum travel
+  const DISMISS_FRAC = 0.10;    // 10% of tile width (slightly more than before)
+  const COMMIT_FRAC = 0.45;     // release commits around 45% of threshold
 
   let isDown=false, activeId=null, mode=null; // null|'drag'|'swipe'
   let t0=0, startX=0, startY=0, lastX=0, lastY=0, baseX=0, baseY=0;
+  let pressTimer=null;
 
   // recent positions to measure instantaneous velocity (~120ms window)
   let trail = []; // [{t, x}]
@@ -760,13 +763,13 @@ function addTileHandlers(tile){
     return v.trim()==='' ? NaN : parseFloat(v);
   };
   const clamp = (n, a, b)=>Math.max(a, Math.min(b, n));
-  // ✅ angle to the *axis*, independent of direction (left or right)
+  // angle to the horizontal axis (direction-agnostic: left or right)
   const hdeg = (dx,dy)=>Math.atan2(Math.abs(dy), Math.abs(dx)) * 180/Math.PI;
   const dismissPx = () => Math.max(DISMISS_MIN, tile.offsetWidth * DISMISS_FRAC);
 
   function beginDrag(){
+    // ensure free-mode & capture starting offsets
     enableFreeMode();
-
     const wrapRect = tilesWrap.getBoundingClientRect();
     const r = tile.getBoundingClientRect();
     const vx = getVar('--x'), vy = getVar('--y');
@@ -790,8 +793,13 @@ function addTileHandlers(tile){
     startX = lastX = e.clientX;
     startY = lastY = e.clientY;
     mode   = null;
+    trail  = [{ t: t0, x: startX }];
 
-    trail = [{ t: t0, x: startX }];
+    // Short press → auto-enter drag (feels "less holdy")
+    clearTimeout(pressTimer);
+    pressTimer = setTimeout(() => {
+      if (!mode && isDown) { mode='drag'; beginDrag(); }
+    }, PRESS_TO_DRAG_MS);
 
     try { tile.setPointerCapture?.(activeId); } catch {}
     if (e.cancelable) e.preventDefault();
@@ -819,10 +827,12 @@ function addTileHandlers(tile){
     // Decide gesture
     if (!mode){
       if (dist < SLOP) return;
-      const angle = hdeg(dx,dy);         // ← direction-agnostic
+      clearTimeout(pressTimer); // movement decides, not the timer
+
+      const angle = hdeg(dx,dy);
       const thr   = dismissPx();
 
-      // mostly horizontal + (fast OR already 30% of threshold) => swipe
+      // mostly horizontal + (fast OR already ~30% of threshold) => swipe
       if (angle <= H_ANGLE && (vxRecent > FLICK_V || Math.abs(dx) > thr * 0.3)){
         mode = 'swipe';
       } else {
@@ -835,14 +845,13 @@ function addTileHandlers(tile){
       if (e.cancelable) e.preventDefault();
       tile.classList.add('cs-swiping');
       const thr = dismissPx();
-      // smooth, earlier fade; tops out ~0.75 opacity loss
-      const fade = Math.min(0.75, Math.abs(dx) / (thr * 0.85));
+      const fade = Math.min(0.7, Math.abs(dx) / (thr * 0.9)); // gentle, earlier fade
       tile.style.transform = `translateX(${dx}px) rotate(${dx*0.008}deg)`;
       tile.style.opacity   = String(1 - fade);
       return;
     }
 
-    // drag (free move)
+    // drag
     if (e.cancelable) e.preventDefault();
     const maxX = tilesWrap.scrollWidth  - tile.offsetWidth;
     const maxY = tilesWrap.scrollHeight - tile.offsetHeight;
@@ -856,6 +865,7 @@ function addTileHandlers(tile){
     if (!isDown) return;
     isDown = false;
 
+    clearTimeout(pressTimer);
     try { if (activeId!=null) tile.releasePointerCapture?.(activeId); } catch {}
     activeId = null;
 
@@ -872,7 +882,7 @@ function addTileHandlers(tile){
     const thr = dismissPx();
 
     if (mode === 'swipe'){
-      // Commit if far OR fast (both are easy now) — works left and right
+      // Commit if far OR fast (slightly firmer than last build)
       if (Math.abs(dx) >= thr * COMMIT_FRAC || vxRecent >= FLICK_V){
         calmDismiss(tile, dx>=0?1:-1);
       } else {
@@ -1166,6 +1176,7 @@ function openTile(key){
 
 </body>
 </html>
+
 
 
 
