@@ -1469,48 +1469,54 @@ if (sec && sec.classList.contains('is-open')) {
 <script>
 (() => {
   function run() {
-    const container = Array.from(document.querySelectorAll('div,section,dialog'))
+    // Find the FS card by its heading text
+    const card = Array.from(document.querySelectorAll('div,section,dialog'))
       .find(n => n && /Best view is Full Screen/i.test(n.textContent || ''));
-    if (!container) return;
+    if (!card) return;
 
-    // Try to remove the whole overlay/backdrop if present; else remove the card.
-    const backdrop =
-      container.closest('#cs-fs-prompt, #cs-fs-prompt-console, .fs-prompt, .fs-modal, .modal, .overlay, [data-modal], [role="dialog"]') ||
-      container.parentElement;
+    // Likely overlay wrapper (adjusts for many implementations)
+    const overlay =
+      card.closest('#cs-fs-prompt, #cs-fs-prompt-console, .fs-prompt, .fs-modal, .modal, .overlay, [data-modal], [role="dialog"]')
+      || card.parentElement || card;
 
-    const closePrompt = () => {
-      cleanup();
-      try { (backdrop && backdrop.remove) ? backdrop.remove() : container.remove(); } catch(_) {}
-    };
-
-    const cleanup = () => {
-      document.removeEventListener('fullscreenchange', closePrompt, true);
-      document.removeEventListener('webkitfullscreenchange', closePrompt, true);
-      document.removeEventListener('mozfullscreenchange', closePrompt, true);
-      document.removeEventListener('MSFullscreenChange', closePrompt, true);
-    };
-
-    // Close automatically when we enter fullscreen (all vendor variants)
-    document.addEventListener('fullscreenchange', closePrompt, {capture:true});
-    document.addEventListener('webkitfullscreenchange', closePrompt, {capture:true});
-    document.addEventListener('mozfullscreenchange', closePrompt, {capture:true});
-    document.addEventListener('MSFullscreenChange', closePrompt, {capture:true});
-
-    // Find buttons by visible label
-    const goBtn = Array.from(container.querySelectorAll('button,a'))
-      .find(el => /Go Full Screen/i.test(el.textContent || ''));
-    const skipBtn = Array.from(container.querySelectorAll('button,a'))
-      .find(el => /Skip/i.test(el.textContent || ''));
-
-    async function enterFS() {
-      const el = document.documentElement;
-      const req =
-        el.requestFullscreen ||
-        el.webkitRequestFullscreen ||
-        el.mozRequestFullScreen ||
-        el.msRequestFullscreen;
-      if (req) await req.call(el);
+    // Brutal close: hide immediately and then remove
+    function closePrompt() {
+      if (!overlay) return;
+      overlay.style.pointerEvents = 'none';
+      overlay.style.opacity = '0';
+      overlay.style.display = 'none'; // immediate unblock
+      // remove a tick later in case other scripts touch it
+      setTimeout(() => { try { overlay.remove(); } catch(_) {} }, 0);
+      // make sure body is interactive
+      document.body.style.pointerEvents = '';
     }
+
+    // As extra safety: if some other fixed overlay still sits on top, nuke it
+    function nukeTopFixed() {
+      const nodes = Array.from(document.querySelectorAll('body > *'));
+      nodes.forEach(el => {
+        const cs = getComputedStyle(el);
+        if (cs.position === 'fixed' && (cs.zIndex === 'auto' || +cs.zIndex > 1000)) {
+          if (/overlay|modal|backdrop|fs|prompt/i.test(el.id + ' ' + el.className)) {
+            el.style.display = 'none';
+            setTimeout(() => { try { el.remove(); } catch(_) {} }, 0);
+          }
+        }
+      });
+    }
+
+    async function requestFS() {
+      const root = document.documentElement;
+      const req = root.requestFullscreen || root.webkitRequestFullscreen ||
+                  root.mozRequestFullScreen || root.msRequestFullscreen;
+      if (req) await req.call(root);
+    }
+
+    // Buttons by visible label
+    const goBtn = Array.from(card.querySelectorAll('button,a'))
+      .find(el => /Go Full Screen/i.test(el.textContent || ''));
+    const skipBtn = Array.from(card.querySelectorAll('button,a'))
+      .find(el => /Skip/i.test(el.textContent || ''));
 
     function bind(el, handler){
       if (!el || el.__csBound) return;
@@ -1522,17 +1528,18 @@ if (sec && sec.classList.contains('is-open')) {
     }
 
     bind(goBtn, async () => {
-      try { await enterFS(); } finally {
-        // Fallback close even if event is delayed
-        setTimeout(closePrompt, 100);
-      }
+      // 1) close immediately so nothing can block the screen
+      closePrompt();
+      nukeTopFixed();
+      // 2) then enter fullscreen (next tick keeps the user gesture)
+      setTimeout(() => { requestFS().catch(() => {}); }, 0);
     });
 
-    bind(skipBtn, closePrompt);
+    bind(skipBtn, () => { closePrompt(); nukeTopFixed(); });
 
-    // If already in fullscreen for some reason, close immediately
+    // If we somehow arrive already in fullscreen, close right away
     if (document.fullscreenElement || document.webkitFullscreenElement) {
-      setTimeout(closePrompt, 50);
+      closePrompt(); nukeTopFixed();
     }
   }
 
@@ -1546,6 +1553,7 @@ if (sec && sec.classList.contains('is-open')) {
 
 </body>
 </html>
+
 
 
 
