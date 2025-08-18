@@ -1475,103 +1475,135 @@ if (sec && sec.classList.contains('is-open')) {
 })();
 </script>
 <script>
-/* Long-press (~250ms) to drag OPEN tiles. Release won't trigger swipe-to-dismiss.
-   Self-contained: no CSS edits, no changes to your swipe code needed. */
+/* Long-press (~250ms) to drag OPEN tiles. Release won't dismiss.
+   Adds a global capture guard to swallow pointer/touch events while dragging. */
 (() => {
   const LONG_PRESS_MS = 250;
-  const MOVE_THRESHOLD = 8; // allow tiny jitter before deciding it's a swipe
+  const MOVE_THRESHOLD = 8;
+
+  // Global drag lock: blocks other listeners during a drag
+  let ACTIVE_TILE = null;
+  let pressTimer = null;
+  let capturingId = null;
+  let sx=0, sy=0, baseX=0, baseY=0;
+  let dragging = false;
+
+  // ---- Global guards (capture phase beats most swipe handlers) ----
+  const guardMove = (e) => {
+    if (!ACTIVE_TILE) return;
+    // If it's our active tile's pointer, consume it before others see it
+    if (capturingId == null || e.pointerId == null || e.pointerId === capturingId) {
+      e.stopImmediatePropagation();
+      e.preventDefault();
+    }
+  };
+  const guardUp = (e) => {
+    if (!ACTIVE_TILE) return;
+    if (capturingId == null || e.pointerId == null || e.pointerId === capturingId) {
+      e.stopImmediatePropagation();
+      e.preventDefault();
+    }
+  };
+  // Pointer events
+  window.addEventListener('pointermove', guardMove, {capture:true});
+  window.addEventListener('pointerup',   guardUp,   {capture:true});
+  window.addEventListener('pointercancel', guardUp, {capture:true});
+  // Touch fallback (iOS quirks)
+  window.addEventListener('touchmove', guardMove, {capture:true, passive:false});
+  window.addEventListener('touchend',  guardUp,   {capture:true, passive:false});
+  window.addEventListener('touchcancel', guardUp, {capture:true, passive:false});
 
   function isOpen(tile){ return tile.matches('.is-open, .open'); }
 
-  // Track any .cs-tile, including ones added later
   function attach(tile){
     if (tile.__csDragBound) return; tile.__csDragBound = true;
 
-    let pressTimer=null, capturingId=null, dragging=false;
-    let sx=0, sy=0, baseX=0, baseY=0;
+    tile.addEventListener('pointerdown', (e) => {
+      if (!isOpen(tile) || ACTIVE_TILE) return;
 
-    const onDown = (e) => {
-      if (!isOpen(tile)) return;
-      if (capturingId!==null) return;
+      capturingId = e.pointerId ?? null;
+      try { tile.setPointerCapture(capturingId); } catch (_) {}
 
-      capturingId = e.pointerId;
-      tile.setPointerCapture(capturingId);
-
-      // read current inline translate
+      // read current inline translate (if any)
       const m = /translate\(([-\d.]+)px,\s*([-\d.]+)px\)/.exec(tile.style.transform||'');
       baseX = m ? parseFloat(m[1])||0 : 0;
       baseY = m ? parseFloat(m[2])||0 : 0;
+
       sx = e.clientX; sy = e.clientY;
       dragging = false;
 
       pressTimer = setTimeout(() => {
         dragging = true;
+        ACTIVE_TILE = tile;
         tile.style.zIndex = '999';
-        tile.style.touchAction = 'none';       // stop page scroll during drag
-        tile.style.transition = 'none';        // no easing while dragging
+        tile.style.touchAction = 'none';
+        tile.style.transition = 'none';
       }, LONG_PRESS_MS);
-    };
+    }, {capture:true});
 
-    const onMove = (e) => {
-      if (capturingId!==e.pointerId) return;
+    tile.addEventListener('pointermove', (e) => {
+      if (capturingId !== (e.pointerId ?? null)) return;
 
-      const dx = e.clientX - sx, dy = e.clientY - sy;
+      const dx = e.clientX - sx;
+      const dy = e.clientY - sy;
 
-      // If user moves before long-press -> likely a swipe: cancel drag arming.
-      if (!dragging && (Math.abs(dx)>MOVE_THRESHOLD || Math.abs(dy)>MOVE_THRESHOLD)) {
-        if (pressTimer){ clearTimeout(pressTimer); pressTimer=null; }
-        return; // allow your existing swipe logic to proceed
+      // If user moves before long-press => treat as swipe; cancel arming.
+      if (!dragging && (Math.abs(dx) > MOVE_THRESHOLD || Math.abs(dy) > MOVE_THRESHOLD)) {
+        if (pressTimer){ clearTimeout(pressTimer); pressTimer = null; }
+        return; // let your existing swipe logic run
       }
 
-      if (dragging) {
-        // We are dragging: update position and block other handlers
+      if (dragging && ACTIVE_TILE === tile) {
         e.preventDefault();
-        e.stopImmediatePropagation(); // suppress swipe handlers
-        tile.style.transform = `translate(${baseX+dx}px, ${baseY+dy}px)`;
+        e.stopImmediatePropagation(); // belt-and-suspenders
+        tile.style.transform = `translate(${baseX + dx}px, ${baseY + dy}px)`;
       }
-    };
+    }, {capture:true});
 
     const endAll = (e) => {
-      if (capturingId!==e.pointerId) return;
+      if (capturingId !== (e.pointerId ?? null)) return;
 
-      if (pressTimer){ clearTimeout(pressTimer); pressTimer=null; }
+      if (pressTimer){ clearTimeout(pressTimer); pressTimer = null; }
 
-      if (dragging) {
-        // Commit position; make sure release doesn't trigger swipe
+      if (dragging && ACTIVE_TILE === tile) {
+        // Commit position; keep dismissal suppressed on release
         e.preventDefault();
         e.stopImmediatePropagation();
-
-        // allow transitions again (not required)
-        requestAnimationFrame(()=>{ tile.style.transition=''; });
+        requestAnimationFrame(() => { tile.style.transition = ''; });
       }
 
-      dragging=false;
-      capturingId=null;
-      tile.style.touchAction='';
-      tile.style.zIndex='';
-      try { tile.releasePointerCapture(e.pointerId); } catch(_) {}
+      dragging = false;
+      capturingId = null;
+      tile.style.touchAction = '';
+      tile.style.zIndex = '';
+      try { tile.releasePointerCapture(e.pointerId); } catch (_) {}
+
+      // Let global guards linger for a tick, then unlock
+      const t = ACTIVE_TILE;
+      setTimeout(() => { if (ACTIVE_TILE === t) ACTIVE_TILE = null; }, 50);
     };
 
-    // Use capture phase to beat existing listeners and suppress swipe while dragging
-    tile.addEventListener('pointerdown', onDown, {capture:true});
-    tile.addEventListener('pointermove', onMove, {capture:true});
-    tile.addEventListener('pointerup',     endAll, {capture:true});
+    tile.addEventListener('pointerup', endAll, {capture:true});
     tile.addEventListener('pointercancel', endAll, {capture:true});
-    // Also suppress click right after a drag
-    tile.addEventListener('click', (e)=>{ if (dragging){ e.stopImmediatePropagation(); e.preventDefault(); } }, true);
+
+    // Prevent click immediately after a drag
+    tile.addEventListener('click', (e) => {
+      if (dragging || ACTIVE_TILE === tile) {
+        e.stopImmediatePropagation();
+        e.preventDefault();
+      }
+    }, true);
   }
 
-  // Attach to current and future tiles
   const seed = () => document.querySelectorAll('.cs-tile').forEach(attach);
   seed();
-  const mo = new MutationObserver(seed);
-  mo.observe(document.documentElement, {subtree:true, childList:true});
+  new MutationObserver(seed).observe(document.documentElement, {subtree:true, childList:true});
 })();
 </script>
 
-
 </body>
 </html>
+
 
 
 
