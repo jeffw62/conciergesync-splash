@@ -1504,8 +1504,86 @@ if (sec && sec.classList.contains('is-open')) {
     .forEach(function (ev) { document.addEventListener(ev, killOverlay); });
 })();
 </script>
+<script>
+/* Open tile reposition with PRESS-AND-HOLD (won’t interfere with swipe) */
+(function () {
+  if (window.__csHoldDrag) return; window.__csHoldDrag = true;
+
+  var root = document.getElementById('cs-console');
+  if (!root) return;
+
+  var active = null, startX = 0, startY = 0, baseX = 0, baseY = 0;
+  var dragging = false, holdTimer = null, movedBeforeHold = false;
+
+  function pt(e){ var t = e.touches ? e.touches[0] : e; return {x:t.clientX,y:t.clientY}; }
+  function isOpenTile(el){
+    if (!el) return false;
+    var t = el.closest('.cs-tile');
+    if (!t) return false;
+    // treat “open” by size; adjust if needed
+    return t.getBoundingClientRect().width > 200 && !t.classList.contains('cs-dismissing');
+  }
+
+  function startDrag(tile){
+    dragging = true;
+    active = tile;
+    baseX = parseFloat(tile.dataset.x || 0);
+    baseY = parseFloat(tile.dataset.y || 0);
+    tile.style.transition = 'none';
+    tile.classList.add('cs-dragging');
+  }
+
+  function onStart(e){
+    var t = e.target.closest('.cs-tile');
+    if (!t || !isOpenTile(t)) return;
+    if (e.target.closest('.cs-close,button,a,input,textarea,select')) return;
+
+    var p = pt(e);
+    startX = p.x; startY = p.y;
+    movedBeforeHold = false;
+
+    clearTimeout(holdTimer);
+    holdTimer = setTimeout(function(){ startDrag(t); }, 250); // hold to enter drag
+  }
+
+  function onMove(e){
+    if (!active && holdTimer){
+      // if user swipes before hold, cancel drag → let swipe-to-dismiss work
+      var p = pt(e), dx = Math.abs(p.x - startX), dy = Math.abs(p.y - startY);
+      if (dx > 12 || dy > 12){ movedBeforeHold = true; clearTimeout(holdTimer); holdTimer = null; }
+      return;
+    }
+    if (!dragging || !active) return;
+
+    var p = pt(e);
+    var dx = p.x - startX, dy = p.y - startY;
+    active.style.transform = 'translate(' + (baseX + dx) + 'px,' + (baseY + dy) + 'px)';
+    if (e.cancelable) e.preventDefault(); // stop page scroll while dragging
+  }
+
+  function onEnd(){
+    clearTimeout(holdTimer); holdTimer = null;
+    if (!dragging || !active) { dragging = false; active = null; return; }
+
+    var m = active.style.transform.match(/translate\(([-\d.]+)px,\s*([-\d.]+)px\)/);
+    if (m){ active.dataset.x = m[1]; active.dataset.y = m[2]; }
+    active.style.transition = ''; active.classList.remove('cs-dragging');
+    dragging = false; active = null;
+  }
+
+  // capture so we start watching before other handlers; we only preventDefault after hold
+  root.addEventListener('mousedown', onStart, true);
+  root.addEventListener('touchstart', onStart, {passive:true, capture:true});
+  window.addEventListener('mousemove', onMove, true);
+  window.addEventListener('touchmove', onMove, {passive:false, capture:true});
+  window.addEventListener('mouseup', onEnd, true);
+  window.addEventListener('touchend', onEnd, true);
+  window.addEventListener('touchcancel', onEnd, true);
+})();
+</script>
 
 </body>
 </html>
+
 
 
