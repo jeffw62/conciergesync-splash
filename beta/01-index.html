@@ -743,13 +743,13 @@ function addTileHandlers(tile){
   tile.querySelector('.cs-close')?.addEventListener('click', () => closeTile(tile));
 
   // ── Tunables ───────────────────────────────────────────────────────────
-  const SLOP = 2;               // px before we decide gesture (was 3–4)
-  const PRESS_TO_DRAG_MS = 120; // short hold starts drag even without moving
-  const H_ANGLE = 60;           // degrees cone for "horizontal" swipe
-  const FLICK_V = 0.20;         // px/ms ≈ 200 px/s (slightly firmer than before)
-  const DISMISS_MIN = 36;       // px absolute minimum travel
-  const DISMISS_FRAC = 0.10;    // 10% of tile width (slightly more than before)
-  const COMMIT_FRAC = 0.45;     // release commits around 45% of threshold
+const SLOP = 2;               // (unchanged)
+const PRESS_TO_DRAG_MS = 90;  // ↓ was 120 — starts drag sooner
+const H_ANGLE = 60;           // (unchanged)
+const FLICK_V = 0.22;         // ↑ was 0.20 — slightly firmer swipe speed
+const DISMISS_MIN = 36;       // (unchanged)
+const DISMISS_FRAC = 0.12;    // ↑ was 0.10 — slightly longer swipe distance
+const COMMIT_FRAC = 0.45;     // (unchanged)
 
   let isDown=false, activeId=null, mode=null; // null|'drag'|'swipe'
   let t0=0, startX=0, startY=0, lastX=0, lastY=0, baseX=0, baseY=0;
@@ -1176,6 +1176,7 @@ function openTile(key){
 
 </body>
 </html>
+
 
 
 
