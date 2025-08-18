@@ -1466,6 +1466,97 @@ if (sec && sec.classList.contains('is-open')) {
   });
 })();
 </script>
+<script>
+(() => {
+  // --- helpers ---
+  function enterFullscreen() {
+    const el = document.documentElement;
+    const req = el.requestFullscreen || el.webkitRequestFullscreen || el.mozRequestFullScreen || el.msRequestFullscreen;
+    return req ? req.call(el) : Promise.resolve();
+  }
+  function closeNode(n){ if(n && n.parentNode) n.parentNode.removeChild(n); }
+
+  function bindButton(btn, handler){
+    if (!btn || btn.__csBound) return false;
+    btn.__csBound = true;
+    btn.addEventListener('click', (e) => {
+      e.preventDefault(); e.stopImmediatePropagation();
+      handler();
+    }, {capture:true});
+    // Also guard pointerup in case something blocks click
+    btn.addEventListener('pointerup', (e) => {
+      e.preventDefault(); e.stopImmediatePropagation();
+      handler();
+    }, {capture:true});
+    return true;
+  }
+
+  function buildFallbackModal(){
+    const modal = document.createElement('div');
+    modal.id = 'cs-fs-prompt-console';
+    Object.assign(modal.style, {
+      position: 'fixed', inset: '0', zIndex: '2147483647',
+      background: 'rgba(0,0,0,.55)', display: 'flex',
+      alignItems: 'center', justifyContent: 'center'
+    });
+    const card = document.createElement('div');
+    Object.assign(card.style, {
+      background: 'rgba(0,0,0,.85)', color:'#fff',
+      padding:'16px 18px', borderRadius:'16px',
+      boxShadow:'0 10px 28px rgba(0,0,0,.35)', minWidth:'260px',
+      fontFamily:'system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif'
+    });
+    card.innerHTML = `
+      <div style="font-weight:700;margin-bottom:10px">Best view is Full Screen</div>
+      <div style="display:flex;gap:10px">
+        <button id="csGoFS_console" style="padding:8px 12px;border-radius:10px;border:1px solid #fff;background:#fff;color:#111;font-weight:600;cursor:pointer">Go Full Screen</button>
+        <button id="csSkipFS_console" style="padding:8px 12px;border-radius:10px;border:1px solid #888;background:transparent;color:#fff;font-weight:600;cursor:pointer">Skip</button>
+      </div>`;
+    modal.appendChild(card);
+    document.body.appendChild(modal);
+
+    const go = card.querySelector('#csGoFS_console');
+    const skip = card.querySelector('#csSkipFS_console');
+
+    bindButton(go, async () => { try { await enterFullscreen(); } finally { closeNode(modal); } });
+    bindButton(skip, () => closeNode(modal));
+  }
+
+  function tryBindExisting(){
+    // Try a few common selectors you might be using on the console page
+    const goSel = [
+      '#goFullScreen', '#csGoFS', 'button[data-action="go-fullscreen"]', '.cs-go-fullscreen'
+    ];
+    const skipSel = [
+      '#skipFullScreen', '#csSkipFS', 'button[data-action="skip-fullscreen"]', '.cs-skip-fullscreen'
+    ];
+    const goBtn = document.querySelector(goSel.join(','));
+    const skipBtn = document.querySelector(skipSel.join(','));
+
+    let bound = false;
+    bound = bindButton(goBtn, async () => { try { await enterFullscreen(); } catch(_){} }) || bound;
+    bound = bindButton(skipBtn, () => {}) || bound;
+
+    return bound;
+  }
+
+  // Run after DOM is ready
+  const run = () => {
+    // Try to bind to existing console-page buttons first
+    const bound = tryBindExisting();
+
+    // If none found, create a local fallback modal (console page only)
+    if (!bound) buildFallbackModal();
+  };
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', run, {once:true});
+  } else {
+    run();
+  }
+})();
+</script>
 
 </body>
 </html>
+
