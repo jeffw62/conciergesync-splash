@@ -580,6 +580,14 @@ body.splash-mode .console-exit {
   left: var(--x, 0px);
   top:  var(--y, 0px);
 }
+  /* Optional: show grabbing immediately on press */
+  .cs-tile:active,
+  .cs-tile.cs-swiping { cursor: grabbing; }
+  
+  /* Cursor hints */
+  .cs-tile { cursor: grab; }
+  .cs-free .cs-tile.cs-swiping { cursor: grabbing; }
+  
 </style>
 
 <script>
@@ -728,17 +736,15 @@ body.splash-mode .console-exit {
     }, { once: true });
   }
 
-  // Natural drag (press→move→release). Quick horizontal flick = dismiss (easier).
 function addTileHandlers(tile){
-  // X button closes
   tile.querySelector('.cs-close')?.addEventListener('click', () => closeTile(tile));
 
-  // Tunables (easier swipe)
-  const SLOP = 8;             // movement before we decide
-  const H_ANGLE = 28;         // degrees from horizontal to count as "horizontal"
-  const FLICK_V = 0.6;        // px/ms (~600 px/s) → easier than before
-  const DISMISS_MIN = 96;     // px absolute minimum
-  const DISMISS_FRAC = 0.33;  // fraction of tile width to dismiss on release
+  // Softer thresholds
+  const SLOP = 6;              // movement before we decide
+  const H_ANGLE = 35;          // cone for "horizontal"
+  const FLICK_V = 0.45;        // px/ms (~450 px/s)  ← easier
+  const DISMISS_MIN = 64;      // px min
+  const DISMISS_FRAC = 0.20;   // 20% of tile width  ← easier
 
   let isDown=false, activeId=null, mode=null; // null|'drag'|'swipe'
   let t0=0, startX=0, startY=0, lastX=0, lastY=0, baseX=0, baseY=0;
@@ -752,7 +758,6 @@ function addTileHandlers(tile){
   const dismissPx = () => Math.max(DISMISS_MIN, tile.offsetWidth * DISMISS_FRAC);
 
   function beginDrag(){
-    // Ensure free mode and figure starting offsets
     enableFreeMode();
 
     const wrapRect = tilesWrap.getBoundingClientRect();
@@ -797,10 +802,10 @@ function addTileHandlers(tile){
       if (dist < SLOP) return;
       const angle = deg(dx,dy);
       const dt    = Math.max(1, performance.now()-t0);
-      const vx    = Math.abs(dx)/dt; // px/ms along X
+      const vx    = Math.abs(dx)/dt;
       const thr   = dismissPx();
 
-      // Mostly horizontal and either quick or already a decent shove → swipe
+      // More forgiving: mostly horizontal + either quick or half-way distance
       if (angle <= H_ANGLE && (vx > FLICK_V || Math.abs(dx) > thr * 0.5)){
         mode = 'swipe';
       } else {
@@ -813,8 +818,7 @@ function addTileHandlers(tile){
       if (e.cancelable) e.preventDefault();
       tile.classList.add('cs-swiping');
       const thr = dismissPx();
-      // smoother whisk feedback: opacity fades relative to threshold
-      const fade = Math.min(0.6, Math.abs(dx) / (thr * 1.2)); // cap fade at 0.6
+      const fade = Math.min(0.6, Math.abs(dx) / (thr * 1.1));
       tile.style.transform = `translateX(${dx}px) rotate(${dx*0.008}deg)`;
       tile.style.opacity   = String(1 - fade);
       return;
@@ -845,8 +849,8 @@ function addTileHandlers(tile){
     const thr = dismissPx();
 
     if (mode === 'swipe'){
-      // Commit if far enough or fast enough (both now easier)
-      if (Math.abs(dx) >= thr || vx >= FLICK_V){
+      // Commit if far OR fast (both are easy now)
+      if (Math.abs(dx) >= thr * 0.8 || vx >= FLICK_V){
         calmDismiss(tile, dx>=0?1:-1);
       } else {
         tile.style.transition = `transform var(--cs-time) var(--cs-ease), opacity var(--cs-time) var(--cs-ease)`;
@@ -855,7 +859,6 @@ function addTileHandlers(tile){
         tile.addEventListener('transitionend', () => { tile.style.transition=''; }, { once:true });
       }
     } else if (mode === 'drag'){
-      // Leave where it is
       tile.style.transition = '';
       tile.style.transform  = 'none';
     }
@@ -868,7 +871,7 @@ function addTileHandlers(tile){
   window.addEventListener('pointercancel', onUp);
 }
 
-  function openTile(key){
+function openTile(key){
   const existing = tilesWrap.querySelector(`.cs-tile[data-key="${key}"]`);
   if (existing){
     openKeys.delete(key);
@@ -891,29 +894,31 @@ function addTileHandlers(tile){
 
   addTileHandlers(sec);
 
+  // Append via FLIP (keeps grid calm if you're not in free mode yet)
   flipAnimate(tilesWrap, () => {
     openKeys.add(key);
     tilesWrap.appendChild(sec);
     updateWrapClass();
   });
 
-  // If we're already in free mode, center the new tile and offset it slightly
-  if (consoleEl.classList.contains('cs-free')){
-    // measure after it's in the DOM
-    requestAnimationFrame(() => {
-      const wrapRect = tilesWrap.getBoundingClientRect();
-      const r = sec.getBoundingClientRect();
-      const count = tilesWrap.querySelectorAll('.cs-tile').length;
-      const offset = (count-1) * 24; // small cascade so they don't stack
-
-      const x = tilesWrap.scrollLeft + Math.max(0, (wrapRect.width  - r.width )/2 + offset);
-      const y = tilesWrap.scrollTop  + Math.max(0, (wrapRect.height - r.height)/2 + offset);
-
-      sec.style.setProperty('--x', x + 'px');
-      sec.style.setProperty('--y', y + 'px');
-      sec.style.transform = 'none';
-    });
+  // 🔸 Ensure FREE MODE on first open, then center & lightly cascade
+  if (!consoleEl.classList.contains('cs-free')) {
+    enableFreeMode(); // freezes current grid positions to --x/--y
   }
+  // Center the NEW tile and offset slightly so multiple don't stack
+  requestAnimationFrame(() => {
+    const wrapRect = tilesWrap.getBoundingClientRect();
+    const r = sec.getBoundingClientRect();
+    const count  = tilesWrap.querySelectorAll('.cs-tile').length;
+    const offset = (count - 1) * 24; // 24px cascade
+
+    const x = tilesWrap.scrollLeft + Math.max(0, (wrapRect.width  - r.width )/2 + offset);
+    const y = tilesWrap.scrollTop  + Math.max(0, (wrapRect.height - r.height)/2 + offset);
+
+    sec.style.setProperty('--x', x + 'px');
+    sec.style.setProperty('--y', y + 'px');
+    sec.style.transform = 'none';
+  });
 
   sec.focus?.({ preventScroll: true });
 }
@@ -1137,6 +1142,7 @@ function addTileHandlers(tile){
 
 </body>
 </html>
+
 
 
 
