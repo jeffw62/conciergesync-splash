@@ -1529,10 +1529,117 @@ if (sec && sec.classList.contains('is-open')) {
   if (isFS()) closeFsPrompt();
 })();
 </script>
+<script>
+/* Press–hold (~250ms) to DRAG an OPEN tile. Quick flicks (before hold) still use your
+   existing swipe-to-dismiss. We create a temporary full-screen shield ONLY while dragging,
+   so legacy swipe handlers can't see move/up. */
+(() => {
+  const HOLD_MS = 250;
+  const JITTER = 8; // small movement allowed before hold
+
+  const isOpen = t => t.matches('.is-open, .open'); // adjust if your open class differs
+
+  // read inline translate(x,y) if present
+  function getTranslate(el){
+    const m = /translate\(([-\d.]+)px,\s*([-\d.]+)px\)/.exec(el.style.transform || '');
+    return { x: m ? parseFloat(m[1])||0 : 0, y: m ? parseFloat(m[2])||0 : 0 };
+  }
+
+  function attach(tile){
+    if (tile.__csHoldDragBound) return; tile.__csHoldDragBound = true;
+
+    let timer=null, pid=null, startX=0, startY=0, baseX=0, baseY=0, dragging=false, shield=null;
+
+    tile.addEventListener('pointerdown', (e) => {
+      if (!isOpen(tile) || pid !== null) return;
+
+      pid = e.pointerId ?? null;
+      const tr = getTranslate(tile);
+      baseX = tr.x; baseY = tr.y;
+      startX = e.clientX; startY = e.clientY;
+      dragging = false;
+
+      // Arm long-press; if user moves before hold => treat as normal swipe (we don't block)
+      clearTimeout(timer);
+      timer = setTimeout(() => {
+        // Begin dragging
+        dragging = true;
+
+        // Build an invisible shield that captures move/up while we drag
+        shield = document.createElement('div');
+        Object.assign(shield.style, {
+          position:'fixed', inset:'0', zIndex:'999999', background:'transparent',
+          touchAction:'none', cursor:'grabbing', pointerEvents:'auto'
+        });
+        document.body.appendChild(shield);
+
+        // Drag visuals
+        tile.style.transition = 'none';
+        tile.style.zIndex = '999';
+
+        // Move handler on the shield
+        const onMove = (ev) => {
+          if ((ev.pointerId ?? null) !== pid) return;
+          ev.preventDefault();
+          ev.stopImmediatePropagation(); // don't let legacy swipe see this
+          const dx = ev.clientX - startX, dy = ev.clientY - startY;
+          tile.style.transform = `translate(${baseX+dx}px, ${baseY+dy}px)`;
+        };
+
+        // End drag on release/cancel
+        const endDrag = (ev) => {
+          if ((ev.pointerId ?? null) !== pid) return;
+          ev.preventDefault();
+          ev.stopImmediatePropagation();
+          cleanup(true);
+        };
+
+        shield.addEventListener('pointermove', onMove, {capture:true});
+        shield.addEventListener('pointerup', endDrag, {capture:true});
+        shield.addEventListener('pointercancel', endDrag, {capture:true});
+      }, HOLD_MS);
+    }, {capture:true}); // capture down so we always arm the hold
+
+    // If they move before the hold time, cancel our drag (let your swipe work)
+    tile.addEventListener('pointermove', (e) => {
+      if (pid === null || dragging) return;
+      const dx = e.clientX - startX, dy = e.clientY - startY;
+      if (Math.abs(dx) > JITTER || Math.abs(dy) > JITTER) {
+        clearTimeout(timer); timer = null; // abandon hold; quick swipe proceeds as-is
+      }
+    }, {capture:true});
+
+    // Safety: if pointer ends before hold triggered
+    const endAll = () => cleanup(false);
+    tile.addEventListener('pointerup', endAll, {capture:true});
+    tile.addEventListener('pointercancel', endAll, {capture:true});
+
+    // Prevent a stray click immediately after a drag
+    tile.addEventListener('click', (e) => { if (dragging) { e.stopImmediatePropagation(); e.preventDefault(); } }, true);
+
+    function cleanup(wasDragging){
+      clearTimeout(timer); timer = null;
+      if (wasDragging) requestAnimationFrame(() => { tile.style.transition = ''; });
+      tile.style.zIndex = '';
+      if (shield) { try { shield.remove(); } catch(_) {} shield = null; }
+      pid = null; dragging = false;
+    }
+  }
+
+  const seed = () => document.querySelectorAll('.cs-tile').forEach(attach);
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', seed, {once:true});
+  } else {
+    seed();
+  }
+  new MutationObserver(seed).observe(document.documentElement, {subtree:true, childList:true});
+})();
+</script>
 
 
 </body>
 </html>
+
 
 
 
