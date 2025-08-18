@@ -1468,91 +1468,72 @@ if (sec && sec.classList.contains('is-open')) {
 </script>
 <script>
 (() => {
-  function run() {
-    // Find the FS card by its heading text
-    const card = Array.from(document.querySelectorAll('div,section,dialog'))
-      .find(n => n && /Best view is Full Screen/i.test(n.textContent || ''));
-    if (!card) return;
+  // Capture clicks anywhere on the page before other handlers.
+  document.addEventListener('click', (e) => {
+    const btnInfo = findFsButton(e.target);
+    if (!btnInfo) return;
 
-    // Likely overlay wrapper (adjusts for many implementations)
-    const overlay =
-      card.closest('#cs-fs-prompt, #cs-fs-prompt-console, .fs-prompt, .fs-modal, .modal, .overlay, [data-modal], [role="dialog"]')
-      || card.parentElement || card;
+    // Stop any other handlers from interfering.
+    e.preventDefault();
+    e.stopImmediatePropagation();
 
-    // Brutal close: hide immediately and then remove
-    function closePrompt() {
-      if (!overlay) return;
-      overlay.style.pointerEvents = 'none';
-      overlay.style.opacity = '0';
-      overlay.style.display = 'none'; // immediate unblock
-      // remove a tick later in case other scripts touch it
-      setTimeout(() => { try { overlay.remove(); } catch(_) {} }, 0);
-      // make sure body is interactive
-      document.body.style.pointerEvents = '';
-    }
-
-    // As extra safety: if some other fixed overlay still sits on top, nuke it
-    function nukeTopFixed() {
-      const nodes = Array.from(document.querySelectorAll('body > *'));
-      nodes.forEach(el => {
-        const cs = getComputedStyle(el);
-        if (cs.position === 'fixed' && (cs.zIndex === 'auto' || +cs.zIndex > 1000)) {
-          if (/overlay|modal|backdrop|fs|prompt/i.test(el.id + ' ' + el.className)) {
-            el.style.display = 'none';
-            setTimeout(() => { try { el.remove(); } catch(_) {} }, 0);
-          }
-        }
-      });
-    }
-
-    async function requestFS() {
+    if (btnInfo.type === 'go') {
+      // Remove the prompt FIRST so nothing blocks interaction…
+      closeFsPrompt();
+      // …then request fullscreen synchronously in the same user gesture.
       const root = document.documentElement;
       const req = root.requestFullscreen || root.webkitRequestFullscreen ||
                   root.mozRequestFullScreen || root.msRequestFullscreen;
-      if (req) await req.call(root);
+      try { if (req) req.call(root); } catch (_) {}
+    } else {
+      // Skip
+      closeFsPrompt();
     }
+  }, true); // capture=true
 
-    // Buttons by visible label
-    const goBtn = Array.from(card.querySelectorAll('button,a'))
-      .find(el => /Go Full Screen/i.test(el.textContent || ''));
-    const skipBtn = Array.from(card.querySelectorAll('button,a'))
-      .find(el => /Skip/i.test(el.textContent || ''));
-
-    function bind(el, handler){
-      if (!el || el.__csBound) return;
-      el.__csBound = true;
-      const go = (e)=>{ e.preventDefault(); e.stopImmediatePropagation(); handler(); };
-      el.addEventListener('click', go, {capture:true});
-      el.addEventListener('pointerup', go, {capture:true});
-      el.addEventListener('touchend', go, {capture:true, passive:false});
+  function findFsButton(target){
+    // Walk up from the click target to catch buttons or button-like elements.
+    for (let n = target; n && n !== document.body; n = n.parentElement) {
+      if (!(n.matches && (n.matches('button, a, [role="button"]') || n.tabIndex >= 0))) continue;
+      const label = (n.textContent || '').trim();
+      if (/^Go Full Screen$/i.test(label) || /Go\s*Full\s*Screen/i.test(label)) return {el:n, type:'go'};
+      if (/^Skip$/i.test(label)) return {el:n, type:'skip'};
     }
-
-    bind(goBtn, async () => {
-      // 1) close immediately so nothing can block the screen
-      closePrompt();
-      nukeTopFixed();
-      // 2) then enter fullscreen (next tick keeps the user gesture)
-      setTimeout(() => { requestFS().catch(() => {}); }, 0);
-    });
-
-    bind(skipBtn, () => { closePrompt(); nukeTopFixed(); });
-
-    // If we somehow arrive already in fullscreen, close right away
-    if (document.fullscreenElement || document.webkitFullscreenElement) {
-      closePrompt(); nukeTopFixed();
-    }
+    return null;
   }
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', run, {once:true});
-  } else {
-    run();
+  function closeFsPrompt(){
+    // Hide/remove common overlay wrappers and the card itself.
+    const candidates = [
+      '#cs-fs-prompt', '#cs-fs-prompt-console', '.fs-prompt', '.fs-modal',
+      '.modal', '.overlay', '[data-modal]', '[role="dialog"]'
+    ];
+    const nodes = Array.from(document.querySelectorAll(candidates.join(',')));
+    // If none matched, try removing any fixed, high-z overlay that contains our text.
+    if (!nodes.length) {
+      const all = Array.from(document.querySelectorAll('body > *'));
+      all.forEach(el => {
+        const cs = getComputedStyle(el);
+        if (cs.position === 'fixed' && (cs.zIndex === 'auto' || +cs.zIndex >= 1000)) {
+          if (/Best view is Full Screen/i.test(el.textContent || '')) nodes.push(el);
+        }
+      });
+    }
+    nodes.forEach(el => { el.style.display = 'none'; try { el.remove(); } catch(_) {} });
+    // Ensure page is interactive again
+    document.body.style.pointerEvents = '';
   }
+
+  // Safety: if already in fullscreen, ensure no prompt lingers.
+  const isFS = () => document.fullscreenElement || document.webkitFullscreenElement;
+  if (isFS()) closeFsPrompt();
 })();
 </script>
 
+
 </body>
 </html>
+
 
 
 
