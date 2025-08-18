@@ -728,19 +728,19 @@ body.splash-mode .console-exit {
     }, { once: true });
   }
 
-  // Long-press to drag; quick swipe to dismiss
-  function addTileHandlers(tile){
+  // Natural drag (press→move→release). Quick horizontal flick = dismiss (easier).
+function addTileHandlers(tile){
   // X button closes
   tile.querySelector('.cs-close')?.addEventListener('click', () => closeTile(tile));
 
-  // Tunables
-  const SLOP = 10;            // movement before we decide
-  const DISMISS_DIST = 160;   // px to trigger dismiss
-  const H_ANGLE = 20;         // degrees from horizontal to count as "horizontal"
-  const FLICK_MS = 180;       // flick window
-  const FLICK_V = 1.2;        // px/ms (≈1200 px/s)
+  // Tunables (easier swipe)
+  const SLOP = 8;             // movement before we decide
+  const H_ANGLE = 28;         // degrees from horizontal to count as "horizontal"
+  const FLICK_V = 0.6;        // px/ms (~600 px/s) → easier than before
+  const DISMISS_MIN = 96;     // px absolute minimum
+  const DISMISS_FRAC = 0.33;  // fraction of tile width to dismiss on release
 
-  let isDown=false, activeId=null, mode=null; // mode: null|'drag'|'swipe'
+  let isDown=false, activeId=null, mode=null; // null|'drag'|'swipe'
   let t0=0, startX=0, startY=0, lastX=0, lastY=0, baseX=0, baseY=0;
 
   const getVar = (name, el=tile) => {
@@ -749,6 +749,7 @@ body.splash-mode .console-exit {
   };
   const clamp = (n, a, b)=>Math.max(a, Math.min(b, n));
   const deg = (dx,dy)=>Math.abs(Math.atan2(dy,dx))*180/Math.PI;
+  const dismissPx = () => Math.max(DISMISS_MIN, tile.offsetWidth * DISMISS_FRAC);
 
   function beginDrag(){
     // Ensure free mode and figure starting offsets
@@ -797,9 +798,10 @@ body.splash-mode .console-exit {
       const angle = deg(dx,dy);
       const dt    = Math.max(1, performance.now()-t0);
       const vx    = Math.abs(dx)/dt; // px/ms along X
+      const thr   = dismissPx();
 
-      // Quick, mostly-horizontal → swipe; otherwise → drag
-      if (angle <= H_ANGLE && (vx > FLICK_V || (Math.abs(dx) > DISMISS_DIST && dt < 300))){
+      // Mostly horizontal and either quick or already a decent shove → swipe
+      if (angle <= H_ANGLE && (vx > FLICK_V || Math.abs(dx) > thr * 0.5)){
         mode = 'swipe';
       } else {
         mode = 'drag';
@@ -810,8 +812,11 @@ body.splash-mode .console-exit {
     if (mode === 'swipe'){
       if (e.cancelable) e.preventDefault();
       tile.classList.add('cs-swiping');
+      const thr = dismissPx();
+      // smoother whisk feedback: opacity fades relative to threshold
+      const fade = Math.min(0.6, Math.abs(dx) / (thr * 1.2)); // cap fade at 0.6
       tile.style.transform = `translateX(${dx}px) rotate(${dx*0.008}deg)`;
-      tile.style.opacity   = String(Math.max(0.4, 1 - Math.abs(dx)/600));
+      tile.style.opacity   = String(1 - fade);
       return;
     }
 
@@ -837,9 +842,11 @@ body.splash-mode .console-exit {
     const dx = lastX - startX;
     const dt = Math.max(1, performance.now()-t0);
     const vx = Math.abs(dx)/dt;
+    const thr = dismissPx();
 
     if (mode === 'swipe'){
-      if (Math.abs(dx) > DISMISS_DIST || vx > FLICK_V){
+      // Commit if far enough or fast enough (both now easier)
+      if (Math.abs(dx) >= thr || vx >= FLICK_V){
         calmDismiss(tile, dx>=0?1:-1);
       } else {
         tile.style.transition = `transform var(--cs-time) var(--cs-ease), opacity var(--cs-time) var(--cs-ease)`;
@@ -848,13 +855,10 @@ body.splash-mode .console-exit {
         tile.addEventListener('transitionend', () => { tile.style.transition=''; }, { once:true });
       }
     } else if (mode === 'drag'){
-      // No pulse; just leave it where it is
+      // Leave where it is
       tile.style.transition = '';
       tile.style.transform  = 'none';
-    } else {
-      // tap/no-op
     }
-
     mode = null;
   }
 
@@ -1133,6 +1137,7 @@ body.splash-mode .console-exit {
 
 </body>
 </html>
+
 
 
 
