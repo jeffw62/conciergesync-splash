@@ -1468,65 +1468,49 @@ if (sec && sec.classList.contains('is-open')) {
 </script>
 <script>
 (() => {
-  // Only run on the console page (must have at least one .cs-tile)
-  const onConsole = !!document.querySelector('.cs-tile');
-  if (!onConsole) return;
+  function run() {
+    // Find the FS prompt by its heading text
+    const container = Array.from(document.querySelectorAll('div,section,dialog'))
+      .find(n => n && n.textContent && /Best view is Full Screen/i.test(n.textContent));
+    if (!container) return;
 
-  function enterFS() {
-    const el = document.documentElement;
-    const req = el.requestFullscreen || el.webkitRequestFullscreen || el.mozRequestFullScreen || el.msRequestFullscreen;
-    return req ? req.call(el) : Promise.resolve();
-  }
-  function bind(btn, handler){
-    if (!btn || btn.__csFSBound) return false;
-    btn.__csFSBound = true;
-    const go = (e)=>{ e.preventDefault(); e.stopImmediatePropagation(); handler(); };
-    btn.addEventListener('click', go, {capture:true});
-    btn.addEventListener('pointerup', go, {capture:true});
-    return true;
-  }
-  function buildModal(){
-    if (document.getElementById('cs-fs-prompt-console')) return;
-    const modal = document.createElement('div');
-    modal.id = 'cs-fs-prompt-console';
-    Object.assign(modal.style, {
-      position:'fixed', inset:'0', zIndex:'2147483647',
-      background:'rgba(0,0,0,.55)', display:'flex',
-      alignItems:'center', justifyContent:'center'
-    });
-    const card = document.createElement('div');
-    Object.assign(card.style, {
-      background:'rgba(0,0,0,.85)', color:'#fff',
-      padding:'16px 18px', borderRadius:'16px',
-      boxShadow:'0 10px 28px rgba(0,0,0,.35)', minWidth:'260px',
-      fontFamily:'system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif'
-    });
-    card.innerHTML = `
-      <div style="font-weight:700;margin-bottom:10px">Best view is Full Screen</div>
-      <div style="display:flex;gap:10px">
-        <button id="csGoFS_console" style="padding:8px 12px;border-radius:10px;border:1px solid #fff;background:#fff;color:#111;font-weight:600;cursor:pointer">Go Full Screen</button>
-        <button id="csSkipFS_console" style="padding:8px 12px;border-radius:10px;border:1px solid #888;background:transparent;color:#fff;font-weight:600;cursor:pointer">Skip</button>
-      </div>`;
-    modal.appendChild(card);
-    document.body.appendChild(modal);
+    // Make sure it's clickable and on top of everything
+    container.style.zIndex = '2147483647';
+    container.style.pointerEvents = 'auto';
+    container.querySelectorAll('*').forEach(el => { el.style.pointerEvents = 'auto'; });
 
-    bind(card.querySelector('#csGoFS_console'), async () => { try { await enterFS(); } finally { modal.remove(); } });
-    bind(card.querySelector('#csSkipFS_console'), () => modal.remove());
-  }
+    // Find the two buttons by their visible labels
+    const goBtn = Array.from(container.querySelectorAll('button,a'))
+      .find(el => /Go Full Screen/i.test(el.textContent || ''));
+    const skipBtn = Array.from(container.querySelectorAll('button,a'))
+      .find(el => /Skip/i.test(el.textContent || ''));
 
-  function tryBindExisting(){
-    const go = document.querySelector('#goFullScreen, #csGoFS, button[data-action="go-fullscreen"], .cs-go-fullscreen');
-    const skip = document.querySelector('#skipFullScreen, #csSkipFS, button[data-action="skip-fullscreen"], .cs-skip-fullscreen');
-    let any = false;
-    any = bind(go, async ()=>{ try{ await enterFS(); }catch(_){} }) || any;
-    any = bind(skip, ()=>{}) || any;
-    return any;
-  }
+    const closePrompt = () => { if (container.parentNode) container.parentNode.removeChild(container); };
 
-  const run = () => {
-    const bound = tryBindExisting();
-    if (!bound) buildModal();       // only on console page
-  };
+    async function enterFullscreen() {
+      try {
+        const root = document.documentElement;
+        const req = root.requestFullscreen || root.webkitRequestFullscreen ||
+                    root.mozRequestFullScreen || root.msRequestFullscreen;
+        if (req) await req.call(root);
+      } catch(_) { /* ignore */ }
+      closePrompt();
+    }
+
+    function bind(el, handler){
+      if (!el || el.__csBound) return;
+      el.__csBound = true;
+      const go = (e) => { e.preventDefault(); e.stopImmediatePropagation(); handler(); };
+      el.style.cursor = 'pointer';
+      el.tabIndex = 0;
+      el.addEventListener('click', go, {capture:true});
+      el.addEventListener('pointerup', go, {capture:true});
+      el.addEventListener('touchend', go, {capture:true, passive:false});
+    }
+
+    bind(goBtn, enterFullscreen);
+    bind(skipBtn, closePrompt);
+  }
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', run, {once:true});
@@ -1537,7 +1521,9 @@ if (sec && sec.classList.contains('is-open')) {
 </script>
 
 
+
 </body>
 </html>
+
 
 
