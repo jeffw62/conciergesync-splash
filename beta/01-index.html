@@ -736,18 +736,24 @@ body.splash-mode .console-exit {
     }, { once: true });
   }
 
+// Natural drag (press→move→release). Light horizontal whisk = dismiss.
 function addTileHandlers(tile){
+  // X closes
   tile.querySelector('.cs-close')?.addEventListener('click', () => closeTile(tile));
 
   // Softer thresholds
-  const SLOP = 6;              // movement before we decide
-  const H_ANGLE = 35;          // cone for "horizontal"
-  const FLICK_V = 0.45;        // px/ms (~450 px/s)  ← easier
-  const DISMISS_MIN = 64;      // px min
-  const DISMISS_FRAC = 0.20;   // 20% of tile width  ← easier
+  const SLOP = 4;               // px before we decide gesture
+  const H_ANGLE = 55;           // degrees cone for "horizontal" swipe
+  const FLICK_V = 0.22;         // px/ms ≈ 220 px/s  ← very easy
+  const DISMISS_MIN = 40;       // px absolute minimum travel
+  const DISMISS_FRAC = 0.12;    // 12% of tile width  ← easy
+  const COMMIT_FRAC = 0.45;     // release commit at ~45% of threshold
 
   let isDown=false, activeId=null, mode=null; // null|'drag'|'swipe'
   let t0=0, startX=0, startY=0, lastX=0, lastY=0, baseX=0, baseY=0;
+
+  // keep a short trail of recent positions to measure instantaneous speed
+  let trail = []; // [{t, x}]
 
   const getVar = (name, el=tile) => {
     const v = getComputedStyle(el).getPropertyValue(name);
@@ -784,6 +790,8 @@ function addTileHandlers(tile){
     startY = lastY = e.clientY;
     mode   = null;
 
+    trail = [{ t: t0, x: startX }];
+
     try { tile.setPointerCapture?.(activeId); } catch {}
     if (e.cancelable) e.preventDefault();
   }
@@ -797,16 +805,24 @@ function addTileHandlers(tile){
     const dy = lastY - startY;
     const dist = Math.hypot(dx,dy);
 
+    // record trail (last ~120ms)
+    const now = performance.now();
+    trail.push({ t: now, x: lastX });
+    while (trail.length && now - trail[0].t > 120) trail.shift();
+    const vxRecent = (() => {
+      if (trail.length < 2) return 0;
+      const a = trail[0], b = trail[trail.length-1];
+      return Math.abs(b.x - a.x) / Math.max(1, b.t - a.t); // px/ms
+    })();
+
     // Decide gesture
     if (!mode){
       if (dist < SLOP) return;
       const angle = deg(dx,dy);
-      const dt    = Math.max(1, performance.now()-t0);
-      const vx    = Math.abs(dx)/dt;
       const thr   = dismissPx();
 
-      // More forgiving: mostly horizontal + either quick or half-way distance
-      if (angle <= H_ANGLE && (vx > FLICK_V || Math.abs(dx) > thr * 0.5)){
+      // More forgiving: mostly horizontal + (fast OR already 30% of threshold)
+      if (angle <= H_ANGLE && (vxRecent > FLICK_V || Math.abs(dx) > thr * 0.3)){
         mode = 'swipe';
       } else {
         mode = 'drag';
@@ -818,7 +834,8 @@ function addTileHandlers(tile){
       if (e.cancelable) e.preventDefault();
       tile.classList.add('cs-swiping');
       const thr = dismissPx();
-      const fade = Math.min(0.6, Math.abs(dx) / (thr * 1.1));
+      // earlier, smoother fade; cap at ~0.72
+      const fade = Math.min(0.72, Math.abs(dx) / (thr * 0.9));
       tile.style.transform = `translateX(${dx}px) rotate(${dx*0.008}deg)`;
       tile.style.opacity   = String(1 - fade);
       return;
@@ -844,13 +861,19 @@ function addTileHandlers(tile){
     tile.classList.remove('cs-swiping','is-focused');
 
     const dx = lastX - startX;
-    const dt = Math.max(1, performance.now()-t0);
-    const vx = Math.abs(dx)/dt;
+    const now = performance.now();
+    // instantaneous velocity from recent trail
+    while (trail.length && now - trail[0].t > 120) trail.shift();
+    const vxRecent = (() => {
+      if (trail.length < 2) return 0;
+      const a = trail[0], b = trail[trail.length-1];
+      return Math.abs(b.x - a.x) / Math.max(1, b.t - a.t);
+    })();
     const thr = dismissPx();
 
     if (mode === 'swipe'){
-      // Commit if far OR fast (both are easy now)
-      if (Math.abs(dx) >= thr * 0.8 || vx >= FLICK_V){
+      // Commit if far enough OR fast enough (both very easy now)
+      if (Math.abs(dx) >= thr * COMMIT_FRAC || vxRecent >= FLICK_V){
         calmDismiss(tile, dx>=0?1:-1);
       } else {
         tile.style.transition = `transform var(--cs-time) var(--cs-ease), opacity var(--cs-time) var(--cs-ease)`;
@@ -863,6 +886,7 @@ function addTileHandlers(tile){
       tile.style.transform  = 'none';
     }
     mode = null;
+    trail.length = 0;
   }
 
   tile.addEventListener('pointerdown', onDown, { passive:false });
@@ -1142,6 +1166,7 @@ function openTile(key){
 
 </body>
 </html>
+
 
 
 
