@@ -1475,115 +1475,104 @@ if (sec && sec.classList.contains('is-open')) {
 })();
 </script>
 <script>
-/* Full-screen overlay: close immediately on click AND on fullscreenchange */
-(function () {
-  function killOverlay() {
-    document.querySelectorAll('#fs-overlay').forEach(function (n) { try { n.remove(); } catch(e){} });
+/* Long-press (~250ms) to drag OPEN tiles. Release won't trigger swipe-to-dismiss.
+   Self-contained: no CSS edits, no changes to your swipe code needed. */
+(() => {
+  const LONG_PRESS_MS = 250;
+  const MOVE_THRESHOLD = 8; // allow tiny jitter before deciding it's a swipe
+
+  function isOpen(tile){ return tile.matches('.is-open, .open'); }
+
+  // Track any .cs-tile, including ones added later
+  function attach(tile){
+    if (tile.__csDragBound) return; tile.__csDragBound = true;
+
+    let pressTimer=null, capturingId=null, dragging=false;
+    let sx=0, sy=0, baseX=0, baseY=0;
+
+    const onDown = (e) => {
+      if (!isOpen(tile)) return;
+      if (capturingId!==null) return;
+
+      capturingId = e.pointerId;
+      tile.setPointerCapture(capturingId);
+
+      // read current inline translate
+      const m = /translate\(([-\d.]+)px,\s*([-\d.]+)px\)/.exec(tile.style.transform||'');
+      baseX = m ? parseFloat(m[1])||0 : 0;
+      baseY = m ? parseFloat(m[2])||0 : 0;
+      sx = e.clientX; sy = e.clientY;
+      dragging = false;
+
+      pressTimer = setTimeout(() => {
+        dragging = true;
+        tile.style.zIndex = '999';
+        tile.style.touchAction = 'none';       // stop page scroll during drag
+        tile.style.transition = 'none';        // no easing while dragging
+      }, LONG_PRESS_MS);
+    };
+
+    const onMove = (e) => {
+      if (capturingId!==e.pointerId) return;
+
+      const dx = e.clientX - sx, dy = e.clientY - sy;
+
+      // If user moves before long-press -> likely a swipe: cancel drag arming.
+      if (!dragging && (Math.abs(dx)>MOVE_THRESHOLD || Math.abs(dy)>MOVE_THRESHOLD)) {
+        if (pressTimer){ clearTimeout(pressTimer); pressTimer=null; }
+        return; // allow your existing swipe logic to proceed
+      }
+
+      if (dragging) {
+        // We are dragging: update position and block other handlers
+        e.preventDefault();
+        e.stopImmediatePropagation(); // suppress swipe handlers
+        tile.style.transform = `translate(${baseX+dx}px, ${baseY+dy}px)`;
+      }
+    };
+
+    const endAll = (e) => {
+      if (capturingId!==e.pointerId) return;
+
+      if (pressTimer){ clearTimeout(pressTimer); pressTimer=null; }
+
+      if (dragging) {
+        // Commit position; make sure release doesn't trigger swipe
+        e.preventDefault();
+        e.stopImmediatePropagation();
+
+        // allow transitions again (not required)
+        requestAnimationFrame(()=>{ tile.style.transition=''; });
+      }
+
+      dragging=false;
+      capturingId=null;
+      tile.style.touchAction='';
+      tile.style.zIndex='';
+      try { tile.releasePointerCapture(e.pointerId); } catch(_) {}
+    };
+
+    // Use capture phase to beat existing listeners and suppress swipe while dragging
+    tile.addEventListener('pointerdown', onDown, {capture:true});
+    tile.addEventListener('pointermove', onMove, {capture:true});
+    tile.addEventListener('pointerup',     endAll, {capture:true});
+    tile.addEventListener('pointercancel', endAll, {capture:true});
+    // Also suppress click right after a drag
+    tile.addEventListener('click', (e)=>{ if (dragging){ e.stopImmediatePropagation(); e.preventDefault(); } }, true);
   }
 
-  // Close the overlay right away when either button is tapped.
-  document.addEventListener('click', function (e) {
-    var go   = e.target.closest('#fs-go');
-    var skip = e.target.closest('#fs-skip');
-    if (!go && !skip) return;
-
-    e.preventDefault(); e.stopPropagation();
-
-    if (go) {
-      var el  = document.documentElement;
-      var req = el.requestFullscreen || el.webkitRequestFullscreen ||
-                el.msRequestFullscreen || el.mozRequestFullScreen;
-      try { req && req.call(el); } catch (_) {}
-    }
-
-    killOverlay(); // disappear immediately on first tap
-  }, true); // capture so nothing else interferes
-
-  // Also remove the overlay the moment the browser enters/exits fullscreen.
-  ['fullscreenchange','webkitfullscreenchange','mozfullscreenchange','MSFullscreenChange']
-    .forEach(function (ev) { document.addEventListener(ev, killOverlay); });
+  // Attach to current and future tiles
+  const seed = () => document.querySelectorAll('.cs-tile').forEach(attach);
+  seed();
+  const mo = new MutationObserver(seed);
+  mo.observe(document.documentElement, {subtree:true, childList:true});
 })();
 </script>
-<script>
-/* Open tile reposition with PRESS-AND-HOLD (won’t interfere with swipe) */
-(function () {
-  if (window.__csHoldDrag) return; window.__csHoldDrag = true;
 
-  var root = document.getElementById('cs-console');
-  if (!root) return;
-
-  var active = null, startX = 0, startY = 0, baseX = 0, baseY = 0;
-  var dragging = false, holdTimer = null, movedBeforeHold = false;
-
-  function pt(e){ var t = e.touches ? e.touches[0] : e; return {x:t.clientX,y:t.clientY}; }
-  function isOpenTile(el){
-    if (!el) return false;
-    var t = el.closest('.cs-tile');
-    if (!t) return false;
-    // treat “open” by size; adjust if needed
-    return t.getBoundingClientRect().width > 200 && !t.classList.contains('cs-dismissing');
-  }
-
-  function startDrag(tile){
-    dragging = true;
-    active = tile;
-    baseX = parseFloat(tile.dataset.x || 0);
-    baseY = parseFloat(tile.dataset.y || 0);
-    tile.style.transition = 'none';
-    tile.classList.add('cs-dragging');
-  }
-
-  function onStart(e){
-    var t = e.target.closest('.cs-tile');
-    if (!t || !isOpenTile(t)) return;
-    if (e.target.closest('.cs-close,button,a,input,textarea,select')) return;
-
-    var p = pt(e);
-    startX = p.x; startY = p.y;
-    movedBeforeHold = false;
-
-    clearTimeout(holdTimer);
-    holdTimer = setTimeout(function(){ startDrag(t); }, 250); // hold to enter drag
-  }
-
-  function onMove(e){
-    if (!active && holdTimer){
-      // if user swipes before hold, cancel drag → let swipe-to-dismiss work
-      var p = pt(e), dx = Math.abs(p.x - startX), dy = Math.abs(p.y - startY);
-      if (dx > 12 || dy > 12){ movedBeforeHold = true; clearTimeout(holdTimer); holdTimer = null; }
-      return;
-    }
-    if (!dragging || !active) return;
-
-    var p = pt(e);
-    var dx = p.x - startX, dy = p.y - startY;
-    active.style.transform = 'translate(' + (baseX + dx) + 'px,' + (baseY + dy) + 'px)';
-    if (e.cancelable) e.preventDefault(); // stop page scroll while dragging
-  }
-
-  function onEnd(){
-    clearTimeout(holdTimer); holdTimer = null;
-    if (!dragging || !active) { dragging = false; active = null; return; }
-
-    var m = active.style.transform.match(/translate\(([-\d.]+)px,\s*([-\d.]+)px\)/);
-    if (m){ active.dataset.x = m[1]; active.dataset.y = m[2]; }
-    active.style.transition = ''; active.classList.remove('cs-dragging');
-    dragging = false; active = null;
-  }
-
-  // capture so we start watching before other handlers; we only preventDefault after hold
-  root.addEventListener('mousedown', onStart, true);
-  root.addEventListener('touchstart', onStart, {passive:true, capture:true});
-  window.addEventListener('mousemove', onMove, true);
-  window.addEventListener('touchmove', onMove, {passive:false, capture:true});
-  window.addEventListener('mouseup', onEnd, true);
-  window.addEventListener('touchend', onEnd, true);
-  window.addEventListener('touchcancel', onEnd, true);
-})();
-</script>
 
 </body>
 </html>
+
 
 
 
