@@ -101,26 +101,18 @@ body.splash-mode .console-exit {
     <!-- Why / Role / Value -->
     <div class="section">
       <div class="card">
-        <h2>Why We’re Inviting Beta Users</h2>
+        <h2>Plase Holder</h2>
         <p style="margin:0 0 12px;color:#444;">
-          <strong>ConciergeSync™ turns confusing points & miles rules into clear, dollar-value decisions.</strong>
-          But to make it rock-solid, we need real travelers and real itineraries—not lab data.
+          <strong>Plase Holder
         </p>
         <p style="margin:0 0 12px;color:#444;">
-          We built ConciergeSync™ because the world of points and miles is broken for most people.
-          The best rewards, the biggest wins, the true premium experiences — they’re hidden behind complexity,
-          endless fine print, and hours of research.
+          WPlase Holder
         </p>
         <p style="margin:0 0 12px;color:#444;">
-          Most platforms either give you generic advice or try to sell you into their partners.
-          <strong>ConciergeSync is different.</strong> We’re creating a tool that thinks like a strategist,
-          works like your personal travel concierge, and is completely on your side — no kickbacks,
-          no fluff, just maximizing <em>your</em> value.
+          Plase Holder
         </p>
         <p style="margin:0 0 20px;color:#444;">
-          You’re here at the very beginning, helping us fine-tune this so it becomes the go-to tool for travelers
-          who want the best without wasting time. <strong>The feedback you share today will literally shape what
-          ConciergeSync becomes tomorrow.</strong>
+          YPlase Holder
         </p>
 
         <h3 style="margin:12px 0 8px;">Your Role as a Beta User Client (BUC)</h3>
@@ -1475,123 +1467,132 @@ if (sec && sec.classList.contains('is-open')) {
 })();
 </script>
 <script>
-/* Long-press (~250ms) to drag OPEN tiles. Release won't dismiss.
-   Adds a global capture guard to swallow pointer/touch events while dragging. */
+/* Open tiles: capture pointerdown so legacy swipe can't arm.
+   - Long-press (~250ms) => drag to reposition; release won't dismiss.
+   - Quick horizontal swipe before long-press => we perform a smooth dismiss.
+*/
 (() => {
   const LONG_PRESS_MS = 250;
-  const MOVE_THRESHOLD = 8;
+  const SWIPE_DISTANCE = 60;      // px, before long-press fires
+  const SWIPE_TIME = 220;         // ms window for "quick" swipe feel
+  const JITTER = 8;               // ignore tiny movement while arming
+  const EASE = 'cubic-bezier(.16,1,.3,1)';
 
-  // Global drag lock: blocks other listeners during a drag
-  let ACTIVE_TILE = null;
-  let pressTimer = null;
-  let capturingId = null;
-  let sx=0, sy=0, baseX=0, baseY=0;
-  let dragging = false;
+  function isOpen(t) { return t.matches('.is-open, .open'); }
+  function getTile(node){ return node?.closest?.('.cs-tile') || null; }
 
-  // ---- Global guards (capture phase beats most swipe handlers) ----
-  const guardMove = (e) => {
-    if (!ACTIVE_TILE) return;
-    // If it's our active tile's pointer, consume it before others see it
-    if (capturingId == null || e.pointerId == null || e.pointerId === capturingId) {
-      e.stopImmediatePropagation();
-      e.preventDefault();
-    }
-  };
-  const guardUp = (e) => {
-    if (!ACTIVE_TILE) return;
-    if (capturingId == null || e.pointerId == null || e.pointerId === capturingId) {
-      e.stopImmediatePropagation();
-      e.preventDefault();
-    }
-  };
-  // Pointer events
-  window.addEventListener('pointermove', guardMove, {capture:true});
-  window.addEventListener('pointerup',   guardUp,   {capture:true});
-  window.addEventListener('pointercancel', guardUp, {capture:true});
-  // Touch fallback (iOS quirks)
-  window.addEventListener('touchmove', guardMove, {capture:true, passive:false});
-  window.addEventListener('touchend',  guardUp,   {capture:true, passive:false});
-  window.addEventListener('touchcancel', guardUp, {capture:true, passive:false});
+  // read current inline translate(x,y)
+  function readTranslate(el){
+    const m = /translate\(([-\d.]+)px,\s*([-\d.]+)px\)/.exec(el.style.transform||'');
+    return {x: m ? parseFloat(m[1])||0 : 0, y: m ? parseFloat(m[2])||0 : 0};
+  }
 
-  function isOpen(tile){ return tile.matches('.is-open, .open'); }
+  // our own smooth dismiss (slides off-screen + fades, then removes node)
+  function dismissTile(tile, dir = 1){
+    const {x, y} = readTranslate(tile);
+    const off = Math.max(window.innerWidth, document.documentElement.clientWidth) * 0.75 + 160;
+    tile.style.willChange = 'transform, opacity';
+    tile.style.transition = `transform 360ms ${EASE}, opacity 240ms ease`;
+    tile.style.transform = `translate(${x + off*dir}px, ${y}px)`;
+    tile.style.opacity = '0';
+    const tidy = () => { tile.removeEventListener('transitionend', tidy); tile.remove(); };
+    tile.addEventListener('transitionend', tidy);
+  }
 
   function attach(tile){
-    if (tile.__csDragBound) return; tile.__csDragBound = true;
+    if (tile.__csOpenGesturesBound) return; tile.__csOpenGesturesBound = true;
 
-    tile.addEventListener('pointerdown', (e) => {
-      if (!isOpen(tile) || ACTIVE_TILE) return;
+    let pressTimer=null, dragging=false, armed=false, downAt=0, sx=0, sy=0, baseX=0, baseY=0, pid=null;
 
-      capturingId = e.pointerId ?? null;
-      try { tile.setPointerCapture(capturingId); } catch (_) {}
+    const onDown = (e) => {
+      const t = getTile(e.target);
+      if (t !== tile || !isOpen(tile)) return;
 
-      // read current inline translate (if any)
-      const m = /translate\(([-\d.]+)px,\s*([-\d.]+)px\)/.exec(tile.style.transform||'');
-      baseX = m ? parseFloat(m[1])||0 : 0;
-      baseY = m ? parseFloat(m[2])||0 : 0;
+      // Stop legacy handlers from arming on open tiles
+      e.stopImmediatePropagation();
+      // Don't block scroll yet; only when we start dragging
+      // (keep default passive behavior)
 
+      pid = e.pointerId ?? null;
+      const tr = readTranslate(tile);
+      baseX = tr.x; baseY = tr.y;
       sx = e.clientX; sy = e.clientY;
+      downAt = performance.now();
       dragging = false;
+      armed = true;
 
+      // arm long-press
+      clearTimeout(pressTimer);
       pressTimer = setTimeout(() => {
+        if (!armed) return;
         dragging = true;
-        ACTIVE_TILE = tile;
-        tile.style.zIndex = '999';
-        tile.style.touchAction = 'none';
         tile.style.transition = 'none';
+        tile.style.touchAction = 'none';
+        tile.style.zIndex = '999';
       }, LONG_PRESS_MS);
-    }, {capture:true});
+    };
 
-    tile.addEventListener('pointermove', (e) => {
-      if (capturingId !== (e.pointerId ?? null)) return;
+    const onMove = (e) => {
+      if (!armed || (pid !== null && e.pointerId !== pid)) return;
 
       const dx = e.clientX - sx;
       const dy = e.clientY - sy;
 
-      // If user moves before long-press => treat as swipe; cancel arming.
-      if (!dragging && (Math.abs(dx) > MOVE_THRESHOLD || Math.abs(dy) > MOVE_THRESHOLD)) {
-        if (pressTimer){ clearTimeout(pressTimer); pressTimer = null; }
-        return; // let your existing swipe logic run
+      // Before long-press: detect quick horizontal swipe -> our dismiss
+      if (!dragging) {
+        const elapsed = performance.now() - downAt;
+        if (Math.abs(dx) > JITTER || Math.abs(dy) > JITTER) {
+          // prevent legacy swipe from seeing movement
+          e.stopImmediatePropagation();
+        }
+        if (Math.abs(dx) >= SWIPE_DISTANCE && elapsed <= SWIPE_TIME && Math.abs(dx) > Math.abs(dy)) {
+          armed = false;
+          clearTimeout(pressTimer);
+          // swallow the rest of this gesture
+          e.preventDefault();
+          e.stopImmediatePropagation();
+          dismissTile(tile, dx > 0 ? +1 : -1);
+          return;
+        }
+        // otherwise just wait for long-press to flip into dragging
+        return;
       }
 
-      if (dragging && ACTIVE_TILE === tile) {
-        e.preventDefault();
-        e.stopImmediatePropagation(); // belt-and-suspenders
-        tile.style.transform = `translate(${baseX + dx}px, ${baseY + dy}px)`;
-      }
-    }, {capture:true});
+      // Dragging: reposition live
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      tile.style.transform = `translate(${baseX + dx}px, ${baseY + dy}px)`;
+    };
 
-    const endAll = (e) => {
-      if (capturingId !== (e.pointerId ?? null)) return;
+    const onEnd = (e) => {
+      if (!armed || (pid !== null && e.pointerId !== pid)) return;
 
-      if (pressTimer){ clearTimeout(pressTimer); pressTimer = null; }
+      clearTimeout(pressTimer);
 
-      if (dragging && ACTIVE_TILE === tile) {
-        // Commit position; keep dismissal suppressed on release
+      // If we were dragging, commit position and ensure no dismiss happens
+      if (dragging) {
         e.preventDefault();
         e.stopImmediatePropagation();
         requestAnimationFrame(() => { tile.style.transition = ''; });
       }
 
-      dragging = false;
-      capturingId = null;
+      // reset
       tile.style.touchAction = '';
       tile.style.zIndex = '';
-      try { tile.releasePointerCapture(e.pointerId); } catch (_) {}
-
-      // Let global guards linger for a tick, then unlock
-      const t = ACTIVE_TILE;
-      setTimeout(() => { if (ACTIVE_TILE === t) ACTIVE_TILE = null; }, 50);
+      dragging = false;
+      armed = false;
+      pid = null;
     };
 
-    tile.addEventListener('pointerup', endAll, {capture:true});
-    tile.addEventListener('pointercancel', endAll, {capture:true});
+    // Capture phase ensures we pre-empt bubble listeners on the tile/ancestors
+    tile.addEventListener('pointerdown', onDown, {capture:true});
+    tile.addEventListener('pointermove', onMove, {capture:true, passive:false});
+    tile.addEventListener('pointerup',   onEnd,  {capture:true});
+    tile.addEventListener('pointercancel', onEnd, {capture:true});
 
-    // Prevent click immediately after a drag
+    // Block click right after a drag
     tile.addEventListener('click', (e) => {
-      if (dragging || ACTIVE_TILE === tile) {
-        e.stopImmediatePropagation();
-        e.preventDefault();
-      }
+      if (dragging) { e.stopImmediatePropagation(); e.preventDefault(); }
     }, true);
   }
 
@@ -1601,8 +1602,10 @@ if (sec && sec.classList.contains('is-open')) {
 })();
 </script>
 
+
 </body>
 </html>
+
 
 
 
