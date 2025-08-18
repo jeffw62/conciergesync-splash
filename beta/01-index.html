@@ -1504,30 +1504,62 @@ if (sec && sec.classList.contains('is-open')) {
     .forEach(function (ev) { document.addEventListener(ev, killOverlay); });
 })();
 </script>
+<script>
+/* Open-tile drag-to-reposition (safe add-on; Arrange not required) */
+(function () {
+  if (window.__csOpenDrag) return;  // guard against duplicates
+  window.__csOpenDrag = true;
+
+  var cs = document.getElementById('cs-console');
+  if (!cs) return;
+
+  var active = null, startX = 0, startY = 0, baseX = 0, baseY = 0;
+
+  function pt(e){
+    return e.touches && e.touches[0]
+      ? { x: e.touches[0].clientX, y: e.touches[0].clientY }
+      : { x: e.clientX,          y: e.clientY };
+  }
+
+  function onStart(e){
+    var t = e.target.closest('.cs-tile');
+    if (!t || !t.classList.contains('is-open')) return;  // only when tile is open
+    active = t;
+    var p = pt(e);
+    startX = p.x; startY = p.y;
+    baseX = parseFloat(t.dataset.x || 0);
+    baseY = parseFloat(t.dataset.y || 0);
+    t.style.transition = 'none';
+    if (e.cancelable) e.preventDefault();
+  }
+
+  function onMove(e){
+    if (!active) return;
+    var p = pt(e);
+    var dx = p.x - startX, dy = p.y - startY;
+    active.style.transform = 'translate(' + (baseX + dx) + 'px, ' + (baseY + dy) + 'px)';
+    if (e.cancelable) e.preventDefault();
+  }
+
+  function onEnd(){
+    if (!active) return;
+    var m = active.style.transform.match(/translate\(([-\d.]+)px,\s*([-\d.]+)px\)/);
+    if (m) { active.dataset.x = m[1]; active.dataset.y = m[2]; }
+    active.style.transition = '';
+    active = null;
+  }
+
+  cs.addEventListener('mousedown', onStart);
+  cs.addEventListener('touchstart', onStart, { passive:false });
+
+  window.addEventListener('mousemove', onMove);
+  window.addEventListener('touchmove', onMove, { passive:false });
+
+  window.addEventListener('mouseup', onEnd);
+  window.addEventListener('touchend', onEnd);
+  window.addEventListener('touchcancel', onEnd);
+})();
+</script>
 
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
