@@ -521,9 +521,9 @@ body.splash-mode .console-exit {
 
 /* Tiny settle pulse after a move */
 @keyframes cs-land {
-  0%   { transform: translate(var(--x, 0), var(--y, 0)) scale(1.015); }
-  60%  { transform: translate(var(--x, 0), var(--y, 0)) scale(0.995); }
-  100% { transform: translate(var(--x, 0), var(--y, 0)) scale(1); }
+  0%   { transform: scale(1.015); }
+  60%  { transform: scale(0.995); }
+  100% { transform: scale(1); }
 }
 .cs-free .cs-tile.cs-landing {
   animation: cs-land 420ms cubic-bezier(.22, 1, .36, 1);
@@ -832,12 +832,14 @@ body.splash-mode .console-exit {
       tile.classList.remove('cs-swiping', 'is-focused');
 
       if (holdMode){
-        tile.style.transition = '';
-        tile.classList.add('cs-landing');
-        tile.addEventListener('animationend', () => tile.classList.remove('cs-landing'), { once:true });
-        holdMode = false;
-        return;
-      }
+  tile.style.transition = '';
+  tile.style.transform = 'none';   // ensure no residual transform
+  void tile.offsetWidth;           // reflow to commit the base state
+  tile.classList.add('cs-landing');
+  tile.addEventListener('animationend', () => tile.classList.remove('cs-landing'), { once:true });
+  holdMode = false;
+  return;
+}
 
       const dx = lastX - startX;
       if (Math.abs(dx) > DISMISS_DIST){
@@ -1107,5 +1109,6 @@ body.splash-mode .console-exit {
 
 </body>
 </html>
+
 
 
