@@ -1469,47 +1469,71 @@ if (sec && sec.classList.contains('is-open')) {
 <script>
 (() => {
   function run() {
-    // Find the FS prompt by its heading text
     const container = Array.from(document.querySelectorAll('div,section,dialog'))
-      .find(n => n && n.textContent && /Best view is Full Screen/i.test(n.textContent));
+      .find(n => n && /Best view is Full Screen/i.test(n.textContent || ''));
     if (!container) return;
 
-    // Make sure it's clickable and on top of everything
-    container.style.zIndex = '2147483647';
-    container.style.pointerEvents = 'auto';
-    container.querySelectorAll('*').forEach(el => { el.style.pointerEvents = 'auto'; });
+    // Try to remove the whole overlay/backdrop if present; else remove the card.
+    const backdrop =
+      container.closest('#cs-fs-prompt, #cs-fs-prompt-console, .fs-prompt, .fs-modal, .modal, .overlay, [data-modal], [role="dialog"]') ||
+      container.parentElement;
 
-    // Find the two buttons by their visible labels
+    const closePrompt = () => {
+      cleanup();
+      try { (backdrop && backdrop.remove) ? backdrop.remove() : container.remove(); } catch(_) {}
+    };
+
+    const cleanup = () => {
+      document.removeEventListener('fullscreenchange', closePrompt, true);
+      document.removeEventListener('webkitfullscreenchange', closePrompt, true);
+      document.removeEventListener('mozfullscreenchange', closePrompt, true);
+      document.removeEventListener('MSFullscreenChange', closePrompt, true);
+    };
+
+    // Close automatically when we enter fullscreen (all vendor variants)
+    document.addEventListener('fullscreenchange', closePrompt, {capture:true});
+    document.addEventListener('webkitfullscreenchange', closePrompt, {capture:true});
+    document.addEventListener('mozfullscreenchange', closePrompt, {capture:true});
+    document.addEventListener('MSFullscreenChange', closePrompt, {capture:true});
+
+    // Find buttons by visible label
     const goBtn = Array.from(container.querySelectorAll('button,a'))
       .find(el => /Go Full Screen/i.test(el.textContent || ''));
     const skipBtn = Array.from(container.querySelectorAll('button,a'))
       .find(el => /Skip/i.test(el.textContent || ''));
 
-    const closePrompt = () => { if (container.parentNode) container.parentNode.removeChild(container); };
-
-    async function enterFullscreen() {
-      try {
-        const root = document.documentElement;
-        const req = root.requestFullscreen || root.webkitRequestFullscreen ||
-                    root.mozRequestFullScreen || root.msRequestFullscreen;
-        if (req) await req.call(root);
-      } catch(_) { /* ignore */ }
-      closePrompt();
+    async function enterFS() {
+      const el = document.documentElement;
+      const req =
+        el.requestFullscreen ||
+        el.webkitRequestFullscreen ||
+        el.mozRequestFullScreen ||
+        el.msRequestFullscreen;
+      if (req) await req.call(el);
     }
 
     function bind(el, handler){
       if (!el || el.__csBound) return;
       el.__csBound = true;
-      const go = (e) => { e.preventDefault(); e.stopImmediatePropagation(); handler(); };
-      el.style.cursor = 'pointer';
-      el.tabIndex = 0;
+      const go = (e)=>{ e.preventDefault(); e.stopImmediatePropagation(); handler(); };
       el.addEventListener('click', go, {capture:true});
       el.addEventListener('pointerup', go, {capture:true});
       el.addEventListener('touchend', go, {capture:true, passive:false});
     }
 
-    bind(goBtn, enterFullscreen);
+    bind(goBtn, async () => {
+      try { await enterFS(); } finally {
+        // Fallback close even if event is delayed
+        setTimeout(closePrompt, 100);
+      }
+    });
+
     bind(skipBtn, closePrompt);
+
+    // If already in fullscreen for some reason, close immediately
+    if (document.fullscreenElement || document.webkitFullscreenElement) {
+      setTimeout(closePrompt, 50);
+    }
   }
 
   if (document.readyState === 'loading') {
@@ -1520,10 +1544,9 @@ if (sec && sec.classList.contains('is-open')) {
 })();
 </script>
 
-
-
 </body>
 </html>
+
 
 
 
