@@ -1505,36 +1505,43 @@ if (sec && sec.classList.contains('is-open')) {
 })();
 </script>
 <script>
-/* Open-tile drag-to-reposition (safe add-on; Arrange not required) */
-(function () {
-  if (window.__csOpenDrag) return;  // guard against duplicates
-  window.__csOpenDrag = true;
+/* Open-tile drag-to-reposition — v2 (capture + width check) */
+(function(){
+  if (window.__csOpenDragV2) return;
+  window.__csOpenDragV2 = true;
 
   var cs = document.getElementById('cs-console');
   if (!cs) return;
 
-  var active = null, startX = 0, startY = 0, baseX = 0, baseY = 0;
+  var active = null, startX = 0, startY = 0, baseX = 0, baseY = 0, dragging = false;
 
-  function pt(e){
-    return e.touches && e.touches[0]
-      ? { x: e.touches[0].clientX, y: e.touches[0].clientY }
-      : { x: e.clientX,          y: e.clientY };
+  function pt(e){ var t = e.touches ? e.touches[0] : e; return { x: t.clientX, y: t.clientY }; }
+  function isOpenTile(t){
+    if (!t) return false;
+    var w = t.getBoundingClientRect().width;
+    return w > 200 && !t.classList.contains('cs-dismissing');
   }
 
   function onStart(e){
     var t = e.target.closest('.cs-tile');
-    if (!t || !t.classList.contains('is-open')) return;  // only when tile is open
+    if (!t || !isOpenTile(t)) return;                     // only large/open tiles
+    if (e.target.closest('.cs-close,button,a,input,textarea,select')) return; // don't drag from controls
+
     active = t;
     var p = pt(e);
     startX = p.x; startY = p.y;
     baseX = parseFloat(t.dataset.x || 0);
     baseY = parseFloat(t.dataset.y || 0);
     t.style.transition = 'none';
+    t.style.willChange = 'transform';
+    dragging = true;
+
     if (e.cancelable) e.preventDefault();
+    e.stopPropagation();
   }
 
   function onMove(e){
-    if (!active) return;
+    if (!dragging || !active) return;
     var p = pt(e);
     var dx = p.x - startX, dy = p.y - startY;
     active.style.transform = 'translate(' + (baseX + dx) + 'px, ' + (baseY + dy) + 'px)';
@@ -1542,24 +1549,28 @@ if (sec && sec.classList.contains('is-open')) {
   }
 
   function onEnd(){
-    if (!active) return;
+    if (!dragging || !active) return;
     var m = active.style.transform.match(/translate\(([-\d.]+)px,\s*([-\d.]+)px\)/);
     if (m) { active.dataset.x = m[1]; active.dataset.y = m[2]; }
     active.style.transition = '';
-    active = null;
+    active.style.willChange = '';
+    dragging = false; active = null;
   }
 
-  cs.addEventListener('mousedown', onStart);
-  cs.addEventListener('touchstart', onStart, { passive:false });
+  // capture=true so we run before existing swipe listeners
+  cs.addEventListener('mousedown', onStart, true);
+  cs.addEventListener('touchstart', onStart, { passive:false, capture:true });
+  window.addEventListener('mousemove', onMove, true);
+  window.addEventListener('touchmove', onMove, { passive:false, capture:true });
+  window.addEventListener('mouseup', onEnd, true);
+  window.addEventListener('touchend', onEnd, true);
+  window.addEventListener('touchcancel', onEnd, true);
 
-  window.addEventListener('mousemove', onMove);
-  window.addEventListener('touchmove', onMove, { passive:false });
-
-  window.addEventListener('mouseup', onEnd);
-  window.addEventListener('touchend', onEnd);
-  window.addEventListener('touchcancel', onEnd);
+  console.log('✅ open-tile drag (v2) armed');
 })();
 </script>
 
+
 </body>
 </html>
+
