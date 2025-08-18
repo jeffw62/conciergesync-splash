@@ -82,12 +82,6 @@ body.splash-mode .console-exit {
   height: min(78vh, 760px) !important;
 }
 
-#cs-console.arrange-on .cs-tile {
-  width: 128px !important;
-  min-width: 128px !important;
-  height: 100px !important;
-}
-
   </style>
 </head>
 <body>
@@ -422,116 +416,108 @@ body.splash-mode .console-exit {
 </div>
 
 <style>
-  /* Layout */
-  #cs-console{
-    position: absolute; inset: 0;
-    display: grid; grid-template-rows: auto 1fr;
-    padding: 24px; pointer-events: auto;
-    z-index: 10; /* keep this above backdrop */
-  }
+/* Layout */
+#cs-console{
+  position: absolute; inset: 0;
+  display: grid; grid-template-rows: auto 1fr;
+  padding: 24px; pointer-events: auto;
+  z-index: 10; /* keep this above backdrop */
+}
 
-  /* Tabs */
-  .cs-tabs{
-    display: flex; justify-content: center; gap: 10px;
-    padding: 10px 12px;
-    backdrop-filter: blur(8px) saturate(1.1);
-    background: rgba(20,20,20,.3);
-    border-radius: 14px;
-    border: 1px solid rgba(255,255,255,.25);
-    width: max-content; margin: 0 auto 14px;
-  }
-  .cs-tab{
-    padding: 10px 14px; border-radius: 10px;
-    color: #fff; background: rgba(255,255,255,.06);
-    border: 1px solid rgba(255,255,255,.18);
-    cursor: pointer; font-weight: 600;
-  }
-  .cs-tab:hover{ background: rgba(255,255,255,.12); }
+/* Tabs */
+.cs-tabs{
+  display: flex; justify-content: center; gap: 10px;
+  padding: 10px 12px;
+  backdrop-filter: blur(8px) saturate(1.1);
+  background: rgba(20,20,20,.3);
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,.25);
+  width: max-content; margin: 0 auto 14px;
+}
+.cs-tab{
+  padding: 10px 14px; border-radius: 10px;
+  color: #fff; background: rgba(255,255,255,.06);
+  border: 1px solid rgba(255,255,255,.18);
+  cursor: pointer; font-weight: 600;
+}
+.cs-tab:hover{ background: rgba(255,255,255,.12); }
 
-  /* Tiles grid: center rows, wrap when needed */
-  .cs-tiles{
-    position: relative;
-    display: grid;
-    grid-auto-flow: row dense;
-    grid-auto-rows: 1fr;
-    grid-template-columns: repeat(auto-fit, minmax(320px, 420px));
-    gap: 18px;
-    justify-content: start;   /* centering magic */
-    align-content: start;
-    height: 100%;
-overflow: visible;              /* ← remove inner scrollbar */
-scrollbar-gutter: auto;         /* reset from the stable setting */
-padding: 6px;
-  }
-  /* Center a single tile perfectly */
-  .cs-tiles.single{
-    grid-template-columns: minmax(360px, 520px); /* exactly one column */
-    justify-content: center;
-  }
+/* Tiles grid: center rows, wrap when needed */
+.cs-tiles{
+  position: relative;
+  display: grid;
+  grid-auto-flow: row dense;
+  grid-auto-rows: 1fr;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 420px));
+  gap: 18px;
+  justify-content: start;
+  align-content: start;
+  height: 100%;
+  overflow: visible;              /* remove inner scrollbar */
+  scrollbar-gutter: auto;         /* reset from stable */
+  padding: 6px;
+}
+/* Center a single tile perfectly */
+.cs-tiles.single{
+  grid-template-columns: minmax(360px, 520px);
+  justify-content: center;
+}
 
-  /* Tile (glass) */
-  .cs-tile{
-    /* perf hints */
-    will-change: transform, opacity;
-    transform: translateZ(0);
+/* Tile (glass) */
+.cs-tile{
+  /* perf hints */
+  will-change: transform, opacity;
+  transform: translateZ(0);
 
-    /* look */
-    background: rgba(255,255,255,.12);
-    border: 1px solid rgba(255,255,255,.28);
-    border-radius: 18px;
-    box-shadow: 0 10px 30px rgba(0,0,0,.18);
-    backdrop-filter: blur(12px) saturate(1.2);
-    color: #f5f7fb;
+  /* look */
+  background: rgba(255,255,255,.12);
+  border: 1px solid rgba(255,255,255,.28);
+  border-radius: 18px;
+  box-shadow: 0 10px 30px rgba(0,0,0,.18);
+  backdrop-filter: blur(12px) saturate(1.2);
+  color: #f5f7fb;
 
-    /* layout */
-    display: grid; 
-    grid-template-rows: auto 1fr;
-    min-height: 260px; 
-    max-height: 65vh;
-    overflow: hidden;
+  /* layout */
+  display: grid; 
+  grid-template-rows: auto 1fr;
+  min-height: 260px; 
+  max-height: 65vh;
+  overflow: hidden;
 
-    /* entry animation disabled to remove flicker */
-transform: none;
-opacity: 1;
-animation: none;
+  /* entry animation disabled to remove flicker */
+  transform: none;
+  opacity: 1;
+  animation: none;
 
-    /* allow horizontal swipe on touch */
-    touch-action: none;
-  }
+  /* touch: allow vertical scroll; horizontal is ours */
+  touch-action: pan-y;
+  -webkit-tap-highlight-color: transparent;
 
-  /* Focused tile: a touch brighter with a soft lift */
-  .cs-tile.is-focused{
-    box-shadow: 0 16px 44px rgba(0,0,0,.28),
-                0 0 0 1px rgba(255,255,255,.20) inset;
-    backdrop-filter: blur(12px) saturate(1.25);
-    transform: translateZ(0);
-  }
+  /* default: no tween; handlers add when needed */
+  transition: none;
+}
 
-  /* While FLIP is running or you're swiping, lighten effects for smoothness */
-  .cs-tile.moving,
-  .cs-tile.cs-swiping{
-    backdrop-filter: blur(8px) saturate(1.1);
-    box-shadow: 0 8px 22px rgba(0,0,0,.16);
-  }
+/* Focused tile: a touch brighter with a soft lift */
+.cs-tile.is-focused{
+  box-shadow: 0 16px 44px rgba(0,0,0,.28),
+              0 0 0 1px rgba(255,255,255,.20) inset;
+  backdrop-filter: blur(12px) saturate(1.25);
+  transform: translateZ(0);
+}
 
-  /* Smooth swipe-away when we commit the dismiss (calm timing) */
-  .cs-tile.cs-dismissing{
-    transition: transform var(--cs-time-out) var(--cs-ease),
-                opacity   var(--cs-time-out) var(--cs-ease);
-    opacity: 0;
-  }
-  /* === Free-mode tile positioning === */
-  .cs-free .cs-tile {
-  position: absolute;
-  transform: translate(var(--x, 0), var(--y, 0));
-  will-change: transform, box-shadow;
-  touch-action: none; /* keeps drag under the finger on touch */
+/* While FLIP is running or you're swiping, lighten effects for smoothness */
+.cs-tile.moving,
+.cs-tile.cs-swiping{
+  backdrop-filter: blur(8px) saturate(1.1);
+  box-shadow: 0 8px 22px rgba(0,0,0,.16);
+}
 
-  /* smooth when snapping/centering; JS sets 'none' during active drag */
- transition: transform 480ms cubic-bezier(.22, 1, .36, 1), 
-            box-shadow 320ms cubic-bezier(.22, 1, .36, 1);
-  }
-  }  /* closes .cs-free .cs-tile  (line 506) */
+/* Smooth swipe-away when we commit the dismiss (calm timing) */
+.cs-tile.cs-dismissing{
+  transition: transform var(--cs-time-out) var(--cs-ease),
+              opacity   var(--cs-time-out) var(--cs-ease);
+  opacity: 0;
+}
 
 /* Tiny settle pulse after a move */
 @keyframes cs-land {
@@ -543,149 +529,75 @@ animation: none;
   animation: cs-land 420ms cubic-bezier(.22, 1, .36, 1);
 }
 
-/* Entrance pop */
-@keyframes cs-pop {
-  0%   { opacity: 0; transform: translateY(24px) scale(.94); }
-  60%  { opacity: 1; transform: translateY(0)    scale(1.02); }
-  100% { opacity: 1; transform: translateY(0)    scale(1); }
-}
+/* Entrance pop (kept minimal to avoid flicker) */
+@keyframes cs-pop { 0% { opacity: 0; } 100% { opacity: 1; } }
 
 /* Close (X) animation */
-.cs-exit{
-  animation: cs-exit var(--cs-time) var(--cs-ease) forwards;
-}
-@keyframes cs-exit{
-  to { opacity: 0; transform: translateY(8px) scale(.96); }
-}
+.cs-exit{ animation: cs-exit var(--cs-time) var(--cs-ease) forwards; }
+@keyframes cs-exit{ to { opacity: 0; transform: translateY(8px) scale(.96); } }
 
-  .cs-tile-head{
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 12px 14px; background: rgba(0,0,0,.18);
-    border-bottom: 1px solid rgba(255,255,255,.18);
-  }
-  .cs-tile-head h4{ margin: 0; font-size: 15px; font-weight: 700; letter-spacing:.2px; }
-  .cs-close{
-    width: 30px; height: 30px; border-radius: 8px;
-    background: rgba(255,255,255,.12);
-    color: #fff; border: 1px solid rgba(255,255,255,.25);
-    cursor: pointer; font-size: 18px; line-height: 28px; text-align:center;
-  }
-  .cs-close:hover{ background: rgba(255,255,255,.2); }
-  .cs-tile-body{ padding: 14px; overflow: auto; }
+.cs-tile-head{
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 14px; background: rgba(0,0,0,.18);
+  border-bottom: 1px solid rgba(255,255,255,.18);
+}
+.cs-tile-head h4{ margin: 0; font-size: 15px; font-weight: 700; letter-spacing:.2px; }
+.cs-close{
+  width: 30px; height: 30px; border-radius: 8px;
+  background: rgba(255,255,255,.12);
+  color: #fff; border: 1px solid rgba(255,255,255,.25);
+  cursor: pointer; font-size: 18px; line-height: 28px; text-align:center;
+}
+.cs-close:hover{ background: rgba(255,255,255,.2); }
+.cs-tile-body{ padding: 14px; overflow: auto; }
 
-  /* Free-mode: tiles are freely placed and draggable (JS will toggle .cs-free) */
+/* Free-mode: tiles are freely placed and draggable (JS will toggle .cs-free) */
 #cs-console.cs-free .cs-tiles {
   position: relative;
   scrollbar-gutter: stable both-edges;
 }
-
 #cs-console.cs-free .cs-tile  {
   position: absolute;
   left: var(--x, 0px);
   top:  var(--y, 0px);
   will-change: left, top, transform;
   transition: transform var(--cs-time) var(--cs-ease), box-shadow 180ms ease;
-  touch-action: none; /* let our handler capture both X & Y without browser scrolling */
+  touch-action: none; /* handler captures both X & Y during drag */
 }
 
-  /* Swipe feedback defaults */
-  .cs-swiping{ transition: none !important; }
-  .cs-tile{ transition: none; }
-
-  /* --- TEMP: force taps through overlays to tiles --- */
-.cs-overlay,
-.cs-scrim,
-.cs-glow,
-.cs-shadow,
-.cs-bling,
-[data-overlay],
-[aria-hidden="true"]{
-  pointer-events: none !important;
-}
+/* Swipe feedback defaults */
+.cs-swiping{ transition: none !important; }
 
 /* Ensure the tiles themselves can still receive taps */
 .cs-tile,
-.cs-tile *{
-  pointer-events: auto;
-}
+.cs-tile *{ pointer-events: auto; }
 
-/* Improve touch behavior on the tap targets */
-.cs-tile{
-  touch-action: manipulation;
-  -webkit-tap-highlight-color: transparent;
-}
-/* OVERRIDE: let FLIP handle movement; entry animation fades only */
-.cs-tile{ transform: none; }  /* cancel the translateY/scale on entry */
+/* Let FLIP handle grid movement; our entry animation just fades */
+.cs-tile{ transform: none; }
 
-@keyframes cs-pop{
-  0%   { opacity: 0; }
-  100% { opacity: 1; }
-}
-/* Fix free-mode conflict: use left/top only (disable old transform approach) */
+/* Fix free-mode: use left/top only; avoid double-transform drift */
 .cs-free .cs-tile{
-  transform: none !important;      /* stop double-transform drift */
-  left: var(--x, 0px) !important;  /* left/top positioning wins */
-  top:  var(--y, 0px) !important;
+  transform: none;       /* allow cs-land animation to run */
+  left: var(--x, 0px);
+  top:  var(--y, 0px);
 }
-
 </style>
 
 <script>
 (()=>{
   const tabs = document.querySelectorAll('.cs-tab');
   const tilesWrap = document.getElementById('cs-tiles');
-  // === Arrange mode toggle (tap to enable free-drag, tap again to exit) ===
-(function addArrangeToggle(){
-  // Create the button next to your Console button
-  const btn = document.createElement('button');
-  btn.id = 'arrangeToggle';
-  btn.className = 'console-btn';
-  btn.style.right = '140px';    // sits left of "Enter Console"
-  btn.textContent = 'Arrange';
-  document.body.appendChild(btn);
+  const consoleEl  = document.getElementById('cs-console');
 
-  btn.addEventListener('click', () => {
-    const consoleEl = document.getElementById('cs-console');
-    const isFree = consoleEl.classList.contains('cs-free');
-    if (!isFree) {
-      // enter arrange mode (uses your existing enableFreeMode)
-      enableFreeMode();
-      btn.textContent = 'Done';
-    } else {
-      // exit arrange mode cleanly
-      disableFreeMode();
-      btn.textContent = 'Arrange';
-    }
-  });
-})();
-
-// Return tiles from free-mode back to grid (smoothly)
-function disableFreeMode(){
-  const consoleEl = document.getElementById('cs-console');
-  const grid = document.getElementById('cs-tiles');
-  if (!consoleEl || !grid) return;
-
-  const tiles = Array.from(grid.children);
-
-  // Animate back to grid with FLIP so there's no jump
-  flipAnimate(grid, () => {
-    tiles.forEach(tile => {
-      tile.style.removeProperty('--x');
-      tile.style.removeProperty('--y');
-      tile.style.transform = '';
-    });
-    consoleEl.classList.remove('cs-free');
-  });
-}
-
-    // Always close on X (delegated, so it works for new tiles too)
-  tilesWrap.addEventListener('click', (e) => {
-    const x = e.target.closest('.cs-close');
-    if (!x) return;
-    const tile = x.closest('.cs-tile');
-    if (tile) closeTile(tile);
-  });
-
+  // Kill any legacy Arrange UI if it exists (from old scripts/fallbacks)
+  (function killArrange(){
+    consoleEl?.classList.remove('arrange-on');
+    const css = document.createElement('style');
+    css.textContent = '#arrangeToggle{display:none!important}';
+    document.head.appendChild(css);
+    const btn = document.getElementById('arrangeToggle');
+    if (btn) try{ btn.remove(); }catch(_){}
+  })();
 
   function updateWrapClass(){
     const count = tilesWrap.querySelectorAll('.cs-tile').length;
@@ -694,32 +606,27 @@ function disableFreeMode(){
 
   // ---- FLIP animation helper: smoothly animate tile reordering ----
   function flipAnimate(container, changeDomSync){
-    // Respect reduced motion
     const REDUCED = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (REDUCED) { changeDomSync(); return; }
 
-    // 1) measure "first" positions
     const children = Array.from(container.children);
     const first = new Map();
     children.forEach(el => first.set(el, el.getBoundingClientRect()));
 
-    // 2) DOM change (append/reorder/remove)
     changeDomSync();
 
-    // 3) measure "last" and animate first -> last
     const last = new Map();
     Array.from(container.children).forEach(el => last.set(el, el.getBoundingClientRect()));
 
     last.forEach((rLast, el) => {
       const rFirst = first.get(el);
-      if (!rFirst) return; // new element: its own entry animation will handle it
+      if (!rFirst) return;
       const dx = rFirst.left - rLast.left;
       const dy = rFirst.top  - rLast.top;
       if (dx || dy) {
         el.style.willChange = 'transform';
         el.style.transition = 'transform 0s';
         el.style.transform = `translate(${dx}px, ${dy}px)`;
-        // double RAF so the browser commits the starting transform
         requestAnimationFrame(() => {
           requestAnimationFrame(() => {
             el.style.transition = 'transform var(--cs-time) var(--cs-ease)';
@@ -734,27 +641,20 @@ function disableFreeMode(){
     });
   }
 
-  // -------------------------------------------
-  // Calm dismiss helper (global to this module)
-  // -------------------------------------------
+  // Calm dismiss helper
   function calmDismiss(tile, direction = 1){
     const off = (window.innerWidth * 0.5) * direction; // 50vw
-    tile.classList.add('cs-dismissing');               // uses --cs-time-out easing
+    tile.classList.add('cs-dismissing');
     tile.style.transform = `translateX(${off}px) rotate(${off*0.002}deg)`;
     tile.addEventListener('transitionend', () => {
       tile.remove();
+      updateWrapClass();
     }, { once: true });
   }
 
-  // Dismiss focused tile on backdrop / outside click with a calm glide
-  const consoleEl  = document.getElementById('cs-console');
+  // Backdrop/outside click → dismiss focused tile
   const backdropEl = document.querySelector('#csBackdrop, .backdrop');
-
-  function isOutsideConsole(target){
-    return consoleEl && !consoleEl.contains(target);
-  }
-
-  // Backdrop click/tap
+  function isOutsideConsole(target){ return consoleEl && !consoleEl.contains(target); }
   if (backdropEl) {
     backdropEl.addEventListener('pointerdown', (e) => {
       const active = document.querySelector('.cs-tile.is-focused');
@@ -763,8 +663,6 @@ function disableFreeMode(){
       calmDismiss(active, dir);
     });
   }
-
-  // Generic click-out anywhere outside the console
   window.addEventListener('pointerdown', (e) => {
     if (!isOutsideConsole(e.target)) return;
     const active = document.querySelector('.cs-tile.is-focused');
@@ -774,186 +672,49 @@ function disableFreeMode(){
   }, { capture: true });
 
   // Store open order so selected + current stay centered in row 1
-  const openKeys = new Set(); // insertion order matters
+  const openKeys = new Set();
 
-  // Map of tile blueprints (you can replace innerHTML per tile)
+  // Tile templates (unchanged)
   const TILE_TEMPLATES = {
     overview: () => `
       <header class="cs-tile-head">
         <h4>Overview</h4>
         <button class="cs-close" aria-label="Close">×</button>
       </header>
-      <div class="cs-tile-body">
-        <p>Overview content goes here.</p>
-      </div>`,
+      <div class="cs-tile-body"><p>Overview content goes here.</p></div>`,
     itinerary: () => `
       <header class="cs-tile-head">
         <h4>Itinerary</h4>
         <button class="cs-close" aria-label="Close">×</button>
       </header>
-      <div class="cs-tile-body">
-        <p>Trip segments, dates, carriers.</p>
-      </div>`,
+      <div class="cs-tile-body"><p>Trip segments, dates, carriers.</p></div>`,
     values: () => `
       <header class="cs-tile-head">
         <h4>Value Calc</h4>
         <button class="cs-close" aria-label="Close">×</button>
       </header>
-      <div class="cs-tile-body">
-        <p>CPP, cash vs award, transfer hints.</p>
-      </div>`
+      <div class="cs-tile-body"><p>CPP, cash vs award, transfer hints.</p></div>`
   };
 
-  // Create/open tile by key
-  function openTile(key){
-    // if already open, bring it to the "focused pair" (row 1 center)
-    const existing = tilesWrap.querySelector(`.cs-tile[data-key="${key}"]`);
-    if (existing){
-      openKeys.delete(key);
-      openKeys.add(key);
-      applyOrder();
-      updateWrapClass();
-      existing.focus({preventScroll:true});
-      return;
-    }
-    // create tile
-    const sec = document.createElement('section');
-    sec.className = 'cs-tile';
-    sec.dataset.key = key;
-    sec.innerHTML = (TILE_TEMPLATES[key] || (()=>`
-    // TEMP: force the tile visible (skip broken css animation)
-        <header class="cs-tile-head">
-        <h4>${key}</h4>
-        <button class="cs-close" aria-label="Close">×</button>
-      </header>
-      <div class="cs-tile-body"><p>${key} tile.</p></div>`))();
-   addTileHandlers(sec);
-addTileHandlers(sec);
+  // Free mode: freeze grid positions → absolute with CSS vars
+  function enableFreeMode(){
+    if (consoleEl.classList.contains('cs-free')) return;
+    consoleEl.classList.add('cs-free');
 
-// Run the layout change (single↔multi) inside FLIP to avoid the second jump
-flipAnimate(tilesWrap, () => {
-  openKeys.add(key);
-  tilesWrap.appendChild(sec);
-  updateWrapClass();  // moved INSIDE the change so FLIP captures it
-});
-
-
-// Re-enable animations on the next tick so close (cs-exit) still works
-setTimeout(() => { sec.style.animation = ''; }, 0);
-
-updateWrapClass();
-
-
-{
-  const consoleEl = document.getElementById('cs-console');
-  if (consoleEl && consoleEl.classList.contains('cs-free')) {
-    const wrapRect = tilesWrap.getBoundingClientRect();
-    const tileRect = sec.getBoundingClientRect();
-
-    const x = tilesWrap.scrollLeft + (wrapRect.width  - tileRect.width)  / 2;
-    const y = tilesWrap.scrollTop  + (wrapRect.height - tileRect.height) / 2;
-
-    sec.style.setProperty('--x', `${Math.max(0, x)}px`);
-    sec.style.setProperty('--y', `${Math.max(0, y)}px`);
-
-    makeDraggable(sec, tilesWrap);
+    const gridRect = tilesWrap.getBoundingClientRect();
+    Array.from(tilesWrap.children).forEach(tile => {
+      const r = tile.getBoundingClientRect();
+      const x = r.left - gridRect.left + tilesWrap.scrollLeft;
+      const y = r.top  - gridRect.top  + tilesWrap.scrollTop;
+      tile.style.setProperty('--x', x + 'px');
+      tile.style.setProperty('--y', y + 'px');
+    });
   }
-}
-
-sec.focus({ preventScroll: true });
-
-  }
-// ---------- FREE MODE: drag anywhere + swipe-off ----------
-function enableFreeMode(){
-  const consoleEl = document.getElementById('cs-console');
-  const grid = document.getElementById('cs-tiles');
-  if (!consoleEl || !grid) return;
-  consoleEl.classList.add('cs-free');
-
-  // Freeze each tile where it currently sits (convert grid pos -> absolute)
-  const gridRect = grid.getBoundingClientRect();
-  Array.from(grid.children).forEach(tile => {
-    const r = tile.getBoundingClientRect();
-    const x = r.left - gridRect.left + grid.scrollLeft;
-    const y = r.top  - gridRect.top  + grid.scrollTop;
-    tile.style.setProperty('--x', x + 'px');
-    tile.style.setProperty('--y', y + 'px');
-    makeDraggable(tile, grid);
-  });
-}
-
-function makeDraggable(tile, container){
-  let sx=0, sy=0, startX=0, startY=0, dx=0, dy=0, dragging=false;
-
-  const getVar = (name) => {
-    const v = getComputedStyle(tile).getPropertyValue(name);
-    return parseFloat(v) || 0;
-  };
-
-  const onDown = (e) => {
-    // let controls/links work
-    const tgt = e.target;
-    if (
-      tgt.closest('.cs-close') ||
-      tgt.closest('button') ||
-      tgt.closest('a') ||
-      tgt.closest('input, textarea, select')
-    ) return;
-
-    if ('button' in e && e.button !== 0) return; // primary only
-
-    const p = ('touches' in e) ? e.touches[0] : e;
-    if (e.cancelable) e.preventDefault();
-    e.stopPropagation();
-
-    dragging = true;
-    sx = p.clientX; sy = p.clientY;
-    startX = getVar('--x'); startY = getVar('--y');
-    dx = dy = 0;
-
-    tile.style.transition = 'none';   // no tween during drag
-    tile.style.transform  = 'none';   // left/top owns position
-    tile.classList.add('cs-swiping');
-  };
-
-  const onMove = (e) => {
-    if (!dragging) return;
-    const p = ('touches' in e) ? e.touches[0] : e;
-    if (e.cancelable) e.preventDefault();
-
-    dx = p.clientX - sx;
-    dy = p.clientY - sy;
-
-    // move with left/top via CSS vars so it sticks to your finger
-    const nx = Math.max(0, startX + dx);
-    const ny = Math.max(0, startY + dy);
-    tile.style.setProperty('--x', nx + 'px');
-    tile.style.setProperty('--y', ny + 'px');
-    tile.style.transform = 'none';
-  };
-
-  const onUp = () => {
-    if (!dragging) return;
-    dragging = false;
-    tile.classList.remove('cs-swiping');
-
-    // restore gentle transitions after drop
-    tile.style.transition = '';
-  };
-
-  tile.addEventListener('mousedown', onDown);
-  tile.addEventListener('touchstart', onDown, { passive: false });
-  window.addEventListener('mousemove', onMove,  { passive: false });
-  window.addEventListener('touchmove', onMove, { passive: false, capture: true });
-  window.addEventListener('mouseup',   onUp);
-  window.addEventListener('touchend',  onUp);
-}
-}
 
   // Maintain centered first row with the last two opened tiles
   function applyOrder(){
     const keys = Array.from(openKeys);
-    const focused = keys.slice(-2); // last two opened should sit together, centered
+    const focused = keys.slice(-2);
     flipAnimate(tilesWrap, () => {
       focused.forEach(k => {
         const el = tilesWrap.querySelector(`.cs-tile[data-key="${k}"]`);
@@ -967,7 +728,6 @@ function makeDraggable(tile, container){
     const key = el.dataset.key;
     el.classList.add('cs-exit');
     el.addEventListener('animationend', () => {
-      // Animate the layout change while removing this tile
       flipAnimate(tilesWrap, () => {
         if (openKeys.has(key)) openKeys.delete(key);
         el.remove();
@@ -977,310 +737,178 @@ function makeDraggable(tile, container){
     }, { once: true });
   }
 
-  // Swipe-to-dismiss handlers (calm tuning)
+  // Press-and-hold drag (no accidental dismiss)
   function addTileHandlers(tile){
-    // If we're in free mode, skip attaching the grid-swipe handlers.
-// Still wire the X button.
-{
-  const consoleEl = document.getElementById('cs-console');
-  if (consoleEl && consoleEl.classList.contains('cs-free')) {
+    // X button always closes
     tile.querySelector('.cs-close')?.addEventListener('click', () => closeTile(tile));
-    return; // prevent conflicting swipe listeners
-  }
-}
 
-    // close button
-    tile.querySelector('.cs-close').addEventListener('click', ()=>closeTile(tile));
+    const HOLD_MS = 280;       // long-press threshold
+    const SLOP = 10;           // px tolerance
+    const DISMISS_DIST = 160;  // px to trigger dismiss
 
-    // swipe
-let startX = 0, currentX = 0, dragging = false;
+    let holdTimer = null;
+    let holdMode  = false;   // true = dragging mode (no dismiss)
+    let startX = 0, startY = 0;
+    let lastX  = 0, lastY  = 0;
+    let baseX  = 0, baseY  = 0;
+    let moved  = false;
 
-const onDown = (e) => {
-  dragging = true;
-  const p = e.touches ? e.touches[0] : e;
-  startX = p.clientX;
-  tile.classList.add('cs-swiping');
-  if (e.cancelable) e.preventDefault(); // lock to finger immediately
-};
+    const getVar = (name, el = tile) => {
+    const v = getComputedStyle(el).getPropertyValue(name);
+    return v.trim() === '' ? NaN : parseFloat(v);
+    };
+    const clamp = (n, min, max) => Math.max(min, Math.min(max, n));
 
-const onMove = (e) => {
-  if (!dragging) return;
-  if (e.cancelable) e.preventDefault(); // stop page scroll during swipe
-  const p = e.touches ? e.touches[0] : e;
-  currentX = p.clientX;
-  const dx = currentX - startX;
-  tile.style.transform = `translateX(${dx}px) rotate(${dx * 0.008}deg)`;
-  tile.style.opacity = String(Math.max(0.4, 1 - Math.abs(dx) / 600));
-};
+    function primeHold(){
+      // Determine starting offset
+      enableFreeMode();
+      
+      const wrapRect = tilesWrap.getBoundingClientRect();
+      const r = tile.getBoundingClientRect();
 
-const onUp = () => {
-  if (!dragging) return;
-  dragging = false;
-  tile.classList.remove('cs-swiping');
+      const vx = getVar('--x');
+      const vy = getVar('--y');
 
-  const dx = currentX - startX;
-  const direction = dx >= 0 ? 1 : -1;
-  const DISMISS_DIST = 160;
+      baseX = Number.isNaN(vx) ? (r.left - wrapRect.left + tilesWrap.scrollLeft) : vx;
+      baseY = Number.isNaN(vy) ? (r.top  - wrapRect.top  + tilesWrap.scrollTop) : vy;
 
-  if (Math.abs(dx) > DISMISS_DIST) {
-    calmDismiss(tile, direction);     // commit dismiss
-  } else {
-    tile.style.transition = `transform var(--cs-time) var(--cs-ease)`;
-    tile.style.transform = '';        // snap back smoothly
-    tile.addEventListener('transitionend', () => {
-      tile.style.transition = '';
-    }, { once: true });
-  }
-};
-
-tile.addEventListener('mousedown', onDown);
-tile.addEventListener('touchstart', onDown, { passive: false }); // was true
-window.addEventListener('mousemove', onMove);
-window.addEventListener('touchmove', onMove, { passive: false }); // was true
-window.addEventListener('mouseup', onUp);
-window.addEventListener('touchend', onUp);
-window.addEventListener('touchcancel', onUp);
-  }
-
-  // Wire tabs — fire immediately on touch/mouse
-tabs.forEach((btn) => {
-  const onTap = (e) => {
-    // prevent the mobile delay / ghost click when it's touch or pen
-    if (e.pointerType === 'touch' || e.pointerType === 'pen') e.preventDefault();
-    openTile(btn.dataset.key);
-  };
-
-  btn.addEventListener('pointerdown', onTap, { passive: false }); // earliest, reliable
-  btn.addEventListener('click', (e) => onTap(e));                  // fallback for mouse-only/older
-});
-
-  // Ensure the initial tile has handlers
-  document.querySelectorAll('.cs-tile').forEach(addTileHandlers);
-  updateWrapClass();
-
-  
-})();
-</script>
-<!-- =================== /END TILE CONSOLE =================== -->
-<script>
-(function(){
-  // If the main opener exists, let it handle things.
-  // (This fallback only runs when the main script isn't wiring tiles.)
-  const wrap = document.getElementById('cs-tiles');
-  const consoleEl = document.getElementById('cs-console');
-  if (!wrap || !consoleEl) return;
-
-  // Small CSS shim for swipe + arrange (scoped, non-invasive)
-  const css = document.createElement('style');
-  css.textContent = `
-    .cs-swiping { transition: none !important; }
-    #cs-console.arrange-on .cs-tiles { position: relative; }
-    #cs-console.arrange-on .cs-tile  {
-      position: absolute !important;
-      transform: none !important;
-      transition: none !important;
-      touch-action: none !important;
-      left: var(--x, 0px);
-      top:  var(--y, 0px);
+      tile.classList.add('is-focused', 'cs-swiping');
+      tile.style.transition = 'none';
+      holdMode = true;
     }
-  `;
-  document.head.appendChild(css);
 
-  // --- Helpers ---------------------------------------------------------
-  function titleize(s){ return s ? s.charAt(0).toUpperCase() + s.slice(1) : 'Tile'; }
-
-  function wireTile(sec){
-    // close (X)
-    sec.querySelector('.cs-close')?.addEventListener('click', () => sec.remove());
-
-    // swipe-to-dismiss (horizontal)
-    let startX=0, currentX=0, dragging=false, pointerId=null;
     function onDown(e){
-      // block swipe-to-dismiss on large (opened) tiles
-      const t = e.target.closest('.cs-tile');
-      if (t) {
-      sec = t;  // track the active tile
-      // no width-based return here
-      }
-
-      if (document.getElementById('cs-console').classList.contains('arrange-on')) return;
+      if ('button' in e && e.button !== 0) return;
       if (e.target.closest('.cs-close,button,a,input,textarea,select')) return;
 
-      dragging = true;
-      // ...
+      const p = e.touches ? e.touches[0] : e;
+      startX = lastX = p.clientX;
+      startY = lastY = p.clientY;
+      moved = false; holdMode = false;
 
-      if (document.getElementById('cs-console').classList.contains('arrange-on')) return; // no swipe in Arrange
-      if (e.target.closest('.cs-close,button,a,input,textarea,select')) return;
-      dragging = true;
-      pointerId = e.pointerId;
-      sec.setPointerCapture?.(pointerId);
-      startX = e.clientX;
-      sec.classList.add('cs-swiping');
-      sec.style.touchAction = 'none';
+      clearTimeout(holdTimer);
+      holdTimer = setTimeout(primeHold, HOLD_MS);
+
+      tile.setPointerCapture?.(e.pointerId);
+      if (e.cancelable) e.preventDefault();
     }
+
     function onMove(e){
-      // If the current tile is OPEN, drag = reposition (horizontal only for now)
-if (sec && sec.classList.contains('is-open')) {
-  const x = e.touches ? e.touches[0].clientX : e.clientX;
-  const dx = x - startX;
+      const p = e.touches ? e.touches[0] : e;
+      lastX = p.clientX;
+      lastY = p.clientY;
 
-  const baseX = parseFloat(sec.dataset.x || 0);
-  const baseY = parseFloat(sec.dataset.y || 0); // keep Y as-is for now
+      const dx = lastX - startX;
+      const dy = lastY - startY;
 
-  sec.classList.add('moving');
-  sec.style.transition = 'none';
-  sec.style.transform = `translate(${baseX + dx}px, ${baseY}px)`;
+      if (!holdMode){
+        if (Math.hypot(dx, dy) > SLOP){
+          moved = true;
+          clearTimeout(holdTimer); // this becomes a swipe gesture
+        }
+        if (moved){
+          if (e.cancelable) e.preventDefault();
+          tile.classList.add('cs-swiping');
+          tile.style.transform = `translateX(${dx}px) rotate(${dx * 0.008}deg)`;
+          tile.style.opacity = String(Math.max(0.4, 1 - Math.abs(dx) / 600));
+        }
+        return;
+      }
 
-  if (e.cancelable) e.preventDefault();
-  return; // don't run swipe-to-dismiss logic
-}
+      // Drag mode
+      if (e.cancelable) e.preventDefault();
+      const maxX = tilesWrap.scrollWidth  - tile.offsetWidth;
+      const maxY = tilesWrap.scrollHeight - tile.offsetHeight;
 
-      if (!dragging) return;
-      currentX = e.clientX;
-      const dx = currentX - startX;
-      sec.style.transform = `translateX(${dx}px) rotate(${dx*0.008}deg)`;
-      sec.style.opacity = String(Math.max(0.4, 1 - Math.abs(dx)/600));
-      e.preventDefault?.();
+      const nx = clamp(baseX + dx, 0, Math.max(0, maxX));
+      const ny = clamp(baseY + dy, 0, Math.max(0, maxY));
+
+      tile.style.setProperty('--x', nx + 'px');
+      tile.style.setProperty('--y', ny + 'px');
+      tile.style.transform = 'none';
     }
+
     function onUp(){
-      if (!dragging) return;
-      dragging = false;
-      sec.classList.remove('cs-swiping');
-      sec.style.touchAction = '';
-      const dx = currentX - startX;
-      if (Math.abs(dx) > 160){
-        // calm dismiss
+      clearTimeout(holdTimer);
+      tile.classList.remove('cs-swiping');
+      tile.classList.remove('is-focused');
+
+      if (holdMode){
+        tile.style.transition = '';
+        tile.classList.add('cs-landing');
+        tile.addEventListener('animationend', () => tile.classList.remove('cs-landing'), { once:true });
+        holdMode = false;
+        return;
+      }
+
+      const dx = lastX - startX;
+      if (Math.abs(dx) > DISMISS_DIST){
         const dir = dx >= 0 ? 1 : -1;
-        const off = (window.innerWidth * 0.5) * dir;
-        sec.style.transition = 'transform 900ms cubic-bezier(.22,1,.36,1), opacity 900ms cubic-bezier(.22,1,.36,1)';
-        sec.style.transform = `translateX(${off}px) rotate(${off*0.002}deg)`;
-        sec.style.opacity = '0';
-        sec.addEventListener('transitionend', () => sec.remove(), { once:true });
+        calmDismiss(tile, dir);
       } else {
-        sec.style.transition = 'transform 640ms cubic-bezier(.22,1,.36,1), opacity 640ms cubic-bezier(.22,1,.36,1)';
-        sec.style.transform = '';
-        sec.addEventListener('transitionend', () => { sec.style.transition = ''; sec.style.opacity = ''; }, { once:true });
+        tile.style.transition = `transform var(--cs-time) var(--cs-ease), opacity var(--cs-time) var(--cs-ease)`;
+        tile.style.transform = '';
+        tile.style.opacity = '';
+        tile.addEventListener('transitionend', () => {
+          tile.style.transition = '';
+        }, { once: true });
       }
     }
-    sec.addEventListener('pointerdown', onDown, { capture:true });
-    window.addEventListener('pointermove', onMove, { passive:false });
+
+    tile.addEventListener('pointerdown', onDown, { passive:false });
+    window.addEventListener('pointermove', onMove,  { passive:false });
     window.addEventListener('pointerup',   onUp);
+    window.addEventListener('pointercancel', onUp);
   }
 
-  function createTile(key){
-    // avoid duplicates
-    if (wrap.querySelector('.cs-tile[data-key="'+key+'"]')) return;
+  // Create/open tile by key
+  function openTile(key){
+    const existing = tilesWrap.querySelector(`.cs-tile[data-key="${key}"]`);
+    if (existing){
+      openKeys.delete(key);
+      openKeys.add(key);
+      applyOrder();
+      updateWrapClass();
+      existing.focus?.({preventScroll:true});
+      return;
+    }
     const sec = document.createElement('section');
     sec.className = 'cs-tile';
     sec.dataset.key = key;
-    sec.innerHTML = `
+    sec.innerHTML = (TILE_TEMPLATES[key] || (()=>`
       <header class="cs-tile-head">
-        <h4>${titleize(key)}</h4>
+        <h4>${key}</h4>
         <button class="cs-close" aria-label="Close">×</button>
       </header>
-      <div class="cs-tile-body"><p>${key} tile.</p></div>
-    `;
-    wrap.appendChild(sec);
-    wireTile(sec);
+      <div class="cs-tile-body"><p>${key} tile.</p></div>`))();
+
+    addTileHandlers(sec);
+
+    flipAnimate(tilesWrap, () => {
+      openKeys.add(key);
+      tilesWrap.appendChild(sec);
+      updateWrapClass();
+    });
+
+    sec.focus?.({ preventScroll: true });
   }
 
-  // Tabs → open
-  document.addEventListener('click', function(e){
-    const btn = e.target.closest('.cs-tab');
-    if (!btn) return;
-
-    // If your original openTile exists, use it; else fallback create
-    try {
-      if (typeof openTile === 'function') { openTile(btn.dataset.key); return; }
-    } catch(_) {}
-    createTile(btn.dataset.key || 'tile');
-  }, { capture:true });
-
-  // --- Arrange mode (toggle button) -----------------------------------
-  let arrangeBtn = document.getElementById('arrangeToggle');
-  if (!arrangeBtn){
-    arrangeBtn = document.createElement('button');
-    arrangeBtn.id = 'arrangeToggle';
-    arrangeBtn.className = 'console-btn';
-    arrangeBtn.style.right = '140px';
-    arrangeBtn.textContent = 'Arrange';
-    document.body.appendChild(arrangeBtn);
-  }
-
-  function freezeToAbsolute(){
-    const wrapRect = wrap.getBoundingClientRect();
-    for (const sec of wrap.children){
-      const r = sec.getBoundingClientRect();
-      const left = r.left - wrapRect.left + wrap.scrollLeft;
-      const top  = r.top  - wrapRect.top  + wrap.scrollTop;
-      sec.style.left = left + 'px';
-      sec.style.top  = top  + 'px';
-    }
-  }
-  function clearAbsolute(){
-    for (const sec of wrap.children){
-      sec.style.left = '';
-      sec.style.top  = '';
-      sec.style.transition = '';
-      sec.style.transform = '';
-    }
-  }
-
-  // drag in arrange mode
-  let dragging=null, offX=0, offY=0;
-  function onADown(e){
-    if (!consoleEl.classList.contains('arrange-on')) return;
-    const sec = e.target.closest('.cs-tile');
-    if (!sec) return;
-    if (e.target.closest('.cs-close,button,a,input,textarea,select')) return;
-
-    const rect = sec.getBoundingClientRect();
-    const wrapRect = wrap.getBoundingClientRect();
-    offX = e.clientX - rect.left;
-    offY = e.clientY - rect.top;
-
-    dragging = sec;
-    sec.style.transition = 'none';
-    sec.setPointerCapture?.(e.pointerId);
-    e.preventDefault?.();
-  }
-  function onAMove(e){
-    if (!dragging) return;
-    const wrapRect = wrap.getBoundingClientRect();
-    let x = e.clientX - wrapRect.left + wrap.scrollLeft - offX;
-    let y = e.clientY - wrapRect.top  + wrap.scrollTop  - offY;
-    x = Math.max(0, Math.min(x, wrap.scrollWidth  - dragging.offsetWidth));
-    y = Math.max(0, Math.min(y, wrap.scrollHeight - dragging.offsetHeight));
-    dragging.style.left = x + 'px';
-    dragging.style.top  = y + 'px';
-    e.preventDefault?.();
-  }
-  function onAUp(){
-    if (!dragging) return;
-    dragging.style.transition = '';
-    dragging = null;
-  }
-
-  arrangeBtn.addEventListener('click', () => {
-    const turnOn = !consoleEl.classList.contains('arrange-on');
-    if (turnOn){
-      consoleEl.classList.add('arrange-on');
-      freezeToAbsolute();
-      wrap.addEventListener('pointerdown', onADown, { capture:true });
-      window.addEventListener('pointermove', onAMove, { passive:false });
-      window.addEventListener('pointerup',   onAUp);
-      arrangeBtn.textContent = 'Done';
-    } else {
-      consoleEl.classList.remove('arrange-on');
-      wrap.removeEventListener('pointerdown', onADown, { capture:true });
-      window.removeEventListener('pointermove', onAMove, { passive:false });
-      window.removeEventListener('pointerup',   onAUp);
-      clearAbsolute();
-      arrangeBtn.textContent = 'Arrange';
-    }
+  // Tabs fire immediately
+  tabs.forEach((btn) => {
+    const onTap = (e) => {
+      if (e.pointerType === 'touch' || e.pointerType === 'pen') e.preventDefault();
+      openTile(btn.dataset.key);
+    };
+    btn.addEventListener('pointerdown', onTap, { passive:false });
+    btn.addEventListener('click', (e) => onTap(e));
   });
+
+  // Wire any server-rendered tiles (none by default)
+  document.querySelectorAll('.cs-tile').forEach(addTileHandlers);
+  updateWrapClass();
 })();
 </script>
+<!-- =================== /END TILE CONSOLE =================== -->
 <script>
 (function () {
   // Only run on the splash page (where the button exists)
@@ -1336,6 +964,7 @@ if (sec && sec.classList.contains('is-open')) {
     if (!root) return;
     var nodes = root.querySelectorAll('a,button,[role="button"],[data-action],[aria-label]');
     nodes.forEach(function (el) {
+      if (el.closest('.cs-tile')) return;
       if (!isCloseLike(el)) return;
 
       // Remove any existing behavior and force our exit
@@ -1532,13 +1161,3 @@ if (sec && sec.classList.contains('is-open')) {
 
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
