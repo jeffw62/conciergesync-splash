@@ -585,18 +585,17 @@ body.splash-mode .console-exit {
 
 <script>
 (()=>{
-  const tabs = document.querySelectorAll('.cs-tab');
+  const tabs      = document.querySelectorAll('.cs-tab');
   const tilesWrap = document.getElementById('cs-tiles');
-  const consoleEl  = document.getElementById('cs-console');
+  const consoleEl = document.getElementById('cs-console');
 
-  // Kill any legacy Arrange UI if it exists (from old scripts/fallbacks)
+  // Hide/remove any legacy Arrange UI that might sneak in
   (function killArrange(){
     consoleEl?.classList.remove('arrange-on');
     const css = document.createElement('style');
     css.textContent = '#arrangeToggle{display:none!important}';
     document.head.appendChild(css);
-    const btn = document.getElementById('arrangeToggle');
-    if (btn) try{ btn.remove(); }catch(_){}
+    document.getElementById('arrangeToggle')?.remove();
   })();
 
   function updateWrapClass(){
@@ -604,7 +603,7 @@ body.splash-mode .console-exit {
     tilesWrap.classList.toggle('single', count === 1);
   }
 
-  // ---- FLIP animation helper: smoothly animate tile reordering ----
+  // FLIP helper
   function flipAnimate(container, changeDomSync){
     const REDUCED = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (REDUCED) { changeDomSync(); return; }
@@ -641,7 +640,7 @@ body.splash-mode .console-exit {
     });
   }
 
-  // Calm dismiss helper
+  // Calm dismiss
   function calmDismiss(tile, direction = 1){
     const off = (window.innerWidth * 0.5) * direction; // 50vw
     tile.classList.add('cs-dismissing');
@@ -652,29 +651,25 @@ body.splash-mode .console-exit {
     }, { once: true });
   }
 
-  // Backdrop/outside click → dismiss focused tile
+  // Outside click/backdrop → dismiss focused tile
   const backdropEl = document.querySelector('#csBackdrop, .backdrop');
   function isOutsideConsole(target){ return consoleEl && !consoleEl.contains(target); }
   if (backdropEl) {
     backdropEl.addEventListener('pointerdown', (e) => {
       const active = document.querySelector('.cs-tile.is-focused');
       if (!active) return;
-      const dir = (e.clientX >= window.innerWidth/2) ? 1 : -1;
-      calmDismiss(active, dir);
+      calmDismiss(active, (e.clientX >= window.innerWidth/2) ? 1 : -1);
     });
   }
   window.addEventListener('pointerdown', (e) => {
     if (!isOutsideConsole(e.target)) return;
     const active = document.querySelector('.cs-tile.is-focused');
     if (!active) return;
-    const dir = (e.clientX >= window.innerWidth/2) ? 1 : -1;
-    calmDismiss(active, dir);
+    calmDismiss(active, (e.clientX >= window.innerWidth/2) ? 1 : -1);
   }, { capture: true });
 
-  // Store open order so selected + current stay centered in row 1
   const openKeys = new Set();
 
-  // Tile templates (unchanged)
   const TILE_TEMPLATES = {
     overview: () => `
       <header class="cs-tile-head">
@@ -696,11 +691,10 @@ body.splash-mode .console-exit {
       <div class="cs-tile-body"><p>CPP, cash vs award, transfer hints.</p></div>`
   };
 
-  // Free mode: freeze grid positions → absolute with CSS vars
+  // Enter free mode and freeze current grid positions into --x/--y
   function enableFreeMode(){
     if (consoleEl.classList.contains('cs-free')) return;
     consoleEl.classList.add('cs-free');
-
     const gridRect = tilesWrap.getBoundingClientRect();
     Array.from(tilesWrap.children).forEach(tile => {
       const r = tile.getBoundingClientRect();
@@ -711,10 +705,9 @@ body.splash-mode .console-exit {
     });
   }
 
-  // Maintain centered first row with the last two opened tiles
   function applyOrder(){
     const keys = Array.from(openKeys);
-    const focused = keys.slice(-2);
+    const focused = keys.slice(-2); // keep last two centered together
     flipAnimate(tilesWrap, () => {
       focused.forEach(k => {
         const el = tilesWrap.querySelector(`.cs-tile[data-key="${k}"]`);
@@ -723,7 +716,6 @@ body.splash-mode .console-exit {
     });
   }
 
-  // Close tile (animated)
   function closeTile(el){
     const key = el.dataset.key;
     el.classList.add('cs-exit');
@@ -737,18 +729,15 @@ body.splash-mode .console-exit {
     }, { once: true });
   }
 
-  // Press-and-hold drag (no accidental dismiss)
+  // Long-press to drag; quick swipe to dismiss
   function addTileHandlers(tile){
-    // X button always closes
     tile.querySelector('.cs-close')?.addEventListener('click', () => closeTile(tile));
 
-    const HOLD_MS = 280;       // long-press threshold
-    const SLOP = 10;           // px tolerance
-    const DISMISS_DIST = 160;  // px to trigger dismiss
+    const HOLD_MS = 280, SLOP = 10, DISMISS_DIST = 160;
 
     let holdTimer = null;
-    let holdMode  = false;     // true = dragging mode (no dismiss)
-    let isDown    = false;     // ⬅️ gate all movement to active press
+    let holdMode  = false;     // true => dragging (no dismiss)
+    let isDown    = false;     // gate movement to active press
     let activeId  = null;
 
     let startX = 0, startY = 0;
@@ -763,8 +752,7 @@ body.splash-mode .console-exit {
     const clamp = (n, min, max) => Math.max(min, Math.min(max, n));
 
     function primeHold(){
-      // Enter free mode first (ensures --x/--y exist)
-      enableFreeMode();
+      enableFreeMode(); // ensure --x/--y exist
 
       const wrapRect = tilesWrap.getBoundingClientRect();
       const r = tile.getBoundingClientRect();
@@ -784,11 +772,11 @@ body.splash-mode .console-exit {
       if (e.target.closest('.cs-close,button,a,input,textarea,select')) return;
 
       isDown   = true;
-      activeId = e.pointerId ?? 0;
+      activeId = e.pointerId ?? null;
 
       startX = lastX = e.clientX;
       startY = lastY = e.clientY;
-      moved  = false; 
+      moved  = false;
       holdMode = false;
 
       clearTimeout(holdTimer);
@@ -799,20 +787,17 @@ body.splash-mode .console-exit {
     }
 
     function onMove(e){
-      // ⬇️ ignore stray moves that aren't for this press
       if (!isDown) return;
       if (activeId != null && e.pointerId != null && e.pointerId !== activeId) return;
 
-      lastX = e.clientX;
-      lastY = e.clientY;
-
+      lastX = e.clientX; lastY = e.clientY;
       const dx = lastX - startX;
       const dy = lastY - startY;
 
       if (!holdMode){
         if (Math.hypot(dx, dy) > SLOP){
           moved = true;
-          clearTimeout(holdTimer); // becomes a swipe gesture
+          clearTimeout(holdTimer); // treat as swipe
         }
         if (moved){
           if (e.cancelable) e.preventDefault();
@@ -823,11 +808,10 @@ body.splash-mode .console-exit {
         return;
       }
 
-      // Drag mode (free position)
+      // Drag mode
       if (e.cancelable) e.preventDefault();
       const maxX = tilesWrap.scrollWidth  - tile.offsetWidth;
       const maxY = tilesWrap.scrollHeight - tile.offsetHeight;
-
       const nx = clamp(baseX + dx, 0, Math.max(0, maxX));
       const ny = clamp(baseY + dy, 0, Math.max(0, maxY));
 
@@ -836,7 +820,7 @@ body.splash-mode .console-exit {
       tile.style.transform = 'none';
     }
 
-    function onUp(e){
+    function onUp(){
       if (!isDown) return;
 
       clearTimeout(holdTimer);
@@ -845,8 +829,7 @@ body.splash-mode .console-exit {
       try { if (activeId != null) tile.releasePointerCapture?.(activeId); } catch {}
       activeId = null;
 
-      tile.classList.remove('cs-swiping');
-      tile.classList.remove('is-focused');
+      tile.classList.remove('cs-swiping', 'is-focused');
 
       if (holdMode){
         tile.style.transition = '';
@@ -858,15 +841,12 @@ body.splash-mode .console-exit {
 
       const dx = lastX - startX;
       if (Math.abs(dx) > DISMISS_DIST){
-        const dir = dx >= 0 ? 1 : -1;
-        calmDismiss(tile, dir);
+        calmDismiss(tile, dx >= 0 ? 1 : -1);
       } else {
         tile.style.transition = `transform var(--cs-time) var(--cs-ease), opacity var(--cs-time) var(--cs-ease)`;
         tile.style.transform = '';
         tile.style.opacity = '';
-        tile.addEventListener('transitionend', () => {
-          tile.style.transition = '';
-        }, { once: true });
+        tile.addEventListener('transitionend', () => { tile.style.transition = ''; }, { once: true });
       }
     }
 
@@ -876,7 +856,50 @@ body.splash-mode .console-exit {
     window.addEventListener('pointercancel', onUp);
   }
 
-  // ...everything below unchanged...
+  function openTile(key){
+    const existing = tilesWrap.querySelector(`.cs-tile[data-key="${key}"]`);
+    if (existing){
+      openKeys.delete(key);
+      openKeys.add(key);
+      applyOrder();
+      updateWrapClass();
+      existing.focus?.({preventScroll:true});
+      return;
+    }
+    const sec = document.createElement('section');
+    sec.className = 'cs-tile';
+    sec.dataset.key = key;
+    sec.innerHTML = (TILE_TEMPLATES[key] || (()=>`
+      <header class="cs-tile-head">
+        <h4>${key}</h4>
+        <button class="cs-close" aria-label="Close">×</button>
+      </header>
+      <div class="cs-tile-body"><p>${key} tile.</p></div>`))();
+
+    addTileHandlers(sec);
+
+    flipAnimate(tilesWrap, () => {
+      openKeys.add(key);
+      tilesWrap.appendChild(sec);
+      updateWrapClass();
+    });
+
+    sec.focus?.({ preventScroll: true });
+  }
+
+  // Tabs: immediate fire
+  tabs.forEach((btn) => {
+    const onTap = (e) => {
+      if (e.pointerType === 'touch' || e.pointerType === 'pen') e.preventDefault();
+      openTile(btn.dataset.key);
+    };
+    btn.addEventListener('pointerdown', onTap, { passive:false });
+    btn.addEventListener('click', (e) => onTap(e));
+  });
+
+  // Wire any pre-rendered tiles
+  document.querySelectorAll('.cs-tile').forEach(addTileHandlers);
+  updateWrapClass();
 })();
 </script>
 <!-- =================== /END TILE CONSOLE =================== -->
@@ -1084,4 +1107,5 @@ body.splash-mode .console-exit {
 
 </body>
 </html>
+
 
