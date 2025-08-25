@@ -246,12 +246,28 @@
 </section>
 
 <script>
-  // simple toggle between the two views
-  const viewLogin = document.getElementById('viewLogin');
+(() => {
+  const viewLogin    = document.getElementById('viewLogin');
   const viewRegister = document.getElementById('viewRegister');
-  document.getElementById('linkShowRegister')?.addEventListener('click', (e)=>{ e.preventDefault(); viewLogin.hidden = true; viewRegister.hidden = false; });
-  document.getElementById('linkShowLogin')?.addEventListener('click', (e)=>{ e.preventDefault(); viewRegister.hidden = true; viewLogin.hidden = false; });
+  if (!viewLogin || !viewRegister) return;
+
+  const showLogin = (e) => { e?.preventDefault(); viewRegister.hidden = true;  viewLogin.hidden = false; };
+  const showRegister = (e) => { e?.preventDefault(); viewLogin.hidden = true; viewRegister.hidden = false; };
+
+  // Bottom links
+  document.getElementById('linkShowRegister')?.addEventListener('click', showRegister);
+  document.getElementById('linkShowLogin')?.addEventListener('click', showLogin);
+
+  // Top pills
+  const pillLogin = document.getElementById('pillLogin');
+  const pillRegister = document.getElementById('pillRegister');
+  pillLogin?.setAttribute('type','button');
+  pillRegister?.setAttribute('type','button');
+  pillLogin?.addEventListener('click', showLogin);
+  pillRegister?.addEventListener('click', showRegister);
+})();
 </script>
+
 
 
         <!-- OTP -->
