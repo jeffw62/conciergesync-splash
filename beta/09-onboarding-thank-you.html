@@ -131,6 +131,29 @@
 .section > p{                    /* paragraph right under a header */
   margin-top: 6px;               /* closer to the header */
 }
+/* === 640px tune: rhythm + legibility === */
+
+/* Narrow card (if you want it locked here) */
+.cs-tile{ width:min(640px, calc(100% - 56px)); }
+
+/* Give the H1 a touch more presence at this width */
+#tyTitle{ font-size: clamp(28px, 4.2vw, 34px); }
+
+/* Hero stack spacing */
+.sub{   margin-bottom:16px; }
+.kudos{ margin-bottom:20px; }
+
+/* Section rhythm: more air above headers, tighter to content below */
+.section{        margin-top:30px; }
+.section h3{     margin:0 0 8px; }
+.section > .list,
+.section > p{    margin-top:8px; }
+
+/* Bullet line spacing */
+.list li + li{   margin-top:6px; }
+
+/* Button breathing room from last paragraph */
+#enterBtn{       margin-top:22px; }
 
   </style>
 </head>
