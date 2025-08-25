@@ -104,10 +104,22 @@
 }
     /* Recolor those blue section headers for better contrast */
 body.thankyou h3{
-  color:#a7b0bf;                 /* dark neutral gray */
-  text-shadow:0 1px 1px rgba(0,0,0,.25); /* subtle lift on busy backgrounds */
+  color:#8a93a3;                       /* darker, better contrast */
+  text-shadow:0 1px 1px rgba(0,0,0,.30);
   letter-spacing:.02em;
   font-weight:800;
+}
+
+/* Force the top H1 to center, even inside a grid/flex container */
+body.thankyou .ty-card h1,
+body.thankyou .hero-title,
+body.thankyou [data-headline]{
+  text-align:center !important;
+  margin-left:auto; 
+  margin-right:auto;
+  width:100%;
+  justify-self:center;   /* if parent is grid */
+  align-self:start;      /* safe default */
 }
 
 </style>
