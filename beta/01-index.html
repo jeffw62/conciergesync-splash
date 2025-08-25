@@ -156,7 +156,7 @@ body.splash-mode .console-exit {
 
 <!-- ============= CONSOLE BACKDROP + FULLSCREEN CONTROLS ============= -->
 <!-- Controls -->
-<button id="enterConsole" class="console-btn">Enter Console</button>
+<a id="enterConsole" class="console-btn" href="/beta/auth.html">Enter Console</a>
 <button id="exitConsole"
         class="console-exit"
         aria-label="Exit Console"
@@ -394,7 +394,9 @@ body.splash-mode .console-exit {
     if (document.fullscreenElement) document.exitFullscreen();
   }
 
+  if (enterBtn && enterBtn.tagName !== 'A') {
   enterBtn.addEventListener('click', enterConsole);
+}
   exitBtn.addEventListener('click', exitConsole);
   window.addEventListener('keydown', (e)=>{ if (e.key === 'Escape') exitConsole(); });
 })();
@@ -988,6 +990,7 @@ function openTile(key){
   document.body.classList.add('splash-mode');
 
   // 2) On click, reveal the console and scroll to it
+  if (btn.tagName !== 'A') {
   btn.addEventListener('click', function (e) {
     e.preventDefault();
     document.body.classList.remove('splash-mode');
@@ -1176,6 +1179,7 @@ function openTile(key){
 
 </body>
 </html>
+
 
 
 
