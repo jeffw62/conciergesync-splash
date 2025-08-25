@@ -1,331 +1,128 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  
-  <style>
-  /* === Base === */
-  :root{
-    --glass-bg: rgba(255,255,255,.10);
-    --glass-border: rgba(255,255,255,.28);
-  }
-  html,body{height:100%}
-  body{
-    margin:0;
-    font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif;
-    color:#fff;
-  }
-
-  /* === Backdrop === */
-  .cs-bg{
-    position:fixed; inset:0;
-    background:center/cover no-repeat;
-    filter:brightness(1.1) contrast(1.05);
-  }
-  .cs-ov{
-    position:fixed; inset:0;
-    background:linear-gradient(to bottom, rgba(0,0,0,.35), rgba(0,0,0,.60));
-  }
-
-  /* === Outer glass frame (keep this) === */
-  .cs-tile{
-    position:relative; z-index:1;
-    max-width:960px; margin:6vh auto; padding:24px;
-    background:var(--glass-bg);
-    border:1px solid var(--glass-border);
-    border-radius:18px;
-    backdrop-filter:blur(14px) saturate(1.2);
-    -webkit-backdrop-filter:blur(14px) saturate(1.2);
-    box-shadow:0 20px 60px rgba(0,0,0,.35);
-  }
-
-  /* === Inner content: no border/ring (prevents double border) === */
-  .card{
-    background:transparent !important;
-    border:none !important;
-    border-radius:14px;
-    box-shadow:none !important;
-    color:#eef2f8;
-  }
-  .card h1,.card h2,.card h3{ color:#fff; }
-  .card p,.card li{ color:rgba(255,255,255,.92); }
-
-  /* Optional chips/badges */
-  .ribbon,.badge{
-    background:rgba(255,255,255,.16);
-    color:#fff;
-    border:1px solid rgba(255,255,255,.28);
-    border-radius:999px;
-    padding:4px 10px;
-    font-weight:700;
-  }
-
-  /* === CTA === */
-  .btn{
-    display:inline-block; padding:12px 18px; border-radius:12px;
-    border:1px solid rgba(255,255,255,.45);
-    background:rgba(0,0,0,.45); color:#fff; font-weight:800; text-decoration:none;
-    box-shadow:0 8px 24px rgba(0,0,0,.28);
-    transition:transform .12s ease, background .12s ease, border-color .12s ease;
-  }
-  .btn:hover{ background:rgba(0,0,0,.60); border-color:rgba(255,255,255,.70); transform:translateY(-1px); }
-
-  /* Safety: if any preview wrapper remains, ensure no inner lines */
-  .preview,.sneak,.dashboard-preview{
-    background:transparent !important;
-    border:none !important;
-    box-shadow:none !important;
-  }
-    /* Center the hero trio (title, subhead, kudos) */
-.card h1:first-of-type{
-  text-align:center;
-  margin: 0 0 6px;
-}
-.card p.sub:first-of-type{
-  text-align:center;
-  max-width: 740px;
-  margin: 0 auto 18px;
-}
-.card .kudos{
-  text-align:center;
-  margin: 0 auto 22px;
-  /* de-green & de-box */
-  background: transparent !important;
-  border: none !important;
-  color: #fff !important;
-  box-shadow: none !important;
-  padding: 0 !important;
-}
-
-/* Center the “Enter Console” button */
-.card .btn{
-  display: block;
-  width: max-content;
-  margin: 16px auto 0;
-}
-    /* Recolor those blue section headers for better contrast */
-body.thankyou h3{
-  color:#8a93a3;                       /* darker, better contrast */
-  text-shadow:0 1px 1px rgba(0,0,0,.30);
-  letter-spacing:.02em;
-  font-weight:800;
-}
-
-/* Force the top H1 to center, even inside a grid/flex container */
-body.thankyou .ty-card h1,
-body.thankyou .hero-title,
-body.thankyou [data-headline]{
-  text-align:center !important;
-  margin-left:auto; 
-  margin-right:auto;
-  width:100%;
-  justify-self:center;   /* if parent is grid */
-  align-self:start;      /* safe default */
-}
-
-</style>
-
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>ConciergeSync™ • Onboarding Complete</title>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+
   <style>
-    :root {
-      --bg: #f6f7fb;
-      --card: #ffffff;
-      --text: #1f2937;
-      --muted: #6b7280;
-      --brand: #3b82f6;
-      --brand-ink: #0f3d8c;
-      --success: #22c55e;
-      --border: #e5e7eb;
-      --shadow: 0 10px 30px rgba(17,24,39,.08);
-      --radius: 18px;
+    /* ===== Base ===== */
+    :root{
+      --glass-bg: rgba(255,255,255,.10);
+      --glass-border: rgba(255,255,255,.28);
     }
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      background: var(--bg);
-      color: var(--text);
-      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+    html,body{height:100%}
+    body.thankyou{
+      margin:0;
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      color:#fff;
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
     }
-    a {
-      color: var(--brand);
-      text-decoration: none;
-    }
-    a:hover {
-      text-decoration: underline;
-    }
-    .wrap {
-      max-width: 820px;
-      margin: 48px auto;
-      padding: 0 16px;
-    }
-    .card {
-      background: var(--card);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      padding: 32px 28px;
-    }
-    .ribbon {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      background: linear-gradient(90deg, var(--brand) 0%, #60a5fa 100%);
-      color: #fff;
-      padding: 8px 14px;
-      border-radius: 999px;
-      font-weight: 600;
-      font-size: 14px;
-    }
-    .ribbon .dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: #fff;
-      opacity: .9;
-    }
-    h1 {
-      margin: 20px 0 10px;
-      font-size: 28px;
-      line-height: 1.2;
-      letter-spacing: -0.01em;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    .sub {
-      color: var(--muted);
-      margin: 0 0 20px;
-    }
-    .kudos {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      color: #065f46;
-      background: #ecfdf5;
-      border: 1px solid #a7f3d0;
-      padding: 10px 12px;
-      border-radius: 12px;
-      font-weight: 600;
-      width: max-content;
-      margin: 12px 0 8px;
-    }
-    .section {
-      margin: 22px 0;
-    }
-    .section h3 {
-      margin: 0 0 8px;
-      font-size: 16px;
-      text-transform: uppercase;
-      letter-spacing: .06em;
-      color: var(--brand-ink);
-    }
-    .list {
-      margin: 8px 0 0;
-      padding-left: 18px;
-    }
-    .list li {
-      margin: 6px 0;
-    }
-    .teaser {
-      margin: 14px 0 6px;
-      border-radius: 14px;
-      overflow: hidden;
-      border: 1px solid var(--border);
-    }
-    .teaser img {
-      width: 100%;
-      display: block;
-      filter: blur(2px) saturate(.95);
-      transform: scale(1.01);
-    }
-    .muted {
-      color: var(--muted);
-      font-size: 14px;
-    }
-    .grid {
-      margin-top: 10px;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 14px;
-    }
-    .cta {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      text-decoration: none;
-      font-weight: 600;
-      background: #f3f4f6;
-      color: #111827;
-      padding: 12px 14px;
-      border-radius: 12px;
-      border: 1px solid var(--border);
-    }
-    .cta:hover {
-      background: #eef2ff;
-      border-color: #e0e7ff;
-    }
-    .footer {
-      margin-top: 22px;
-      color: var(--muted);
-      font-size: 13px;
-      text-align: center;
-    }
-    @media (max-width: 640px) {
-      .grid {
-        grid-template-columns: 1fr;
-      }
-    }
-    /* Force-center the title */
-section.card h1,
-.card > h1,
-.card h1 {
-  text-align: center !important;
-  margin: 0 auto 8px !important;
-}
 
-/* Force-center + de-green the kudos line */
-.card .kudos{
-  display: flex !important;
-  justify-content: center !important;
-  align-items: center !important;
-  gap: 10px;
-  text-align: center !important;
-  max-width: 820px;
-  margin: 0 auto 22px !important;
-  padding: 0 !important;
-  background: transparent !important;
-  border: none !important;
-  box-shadow: none !important;
-  color: #fff !important;          /* kill the green text */
-}
-/* Nuke any inner chip/badge styling that may re-apply green */
-.card .kudos *,
-.card .kudos .badge,
-.card .kudos .chip {
-  background: transparent !important;
-  border: none !important;
-  color: #fff !important;
-}
-/* Center the hero H1 only */
-.hero-title, [data-headline]{
-  text-align:center;
-  margin-left:auto;
-  margin-right:auto;
-}
+    /* ===== Background layers ===== */
+    .cs-bg{
+      position:fixed; inset:0;
+      background:center/cover no-repeat;
+      filter:brightness(1.1) contrast(1.05);
+    }
+    .cs-ov{
+      position:fixed; inset:0;
+      background:linear-gradient(to bottom, rgba(0,0,0,.35), rgba(0,0,0,.60));
+    }
 
+    /* ===== Glass card (single border) ===== */
+    .cs-tile{
+      position:relative; z-index:1;
+      max-width:960px; margin:6vh auto; padding:24px;
+      background:var(--glass-bg);
+      border:1px solid var(--glass-border);
+      border-radius:18px;
+      backdrop-filter:blur(14px) saturate(1.2);
+      -webkit-backdrop-filter:blur(14px) saturate(1.2);
+      box-shadow:0 20px 60px rgba(0,0,0,.35);
+    }
+
+    /* ===== Content (no inner border/rings) ===== */
+    .card{
+      background:transparent !important;
+      border:none !important;
+      border-radius:14px;
+      box-shadow:none !important;
+      color:#eef2f8;
+    }
+    .card h1,.card h2,.card h3{ color:#fff; }
+    .card p,.card li{ color:rgba(255,255,255,.92); }
+
+    /* Title + sub + kudos centered */
+    #tyTitle{
+      text-align:center !important;
+      margin:0 auto 6px !important;
+      font-size: clamp(26px, 4vw, 34px);
+      line-height:1.15;
+      letter-spacing:-.01em;
+      font-weight:800;
+    }
+    .sub{
+      text-align:center;
+      max-width:740px;
+      margin:0 auto 18px;
+      color:rgba(255,255,255,.92);
+    }
+    .kudos{
+      text-align:center;
+      margin:0 auto 22px;
+      background:transparent !important;
+      border:none !important;
+      color:#fff !important;
+      box-shadow:none !important;
+      padding:0 !important;
+      font-weight:700;
+    }
+
+    /* Section headers (darker neutral per your tweak) */
+    body.thankyou h3{
+      margin:0 0 8px;
+      font-size:16px;
+      text-transform:uppercase;
+      letter-spacing:.06em;
+      color:#7a8596;                 /* keep this shade */
+      text-shadow:0 1px 1px rgba(0,0,0,.30);
+      font-weight:800;
+    }
+    .list{ margin:8px 0 0; padding-left:18px; }
+    .list li{ margin:6px 0; }
+
+    /* Button */
+    .btn{
+      display:block;
+      width:max-content;
+      margin:16px auto 0;
+      padding:12px 18px;
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,.45);
+      background:rgba(0,0,0,.45);
+      color:#fff; font-weight:800; text-decoration:none;
+      box-shadow:0 8px 24px rgba(0,0,0,.28);
+      transition:transform .12s ease, background .12s ease, border-color .12s ease;
+    }
+    .btn:hover{ background:rgba(0,0,0,.60); border-color:rgba(255,255,255,.70); transform:translateY(-1px); }
+
+    @media (max-width:640px){
+      .cs-tile{ margin:4vh 12px; padding:20px; }
+    }
   </style>
 </head>
-<body>
-  <main class="wrap">
-    <div class="cs-bg"></div>
-    <div class="cs-ov"></div>
-    <div class="cs-tile">
 
+<body class="thankyou">
+  <div class="cs-bg"></div>
+  <div class="cs-ov"></div>
+
+  <main class="cs-tile">
     <section class="card">
-      <h1>Onboarding Complete</h1>
+      <h1 id="tyTitle">Onboarding Complete</h1>
       <p class="sub">Your ConciergeSync™ profile is fully set. Welcome to the inner circle.</p>
       <div class="kudos">Nice work — your blueprint is locked.</div>
 
@@ -352,15 +149,30 @@ section.card h1,
         <p>We’re preparing your <strong>personalized insights</strong> based on everything you shared. We’ll let you know the moment they’re ready — it won’t be long.</p>
       </div>
 
-  <div class="cta-center">
-  <a class="btn" href="/beta/01-index.html?enter=1">Enter Console</a>
-</div>
+      <a id="enterBtn" class="btn" href="/beta/02-console.html?enter=1">Enter Console</a>
+    </section>
+  </main>
 
-<script>
-  // Reuse whatever background was set on auth; fallback to a default image.
-  const savedBg = localStorage.getItem('cs_bg_src') || '/beta/assets/bg/IMG_5374.jpeg';
-  document.querySelector('.cs-bg').style.backgroundImage = `url(${savedBg})`;
-</script>
-<body class="thankyou">
+  <script>
+    // Keep whichever background was last set during auth; fallback to default.
+    const savedBg = localStorage.getItem('cs_bg_src') || '/beta/assets/bg/IMG_5374.jpeg';
+    const bgEl = document.querySelector('.cs-bg');
+    if (bgEl) bgEl.style.backgroundImage = `url(${savedBg})`;
+
+    // Carry uid/email to the console.
+    (function(){
+      const params = new URLSearchParams(location.search);
+      const uid   = params.get('uid')   || '';
+      const email = params.get('email') || '';
+
+      const qp = new URLSearchParams({ enter: '1' });
+      if (uid)   qp.set('uid', uid);
+      if (email) qp.set('email', email);
+
+      const btn = document.getElementById('enterBtn');
+      const CONSOLE_URL = '/beta/02-console.html'; // adjust if your console path differs
+      if (btn) btn.href = `${CONSOLE_URL}?${qp.toString()}`;
+    })();
+  </script>
 </body>
 </html>
