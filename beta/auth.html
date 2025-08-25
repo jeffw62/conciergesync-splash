@@ -99,6 +99,71 @@
       h1{font-size:26px}
     }
   </style>
+<style>
+  /* Auth layout */
+  #viewLogin, #viewRegister{
+    max-width: 480px;         /* controls field length */
+    margin: 18px auto 0;      /* center the form */
+    text-align: left;
+  }
+
+  /* Labels */
+  #viewLogin label, #viewRegister label{
+    display:block;
+    margin: 12px 0 6px;
+    font-weight: 600;
+    letter-spacing:.2px;
+  }
+
+  /* Inputs (email + password) */
+  #viewLogin input[type="email"],
+  #viewLogin input[type="password"],
+  #viewRegister input[type="email"],
+  #viewRegister input[type="password"],
+  #viewRegister input[type="text"]{
+    width: 100%;
+    height: 44px;
+    padding: 10px 14px;
+    border-radius: 12px;
+    border: 1px solid rgba(0,0,0,.12);
+    background: rgba(255,255,255,.92);
+    outline: none;
+    box-shadow: 0 2px 8px rgba(0,0,0,.06) inset;
+  }
+
+  /* Login / Create buttons */
+  #btnLogin, #btnCreate{
+    width: 100%;
+    height: 46px;
+    margin-top: 14px;
+    border: 0;
+    border-radius: 12px;
+    background: #111;              /* matches your CTA */
+    color: #fff;
+    font-weight: 700;
+    box-shadow: 0 6px 16px rgba(0,0,0,.18);
+    cursor: pointer;
+  }
+  #btnLogin:hover, #btnCreate:hover{
+    transform: translateY(-1px);
+    box-shadow: 0 10px 22px rgba(0,0,0,.22);
+  }
+
+  /* Small link row under buttons */
+  #viewLogin a, #viewRegister a{
+    display:inline-block;
+    margin-top:10px;
+    text-decoration: underline;
+  }
+
+  /* Optional: tighten the big hero title duplication */
+  #viewLogin h1, #viewRegister h1{
+    font-size: 24px;
+    margin: 6px 0 8px;
+    text-align:left;
+  }
+</style>
+
 </head>
 <body>
   <!-- Backdrop -->
