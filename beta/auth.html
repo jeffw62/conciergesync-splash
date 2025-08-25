@@ -100,61 +100,40 @@
     }
   </style>
 <style>
-  /* Glass inputs */
-  #viewLogin input[type="email"],
-  #viewLogin input[type="password"],
-  #viewRegister input[type="email"],
-  #viewRegister input[type="password"],
-  #viewRegister input[type="text"]{
-    width: 100%;
-    height: 44px;
-    padding: 10px 14px;
-    border-radius: 12px;
-    border: 1px solid rgba(255,255,255,0.35);
-    background: rgba(255,255,255,0.12);     /* translucent glass */
-    color: #fff;
-    backdrop-filter: blur(10px) saturate(1.1);
-    -webkit-backdrop-filter: blur(10px) saturate(1.1);
-    box-shadow: 0 2px 8px rgba(0,0,0,.18) inset;
-  }
-  /* Placeholder + focus */
-  #viewLogin input::placeholder,
-  #viewRegister input::placeholder{ color: rgba(255,255,255,.75); }
-  #viewLogin input:focus,
-  #viewRegister input:focus{
-    outline: none;
-    border-color: rgba(255,255,255,0.9);
-    box-shadow:
-      0 0 0 3px rgba(255,255,255,0.18) inset,
-      0 6px 18px rgba(0,0,0,.28);
-  }
-  /* Labels contrast on the hero background */
-  #viewLogin label, #viewRegister label{
-    color: #fff;
-    text-shadow: 0 1px 1px rgba(0,0,0,.28);
-    font-weight: 600;
+  /* Pull the form in */
+  #viewLogin, #viewRegister{
+    max-width: 420px !important;   /* was wide; tighten it */
+    margin: 18px auto 0 !important;/* center it */
   }
 
-  /* Make the “Register here” pop as a glassy secondary CTA */
-  #linkShowRegister{
-    display: block;
-    text-align: center;
-    margin-top: 12px;
-    padding: 10px 14px;
+  /* Make the Log in / Create buttons full-width and styled
+     — works whether they’re <button> or <input type="submit"> */
+  #viewLogin button,
+  #viewLogin input[type="button"],
+  #viewLogin input[type="submit"],
+  #viewRegister button,
+  #viewRegister input[type="button"],
+  #viewRegister input[type="submit"]{
+    width: 100% !important;
+    height: 46px;
+    margin-top: 14px;
+    border: 0;
     border-radius: 12px;
-    border: 1px solid rgba(255,255,255,0.55);
-    background: rgba(0,0,0,0.28);
-    color: #fff !important;
-    text-decoration: none;
+    background: #111;
+    color: #fff;
     font-weight: 700;
-    backdrop-filter: blur(8px) saturate(1.1);
-    -webkit-backdrop-filter: blur(8px) saturate(1.1);
     box-shadow: 0 6px 16px rgba(0,0,0,.18);
+    cursor: pointer;
+    display: block;               /* prevents left-align small button */
   }
-  #linkShowRegister:hover{
-    background: rgba(0,0,0,0.4);
-    border-color: rgba(255,255,255,0.75);
+  #viewLogin button:hover,
+  #viewLogin input[type="button"]:hover,
+  #viewLogin input[type="submit"]:hover,
+  #viewRegister button:hover,
+  #viewRegister input[type="button"]:hover,
+  #viewRegister input[type="submit"]:hover{
     transform: translateY(-1px);
+    box-shadow: 0 10px 22px rgba(0,0,0,.22);
   }
 </style>
 
