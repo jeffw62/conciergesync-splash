@@ -118,16 +118,65 @@
       </div>
 
       <!-- LOGIN -->
-      <form id="form-login" autocomplete="on">
-        <div>
-          <label for="login-email">Email</label>
-          <input id="login-email" name="email" type="email" inputmode="email" autocomplete="email" placeholder="you@example.com" required />
-        </div>
-        <div class="actions">
-          <button class="btn" id="btn-send-code" type="submit">Send sign-in code</button>
-          <button class="btn secondary" id="btn-use-link" type="button" title="Use a one-time magic link instead">Email me a magic link</button>
-          <span id="login-msg" class="hint" aria-live="polite"></span>
-        </div>
+      <!-- LOGIN (default) -->
+<section id="viewLogin">
+  <h1>Welcome To ConciergeSync™</h1>
+  <p>Sign in with your email and password.</p>
+
+  <label>Email</label>
+  <input id="loginEmail" type="email" autocomplete="username" required>
+
+  <label>Password</label>
+  <input id="loginPassword" type="password" autocomplete="current-password" required>
+
+  <button id="btnLogin">Log in</button>
+
+  <div style="margin-top:10px">
+    <a id="linkShowRegister" href="#register">Not a member yet? Register here</a>
+  </div>
+</section>
+
+<!-- REGISTER (hidden until clicked) -->
+<section id="viewRegister" hidden>
+  <h1>Create your account</h1>
+
+  <div style="display:flex; gap:12px">
+    <div style="flex:1">
+      <label>First name</label>
+      <input id="firstName" type="text" autocomplete="given-name">
+    </div>
+    <div style="flex:1">
+      <label>Last name</label>
+      <input id="lastName" type="text" autocomplete="family-name">
+    </div>
+  </div>
+
+  <label>Email (your LoginID)</label>
+  <input id="regEmail" type="email" autocomplete="username" required>
+
+  <label>Create a password</label>
+  <input id="regPassword" type="password" autocomplete="new-password" required>
+
+  <label style="display:flex;gap:8px;align-items:center;margin:10px 0">
+    <input id="agreeTos" type="checkbox" required>
+    <span>I agree to the <a href="/terms.html" target="_blank">Terms</a> &amp; <a href="/privacy.html" target="_blank">Privacy</a>.</span>
+  </label>
+
+  <button id="btnCreate">Create account</button>
+
+  <div style="margin-top:10px">
+    <a id="linkShowLogin" href="#login">Already have an account? Log in</a>
+  </div>
+</section>
+
+<script>
+  // simple toggle between the two views
+  const viewLogin = document.getElementById('viewLogin');
+  const viewRegister = document.getElementById('viewRegister');
+  document.getElementById('linkShowRegister')?.addEventListener('click', (e)=>{ e.preventDefault(); viewLogin.hidden = true; viewRegister.hidden = false; });
+  document.getElementById('linkShowLogin')?.addEventListener('click', (e)=>{ e.preventDefault(); viewRegister.hidden = true; viewLogin.hidden = false; });
+</script>
+
 
         <!-- OTP -->
         <div id="otp-wrap" style="display:none">
