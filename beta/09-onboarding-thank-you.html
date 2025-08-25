@@ -102,6 +102,13 @@
   width: max-content;
   margin: 16px auto 0;
 }
+    /* Recolor those blue section headers for better contrast */
+body.thankyou h3{
+  color:#a7b0bf;                 /* dark neutral gray */
+  text-shadow:0 1px 1px rgba(0,0,0,.25); /* subtle lift on busy backgrounds */
+  letter-spacing:.02em;
+  font-weight:800;
+}
 
 </style>
 
@@ -290,6 +297,12 @@ section.card h1,
   border: none !important;
   color: #fff !important;
 }
+/* Center the hero H1 only */
+.hero-title, [data-headline]{
+  text-align:center;
+  margin-left:auto;
+  margin-right:auto;
+}
 
   </style>
 </head>
@@ -336,6 +349,6 @@ section.card h1,
   const savedBg = localStorage.getItem('cs_bg_src') || '/beta/assets/bg/IMG_5374.jpeg';
   document.querySelector('.cs-bg').style.backgroundImage = `url(${savedBg})`;
 </script>
-
+<body class="thankyou">
 </body>
 </html>
