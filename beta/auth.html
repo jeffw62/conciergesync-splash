@@ -100,31 +100,43 @@
     }
   </style>
 <style>
-  /* Force any password field in the login view to match the glass email input */
-  #viewLogin input[type="password"],
-  #viewLogin input#loginPassword,
-  #viewLogin input#password {
-    width: 100% !important;
-    display: block !important;
-    height: 44px !important;
-    padding: 10px 14px !important;
-    border-radius: 12px !important;
-    border: 1px solid rgba(255,255,255,0.35) !important;
-    background: rgba(255,255,255,0.12) !important;
-    color: #fff !important;
-    backdrop-filter: blur(10px) saturate(1.1) !important;
-    -webkit-backdrop-filter: blur(10px) saturate(1.1) !important;
-    box-shadow: 0 2px 8px rgba(0,0,0,.18) inset !important;
+  /* Compact card */
+  .auth-card{ max-width:420px; margin:18px auto 0; text-align:left; }
+
+  /* Labels */
+  .auth-label{ display:block; margin:12px 0 6px; font-weight:600; color:#fff; text-shadow:0 1px 1px rgba(0,0,0,.28); }
+
+  /* Glass inputs (uniform width/height) */
+  .auth-field{
+    width:100%; height:44px; padding:10px 14px;
+    border-radius:12px; border:1px solid rgba(255,255,255,.35);
+    background:rgba(255,255,255,.12); color:#fff;
+    backdrop-filter: blur(10px) saturate(1.1); -webkit-backdrop-filter: blur(10px) saturate(1.1);
+    box-shadow:0 2px 8px rgba(0,0,0,.18) inset;
   }
-  #viewLogin input[type="password"]:focus,
-  #viewLogin input#loginPassword:focus,
-  #viewLogin input#password:focus {
-    outline: none !important;
-    border-color: rgba(255,255,255,0.9) !important;
-    box-shadow:
-      0 0 0 3px rgba(255,255,255,0.18) inset,
-      0 6px 18px rgba(0,0,0,.28) !important;
+  .auth-field::placeholder{ color:rgba(255,255,255,.75); }
+  .auth-field:focus{
+    outline:none; border-color:rgba(255,255,255,.9);
+    box-shadow:0 0 0 3px rgba(255,255,255,.18) inset, 0 6px 18px rgba(0,0,0,.28);
   }
+
+  /* Full-width primary button */
+  .auth-btn{
+    width:100%; height:46px; margin-top:14px;
+    border:0; border-radius:12px; background:#111; color:#fff; font-weight:700;
+    box-shadow:0 6px 16px rgba(0,0,0,.18); cursor:pointer; display:block;
+  }
+  .auth-btn:hover{ transform:translateY(-1px); box-shadow:0 10px 22px rgba(0,0,0,.22); }
+
+  /* Make the Register link a visible glass CTA */
+  .auth-cta{
+    display:block; text-align:center; margin-top:12px; padding:10px 14px;
+    border-radius:12px; border:1px solid rgba(255,255,255,.55);
+    background:rgba(0,0,0,.28); color:#fff; text-decoration:none; font-weight:700;
+    backdrop-filter: blur(8px) saturate(1.1); -webkit-backdrop-filter: blur(8px) saturate(1.1);
+    box-shadow:0 6px 16px rgba(0,0,0,.18);
+  }
+  .auth-cta:hover{ background:rgba(0,0,0,.4); border-color:rgba(255,255,255,.75); transform:translateY(-1px); }
 </style>
 
 </head>
@@ -147,21 +159,19 @@
 
       <!-- LOGIN -->
       <!-- LOGIN (default) -->
-<section id="viewLogin">
-  <h1>Welcome To ConciergeSync™</h1>
+<section id="viewLogin" class="auth-card">
+  <h2 class="auth-title">Welcome To ConciergeSync™</h2>
   <p>Sign in with your email and password.</p>
 
-  <label>Email</label>
-  <input id="loginEmail" type="email" autocomplete="username" required>
+  <label class="auth-label" for="loginEmail">Email</label>
+  <input id="loginEmail" class="auth-field" type="email" autocomplete="username" required>
 
-  <label>Password</label>
-  <input id="loginPassword" type="password" autocomplete="current-password" required>
+  <label class="auth-label" for="loginPassword">Password</label>
+  <input id="loginPassword" class="auth-field" type="password" autocomplete="current-password" required>
 
-  <button id="btnLogin">Log in</button>
+  <button id="btnLogin" class="auth-btn" type="button">Log in</button>
 
-  <div style="margin-top:10px">
-    <a id="linkShowRegister" href="#register">Not a member yet? Register here</a>
-  </div>
+  <a id="linkShowRegister" class="auth-cta" href="#register">Not a member yet? Register here</a>
 </section>
 
 <!-- REGISTER (hidden until clicked) -->
