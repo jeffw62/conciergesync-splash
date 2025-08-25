@@ -18,6 +18,39 @@
     text-decoration:none;font-weight:700
   }
   .btn:hover{background:rgba(0,0,0,.5);border-color:rgba(255,255,255,.6)}
+
+    /* === Glass overrides for the inner card & preview === */
+.card{
+  background: rgba(255,255,255,0.10) !important;
+  border: 1px solid rgba(255,255,255,0.28) !important;
+  border-radius: 18px !important;
+  backdrop-filter: blur(14px) saturate(1.2) !important;
+  -webkit-backdrop-filter: blur(14px) saturate(1.2) !important;
+  box-shadow: 0 20px 60px rgba(0,0,0,.35) !important;
+  color: #eef2f8 !important;
+}
+.card h1, .card h2, .card h3{ color:#fff !important; }
+.card p, .card li{ color: rgba(255,255,255,0.92) !important; }
+
+/* The big “Sneak peek” box */
+.preview, .sneak, .dashboard-preview{
+  background: rgba(255,255,255,0.08) !important;
+  border: 1px solid rgba(255,255,255,0.22) !important;
+  border-radius: 12px !important;
+}
+.preview iframe, .sneak iframe, .dashboard-preview iframe{
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 12px !important;
+}
+
+/* Soften any white chips/badges if present */
+.ribbon, .badge{
+  background: rgba(255,255,255,0.16) !important;
+  color:#fff !important;
+  border: 1px solid rgba(255,255,255,0.28) !important;
+}
+
 </style>
 
   <meta charset="UTF-8" />
