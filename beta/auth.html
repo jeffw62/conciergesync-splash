@@ -173,6 +173,36 @@
 
   <a id="linkShowRegister" class="auth-cta" href="#register">Not a member yet? Register here</a>
 </section>
+      <section id="viewRegister" class="auth-card" hidden>
+  <h2 class="auth-title">Create your ConciergeSync™ account</h2>
+
+  <div style="display:flex; gap:12px">
+    <div style="flex:1">
+      <label class="auth-label" for="regFirst">First name</label>
+      <input id="regFirst"  class="auth-field" type="text" autocomplete="given-name">
+    </div>
+    <div style="flex:1">
+      <label class="auth-label" for="regLast">Last name</label>
+      <input id="regLast"   class="auth-field" type="text" autocomplete="family-name">
+    </div>
+  </div>
+
+  <label class="auth-label" for="regEmail">Email (your LoginID)</label>
+  <input id="regEmail" class="auth-field" type="email" autocomplete="username" required>
+
+  <label class="auth-label" for="regPassword">Create a password</label>
+  <input id="regPassword" class="auth-field" type="password" autocomplete="new-password" required>
+
+  <label class="auth-label" style="display:flex;gap:8px;align-items:center;margin:10px 0">
+    <input id="agreeTos" type="checkbox" required>
+    <span>I agree to the <a href="/terms.html" target="_blank">Terms</a> &amp; <a href="/privacy.html" target="_blank">Privacy</a>.</span>
+  </label>
+
+  <button id="btnCreate" class="auth-btn" type="button">Create account</button>
+
+  <a id="linkShowLogin" class="auth-cta" href="#login">Already have an account? Log in</a>
+</section>
+
 
 <!-- REGISTER (hidden until clicked) -->
 <section id="viewRegister" hidden>
@@ -375,5 +405,102 @@
     // Deep link: #register opens Register tab
     if(location.hash==='#register') setMode('register');
   </script>
+  <!-- ... your LOGIN section (#viewLogin) ... -->
+<!-- ... your REGISTER section (#viewRegister) ... -->
+
+<!-- ⬇️ Paste Step 2 toggle script here (plain <script>, not module) -->
+<script>
+  const viewLogin    = document.getElementById('viewLogin');
+  const viewRegister = document.getElementById('viewRegister');
+
+  function showLogin(e){ e?.preventDefault(); viewRegister.hidden = true; viewLogin.hidden = false; }
+  function showRegister(e){ e?.preventDefault(); viewLogin.hidden = true; viewRegister.hidden = false; }
+
+  document.getElementById('linkShowRegister')?.addEventListener('click', showRegister);
+  document.getElementById('linkShowLogin')?.addEventListener('click', showLogin);
+
+  // Optional: if your top pills exist, give them data-auth="login"/"register" and wire them:
+  document.querySelector('button[data-auth="login"]')?.addEventListener('click', showLogin);
+  document.querySelector('button[data-auth="register"]')?.addEventListener('click', showRegister);
+</script>
+
+<!-- ⬇️ Then your Firebase script (Step 3) comes after this -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
+  import {
+    getAuth,
+    createUserWithEmailAndPassword,
+    signInWithEmailAndPassword,
+    onAuthStateChanged,
+    updateProfile
+  } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-auth.js";
+
+  // Firebase (public client config is fine here)
+  const firebaseConfig = {
+    apiKey: "AIzaSyCcqBQtV3e1hGRMzBa_k5trNRqL0UmlByE",
+    authDomain: "conciergesync.firebaseapp.com",
+    projectId: "conciergesync",
+    storageBucket: "conciergesync.firebasestorage.app",
+    messagingSenderId: "882907448780",
+    appId: "1:882907448780:web:6e797ce9ad5bb84a9f8969"
+  };
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+
+  // NoteForms Section-1 (your exact keys)
+  const S1_URL       = "https://noteforms.com/forms/beta-user-tracker-conciergesync-b4yxaf";
+  const S1_EMAIL_KEY = "aafd8404-ef8a-4b17-ab3d-15e2357e93a5";
+  const S1_UID_KEY   = "78ddd51d-9ccb-4fc7-a3cd-d17f7cd37ff4";
+  const EXTRA_PARAM  = "b4eb726e-c3f1-41ab-bce2-61c3d3752b3c=0";
+
+  function goToSection1(user){
+    const email = user?.email, uid = user?.uid;
+    if(!email || !uid){ alert("Signed in, but missing email or UID."); return; }
+    const url = `${S1_URL}?${S1_EMAIL_KEY}=${encodeURIComponent(email)}&${EXTRA_PARAM}&${S1_UID_KEY}=${encodeURIComponent(uid)}`;
+    window.location.replace(url);
+  }
+
+  // Auto-forward returning users (skip the form if they’re already logged in)
+  onAuthStateChanged(auth, (user) => {
+    if (user) goToSection1(user);
+  });
+
+  // ------- Login -------
+  document.getElementById('btnLogin')?.addEventListener('click', async () => {
+    const email = document.getElementById('loginEmail')?.value.trim();
+    const password = document.getElementById('loginPassword')?.value;
+    if (!email || !password) return alert("Email and password are required.");
+    try {
+      const res = await signInWithEmailAndPassword(auth, email, password);
+      goToSection1(res.user);
+    } catch (err) {
+      console.error(err);
+      alert("Login failed. Check your email/password and try again.");
+    }
+  });
+
+  // ------- Register -------
+  document.getElementById('btnCreate')?.addEventListener('click', async () => {
+    const first = document.getElementById('regFirst')?.value.trim();
+    const last  = document.getElementById('regLast')?.value.trim();
+    const email = document.getElementById('regEmail')?.value.trim();
+    const password = document.getElementById('regPassword')?.value;
+    const agreed = document.getElementById('agreeTos')?.checked;
+    if (!email || !password) return alert("Email and password are required.");
+    if (!agreed) return alert("Please agree to the Terms & Privacy.");
+
+    try {
+      const res = await createUserWithEmailAndPassword(auth, email, password);
+      // Optional: set display name
+      const displayName = [first, last].filter(Boolean).join(' ').trim();
+      if (displayName) { try { await updateProfile(res.user, { displayName }); } catch(_) {} }
+      goToSection1(res.user);
+    } catch (err) {
+      console.error(err);
+      alert(err?.message || "Could not create account.");
+    }
+  });
+</script>
+
 </body>
 </html>
