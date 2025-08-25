@@ -196,26 +196,33 @@
   </main>
 
   <script>
-    // Keep whichever background was last set during auth; fallback to default.
-    const savedBg = localStorage.getItem('cs_bg_src') || '/beta/assets/bg/IMG_5374.jpeg';
-    const bgEl = document.querySelector('.cs-bg');
-    if (bgEl) bgEl.style.backgroundImage = `url(${savedBg})`;
+  // Keep whichever background was last set during auth; fallback to default.
+  const savedBg = localStorage.getItem('cs_bg_src') || '/beta/assets/bg/IMG_5374.jpeg';
+  const bgEl = document.querySelector('.cs-bg');
+  if (bgEl) bgEl.style.backgroundImage = `url(${savedBg})`;
 
-    // Carry uid/email to the console.
-    (function(){
-      const params = new URLSearchParams(location.search);
-      const uid   = params.get('uid')   || '';
-      const email = params.get('email') || '';
+  // Build Enter Console URL and mark session authed on click
+  (function(){
+    const btn = document.getElementById('enterBtn');
+    if (!btn) return;
 
-      const qp = new URLSearchParams({ enter: '1' });
-      if (uid)   qp.set('uid', uid);
-      if (email) qp.set('email', email);
+    // carry params forward
+    const p  = new URLSearchParams(location.search);
+    const qp = new URLSearchParams({ enter: '1' });
+    ['uid','email','open'].forEach(k => { const v = p.get(k); if (v) qp.set(k, v); });
 
-      const btn = document.getElementById('enterBtn');
-      const CONSOLE_URL = '/beta/01.index.html'; // adjust if your console path differs
-      if (btn) btn.href = `${CONSOLE_URL}?${qp.toString()}`;
-    })();
-  </script>
+    // set target
+    btn.href = '/beta/02-console.html?' + qp.toString();
+
+    // mark authed so console won't bounce to auth.html
+    btn.addEventListener('click', () => {
+      sessionStorage.setItem('cs_authed','1');
+      localStorage.setItem('cs_authed','1'); // optional persistence
+      document.cookie = "cs_auth=1; path=/; max-age=7200; SameSite=Lax";
+    });
+  })();
+</script>
+
 <script>
 (function () {
   const btn = document.getElementById('enterBtn');
@@ -225,7 +232,7 @@
   const qp = new URLSearchParams({ enter: '1' });
   ['uid','email','open'].forEach(k => { const v = p.get(k); if (v) qp.set(k, v); });
 
-  btn.href = '/beta/01-index.html?' + qp.toString();
+  btn.href = '/beta/02-console.html?' + qp.toString();
 })();
 </script>
 
