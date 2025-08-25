@@ -1,6 +1,25 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  
+  <style>
+  body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif;color:#fff}
+  .cs-bg{position:fixed;inset:0;background:center/cover no-repeat;filter:brightness(1.1) contrast(1.05)}
+  .cs-ov{position:fixed;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,.35),rgba(0,0,0,.6))}
+  .cs-tile{
+    position:relative;z-index:1;max-width:960px;margin:6vh auto;padding:22px;
+    background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.28);
+    border-radius:18px;backdrop-filter:blur(14px) saturate(1.2);-webkit-backdrop-filter:blur(14px) saturate(1.2);
+    box-shadow:0 20px 60px rgba(0,0,0,.35);
+  }
+  .btn{
+    display:inline-block;margin-top:14px;padding:12px 16px;border-radius:12px;
+    border:1px solid rgba(255,255,255,.35);background:rgba(0,0,0,.35);color:#fff;
+    text-decoration:none;font-weight:700
+  }
+  .btn:hover{background:rgba(0,0,0,.5);border-color:rgba(255,255,255,.6)}
+</style>
+
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>ConciergeSync™ • Onboarding Complete</title>
@@ -159,6 +178,10 @@
 </head>
 <body>
   <main class="wrap">
+    <div class="cs-bg"></div>
+    <div class="cs-ov"></div>
+    <div class="cs-tile">
+
     <section class="card">
       <span class="ribbon" aria-label="Profile complete badge"><span class="dot"></span>Profile 100% Complete • Beta User Client</span>
       <h1>🎉 Onboarding Complete</h1>
@@ -200,31 +223,15 @@
   allowfullscreen
 ></iframe>
 
+
+  <a class="btn" href="/beta/01-index.html">Enter Console</a>
+</div> <!-- /.cs-tile -->
+
 <script>
-  // Extract the user's unique ID from the URL query string
-  const urlParams = new URLSearchParams(window.location.search);
-  const bucId = urlParams.get('id');  // e.g., "0007"
-
-  // Map BUC IDs to filenames
-  const dashboardMap = {
-    "0001": "Lindsay-BUC-0001.pdf",
-    "0002": "Misha-BUC-0002.pdf",
-    "0003": "Brett-BUC-0003.pdf",
-    "0004": "Athena-BUC-0004.pdf",
-    "0005": "Kendall-BUC-0005.pdf",
-    "0006": "Alin-BUC-0006.pdf",
-    "0007": "Iryna-BUC-0007.pdf",
-    "0008": "Jeffrey-BUC-0008.pdf"
-  };
-
-  const filename = dashboardMap[bucId] || "placeholder.txt";
-  const dashboardPath = `/beta/buc_dashboards/${filename}`;
-
-  // Set iframe src if valid
-  document.getElementById("buc-dashboard").src = dashboardPath;
+  // Reuse whatever background was set on auth; fallback to a default image.
+  const savedBg = localStorage.getItem('cs_bg_src') || '/beta/assets/bg/IMG_5374.jpeg';
+  document.querySelector('.cs-bg').style.backgroundImage = `url(${savedBg})`;
 </script>
-
-
 
 </body>
 </html>
