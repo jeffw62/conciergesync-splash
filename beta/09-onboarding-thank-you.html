@@ -191,7 +191,7 @@
         <p>We’re preparing your <strong>personalized insights</strong> based on everything you shared. We’ll let you know the moment they’re ready — it won’t be long.</p>
       </div>
 
-      <a id="enterBtn" class="btn" href="/beta/01-index.html">Enter Console</a>
+      <a id="enterBtn" class="btn" href="#">Enter Console</a>
     </section>
   </main>
 
@@ -216,5 +216,18 @@
       if (btn) btn.href = `${CONSOLE_URL}?${qp.toString()}`;
     })();
   </script>
+<script>
+(function () {
+  const btn = document.getElementById('enterBtn');
+  if (!btn) return;
+
+  const p  = new URLSearchParams(location.search);
+  const qp = new URLSearchParams({ enter: '1' });
+  ['uid','email','open'].forEach(k => { const v = p.get(k); if (v) qp.set(k, v); });
+
+  btn.href = '/beta/01-index.html?' + qp.toString();
+})();
+</script>
+
 </body>
 </html>
