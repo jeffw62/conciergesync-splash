@@ -100,22 +100,7 @@
     }
   </style>
 <style>
-  /* Auth layout */
-  #viewLogin, #viewRegister{
-    max-width: 480px;         /* controls field length */
-    margin: 18px auto 0;      /* center the form */
-    text-align: left;
-  }
-
-  /* Labels */
-  #viewLogin label, #viewRegister label{
-    display:block;
-    margin: 12px 0 6px;
-    font-weight: 600;
-    letter-spacing:.2px;
-  }
-
-  /* Inputs (email + password) */
+  /* Glass inputs */
   #viewLogin input[type="email"],
   #viewLogin input[type="password"],
   #viewRegister input[type="email"],
@@ -125,42 +110,51 @@
     height: 44px;
     padding: 10px 14px;
     border-radius: 12px;
-    border: 1px solid rgba(0,0,0,.12);
-    background: rgba(255,255,255,.92);
-    outline: none;
-    box-shadow: 0 2px 8px rgba(0,0,0,.06) inset;
-  }
-
-  /* Login / Create buttons */
-  #btnLogin, #btnCreate{
-    width: 100%;
-    height: 46px;
-    margin-top: 14px;
-    border: 0;
-    border-radius: 12px;
-    background: #111;              /* matches your CTA */
+    border: 1px solid rgba(255,255,255,0.35);
+    background: rgba(255,255,255,0.12);     /* translucent glass */
     color: #fff;
+    backdrop-filter: blur(10px) saturate(1.1);
+    -webkit-backdrop-filter: blur(10px) saturate(1.1);
+    box-shadow: 0 2px 8px rgba(0,0,0,.18) inset;
+  }
+  /* Placeholder + focus */
+  #viewLogin input::placeholder,
+  #viewRegister input::placeholder{ color: rgba(255,255,255,.75); }
+  #viewLogin input:focus,
+  #viewRegister input:focus{
+    outline: none;
+    border-color: rgba(255,255,255,0.9);
+    box-shadow:
+      0 0 0 3px rgba(255,255,255,0.18) inset,
+      0 6px 18px rgba(0,0,0,.28);
+  }
+  /* Labels contrast on the hero background */
+  #viewLogin label, #viewRegister label{
+    color: #fff;
+    text-shadow: 0 1px 1px rgba(0,0,0,.28);
+    font-weight: 600;
+  }
+
+  /* Make the “Register here” pop as a glassy secondary CTA */
+  #linkShowRegister{
+    display: block;
+    text-align: center;
+    margin-top: 12px;
+    padding: 10px 14px;
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,0.55);
+    background: rgba(0,0,0,0.28);
+    color: #fff !important;
+    text-decoration: none;
     font-weight: 700;
+    backdrop-filter: blur(8px) saturate(1.1);
+    -webkit-backdrop-filter: blur(8px) saturate(1.1);
     box-shadow: 0 6px 16px rgba(0,0,0,.18);
-    cursor: pointer;
   }
-  #btnLogin:hover, #btnCreate:hover{
+  #linkShowRegister:hover{
+    background: rgba(0,0,0,0.4);
+    border-color: rgba(255,255,255,0.75);
     transform: translateY(-1px);
-    box-shadow: 0 10px 22px rgba(0,0,0,.22);
-  }
-
-  /* Small link row under buttons */
-  #viewLogin a, #viewRegister a{
-    display:inline-block;
-    margin-top:10px;
-    text-decoration: underline;
-  }
-
-  /* Optional: tighten the big hero title duplication */
-  #viewLogin h1, #viewRegister h1{
-    font-size: 24px;
-    margin: 6px 0 8px;
-    text-align:left;
   }
 </style>
 
