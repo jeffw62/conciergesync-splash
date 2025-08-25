@@ -50,6 +50,20 @@
   color:#fff !important;
   border: 1px solid rgba(255,255,255,0.28) !important;
 }
+/* Kill inner borders; keep only the outer cs-tile frame */
+.card,
+.preview,
+.sneak,
+.dashboard-preview {
+  border: none !important;
+}
+
+/* Keep a subtle inner “glass glow” so text still reads crisply */
+.card{
+  box-shadow:
+    0 20px 60px rgba(0,0,0,.35),
+    0 0 0 1px rgba(255,255,255,.06) inset !important;
+}
 
 </style>
 
