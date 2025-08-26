@@ -1,254 +1,222 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Sign in — ConciergeSync™</title>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Sign in — ConciergeSync™</title>
+  <style>
+    :root{
+      --glass: rgba(15,15,18,.36);
+      --glass-b: rgba(255,255,255,.22);
+      --ink: #eef2f8;
+      --muted: #cbd5e1;
+      --accent: #fff;
+      --danger-bg: rgba(190, 18, 60, .18);
+      --danger-b:  rgba(244, 63, 94, .55);
+      --danger-ink:#ffeef1;
+      --radius: 16px;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family: system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif;
+      color:var(--ink);
+      background:#0b0f14;
+    }
 
-<style>
-  :root{
-    --glass-bg: rgba(0,0,0,.38);
-    --glass-border: rgba(255,255,255,.22);
-    --ui: 6000;
-    --ink: #eef2f8;
-    --muted: #c9d2e1;
-    --brand: #ffffff;
-    --btn-bg: #ffffff;
-    --btn-ink:#111;
-    --btn-ring: rgba(255,255,255,.55);
-    --danger: #7a1f24;
-    --danger-bg: rgba(122,31,36,.22);
-    --ease: cubic-bezier(.22,1,.36,1);
-  }
+    /* Backdrop */
+    .backdrop{position:fixed; inset:0; z-index:0; overflow:hidden}
+    .backdrop::before{
+      content:"";
+      position:absolute; inset:0;
+      background:url("/beta/assets/bg/IMG_5374.jpeg") center/cover no-repeat;
+      filter:brightness(1.12) contrast(1.05);
+      transform:scale(1.03);
+    }
 
-  *{box-sizing:border-box}
-  html,body{height:100%}
-  body{
-    margin:0;
-    font-family: system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif;
-    color:var(--ink);
-    background:#0b0f14;
-  }
+    /* Card */
+    .wrap{position:relative; z-index:1; min-height:100%;}
+    .card{
+      width:min(880px, 92vw);
+      margin: clamp(48px, 12vh, 120px) auto 40px;
+      background:var(--glass);
+      border:1px solid var(--glass-b);
+      border-radius:var(--radius);
+      backdrop-filter: blur(12px) saturate(1.12);
+      box-shadow:0 14px 50px rgba(0,0,0,.35);
+      padding:28px;
+    }
+    h1{
+      margin:0 0 10px;
+      font-size:clamp(26px, 3.4vw, 40px);
+      line-height:1.2;
+      letter-spacing:.2px;
+    }
+    .sub{color:var(--muted); margin:0 0 14px; font-weight:600}
 
-  /* Backdrop */
-  .backdrop{position:fixed; inset:0; z-index:0; overflow:hidden;}
-  .backdrop-image{
-    position:absolute; inset:0;
-    background:url("/beta/assets/bg/IMG_5374.jpeg") center/cover no-repeat;
-    filter:brightness(1.1) contrast(1.04);
-    transform:scale(1.02);
-  }
+    .row{display:flex; gap:12px; align-items:center}
+    .email{
+      flex:1 1 auto;
+      height:46px;
+      border-radius:12px;
+      padding:0 14px;
+      border:1px solid rgba(255,255,255,.22);
+      background:rgba(255,255,255,.08);
+      color:#fff;
+      outline:none;
+      font-size:16px;
+    }
+    .email::placeholder{color:#cbd5e1}
+    .cta{
+      height:46px;
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,.55);
+      background:#fff; color:#111;
+      font-weight:800; padding:0 16px; cursor:pointer;
+      white-space:nowrap;
+    }
 
-  /* Auth wrap/card */
-  .auth-wrap{position:fixed; inset:0; display:grid; place-items:center; z-index:var(--ui); padding:24px;}
-  .auth-card{
-    width:min(680px, 92vw);
-    backdrop-filter: blur(10px) saturate(1.15);
-    background:var(--glass-bg);
-    border:1px solid var(--glass-border);
-    border-radius:18px;
-    box-shadow:0 24px 64px rgba(0,0,0,.35);
-    padding:22px 22px 18px;
-  }
+    /* inline warning */
+    .warn{
+      display:none;
+      margin:10px 0 12px;
+      padding:10px 12px;
+      border-radius:10px;
+      background:var(--danger-bg);
+      border:1px solid var(--danger-b);
+      color:var(--danger-ink);
+      font-weight:700;
+    }
+    .warn.show{display:block}
 
-  h1{
-    margin:0 0 12px;
-    font-size: clamp(26px, 4.2vw, 34px);
-    line-height:1.15;
-    font-weight:900;
-    letter-spacing:.2px;
-  }
-  .hint{color:var(--muted); margin:0 0 14px; font-weight:600}
+    /* bottom actions */
+    .actions{
+      display:flex; gap:12px; margin-top:12px; flex-wrap:wrap;
+    }
+    .btn{
+      flex:1 1 280px;
+      display:inline-flex; align-items:center; justify-content:center;
+      height:44px; border-radius:12px;
+      border:1px solid rgba(255,255,255,.35);
+      background:rgba(255,255,255,.08);
+      color:#fff; font-weight:800; cursor:pointer; text-decoration:none;
+    }
+    .btn:hover{background:rgba(255,255,255,.14)}
+    .btn.primary{background:#fff; color:#111; border-color:#fff}
 
-  /* Form grid: input + submit on one row */
-  .row-input{
-    display:grid;
-    grid-template-columns: 1fr auto;
-    gap:10px;
-    align-items:center;
-  }
-  .email{
-    height:44px;
-    width:100%;
-    border-radius:12px;
-    border:1px solid rgba(255,255,255,.28);
-    background: rgba(255,255,255,.08);
-    color:#fff;
-    padding:0 14px;
-    font-size:16px;
-    outline:none;
-  }
-  .email::placeholder{color:rgba(255,255,255,.65)}
-  .email:focus{box-shadow:0 0 0 2px rgba(255,255,255,.25) inset}
-
-  .btn{
-    display:inline-flex; align-items:center; justify-content:center;
-    height:44px; padding:0 16px;
-    border-radius:12px; border:1px solid var(--btn-ring);
-    font-weight:800; letter-spacing:.2px; cursor:pointer;
-    user-select:none; text-decoration:none;
-    transition: transform .06s var(--ease), box-shadow .12s var(--ease), background .12s var(--ease);
-  }
-  .btn:active{transform:translateY(1px)}
-  .btn-primary{background:var(--btn-bg); color:var(--btn-ink); border-color:#fff;}
-  .btn-ghost{background:transparent; color:#fff;}
-  .btn-ghost:hover{background:rgba(255,255,255,.08)}
-  .btn-primary:hover{box-shadow:0 8px 18px rgba(0,0,0,.22)}
-
-  /* Error directly under input (spans grid) */
-  .error{
-    grid-column: 1 / -1;
-    display:none;
-    margin:8px 0 0;
-    background: var(--danger-bg);
-    color:#fff;
-    border:1px solid rgba(255,255,255,.22);
-    border-radius:10px;
-    padding:10px 12px;
-    font-weight:700;
-  }
-  .error.show{display:block}
-
-  /* Bottom actions row */
-  .row-actions{
-    margin-top:14px;
-    display:grid;
-    grid-template-columns: 1fr 1fr;
-    gap:10px;
-  }
-  .row-actions .btn{
-    height:42px;
-    line-height:42px; /* optical center */
-  }
-
-  /* Small screens: stack actions */
-  @media (max-width:560px){
-    .row-input{grid-template-columns:1fr}
-    .row-actions{grid-template-columns:1fr}
-  }
-</style>
+    .hint{color:var(--muted); font-size:14px; margin-top:6px}
+  </style>
 </head>
 <body>
 
-  <div class="backdrop" aria-hidden="true">
-    <div class="backdrop-image"></div>
-  </div>
+  <div class="backdrop" aria-hidden="true"></div>
 
-  <main class="auth-wrap">
-    <section class="auth-card" role="dialog" aria-modal="true" aria-labelledby="t">
+  <main class="wrap">
+    <section class="card" role="dialog" aria-modal="true" aria-labelledby="t">
       <h1 id="t">Sign in to ConciergeSync™</h1>
-      <p class="hint">Enter your email (and password if enabled) to continue to your console.</p>
+      <p class="sub">Enter your email (and password if enabled) to continue to your console.</p>
 
-      <form id="authForm" class="row-input" novalidate>
-        <input id="email" class="email" type="email" autocomplete="email"
-               placeholder="you@example.com" required/>
-        <button id="enterBtn" class="btn btn-primary" type="submit">Enter Console</button>
-
-        <div id="errorBox" class="error" role="alert">
-          That email wasn’t recognized. If you’re new, tap “I’m new — Join the beta.”
-        </div>
-      </form>
-
-      <div class="row-actions">
-        <a id="whatsBtn" class="btn btn-ghost" href="/beta/what-is.html">What is ConciergeSync?</a>
-        <a id="joinBtn"  class="btn btn-ghost" href="/beta/02-agree.html">I’m new — Join the beta</a>
+      <div class="row" style="margin:10px 0 6px;">
+        <input id="email" class="email" type="email" inputmode="email" autocomplete="email"
+               placeholder="you@example.com" />
+        <button id="enter" class="cta">Enter Console</button>
       </div>
+
+      <div id="warn" class="warn" role="alert">
+        That email wasn’t recognized. If you’re new, tap “I’m new — Join the beta.”
+      </div>
+
+      <div class="actions">
+        <a id="what" class="btn" href="/beta/whatis.html">What is ConciergeSync?</a>
+        <a id="new"  class="btn" href="/beta/02-agree.html">I’m new — Join the beta</a>
+      </div>
+
+      <div class="hint">No bank logins required.</div>
     </section>
   </main>
 
-<script>
-(function(){
-  // ---------- allowlist wiring ----------
-  // Priority 1: window.CS_ALLOWLIST (if you set it elsewhere)
-  // Priority 2: /beta/allowlist.json (optional file of ["email@x.com", ...])
-  // Priority 3: localStorage 'cs_allowlist' (comma-separated)
-  // Fallback: empty (every email is "new")
+  <script>
+  (function(){
+    // ——— helpers
+    const $ = (s,p=document)=>p.querySelector(s);
+    const emailInput = $('#email');
+    const warn = $('#warn');
+    const enterBtn = $('#enter');
 
-  const state = { allow: new Set() };
+    // Prefill from ?email=
+    const qs = new URLSearchParams(location.search);
+    if (qs.get('email')) emailInput.value = (qs.get('email')||'').trim();
 
-  // Load from localStorage (optional)
-  try{
-    const raw = localStorage.getItem('cs_allowlist');
-    if (raw) raw.split(',').map(s=>s.trim().toLowerCase()).filter(Boolean).forEach(x=>state.allow.add(x));
-  }catch(_){}
+    // Build the "known" set
+    function getKnownEmails(){
+      const known = new Set();
 
-  // From global injection (optional)
-  if (Array.isArray(window.CS_ALLOWLIST)) {
-    window.CS_ALLOWLIST.map(s=>String(s||'').toLowerCase()).forEach(x=>state.allow.add(x));
-  }
+      // Saved during previous sessions (don’t clear this on logout)
+      const saved = (localStorage.getItem('cs_email') || '').trim().toLowerCase();
+      if (saved) known.add(saved);
 
-  // Optional remote file (fails silently if missing)
-  try{
-    fetch('/beta/allowlist.json', {cache:'no-store'}).then(r=>{
-      if (!r.ok) return;
-      r.json().then(list=>{
-        if (Array.isArray(list)) {
-          list.map(s=>String(s||'').toLowerCase()).forEach(x=>state.allow.add(x));
-        }
-      }).catch(()=>{});
-    }).catch(()=>{});
-  }catch(_){}
+      // Optional list you/JS add: localStorage.cs_known_emails = '["a@x.com","b@y.com"]'
+      try {
+        const arr = JSON.parse(localStorage.getItem('cs_known_emails') || '[]');
+        arr.forEach(e => { if (e) known.add(String(e).toLowerCase()); });
+      } catch(_) {}
 
-  const form     = document.getElementById('authForm');
-  const emailEl  = document.getElementById('email');
-  const errorBox = document.getElementById('errorBox');
-  const joinBtn  = document.getElementById('joinBtn');
+      // DEV convenience: allow your own domain (remove if you don’t want this)
+      known.add('@conciergesync.ai'); // domain marker, handled specially
 
-  // Keep join link carrying the typed email
-  const syncJoinHref = () => {
-    const e = (emailEl.value||'').trim();
-    const url = new URL('/beta/02-agree.html', location.origin);
-    if (e) url.searchParams.set('email', e);
-    joinBtn.href = url.pathname + url.search;
-  };
-  emailEl.addEventListener('input', syncJoinHref);
-  syncJoinHref();
-
-  function isKnown(email){
-    return state.allow.has(email.toLowerCase());
-  }
-
-  function goConsole(email){
-    try{
-      sessionStorage.setItem('cs_authed','1');
-      localStorage.setItem('cs_authed','1');
-      localStorage.setItem('cs_email', email);
-      document.cookie = "cs_auth=1; path=/; max-age=7200; SameSite=Lax";
-    }catch(_){}
-    const url = new URL('/beta/01-index.html', location.origin);
-    url.searchParams.set('enter','1');
-    url.searchParams.set('open','overview');
-    url.searchParams.set('email', email);
-    location.assign(url.pathname + url.search);
-  }
-
-  form.addEventListener('submit', (e)=>{
-    e.preventDefault();
-
-    const email = (emailEl.value||'').trim();
-    if (!email || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
-      errorBox.textContent = 'Enter a valid email address to continue.';
-      errorBox.classList.add('show');
-      emailEl.focus();
-      return;
+      return known;
     }
 
-    // Recognized?
-    if (isKnown(email)) {
-      errorBox.classList.remove('show');
-      goConsole(email);
-      return;
+    function isRecognized(input){
+      const e = (input||'').trim().toLowerCase();
+      if (!e) return false;
+
+      const known = getKnownEmails();
+      if (known.has(e)) return true;
+
+      // allow domain rule
+      if (known.has('@conciergesync.ai') && /@conciergesync\.ai$/i.test(e)) return true;
+
+      return false;
     }
 
-    // Unknown → show inline message and keep them here.
-    errorBox.textContent = 'That email wasn’t recognized. If you’re new, tap “I’m new — Join the beta.”';
-    errorBox.classList.add('show');
-    syncJoinHref();
-  });
+    function authAndEnter(email){
+      // Persist who signed in (used by 01-index.html etc.)
+      try {
+        localStorage.setItem('cs_email', email);
+        sessionStorage.setItem('cs_authed', '1');
+        localStorage.setItem('cs_authed', '1');
+        document.cookie = "cs_auth=1; path=/; max-age=7200; SameSite=Lax";
+      } catch(_){}
 
-  // Pressing Enter inside the email field submits; handled above.
+      // Navigate straight into the console
+      location.assign('/beta/01-index.html?enter=1');
+    }
 
-})();
-</script>
+    function showWarn(){
+      warn.classList.add('show');
+      warn.scrollIntoView({behavior:'smooth', block:'nearest'});
+    }
+
+    enterBtn.addEventListener('click', (e)=>{
+      e.preventDefault();
+      const eaddr = emailInput.value.trim();
+      if (isRecognized(eaddr)) {
+        authAndEnter(eaddr.toLowerCase());
+      } else {
+        showWarn();
+      }
+    });
+
+    // Enter key on the input triggers the same flow
+    emailInput.addEventListener('keydown', (e)=>{
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        enterBtn.click();
+      }
+    });
+  })();
+  </script>
 </body>
 </html>
