@@ -29,7 +29,7 @@
 
   /* Slim form column */
   .form{width:min(480px, 92vw); margin:0 auto; display:grid; gap:10px}
-  .nameRow{ display:grid; grid-template-columns:1fr 1fr; gap:32px; } /* keep your 32px */
+  .nameRow{ display:grid; grid-template-columns:1fr 1fr; gap:32px; } /* your 32px */
   .nameRow > div{ min-width:0; }
   label{font-size:12px;color:#dbe2ee}
   input[type="text"],input[type="email"]{
@@ -45,6 +45,8 @@
     color:#111;font-weight:800;border:1px solid #fff;background:#fff;cursor:pointer;font-size:14px
   }
   .muted{color:#cdd3dd; font-size:12px; margin-top:10px}
+  .status{color:#cdd3dd; font-size:12px; margin-top:8px; display:none}
+  .status.show{display:block}
   @media (max-width:560px){ .nameRow{grid-template-columns:1fr; gap:12px} }
 </style>
 </head>
@@ -94,106 +96,191 @@
           <button id="doSubmit" type="submit">Create account</button>
         </div>
 
+        <div id="status" class="status">Working…</div>
         <div class="muted">Protected by rate-limiting and verification. We’ll never share your email.</div>
       </form>
     </div>
   </div>
 
-<script>
-  // Background: last chosen, or default wing
+<!-- Firebase + gate logic -->
+<script type="module">
+  // ——— Background: last chosen, or default wing
   (function(){
-    var src = localStorage.getItem('cs_bg_src') || '/beta/assets/bg/IMG_5374.jpeg';
+    const src = localStorage.getItem('cs_bg_src') || '/beta/assets/bg/IMG_5374.jpeg';
     document.getElementById('bg').style.backgroundImage = 'url(' + src + ')';
   })();
 
-  (function(){
-    const $ = s => document.querySelector(s);
-    const mode = { value: 'register' };
+  // ——— Firebase Web SDK (v9+ modular)
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getFirestore, doc, getDoc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-    const tabLogin = $('#tabLogin'), tabReg = $('#tabReg');
-    const nameRow = $('#nameRow'), agreeRow = $('#agreeRow');
-    const first = $('#first'), last = $('#last'), email = $('#email'), agree = $('#agree');
-    const errFirst = $('#errFirst'), errLast = $('#errLast'), errEmail = $('#errEmail'), errAgree = $('#errAgree');
-    const form = $('#gate'), submitBtn = $('#doSubmit');
+  // TODO: 🔧 paste your real Firebase config here
+  const firebaseConfig = {
+  apiKey: "AIzaSyCcqBQtV3e1hGRMzBa_k5trNRqL0UmlByE",
+  authDomain: "conciergesync.firebaseapp.com",
+  projectId: "conciergesync",
+  storageBucket: "conciergesync.appspot.com",   // ← corrected
+  messagingSenderId: "882907448780",
+  appId: "1:882907448780:web:6e797ce9ad5bb84a9f8969"
+};
 
-    // start clean
-    [first,last,email].forEach(i => { try{ i.value=''; }catch{} });
+  // Init Firebase
+  let app, db;
+  try {
+    app = initializeApp(firebaseConfig);
+    db  = getFirestore(app);
+  } catch (e) {
+    console.warn("Firebase init error:", e);
+  }
 
-    function validEmail(v){ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v); }
-    function hide(el){ el.style.display='none'; }
-    function show(el){ el.style.display='block'; }
-    function clearErrors(){
-      [first,last,email].forEach(i=>i.setAttribute('aria-invalid','false'));
-      [errFirst,errLast,errEmail,errAgree].forEach(hide);
-    }
+  // ——— Gate UI + Firestore integration
+  const $ = s => document.querySelector(s);
+  const mode = { value: 'register' };
 
-    function applyRequireds(){
-      const login = mode.value === 'login';
-      email.required = true;
-      first.required = !login;
-      last.required  = !login;
-      agree.required = !login;
-    }
+  const tabLogin = $('#tabLogin'), tabReg = $('#tabReg');
+  const nameRow = $('#nameRow'), agreeRow = $('#agreeRow');
+  const first = $('#first'), last = $('#last'), email = $('#email'), agree = $('#agree');
+  const errFirst = $('#errFirst'), errLast = $('#errLast'), errEmail = $('#errEmail'), errAgree = $('#errAgree');
+  const form = $('#gate'), submitBtn = $('#doSubmit'), statusEl = $('#status');
 
-    function setMode(m){
-      mode.value = m;
-      const login = m === 'login';
-      tabLogin.classList.toggle('is-active', login);
-      tabReg.classList.toggle('is-active', !login);
-      tabLogin.setAttribute('aria-selected', login);
-      tabReg.setAttribute('aria-selected', !login);
-      nameRow.style.display = login ? 'none' : 'grid';
-      agreeRow.style.display = login ? 'none' : 'block';
-      submitBtn.textContent = login ? 'Log in' : 'Create account';
-      [first,last].forEach(i => i.value='');
-      clearErrors();
-      applyRequireds();
-    }
+  // Force blank values on load (defense vs restore)
+  [first,last,email].forEach(i => { try{ i.value=''; }catch{} });
 
-    tabLogin.addEventListener('click', ()=> setMode('login'));
-    tabReg.addEventListener('click',   ()=> setMode('register'));
-    applyRequireds(); // initialize for default register mode
+  function validEmail(v){ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v); }
+  function hide(el){ el.style.display='none'; }
+  function show(el){ el.style.display='block'; }
+  function clearErrors(){
+    [first,last,email].forEach(i=>i.setAttribute('aria-invalid','false'));
+    [errFirst,errLast,errEmail,errAgree].forEach(hide);
+    statusEl.classList.remove('show');
+  }
+  function setWorking(on){
+    submitBtn.disabled = on;
+    submitBtn.style.opacity = on ? .7 : 1;
+    statusEl.textContent = on ? 'Working…' : '';
+    statusEl.classList.toggle('show', on);
+  }
 
-    ['input','change'].forEach(evt=>{
-      [first,last,email,agree].forEach(el => el.addEventListener(evt, clearErrors));
-    });
+  function applyRequireds(){
+    const login = mode.value === 'login';
+    email.required = true;
+    first.required = !login;
+    last.required  = !login;
+    agree.required = !login;
+  }
 
-    function validate(){
-      clearErrors();
-      let ok = true, focusEl = null;
+  function setMode(m){
+    mode.value = m;
+    const login = m === 'login';
+    tabLogin.classList.toggle('is-active', login);
+    tabReg.classList.toggle('is-active', !login);
+    tabLogin.setAttribute('aria-selected', login);
+    tabReg.setAttribute('aria-selected', !login);
+    nameRow.style.display = login ? 'none' : 'grid';
+    agreeRow.style.display = login ? 'none' : 'block';
+    submitBtn.textContent = login ? 'Log in' : 'Create account';
+    [first,last].forEach(i => i.value='');
+    clearErrors();
+    applyRequireds();
+  }
+  tabLogin.addEventListener('click', ()=> setMode('login'));
+  tabReg.addEventListener('click',   ()=> setMode('register'));
+  applyRequireds(); // init
 
-      const e = email.value.trim();
-      if(!validEmail(e)){ ok=false; show(errEmail); email.setAttribute('aria-invalid','true'); focusEl = focusEl || email; }
+  ['input','change'].forEach(evt=>{
+    [first,last,email,agree].forEach(el => el.addEventListener(evt, clearErrors));
+  });
 
-      if(mode.value !== 'login'){
-        if(!first.value.trim()){ ok=false; show(errFirst); first.setAttribute('aria-invalid','true'); focusEl = focusEl || first; }
-        if(!last.value.trim()){  ok=false; show(errLast);  last.setAttribute('aria-invalid','true');  focusEl = focusEl || last; }
-        if(!agree.checked){ ok=false; show(errAgree); focusEl = focusEl || agree; }
+  function goConsole(){
+    try{
+      localStorage.setItem('cs_authed','1');
+      sessionStorage.setItem('cs_authed','1');
+    }catch{}
+    location.replace('/beta/01-index.html?enter=1');
+  }
+
+  async function handleLogin(emailStr){
+    const key = emailStr.toLowerCase().trim();
+    if (!db){ show(errEmail); errEmail.textContent = 'Cannot reach database. Check Firebase config.'; return; }
+
+    setWorking(true);
+    try{
+      const ref = doc(db, 'beta_users', key);
+      const snap = await getDoc(ref);
+      if (snap.exists()){
+        setWorking(false);
+        goConsole();
+      } else {
+        setWorking(false);
+        show(errEmail);
+        errEmail.textContent = 'We couldn’t find that email. Please register first.';
+        email.setAttribute('aria-invalid','true');
+        email.focus();
       }
-
-      if(!ok && focusEl){ try{ focusEl.focus(); }catch{} }
-      return ok;
+    }catch(e){
+      console.warn(e);
+      setWorking(false);
+      show(errEmail);
+      errEmail.textContent = 'Login unavailable (rules or network).';
+      email.setAttribute('aria-invalid','true');
     }
+  }
 
-    function goConsole(){
-      try{
-        localStorage.setItem('cs_authed','1');
-        sessionStorage.setItem('cs_authed','1');
-      }catch{}
-      location.replace('/beta/01-index.html?enter=1');
+  async function handleRegister(firstStr,lastStr,emailStr){
+    const key = emailStr.toLowerCase().trim();
+    if (!db){ show(errEmail); errEmail.textContent = 'Cannot reach database. Check Firebase config.'; return; }
+
+    setWorking(true);
+    try{
+      const ref = doc(db, 'beta_users', key);
+      await setDoc(ref, {
+        first: firstStr.trim(),
+        last:  lastStr.trim(),
+        email: key,
+        agreed: !!agree.checked,
+        updatedAt: serverTimestamp(),
+        createdAt: serverTimestamp()
+      }, { merge: true });
+
+      setWorking(false);
+      goConsole();
+    }catch(e){
+      console.warn(e);
+      setWorking(false);
+      show(errEmail);
+      errEmail.textContent = 'Registration unavailable (rules or network).';
+      email.setAttribute('aria-invalid','true');
     }
+  }
 
-    // Submit via both the form and the button (belt + suspenders)
-    form.addEventListener('submit', (ev) => {
-      ev.preventDefault();
-      if(validate()) goConsole();
-    });
-    submitBtn.addEventListener('click', (ev) => {
-      ev.preventDefault();
-      // in case the button lost 'type=submit' via future edits
-      if(validate()) goConsole();
-    });
-  })();
+  function validate(){
+    clearErrors();
+    let ok = true, focusEl = null;
+    const e = email.value.trim();
+
+    if(!validEmail(e)){ ok=false; show(errEmail); errEmail.textContent='Please enter a valid email address.'; email.setAttribute('aria-invalid','true'); focusEl = focusEl || email; }
+
+    if(mode.value !== 'login'){
+      if(!first.value.trim()){ ok=false; show(errFirst); first.setAttribute('aria-invalid','true'); focusEl = focusEl || first; }
+      if(!last.value.trim()){  ok=false; show(errLast);  last.setAttribute('aria-invalid','true');  focusEl = focusEl || last; }
+      if(!agree.checked){ ok=false; show(errAgree); focusEl = focusEl || agree; }
+    }
+    if(!ok && focusEl){ try{ focusEl.focus(); }catch{} }
+    return ok;
+  }
+
+  form.addEventListener('submit', async (ev) => {
+    ev.preventDefault();
+    if(!validate()) return;
+
+    const e = email.value.trim();
+    if (mode.value === 'login'){
+      await handleLogin(e);
+    } else {
+      await handleRegister(first.value, last.value, e);
+    }
+  });
+
 </script>
 </body>
 </html>
