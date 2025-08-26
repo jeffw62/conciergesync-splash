@@ -3,108 +3,81 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>ConciergeSync™ — Sign in</title>
+<title>ConciergeSync™ Console</title>
+
 <style>
-  :root { --ui: 4000; }
-  * { box-sizing: border-box; }
-  html, body { height:100%; }
-  body {
-    margin:0; font-family: system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif;
-    background: radial-gradient(1200px 600px at 50% -20%, #2a3140 0%, #0b0f14 70%);
-    color:#e8eef7; display:grid; place-items:center;
-  }
-  .card {
-    width:min(560px, 92vw);
-    background: rgba(255,255,255,.06);
-    border:1px solid rgba(255,255,255,.14);
-    border-radius:16px; padding:24px 22px;
-    backdrop-filter: blur(10px) saturate(1.15);
-    box-shadow: 0 12px 42px rgba(0,0,0,.35);
-  }
-  h1 { margin:0 0 6px; font-size:28px; }
-  p { margin:0 0 18px; color:#b8c4d6; }
-  .row { display:flex; gap:10px; flex-wrap:wrap; margin-top:10px; }
-  .btn {
-    padding:12px 16px; border-radius:12px; cursor:pointer; font-weight:800;
-    border:1px solid rgba(255,255,255,.55); background:transparent; color:#fff;
-  }
-  .btn.primary { background:#fff; color:#111; border-color:#fff; }
-  .fine { font-size:12px; color:#9fb0c8; margin-top:10px; }
-  .notice {
-    padding:8px 10px; border-radius:10px; background:rgba(0,0,0,.35);
-    border:1px solid rgba(255,255,255,.12); margin-bottom:12px; color:#dfe8f6;
-  }
-</style>
-</head>
-<body>
-  <div class="card" role="dialog" aria-modal="true" id="signinCard" style="display:none">
-    <h1>Sign in to ConciergeSync™</h1>
-    <p>Welcome back. Continue to your console.</p>
-    <div id="logoutNotice" class="notice" style="display:none;">You’ve been logged out.</div>
-    <div class="row">
-      <button id="signin" class="btn primary">Enter Console</button>
-      <button id="learn" class="btn">What is ConciergeSync?</button>
-    </div>
-    <div class="fine">No bank logins required.</div>
-  </div>
-
-<script>
-(function(){
-  // 🔧 Set this to your real login page:
-  // e.g. 'https://portal.conciergesync.ai/login' or 'https://portal.conciergesync.ai/'
-  const LOGIN_URL = 'https://portal.conciergesync.ai/login';
-
-  const qs = new URLSearchParams(location.search);
-  const card = document.getElementById('signinCard');
-  const logoutNotice = document.getElementById('logoutNotice');
-
-  function clearAuth(){
-    try{
-      sessionStorage.removeItem('cs_authed');
-      localStorage.removeItem('cs_authed');
-      localStorage.removeItem('cs_uid');
-      localStorage.removeItem('cs_email');
-      localStorage.removeItem('cs_onboarding_done');
-      localStorage.removeItem('cs_bg_src');
-      localStorage.removeItem('last_bg_idx');
-      document.cookie = 'cs_auth=; Max-Age=0; path=/; SameSite=Lax';
-    }catch(_){}
+  :root{
+    --glass-bg: rgba(255,255,255,.12);
+    --glass-border: rgba(255,255,255,.28);
+    --overlay-grad-top: rgba(0,0,0,.35);
+    --overlay-grad-bot: rgba(0,0,0,.58);
+    --overlay: .30;
+    --vh: 100vh;
+    --ui: 4000;
+    --ease: cubic-bezier(.22,1,.36,1);
+    --t-fast: 220ms;
+    --t: 640ms;
+    --t-out: 900ms;
   }
 
-  // If we arrived with ?logout=1, clear & forward to the real login immediately.
-  if (qs.get('logout') === '1') {
-    clearAuth();
-    // Hard forward to the external login
-    location.replace(LOGIN_URL);
-    return;
+  *{ box-sizing:border-box; }
+
+  html,body{ height:100%; }
+  body{
+    margin:0;
+    font-family: system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif;
+    color:#eef2f8;
+    background: #0b0f14;
   }
 
-  // Otherwise: if still authed, fast-forward to the console splash
-  const hasCookie = /(?:^|;\s*)cs_auth=1(?:;|$)/.test(document.cookie);
-  const hasStorage = (localStorage.getItem('cs_authed') === '1' || sessionStorage.getItem('cs_authed') === '1');
-  if (hasCookie || hasStorage) {
-    location.replace('/beta/01-index.html?enter=1');
-    return;
+  /* Backdrop image + overlay */
+  .backdrop{ position:fixed; inset:0; z-index:0; overflow:hidden; }
+  .backdrop-image{
+    position:absolute; inset:0;
+    background:center/cover no-repeat;
+    filter: brightness(1.12) contrast(1.05);
+    transform: scale(1.03) translateZ(0);
+    will-change: transform, opacity, filter;
+    transition: opacity 600ms ease, transform 900ms ease, filter 900ms ease;
+    opacity:.999;
+  }
+  .backdrop-overlay{
+    position:absolute; inset:0; pointer-events:none;
+    background: linear-gradient(to bottom, var(--overlay-grad-top), var(--overlay-grad-bot));
+    opacity: var(--overlay);
   }
 
-  // Show our simple sign-in card (manual entry to console)
-  card.style.display = 'block';
+  /* Tabs (top bar) */
+  .cs-tabs{
+    position: fixed; top: 18px; left: 50%; transform: translateX(-50%);
+    z-index: var(--ui);
+    display:flex; gap:10px; padding:10px 12px;
+    background: rgba(15,15,18,.36);
+    border:1px solid rgba(255,255,255,.25);
+    border-radius:14px; backdrop-filter: blur(8px) saturate(1.1);
+  }
+  .cs-tab{
+    padding:10px 14px; border-radius:10px; border:1px solid rgba(255,255,255,.18);
+    background: rgba(255,255,255,.07); color:#fff; font-weight:700; cursor:pointer;
+  }
+  .cs-tab:hover{ background: rgba(255,255,255,.12); }
 
-  document.getElementById('signin').addEventListener('click', function(e){
-    e.preventDefault();
-    try{
-      sessionStorage.setItem('cs_authed','1');
-      localStorage.setItem('cs_authed','1');
-      document.cookie = 'cs_auth=1; Max-Age=7200; path=/; SameSite=Lax';
-    }catch(_){}
-    location.assign('/beta/01-index.html?enter=1');
-  });
+  /* Exit fullscreen button */
+  .console-exit{
+    position:fixed; top:18px; right:18px; z-index:var(--ui);
+    width:40px; height:40px; border-radius:10px;
+    border:1px solid rgba(255,255,255,.35);
+    background: rgba(20,20,20,.45);
+    color:#fff; font-size:28px; line-height:36px; text-align:center; cursor:pointer;
+    backdrop-filter: blur(8px) saturate(1.1);
+  }
+  .console-exit:hover{ background: rgba(20,20,20,.6); }
 
-  document.getElementById('learn').addEventListener('click', function(e){
-    e.preventDefault();
-    alert('ConciergeSync™ helps you earn, manage, and redeem travel rewards with clarity.');
-  });
-})();
-</script>
-</body>
-</html>
+  /* Tiles stage */
+  #cs-tiles{
+    position: fixed; inset: 0; z-index: 10; pointer-events: none;
+  }
+
+  /* Tile look */
+  .cs-tile{
+    position:absolute;
