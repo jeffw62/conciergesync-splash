@@ -30,8 +30,8 @@
   .spacer{flex:1}
   .link{opacity:.9; text-decoration:none; color:#fff}
   .xbtn{
-    width:38px;height:38px;border-radius:999px;border:1px solid rgba(255,255,255,.28);
-    background:rgba(0,0,0,.25); display:grid;place-items:center; cursor:pointer; font-weight:700;
+    height:38px; padding:0 12px; border-radius:999px; border:1px solid rgba(255,255,255,.28);
+    background:rgba(0,0,0,.25); display:grid; place-items:center; cursor:pointer; font-weight:700;
   }
 
   /* Tiles */
@@ -54,20 +54,6 @@
   .ghost{opacity:.75}
   .dismissing{transition:transform 520ms cubic-bezier(.16,1,.3,1), opacity 320ms ease}
 
-  /* Fullscreen CTA */
-  .fs-veil{
-    position:fixed; inset:0; background:linear-gradient(180deg, rgba(0,0,0,.35), rgba(0,0,0,.7)); display:grid; place-items:center; z-index:1100;
-  }
-  .fs-card{
-    width:min(540px,92vw); border:1px solid var(--brd); background:var(--glass); backdrop-filter:var(--blur);
-    border-radius:24px; padding:24px; box-shadow:var(--lift); text-align:center;
-  }
-  .row{display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin-top:12px}
-  .btn{
-    display:inline-flex; align-items:center; justify-content:center; padding:12px 16px; border-radius:999px;
-    border:1px solid rgba(255,255,255,.24); background:rgba(255,255,255,.12); color:#fff; text-decoration:none; cursor:pointer; font-weight:600;
-  }
-
   /* Logout modal */
   .modal{position:fixed; inset:0; display:none; place-items:center; background:rgba(0,0,0,.45); z-index:1200}
   .modal.open{display:grid}
@@ -80,7 +66,7 @@
 </head>
 <body>
 
-<!-- STEP 2: Guard — bounce unauthenticated users back to the gate -->
+<!-- Auth guard -->
 <script>
   try {
     if (!localStorage.getItem('cs_authed')) location.replace('/beta/auth.html');
@@ -96,19 +82,7 @@
   <button class="pill" data-tile="Engine">Redemption Engine</button>
   <div class="spacer"></div>
   <a class="link pill" href="/index.html">What is ConciergeSync?</a>
-  <button id="logoutBtn" class="xbtn" title="Logout">×</button>
-</div>
-
-<!-- Fullscreen prompt -->
-<div id="fsVeil" class="fs-veil" hidden>
-  <div class="fs-card">
-    <h2 style="margin:0 0 6px">Go Full Screen?</h2>
-    <p class="muted" style="margin:0 0 8px">For the calmest console, we recommend fullscreen.</p>
-    <div class="row">
-      <button class="btn" id="goFs">Go Full Screen</button>
-      <button class="btn" id="skipFs">Skip</button>
-    </div>
-  </div>
+  <button id="logoutBtn" class="xbtn" title="Sign out">× Sign out</button>
 </div>
 
 <!-- Logout confirm modal -->
@@ -116,32 +90,14 @@
   <div class="card">
     <h3 id="logoutTitle" style="margin:0 0 8px">Sign out of ConciergeSync™?</h3>
     <p class="muted" style="margin:0 0 14px">You can sign back in anytime with your email.</p>
-    <div class="row" style="justify-content:flex-end">
-      <button class="btn" id="stayBtn">No, stay here</button>
-      <button class="btn" id="confirmLogoutBtn">Yes, sign out</button>
+    <div style="display:flex; gap:10px; justify-content:flex-end">
+      <button class="pill" id="stayBtn">No, stay here</button>
+      <button class="pill" id="confirmLogoutBtn">Yes, sign out</button>
     </div>
   </div>
 </div>
 
 <script>
-  // ————— Fullscreen CTA —————
-  const fsVeil = document.getElementById('fsVeil');
-  let userChoseFullscreen = false;
-
-  function showFsPrompt(){
-    // Only show once per session
-    if (sessionStorage.getItem('cs_fs_prompt') === '1') return;
-    fsVeil.hidden = false;
-  }
-  function hideFsPrompt(){ fsVeil.hidden = true; sessionStorage.setItem('cs_fs_prompt','1'); }
-
-  document.getElementById('goFs').onclick = async () => {
-    userChoseFullscreen = true;
-    hideFsPrompt();
-    try { await document.documentElement.requestFullscreen(); } catch(e){}
-  };
-  document.getElementById('skipFs').onclick = hideFsPrompt;
-
   // ————— Tiles: fan/cascade, draggable, swipe-to-dismiss —————
   const btns = document.querySelectorAll('[data-tile]');
   let z = 10, fan = 0;
@@ -166,7 +122,20 @@
 
     // pointer drag + fling
     let startX=0,startY=0, x=0,y=0, lastT=0, lastX=0, lastY=0, vx=0, vy=0;
+
+    function parseCurrent(){
+      // read current translate(px,px) if we've started dragging; otherwise compute center
+      const m = t.style.transform.match(/translate\(([-0-9.]+)px,\s*([-0-9.]+)px\)/);
+      if(m){ x = parseFloat(m[1]); y = parseFloat(m[2]); return; }
+      // fall back to centered position
+      const rect = t.getBoundingClientRect();
+      x = window.innerWidth/2 - rect.width/2;
+      y = window.innerHeight/2 - rect.height/2;
+      t.style.transform = `translate(${x}px, ${y}px)`;
+    }
+
     function onDown(e){
+      parseCurrent();
       t.classList.add('ghost');
       t.style.zIndex = ++z;
       const p = getPoint(e);
@@ -186,7 +155,9 @@
     function onUp(){
       t.classList.remove('ghost');
       const speed = Math.hypot(vx,vy);
-      const dist  = Math.hypot(x - (-window.innerWidth/2), y - (-window.innerHeight/2));
+      const centerX = window.innerWidth/2 - t.offsetWidth/2;
+      const centerY = window.innerHeight/2 - t.offsetHeight/2;
+      const dist  = Math.hypot(x - centerX, y - centerY);
       const shouldDismiss = speed > 0.9 || dist > Math.min(window.innerWidth, window.innerHeight)*0.65;
       if(shouldDismiss){
         dismissTile(t, {dx: vx*900, dy: vy*900});
@@ -213,16 +184,10 @@
 
   btns.forEach(b => b.onclick = () => createTile(b.dataset.tile));
 
-  // ————— Logout flow (Esc or ×) —————
+  // ————— Logout flow (Esc or button) —————
   const modal = document.getElementById('logoutModal');
   document.getElementById('logoutBtn').onclick = () => modal.classList.add('open');
-  document.getElementById('stayBtn').onclick   = async () => {
-    modal.classList.remove('open');
-    // Re-enter fullscreen on "No" if they chose it earlier
-    if (userChoseFullscreen && !document.fullscreenElement){
-      try { await document.documentElement.requestFullscreen(); } catch(e){}
-    }
-  };
+  document.getElementById('stayBtn').onclick   = () => modal.classList.remove('open');
   document.getElementById('confirmLogoutBtn').onclick = csLogout;
 
   document.addEventListener('keydown', (e)=>{
@@ -236,9 +201,6 @@
     }catch{}
     location.replace('/beta/auth.html');
   }
-
-  // Show fullscreen prompt on first entry
-  showFsPrompt();
 </script>
 </body>
 </html>
