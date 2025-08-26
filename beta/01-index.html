@@ -382,43 +382,22 @@
   const yesBtn = document.getElementById('logoutYes');
   const noBtn  = document.getElementById('logoutNo');
 
-  // Put YOUR real login page first for instant redirect:
-  const LOGOUT_URLS = [
-    '/login.html',           // <-- change this to your actual login page
-    '/beta/login.html',
-    '/account/login.html',
-    '/auth/login.html',
-    '/auth/index.html',
-    '/',
-  ];
+  // ✅ Set your actual login page here:
+  const LOGIN_DEST = '/beta/auth.html';
 
   function showLogoutConfirm(){ modal.hidden = false; modal.classList.add('show'); }
   function hideLogoutConfirm(){ modal.classList.remove('show'); modal.hidden = true; }
 
-  async function smartRedirectToLogin(){
-    // Try each candidate; pick the first that exists (same-origin)
-    for (const path of LOGOUT_URLS){
-      try{
-        const cb = (path.includes('?') ? '&' : '?') + 'cb=' + Date.now();
-        const res = await fetch(path + cb, { method:'HEAD', cache:'no-store', credentials:'same-origin' });
-        if (res.ok) { location.replace(path); return; }
-      }catch(e){ /* ignore and try next */ }
-    }
-    // Fallback to root
-    location.replace('/');
-  }
-
-  yesBtn.addEventListener('click', async () => {
+  yesBtn.addEventListener('click', () => {
     hideLogoutConfirm();
-    // clear auth everywhere
     try {
       sessionStorage.removeItem('cs_authed');
       localStorage.removeItem('cs_authed');
       document.cookie = 'cs_auth=; Max-Age=0; path=/; SameSite=Lax';
     } catch(_) {}
-    // make sure we are not in FS before navigating
     leaveFS();
-    await smartRedirectToLogin();
+    // Hard redirect to the login screen; no fallbacks to "/"
+    location.replace(LOGIN_DEST);
   });
 
   noBtn.addEventListener('click', () => {
@@ -426,12 +405,12 @@
     enterFS();
   });
 
-  // If user hits Esc to leave FS, prompt them
+  // If user leaves FS via Esc/OS UI, ask to confirm logout.
   document.addEventListener('fullscreenchange', () => {
     if (!document.fullscreenElement) showLogoutConfirm();
   });
 
-  // Also intercept any “exit/close” looking button on page (defensive)
+  // Defensive: intercept any “exit/close” button
   document.addEventListener('click', (e) => {
     const t = e.target.closest('button, a, [role="button"]');
     if (!t) return;
