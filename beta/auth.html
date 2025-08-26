@@ -1,128 +1,177 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Sign in • ConciergeSync™</title>
-  <style>
-    :root{
-      --overlay: .32;
-      --ring: rgba(255,255,255,.22);
-      --glass-bg: rgba(255,255,255,.12);
-      --glass-border: rgba(255,255,255,.28);
-    }
-    *{box-sizing:border-box}
-    html,body{height:100%}
-    body{
-      margin:0; font-family: system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif;
-      color:#eef2f8; background:#0b0f14;
-      overflow:hidden;
-    }
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Sign in — ConciergeSync™</title>
+<style>
+  :root{
+    --card-bg: rgba(255,255,255,.08);
+    --card-bd: rgba(255,255,255,.25);
+    --glass: blur(12px) saturate(1.15);
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif;
+    color:#eef2f8; background:#0b0f14;
+  }
+  /* Backdrop */
+  .backdrop{position:fixed; inset:0; overflow:hidden; z-index:0}
+  .backdrop:before{
+    content:""; position:absolute; inset:0;
+    background:url("/beta/assets/bg/IMG_5374.jpeg") center/cover no-repeat;
+    filter:brightness(1.12) contrast(1.05);
+    transform:scale(1.02);
+  }
+  .backdrop:after{
+    content:""; position:absolute; inset:0;
+    background:linear-gradient(to bottom, rgba(0,0,0,.25), rgba(0,0,0,.55));
+  }
 
-    /* Backdrop */
-    .backdrop{position:fixed; inset:0; z-index:0; overflow:hidden}
-    .backdrop-image{
-      position:absolute; inset:0;
-      background:center/cover no-repeat;
-      filter:brightness(1.12) contrast(1.05);
-      transform:scale(1.03) translateZ(0);
-    }
-    .backdrop-overlay{
-      position:absolute; inset:0; pointer-events:none;
-      background: linear-gradient(to bottom, rgba(0,0,0,.35), rgba(0,0,0,.58));
-      opacity: var(--overlay);
-    }
+  /* Card */
+  .wrap{position:relative; z-index:1; min-height:100%; display:grid; place-items:center; padding:28px}
+  .card{
+    width:min(880px, 92vw);
+    background:var(--card-bg); border:1px solid var(--card-bd); border-radius:16px;
+    backdrop-filter:var(--glass);
+    padding:28px; box-shadow:0 10px 32px rgba(0,0,0,.28);
+  }
+  h1{font-size:42px; line-height:1.15; margin:0 0 6px}
+  p.lead{margin:0 0 18px; color:#cbd5e1}
 
-    /* Center tile */
-    .stage{position:fixed; inset:0; display:grid; place-items:center; padding:24px; z-index:10}
-    .card{
-      width:min(820px, 92vw);
-      background: var(--glass-bg);
-      border:1px solid var(--glass-border);
-      border-radius:18px; backdrop-filter: blur(12px) saturate(1.22);
-      box-shadow:0 18px 50px rgba(0,0,0,.30);
-      padding:26px 26px 20px;
-    }
-    .card h1{margin:0 0 6px; font-size:34px; line-height:1.2}
-    .sub{margin:0 0 18px; color:#c8d2de}
-    .row{display:flex; gap:10px; align-items:center; flex-wrap:wrap}
-    input[type="email"]{
-      flex:1 1 320px; min-width:280px;
-      padding:12px 14px; border-radius:12px; background:rgba(13,19,26,.6);
-      border:1px solid var(--ring); color:#eef2f8; font-size:16px; outline:none;
-    }
-    input[type="email"]::placeholder{color:#a6b0bf}
-    input[type="email"]:focus{border-color:#7cc4ff; box-shadow:0 0 0 3px rgba(124,196,255,.18)}
-    .btn{
-      padding:12px 16px; border-radius:12px; border:1px solid var(--ring);
-      font-weight:800; cursor:pointer; background:#fff; color:#0c1117;
-      box-shadow:0 8px 22px rgba(0,0,0,.20);
-    }
-    .btn.secondary{
-      background:transparent; color:#eef2f8;
-    }
-    .meta{margin-top:10px; color:#c0cad6; font-size:.92rem}
-    @media (max-width:560px){
-      .card h1{font-size:28px}
-    }
-  </style>
+  .row{display:flex; gap:12px; flex-wrap:wrap}
+  input[type="email"]{
+    flex:1 1 420px; min-width:280px;
+    padding:14px 16px; border-radius:12px; border:1px solid rgba(255,255,255,.25);
+    background:rgba(15,15,18,.65); color:#fff; outline:none;
+  }
+  input[type="email"]::placeholder{color:#9aa4b2}
+  .btn{
+    padding:14px 18px; border-radius:12px; font-weight:800; cursor:pointer; border:1px solid rgba(255,255,255,.55);
+    background:#fff; color:#111;
+  }
+  .btn.ghost{background:transparent; color:#fff}
+  .hint{margin-top:10px; color:#94a3b8; font-size:.95rem}
+  .error{margin-top:10px; color:#fecaca; font-weight:700; display:none}
+  .error.show{display:block}
+</style>
 </head>
 <body>
 
-  <!-- Backdrop -->
-  <div class="backdrop" aria-hidden="true">
-    <div id="bg" class="backdrop-image"></div>
-    <div class="backdrop-overlay"></div>
+<div class="backdrop" aria-hidden="true"></div>
+
+<div class="wrap">
+  <div class="card" role="dialog" aria-labelledby="title" aria-describedby="desc">
+    <h1 id="title">Sign in to ConciergeSync™</h1>
+    <p id="desc" class="lead">Enter your email to continue to your console.</p>
+
+    <div class="row" style="margin-bottom:6px">
+      <input id="email" type="email" inputmode="email" autocomplete="email" placeholder="you@example.com" aria-label="Email"/>
+      <button id="enter" class="btn">Enter Console</button>
+      <a class="btn ghost" href="/beta/01-index.html">What is ConciergeSync?</a>
+    </div>
+
+    <div id="err" class="error">That email isn’t recognized for beta access yet. We’ll take you to onboarding to get set up.</div>
+    <div class="hint">Passwordless during beta — just your email.</div>
   </div>
+</div>
 
-  <!-- Auth tile -->
-  <div class="stage">
-    <form id="signin" class="card" autocomplete="on" novalidate>
-      <h1>Sign in to ConciergeSync™</h1>
-      <p class="sub">Enter your email to continue to your console.</p>
-      <div class="row">
-        <input id="email" name="email" type="email" inputmode="email" autocomplete="email"
-               placeholder="you@example.com" required />
-        <button class="btn" type="submit">Enter Console</button>
-        <a class="btn secondary" href="/beta/01-index.html?open=overview">What is ConciergeSync?</a>
-      </div>
-      <div class="meta">No bank logins required.</div>
-    </form>
-  </div>
+<script>
+/* Optional: seed an allowlist here if you want.
+   Example: window.CS_ALLOWLIST = ['alice@example.com','bob@company.com']; */
+window.CS_ALLOWLIST = window.CS_ALLOWLIST || [];
 
-  <script>
-    (function(){
-      // Backdrop image (same as console)
-      var BG = '/beta/assets/bg/IMG_5374.jpeg';
-      document.getElementById('bg').style.backgroundImage = 'url("' + BG + '")';
+/* Helper: tiny email check */
+function validEmail(v){ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v); }
 
-      // Optional: restore email if we have it
-      var emailInput = document.getElementById('email');
-      try {
-        var saved = localStorage.getItem('cs_email') || sessionStorage.getItem('cs_email') || '';
-        if (saved) emailInput.value = saved;
-      } catch(_){}
+/* Known-user check:
+   - previously used on this browser (localStorage list)
+   - seeded allowlist above
+   - dev convenience: @conciergesync.ai */
+function isKnown(email){
+  const e = email.toLowerCase().trim();
+  const fromLocal = JSON.parse(localStorage.getItem('cs_known_users')||'[]');
+  const seeded    = (window.CS_ALLOWLIST||[]).map(x=>String(x).toLowerCase().trim());
+  return fromLocal.includes(e) || seeded.includes(e) || /@conciergesync\.ai$/i.test(e);
+}
 
-      // Never auto-redirect on this page. Always show the tile.
+/* Mark a user as known (you can also do this on your thank-you page after onboarding) */
+function remember(email){
+  const e = email.toLowerCase().trim();
+  const list = new Set(JSON.parse(localStorage.getItem('cs_known_users')||'[]'));
+  list.add(e);
+  localStorage.setItem('cs_known_users', JSON.stringify([...list]));
+}
 
-      // Submit → mark authed and enter console
-      document.getElementById('signin').addEventListener('submit', function(e){
-        e.preventDefault();
-        var v = (emailInput.value || '').trim();
-        if (!v) { emailInput.focus(); return; }
+/* Create a stable UID from email (non-crypto, fine for client-only beta state) */
+function uidFromEmail(email){
+  try{
+    return 'u_' + btoa(email.toLowerCase()).replace(/[^a-z0-9]/ig,'').slice(0,12);
+  }catch(_){
+    return 'u_' + (Date.now().toString(36));
+  }
+}
 
-        try {
-          sessionStorage.setItem('cs_email', v);
-          localStorage.setItem('cs_email', v);
-          sessionStorage.setItem('cs_authed', '1');
-          localStorage.setItem('cs_authed', '1');
-          document.cookie = 'cs_auth=1; path=/; max-age=7200; SameSite=Lax';
-        } catch(_){}
+/* Set beta “session” flags used by the console */
+function setAuthed(email){
+  const uid = uidFromEmail(email);
+  sessionStorage.setItem('cs_authed','1');
+  localStorage.setItem('cs_authed','1');
+  sessionStorage.setItem('cs_email', email);
+  localStorage.setItem('cs_email', email);
+  sessionStorage.setItem('cs_uid', uid);
+  localStorage.setItem('cs_uid', uid);
+  document.cookie = 'cs_auth=1; path=/; max-age=7200; SameSite=Lax';
+}
 
-        // Go straight into console "enter" flow
-        window.location.assign('/beta/01-index.html?enter=1&open=overview');
-      });
-    })();
-  </script>
+/* Wire up UI */
+const emailEl = document.getElementById('email');
+const enterEl = document.getElementById('enter');
+const errEl   = document.getElementById('err');
+
+/* Prefill from ?email= if present */
+{
+  const qs = new URLSearchParams(location.search);
+  const qEmail = qs.get('email');
+  if (qEmail) emailEl.value = qEmail;
+}
+
+function goReturning(email){
+  setAuthed(email);
+  // send directly into the console with the same state we use elsewhere
+  location.assign('/beta/01-index.html?enter=1&open=overview');
+}
+function goOnboarding(email){
+  // gentle message + route to splash (prefill email so they don’t retype)
+  errEl.classList.add('show');
+  // small pause so they can see the reason, then navigate
+  setTimeout(()=>{
+    location.assign('/beta/01-index.html?signup=1&email=' + encodeURIComponent(email));
+  }, 500);
+}
+
+function handleEnter(){
+  const email = (emailEl.value || '').trim();
+  if (!validEmail(email)){
+    errEl.textContent = 'Please enter a valid email.';
+    errEl.classList.add('show');
+    emailEl.focus();
+    return;
+  }
+  errEl.classList.remove('show');
+
+  if (isKnown(email)){
+    goReturning(email);
+  }else{
+    // Treat as first-time: remember locally (so next time on this browser they’re known)
+    remember(email);
+    goOnboarding(email);
+  }
+}
+
+enterEl.addEventListener('click', (e)=>{ e.preventDefault(); handleEnter(); });
+emailEl.addEventListener('keydown', (e)=>{ if (e.key === 'Enter') handleEnter(); });
+</script>
 </body>
 </html>
