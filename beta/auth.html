@@ -26,13 +26,13 @@
   }
   .backdrop:after{
     content:""; position:absolute; inset:0;
-    background:linear-gradient(to bottom, rgba(0,0,0,.25), rgba(0,0,0,.55));
+    background:linear-gradient(to bottom, rgba(0,0,0,.22), rgba(0,0,0,.55));
   }
 
   /* Card */
   .wrap{position:relative; z-index:1; min-height:100%; display:grid; place-items:center; padding:28px}
   .card{
-    width:min(880px, 92vw);
+    width:min(960px, 94vw);
     background:var(--card-bg); border:1px solid var(--card-bd); border-radius:16px;
     backdrop-filter:var(--glass);
     padding:28px; box-shadow:0 10px 32px rgba(0,0,0,.28);
@@ -42,7 +42,7 @@
 
   .row{display:flex; gap:12px; flex-wrap:wrap}
   input[type="email"]{
-    flex:1 1 420px; min-width:280px;
+    flex:1 1 460px; min-width:280px;
     padding:14px 16px; border-radius:12px; border:1px solid rgba(255,255,255,.25);
     background:rgba(15,15,18,.65); color:#fff; outline:none;
   }
@@ -52,9 +52,16 @@
     background:#fff; color:#111;
   }
   .btn.ghost{background:transparent; color:#fff}
+  .btn.linklike{background:transparent; color:#fff; border-color:rgba(255,255,255,.35)}
   .hint{margin-top:10px; color:#94a3b8; font-size:.95rem}
-  .error{margin-top:10px; color:#fecaca; font-weight:700; display:none}
-  .error.show{display:block}
+
+  .notice{
+    margin-top:12px; padding:10px 12px; border-radius:12px;
+    background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.22);
+    display:none;
+  }
+  .notice.show{display:flex; gap:10px; justify-content:space-between; align-items:center; flex-wrap:wrap}
+  .notice strong{color:#fff}
 </style>
 </head>
 <body>
@@ -64,56 +71,37 @@
 <div class="wrap">
   <div class="card" role="dialog" aria-labelledby="title" aria-describedby="desc">
     <h1 id="title">Sign in to ConciergeSync™</h1>
-    <p id="desc" class="lead">Enter your email to continue to your console.</p>
+    <p id="desc" class="lead">Enter your email to continue to your console. <span style="opacity:.8">Passwordless during beta.</span></p>
 
-    <div class="row" style="margin-bottom:6px">
+    <div class="row" style="margin-bottom:8px">
       <input id="email" type="email" inputmode="email" autocomplete="email" placeholder="you@example.com" aria-label="Email"/>
       <button id="enter" class="btn">Enter Console</button>
       <a class="btn ghost" href="/beta/01-index.html">What is ConciergeSync?</a>
     </div>
 
-    <div id="err" class="error">That email isn’t recognized for beta access yet. We’ll take you to onboarding to get set up.</div>
-    <div class="hint">Passwordless during beta — just your email.</div>
+    <!-- Unknown email → persistent notice (no auto-redirect) -->
+    <div id="unknown" class="notice" role="status" aria-live="polite">
+      <div><strong>That email isn’t recognized for beta access yet.</strong> You can join now — it only takes a few minutes.</div>
+      <div class="row" style="gap:8px">
+        <a id="join" class="btn">Join the Beta</a>
+        <button id="dismiss" class="btn linklike">Dismiss</button>
+      </div>
+    </div>
+
+    <div class="hint">No bank logins required.</div>
   </div>
 </div>
 
 <script>
-/* Optional: seed an allowlist here if you want.
-   Example: window.CS_ALLOWLIST = ['alice@example.com','bob@company.com']; */
-window.CS_ALLOWLIST = window.CS_ALLOWLIST || [];
+/* ---------- Config (optional allowlist) ---------- */
+window.CS_ALLOWLIST = window.CS_ALLOWLIST || [];  // e.g. ['alice@company.com']
 
-/* Helper: tiny email check */
+/* ---------- Helpers ---------- */
 function validEmail(v){ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v); }
-
-/* Known-user check:
-   - previously used on this browser (localStorage list)
-   - seeded allowlist above
-   - dev convenience: @conciergesync.ai */
-function isKnown(email){
-  const e = email.toLowerCase().trim();
-  const fromLocal = JSON.parse(localStorage.getItem('cs_known_users')||'[]');
-  const seeded    = (window.CS_ALLOWLIST||[]).map(x=>String(x).toLowerCase().trim());
-  return fromLocal.includes(e) || seeded.includes(e) || /@conciergesync\.ai$/i.test(e);
-}
-
-/* Mark a user as known (you can also do this on your thank-you page after onboarding) */
-function remember(email){
-  const e = email.toLowerCase().trim();
-  const list = new Set(JSON.parse(localStorage.getItem('cs_known_users')||'[]'));
-  list.add(e);
-  localStorage.setItem('cs_known_users', JSON.stringify([...list]));
-}
-
-/* Create a stable UID from email (non-crypto, fine for client-only beta state) */
 function uidFromEmail(email){
-  try{
-    return 'u_' + btoa(email.toLowerCase()).replace(/[^a-z0-9]/ig,'').slice(0,12);
-  }catch(_){
-    return 'u_' + (Date.now().toString(36));
-  }
+  try{ return 'u_' + btoa(email.toLowerCase()).replace(/[^a-z0-9]/ig,'').slice(0,12); }
+  catch(_){ return 'u_' + (Date.now().toString(36)); }
 }
-
-/* Set beta “session” flags used by the console */
 function setAuthed(email){
   const uid = uidFromEmail(email);
   sessionStorage.setItem('cs_authed','1');
@@ -124,11 +112,19 @@ function setAuthed(email){
   localStorage.setItem('cs_uid', uid);
   document.cookie = 'cs_auth=1; path=/; max-age=7200; SameSite=Lax';
 }
+function isKnown(email){
+  const e = email.toLowerCase().trim();
+  const fromLocal = JSON.parse(localStorage.getItem('cs_known_users')||'[]');
+  const seeded    = (window.CS_ALLOWLIST||[]).map(x=>String(x).toLowerCase().trim());
+  return fromLocal.includes(e) || seeded.includes(e) || /@conciergesync\.ai$/i.test(e);
+}
 
-/* Wire up UI */
+/* ---------- UI wiring ---------- */
 const emailEl = document.getElementById('email');
 const enterEl = document.getElementById('enter');
-const errEl   = document.getElementById('err');
+const joinEl  = document.getElementById('join');
+const msgEl   = document.getElementById('unknown');
+document.getElementById('dismiss').addEventListener('click', ()=> msgEl.classList.remove('show'));
 
 /* Prefill from ?email= if present */
 {
@@ -137,36 +133,33 @@ const errEl   = document.getElementById('err');
   if (qEmail) emailEl.value = qEmail;
 }
 
-function goReturning(email){
-  setAuthed(email);
-  // send directly into the console with the same state we use elsewhere
-  location.assign('/beta/01-index.html?enter=1&open=overview');
-}
-function goOnboarding(email){
-  // gentle message + route to splash (prefill email so they don’t retype)
-  errEl.classList.add('show');
-  // small pause so they can see the reason, then navigate
-  setTimeout(()=>{
-    location.assign('/beta/01-index.html?signup=1&email=' + encodeURIComponent(email));
-  }, 500);
-}
+/* Join beta goes to the onboarding splash (no console mode) */
+joinEl.addEventListener('click', (e)=>{
+  e.preventDefault();
+  const email = (emailEl.value||'').trim();
+  const url = '/beta/01-index.html' + (email ? ('?signup=1&email='+encodeURIComponent(email)) : '?signup=1');
+  location.assign(url);
+});
 
+/* Returning sign-in (passwordless) */
 function handleEnter(){
-  const email = (emailEl.value || '').trim();
+  const email = (emailEl.value||'').trim();
   if (!validEmail(email)){
-    errEl.textContent = 'Please enter a valid email.';
-    errEl.classList.add('show');
+    msgEl.querySelector('div').innerHTML = '<strong>Please enter a valid email address.</strong>';
+    msgEl.classList.add('show');
     emailEl.focus();
     return;
   }
-  errEl.classList.remove('show');
 
   if (isKnown(email)){
-    goReturning(email);
-  }else{
-    // Treat as first-time: remember locally (so next time on this browser they’re known)
-    remember(email);
-    goOnboarding(email);
+    setAuthed(email);
+    /* Straight into the console with the flags the console expects */
+    location.assign('/beta/01-index.html?enter=1&open=overview');
+  } else {
+    /* Unknown: show the notice and let them choose to join */
+    msgEl.querySelector('div').innerHTML =
+      '<strong>That email isn’t recognized for beta access yet.</strong> You can join now — it only takes a few minutes.';
+    msgEl.classList.add('show');
   }
 }
 
