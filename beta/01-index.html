@@ -88,14 +88,53 @@ body.splash-mode .console-exit {
   max-width: 92vw;
   height: min(78vh, 760px) !important;
 }
+  /* default: keep console hidden */
+.console { display: none; }
+
+/* when entering console mode, hide landing hero and show console UI */
+.console-mode .hero,
+.console-mode .intro,
+.console-mode .welcome { display: none !important; }
+.console-mode .console { display: block !important; }
 
   </style>
 </head>
 <body>
+
+  <script>
+(() => {
+  const qs = new URLSearchParams(location.search);
+  if (qs.get('enter') === '1') {
+    // mark authed so no redirect back to auth.html
+    sessionStorage.setItem('cs_authed','1');
+    localStorage.setItem('cs_authed','1');
+    document.cookie = "cs_auth=1; path=/; max-age=7200; SameSite=Lax";
+
+    // carry uid/email for later use (optional)
+    const uid = qs.get('uid') || '', email = qs.get('email') || '';
+    if (uid)   { sessionStorage.setItem('cs_uid', uid);   localStorage.setItem('cs_uid', uid); }
+    if (email) { sessionStorage.setItem('cs_email', email); localStorage.setItem('cs_email', email); }
+
+    // swap to console view immediately
+    document.documentElement.classList.add('console-mode');
+
+    // open a default tile once DOM is ready
+    const open = qs.get('open') || 'overview';
+    const openNow = () => {
+      if (window.openConsole) { window.openConsole(open); return; }
+      const sel = `[data-open="${open}"], [data-tile-open="${open}"], .open-${open}`;
+      document.querySelector(sel)?.dispatchEvent(new Event('click', { bubbles: true }));
+    };
+    requestAnimationFrame(openNow);
+    setTimeout(openNow, 200); // safety in case UI mounts a beat later
+  }
+})();
+</script>
+
   <body class="splash-mode">
   <div class="container">
     <!-- Hero Card -->
-    <div class="card">
+    <div class="card welcome">
       <h1>Welcome to ConciergeSync™</h1>
       <p class="centered">Your personal travel rewards strategist — earn, manage, and redeem points with clarity.</p>
     </div>
@@ -164,7 +203,29 @@ body.splash-mode .console-exit {
 
 <!-- ============= CONSOLE BACKDROP + FULLSCREEN CONTROLS ============= -->
 <!-- Controls -->
-<a id="enterConsole" class="console-btn" href="/beta/auth.html">Enter Console</a>
+<a id="enterConsole" class="console-btn" href="#">Enter Console</a>
+<script>
+  // attach right after the button
+  document.getElementById('enterConsole')?.addEventListener('click', function (e) {
+    e.preventDefault();
+    // mark authed so guards don’t bounce to auth.html
+    sessionStorage.setItem('cs_authed','1');
+    localStorage.setItem('cs_authed','1');
+    document.cookie = "cs_auth=1; path=/; max-age=7200; SameSite=Lax";
+
+    // swap to console view
+    document.documentElement.classList.add('console-mode');
+
+    // open your default tile
+    if (window.openConsole) {
+      window.openConsole('overview');
+    } else {
+      const el = document.querySelector('[data-open="overview"], [data-tile-open="overview"], .open-overview');
+      el?.dispatchEvent(new Event('click', { bubbles: true }));
+    }
+  });
+</script>
+
 <button id="exitConsole"
         class="console-exit"
         aria-label="Exit Console"
@@ -1188,6 +1249,7 @@ function openTile(key){
 
 </body>
 </html>
+
 
 
 
