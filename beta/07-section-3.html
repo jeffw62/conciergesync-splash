@@ -31,6 +31,24 @@
 </iframe>
 
 <script>
+  window.addEventListener('message', function (e) {
+  if (e.source !== (iframe && iframe.contentWindow)) return;
+  if (!ok(e.data)) return;
+
+  // 1) mark this section complete
+  const prog = JSON.parse(localStorage.getItem('cs_onboarding_progress') || '{}');
+  prog.s1 = true;  // ← s2/s3/s4 on the other pages
+  localStorage.setItem('cs_onboarding_progress', JSON.stringify(prog));
+
+  // 2) carry uid/email (whatever’s already in the URL) to NEXT
+  const url = new URL(NEXT, location.origin);
+  const qs = new URLSearchParams(location.search);
+  if ([...qs].length) url.search = qs.toString();
+
+  // 3) go to next page
+  window.location.replace(url.href);
+});
+
 (function () {
   var NEXT = "/beta/08-section-4.html";
   var iframe = document.getElementById("nf3");
