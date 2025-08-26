@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <title>ConciergeSync™ Console</title>
 
   <link rel="dns-prefetch" href="//portal.conciergesync.ai">
@@ -20,7 +20,6 @@
       --overlay-top:rgba(0,0,0,.35);
       --overlay-bot:rgba(0,0,0,.55);
 
-      --vh:100vh;
       --z-ui:4000;
     }
     *{box-sizing:border-box}
@@ -33,7 +32,7 @@
       line-height:1.6;
     }
 
-    /* ---------- Landing (hidden once console-mode is set) ---------- */
+    /* ---------- Landing (hidden once console-mode is set on <body>) ---------- */
     .wrap{max-width:880px;margin:40px auto;padding:0 20px}
     .card{
       background:#fff;border:1px solid #e6eaf0;border-radius:16px;
@@ -46,7 +45,7 @@
     ul{margin:8px 0 0 24px}
     .center{text-align:center}
 
-    .console-mode .wrap{display:none}
+    body.console-mode .wrap{display:none}
 
     /* ---------- Backdrop ---------- */
     .backdrop{position:fixed;inset:0;z-index:0;overflow:hidden}
@@ -64,7 +63,7 @@
     /* ---------- Console shell ---------- */
     #cs-console{
       position:absolute;inset:0;display:grid;grid-template-rows:auto 1fr;
-      padding:24px; pointer-events:auto; z-index:10;
+      padding:24px;pointer-events:auto;z-index:10;
     }
     .cs-tabs{
       display:flex;justify-content:center;gap:10px;margin:0 auto 14px;
@@ -75,11 +74,11 @@
     }
     .cs-tab{
       padding:10px 14px;border-radius:10px;border:1px solid rgba(255,255,255,.18);
-      background:rgba(255,255,255,.06); color:#fff; font-weight:600; cursor:pointer;
+      background:rgba(255,255,255,.06);color:#fff;font-weight:600;cursor:pointer;
     }
     .cs-tab:hover{background:rgba(255,255,255,.12)}
 
-    /* tiles container */
+    /* tiles host */
     .cs-tiles{position:relative;height:100%}
 
     /* simple glass tile */
@@ -113,29 +112,30 @@
       position:fixed;top:18px;right:18px;z-index:var(--z-ui);
       width:40px;height:40px;border-radius:10px;
       border:1px solid rgba(255,255,255,.35);
-      background:rgba(20,20,20,.45); color:#fff;
+      background:rgba(20,20,20,.45);color:#fff;
       font-size:28px;line-height:36px;text-align:center;
-      cursor:pointer; backdrop-filter:blur(8px) saturate(1.1);
+      cursor:pointer;backdrop-filter:blur(8px) saturate(1.1);
     }
-    .console-exit:hover{ background:rgba(20,20,20,.6) }
+    .console-exit:hover{background:rgba(20,20,20,.6)}
 
     /* ---------- Fullscreen CTA ---------- */
     .fs-cta{
-      position:fixed; inset:0; z-index:5000;
-      display:none; place-items:center;
-      pointer-events:none;
+      position:fixed;inset:0;z-index:5000;
+      display:none;place-items:center;
+      background:transparent;
     }
-    .fs-cta.on{ display:grid }
+    /* KEY: show FS pill whenever we're in console mode and not yet fullscreen */
+    body.console-mode:not(.fs-active) .fs-cta{ display:grid }
+
     .fs-btn{
-      pointer-events:auto;
-      padding:14px 20px; border-radius:14px;
+      padding:14px 20px;border-radius:14px;
       border:1px solid rgba(255,255,255,.45);
-      background:rgba(20,20,20,.55); color:#fff; font-weight:800;
+      background:rgba(20,20,20,.55);color:#fff;font-weight:800;
       box-shadow:0 10px 28px rgba(0,0,0,.35);
       backdrop-filter:blur(8px) saturate(1.1);
       cursor:pointer;
     }
-    .fs-btn:hover{ background:rgba(20,20,20,.70) }
+    .fs-btn:hover{background:rgba(20,20,20,.70)}
 
     @media (prefers-reduced-motion:reduce){
       .backdrop-image,.backdrop-overlay{transition:none}
@@ -143,7 +143,8 @@
   </style>
 </head>
 <body>
-  <!-- Landing -->
+
+  <!-- Landing (hidden once console-mode is applied) -->
   <main class="wrap">
     <section class="card">
       <h1>Welcome to ConciergeSync™</h1>
@@ -177,108 +178,95 @@
     <div id="cs-tiles" class="cs-tiles"></div>
   </div>
 
-  <!-- Exit button -->
+  <!-- Exit -->
   <button id="exitConsole" class="console-exit" aria-label="Exit Console" type="button"
           onclick="window.location.href='exit.html'">×</button>
 
   <!-- Center fullscreen pill -->
-  <div id="fs-cta" class="fs-cta" aria-hidden="true">
+  <div id="fs-cta" class="fs-cta" aria-hidden="false">
     <button id="fs-go" class="fs-btn" type="button">Enter Fullscreen Mode</button>
   </div>
 
   <script>
-  (function () {
+  (function(){
     "use strict";
 
-    /* --------- Backdrop image (static) --------- */
+    /* Backdrop image (static) */
     var bg = '/beta/assets/bg/IMG_5374.jpeg';
     var bgEl = document.getElementById('backdropImage');
     if (bgEl) bgEl.style.backgroundImage = 'url("'+bg+'")';
 
-    /* --------- Enter console when coming from thank-you --------- */
+    /* Enter console when coming from thank-you (?enter=1) */
     var qs = new URLSearchParams(location.search);
     var fromThankYou = qs.get('enter') === '1';
-
-    if (fromThankYou) {
+    if (fromThankYou){
       try {
         sessionStorage.setItem('cs_authed','1');
         localStorage.setItem('cs_authed','1');
         document.cookie = "cs_auth=1; path=/; max-age=7200; SameSite=Lax";
       } catch(_) {}
-
-      document.documentElement.classList.add('console-mode');
-      showFsCtaIfNeeded();
+      document.body.classList.add('console-mode');
     }
 
-    /* --------- Fullscreen CTA --------- */
-    var fsWrap = document.getElementById('fs-cta');
-    var fsBtn  = document.getElementById('fs-go');
-
+    /* Fullscreen helpers */
     function isFS(){
-      return !!(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement);
+      return !!(document.fullscreenElement || document.webkitFullscreenElement ||
+                document.mozFullScreenElement || document.msFullscreenElement);
     }
-    function showFsCtaIfNeeded(){
-      if (!isFS() && fsWrap) fsWrap.classList.add('on');
+    function setFsClass(){
+      document.body.classList.toggle('fs-active', isFS());
     }
-    function hideFsCta(){
-      if (fsWrap) fsWrap.classList.remove('on');
-    }
+    ['fullscreenchange','webkitfullscreenchange','mozfullscreenchange','MSFullscreenChange']
+      .forEach(function(evt){ document.addEventListener(evt, setFsClass); });
+    setFsClass(); // set initial state so CSS can decide whether to show the pill
 
+    var fsBtn = document.getElementById('fs-go');
     if (fsBtn){
       fsBtn.addEventListener('click', function(e){
         e.preventDefault();
         var root = document.documentElement;
-        var req = root.requestFullscreen || root.webkitRequestFullscreen || root.mozRequestFullScreen || root.msRequestFullscreen;
+        var req = root.requestFullscreen || root.webkitRequestFullscreen ||
+                  root.mozRequestFullScreen || root.msRequestFullscreen;
         if (req){
-          Promise.resolve(req.call(root)).catch(function(){ /* ignore */ }).finally(hideFsCta);
+          Promise.resolve(req.call(root)).catch(function(){ /* ignore */ }).finally(setFsClass);
         } else {
-          hideFsCta();
+          // Not supported → hide pill so users aren’t stuck
+          document.body.classList.add('fs-active');
         }
       });
     }
-    document.addEventListener('fullscreenchange', function(){ if (isFS()) hideFsCta(); });
 
-    /* --------- Simple tiles: open on tab click --------- */
+    /* Simple tiles — open on tab click (no auto-open) */
     var tilesHost = document.getElementById('cs-tiles');
-
     var TILES = {
-      overview: { title:'Overview', html:'<p>Overview content goes here.</p>' },
+      overview:{ title:'Overview',  html:'<p>Overview content goes here.</p>' },
       itinerary:{ title:'Itinerary', html:'<p>Trip segments, dates, carriers.</p>' },
-      values:   { title:'Value Calc', html:'<p>CPP, cash vs award, transfer hints.</p>' }
+      values:{   title:'Value Calc', html:'<p>CPP, cash vs award, transfer hints.</p>' }
     };
-
-    function closeTile(el){
-      try { el.remove(); } catch(_){}
-    }
+    function closeTile(el){ try{ el.remove(); }catch(_){} }
     function openTile(key){
       var spec = TILES[key]; if (!spec) return;
-      // remove any existing tile with same key (keep one visible)
       Array.from(tilesHost.querySelectorAll('.tile[data-key="'+key+'"]')).forEach(closeTile);
-
       var sec = document.createElement('section');
       sec.className = 'tile';
       sec.dataset.key = key;
       sec.innerHTML =
-        '<div class="tile-head">' +
-          '<h4>'+spec.title+'</h4>' +
-          '<button class="tile-close" aria-label="Close">×</button>' +
-        '</div>' +
+        '<div class="tile-head"><h4>'+spec.title+
+        '</h4><button class="tile-close" aria-label="Close">×</button></div>'+
         '<div class="tile-body">'+spec.html+'</div>';
-
       sec.querySelector('.tile-close').addEventListener('click', function(){ closeTile(sec); });
       tilesHost.appendChild(sec);
     }
-
     document.querySelectorAll('.cs-tab').forEach(function(btn){
       btn.addEventListener('click', function(){ openTile(btn.dataset.key); });
     });
 
-    /* --------- iOS vh fix --------- */
-    function setVh(){ document.documentElement.style.setProperty('--vh', window.innerHeight + 'px'); }
-    setVh(); addEventListener('resize', setVh);
-
-    /* --------- Pre-warm the portal (non-blocking) --------- */
-    try { var img = new Image(); img.referrerPolicy='no-referrer'; img.src='https://portal.conciergesync.ai/health?ts='+Date.now(); } catch(e){}
+    /* Pre-warm the portal (non-blocking) */
+    try {
+      var img = new Image();
+      img.referrerPolicy='no-referrer';
+      img.src='https://portal.conciergesync.ai/health?ts='+Date.now();
+    } catch(e){}
   })();
   </script>
 </body>
