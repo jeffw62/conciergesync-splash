@@ -1,45 +1,267 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Redirecting…</title>
-
-  <!-- JS redirect: preserve query string + hash, replace history entry -->
-  <script>
-    (function () {
-      var target = "/beta/03-intake-start.html" + (location.search || "") + (location.hash || "");
-      location.replace(target);
-    })();
-  </script>
-
-  <!-- No-JS fallback -->
-  <noscript>
-    <meta http-equiv="refresh" content="0; url=/beta/03-intake-start.html" />
-  </noscript>
-
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Sign in • ConciergeSync™</title>
   <style>
-    body {
-      margin: 0;
-      height: 100vh;
-      display: grid;
-      place-items: center;
-      background: #0b0f14;
-      color: #fff;
-      font: 600 16px system-ui, -apple-system, Segoe UI, Roboto, Inter, Arial, sans-serif;
+    :root{
+      /* 🔧 easy size knobs */
+      --card-max: 640px;       /* card max width (desktop) */
+      --card-pad: 18px;        /* inner padding */
+      --title-size: 32px;      /* H1 size on desktop */
+
+      --glass: rgba(255,255,255,.08);
+      --border: rgba(255,255,255,.22);
+      --overlay-top: rgba(0,0,0,.32);
+      --overlay-bot: rgba(0,0,0,.58);
+      --ui: 4000;
+      --ease: cubic-bezier(.22,1,.36,1);
     }
-    .card {
-      background: #111;
-      padding: 16px 20px;
-      border-radius: 14px;
-      box-shadow: 0 10px 30px rgba(0,0,0,.4);
+    *{ box-sizing:border-box; }
+    html,body{ height:100%; }
+    body{
+      margin:0;
+      background:#0b0f14;
+      font-family: system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif;
+      color:#e9edf5;
     }
-    a { color: #fff; font-weight: 800; text-decoration: underline; }
+
+    /* Backdrop */
+    .backdrop{ position:fixed; inset:0; z-index:0; overflow:hidden; }
+    .backdrop-image{
+      position:absolute; inset:0;
+      background:center/cover no-repeat;
+      filter: brightness(1.12) contrast(1.05);
+      transform: scale(1.03);
+    }
+    .backdrop-overlay{
+      position:absolute; inset:0; pointer-events:none;
+      background: linear-gradient(to bottom, var(--overlay-top), var(--overlay-bot));
+      opacity:.35;
+    }
+
+    /* Centering */
+    .wrap{
+      position:relative; z-index:var(--ui);
+      min-height:100%;
+      display:grid; place-items:center;
+      padding:20px 14px;
+    }
+
+    /* Compact card */
+    .card{
+      width:min(var(--card-max), calc(100vw - 28px));
+      background: rgba(15,15,18,.50);
+      backdrop-filter: blur(10px) saturate(1.08);
+      border:1px solid var(--border);
+      border-radius:14px;
+      box-shadow:0 12px 28px rgba(0,0,0,.28);
+      padding:var(--card-pad);
+    }
+    h1{
+      margin:2px 0 10px;
+      font-size:var(--title-size);
+      line-height:1.2;
+      letter-spacing:.2px;
+    }
+    p.sub{ margin:0 0 12px; color:#c8d0db; font-size:15px; }
+
+    .row{ display:flex; gap:10px; align-items:stretch; flex-wrap:wrap; }
+    .row + .row{ margin-top:10px; }
+    .row .grow{ flex:1 1 320px; min-width:240px; }
+
+    input[type="email"], input[type="password"]{
+      width:100%;
+      height:44px;                  /* smaller */
+      border-radius:10px;
+      border:1px solid var(--border);
+      background: rgba(255,255,255,.06);
+      color:#fff;
+      padding:0 12px;
+      font-size:15px;
+      outline:none;
+    }
+    input::placeholder{ color:#a8b0bc; }
+
+    .btn{
+      height:44px; padding:0 14px; border-radius:10px;
+      border:1px solid #fff; background:#fff; color:#121212;
+      font-weight:800; cursor:pointer; font-size:15px;
+      transition: transform .08s var(--ease), box-shadow .08s var(--ease), opacity .2s;
+      white-space:nowrap;
+    }
+    .btn:hover{ transform: translateY(-1px); box-shadow:0 6px 14px rgba(0,0,0,.22); }
+    .btn:disabled{ opacity:.6; cursor:default; transform:none; box-shadow:none; }
+    .btn.ghost{
+      background:transparent; color:#fff; border-color:rgba(255,255,255,.55);
+    }
+
+    .help{ margin-top:8px; color:#c2cad6; font-size:13px; }
+    .error{
+      margin-top:8px;
+      background:#2b1212; border:1px solid #d66; color:#ffd7d7;
+      padding:9px 10px; border-radius:10px; display:none; font-size:14px;
+    }
+
+    .split{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-top:8px; }
+    .split .spacer{ flex:1 1 10px; }
+
+    /* Even tighter on small screens */
+    @media (max-width: 520px){
+      :root{ --card-pad: 14px; --title-size: 28px; }
+      .btn, input{ height:42px; }
+    }
   </style>
 </head>
 <body>
-  <div class="card">
-    Redirecting to sign-in… <a href="/beta/03-intake-start.html">Go now</a>
+
+  <!-- Backdrop -->
+  <div class="backdrop" aria-hidden="true">
+    <div class="backdrop-image" style="background-image:url('/beta/assets/bg/IMG_5374.jpeg')"></div>
+    <div class="backdrop-overlay"></div>
   </div>
+
+  <div class="wrap">
+    <div class="card" role="form" aria-labelledby="title">
+      <h1 id="title">Sign in to ConciergeSync™</h1>
+      <p class="sub">Enter your email (and password if enabled) to continue to your console.</p>
+
+      <form id="authForm" novalidate>
+        <div class="row">
+          <div class="grow">
+            <input id="email" type="email" placeholder="you@example.com" autocomplete="email" required/>
+          </div>
+          <button id="btnLogin" class="btn" type="submit">Enter Console</button>
+          <a class="btn ghost" href="/beta/01-index.html">What is ConciergeSync?</a>
+        </div>
+
+        <!-- Optional password row (hidden unless you enable server password auth) -->
+        <div id="pwdRow" class="row" style="display:none;">
+          <div class="grow">
+            <input id="password" type="password" placeholder="Password" autocomplete="current-password"/>
+          </div>
+        </div>
+
+        <div id="err" class="error" role="alert"></div>
+
+        <div class="split">
+          <div class="help">No bank logins required.</div>
+          <span class="spacer"></span>
+          <a class="btn ghost" href="/beta/01-index.html">I’m new — Join the beta</a>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // ---------- CONFIG: set to your backend routes ----------
+    const API_LOGIN = 'https://portal.conciergesync.ai/auth/login'; // POST {email,password?} -> {ok:true}
+    const API_CHECK = 'https://portal.conciergesync.ai/auth/check'; // GET  ?email=...          -> {ok:true}
+    const CONSOLE_URL = '/beta/01-index.html?enter=1';
+    // --------------------------------------------------------
+
+    // If arriving with ?logout=1, hard-clear any auth breadcrumbs
+    (() => {
+      const qs = new URLSearchParams(location.search);
+      if (qs.get('logout') === '1') {
+        try {
+          sessionStorage.removeItem('cs_authed');
+          localStorage.removeItem('cs_authed');
+          localStorage.removeItem('cs_email');
+          sessionStorage.removeItem('cs_email');
+          document.cookie = 'cs_auth=; Max-Age=0; path=/; SameSite=Lax';
+        } catch(_) {}
+      }
+    })();
+
+    const form = document.getElementById('authForm');
+    const emailEl = document.getElementById('email');
+    const pwdEl = document.getElementById('password');
+    const btn = document.getElementById('btnLogin');
+    const errBox = document.getElementById('err');
+
+    function showErr(msg){ errBox.textContent = msg; errBox.style.display = 'block'; }
+    function clearErr(){ errBox.style.display = 'none'; errBox.textContent = ''; }
+    function setBusy(b){
+      btn.disabled = b;
+      emailEl.disabled = b;
+      if (pwdEl) pwdEl.disabled = b;
+    }
+    function markAuthed(email){
+      try{
+        sessionStorage.setItem('cs_authed','1');
+        localStorage.setItem('cs_authed','1');
+        if (email) {
+          sessionStorage.setItem('cs_email', email);
+          localStorage.setItem('cs_email', email);
+        }
+        document.cookie = 'cs_auth=1; path=/; max-age=7200; SameSite=Lax';
+      }catch(_){}
+    }
+
+    async function verifyWithLogin(email, password){
+      try{
+        const res = await fetch(API_LOGIN, {
+          method:'POST',
+          headers:{'content-type':'application/json'},
+          body: JSON.stringify({ email, password })
+        });
+        if (!res.ok) return { ok:false };
+        const data = await res.json().catch(()=>({}));
+        return { ok: !!(data && (data.ok || data.auth === true || data.status === 'ok')) };
+      }catch{ return { ok:false }; }
+    }
+    async function verifyWithCheck(email){
+      try{
+        const url = API_CHECK + (API_CHECK.includes('?') ? '&' : '?') + 'email=' + encodeURIComponent(email);
+        const res = await fetch(url);
+        if (!res.ok) return { ok:false };
+        const data = await res.json().catch(()=>({}));
+        return { ok: !!(data && (data.ok || data.exists === true || data.valid === true)) };
+      }catch{ return { ok:false }; }
+    }
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      clearErr();
+
+      const email = (emailEl.value || '').trim();
+      const password = (pwdEl && pwdEl.value || '').trim();
+
+      if (!email || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){
+        showErr('Please enter a valid email address.');
+        return;
+      }
+
+      setBusy(true);
+
+      let ok = false;
+      const r1 = await verifyWithLogin(email, password);
+      ok = r1.ok;
+      if (!ok){
+        const r2 = await verifyWithCheck(email);
+        ok = r2.ok;
+      }
+
+      if (!ok){
+        setBusy(false);
+        showErr('That email wasn’t recognized. If you’re new, tap “I’m new — Join the beta.”');
+        return;
+      }
+
+      markAuthed(email);
+      window.location.assign(CONSOLE_URL);
+    });
+
+    // Prewarm portal for snappier round-trips
+    (function () {
+      try {
+        const img = new Image();
+        img.referrerPolicy = 'no-referrer';
+        img.src = 'https://portal.conciergesync.ai/health?ts=' + Date.now();
+      } catch(_) {}
+    })();
+  </script>
 </body>
 </html>
