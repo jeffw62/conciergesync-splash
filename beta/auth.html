@@ -602,6 +602,47 @@
     }
   });
 </script>
+<!-- ...your auth.html markup... -->
+
+<!-- GO-NEXT ROUTER (put this just before </body>) -->
+<script>
+(function(){
+  // Decide where to send the user after successful register/login
+  window.goNext = function({ uid = "", email = "" } = {}){
+    // mark authed
+    sessionStorage.setItem('cs_authed','1');
+    localStorage.setItem('cs_authed','1');     // optional persistence
+    document.cookie = "cs_auth=1; path=/; max-age=7200; SameSite=Lax";
+
+    if (uid)   { sessionStorage.setItem('cs_uid', uid);   localStorage.setItem('cs_uid', uid); }
+    if (email) { sessionStorage.setItem('cs_email', email); localStorage.setItem('cs_email', email); }
+
+    // if onboarding already finished, go to console
+    if (localStorage.getItem('cs_onboarding_done') === '1') {
+      const qp = new URLSearchParams({ enter:'1' });
+      if (uid) qp.set('uid', uid);
+      if (email) qp.set('email', email);
+      location.assign('/beta/01-index.html?' + qp.toString());
+      return;
+    }
+
+    // otherwise jump to the first incomplete section
+    const prog = JSON.parse(localStorage.getItem('cs_onboarding_progress') || '{}');
+    const base = new URLSearchParams();
+    if (uid) base.set('uid', uid);
+    if (email) base.set('email', email);
+
+    if (!prog.s1) return location.assign('/beta/05-section-1.html?' + base.toString());
+    if (!prog.s2) return location.assign('/beta/06-section-2.html?' + base.toString());
+    if (!prog.s3) return location.assign('/beta/07-section-3.html?' + base.toString());
+    if (!prog.s4) return location.assign('/beta/08-section-4.html?' + base.toString());
+
+    // fallback: all sections flagged but done not set
+    location.assign('/beta/09-onboarding-thank-you.html?' + base.toString());
+  };
+})();
+</script>
+</body>
 
 </body>
 </html>
