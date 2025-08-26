@@ -1,230 +1,60 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>ConciergeSync™ • Onboarding Complete</title>
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
-
-  <style>
-    /* ===== Base ===== */
-    :root{
-      --glass-bg: rgba(255,255,255,.10);
-      --glass-border: rgba(255,255,255,.28);
-    }
-    html,body{height:100%}
-    body.thankyou{
-      margin:0;
-      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-      color:#fff;
-      -webkit-font-smoothing:antialiased;
-      -moz-osx-font-smoothing:grayscale;
-    }
-
-    /* ===== Background layers ===== */
-    .cs-bg{
-      position:fixed; inset:0;
-      background:center/cover no-repeat;
-      filter:brightness(1.1) contrast(1.05);
-    }
-    .cs-ov{
-      position:fixed; inset:0;
-      background:linear-gradient(to bottom, rgba(0,0,0,.35), rgba(0,0,0,.60));
-    }
-
-    /* ===== Glass card (single border) ===== */
- .cs-tile{
-  /* was: max-width: 960px; */
-  width: min(640px, calc(100% - 64px)); /* ~1" per side vs 960px, with 32px gutters on small screens */
-  margin: 6vh auto;
-  padding: 24px;
-  background: var(--glass-bg);
-  border: 1px solid var(--glass-border);
-  border-radius: 18px;
-  backdrop-filter: blur(14px) saturate(1.2);
-  -webkit-backdrop-filter: blur(14px) saturate(1.2);
-  box-shadow: 0 20px 60px rgba(0,0,0,.35);
-}
-
-    /* ===== Content (no inner border/rings) ===== */
-    .card{
-      background:transparent !important;
-      border:none !important;
-      border-radius:14px;
-      box-shadow:none !important;
-      color:#eef2f8;
-    }
-    .card h1,.card h2,.card h3{ color:#fff; }
-    .card p,.card li{ color:rgba(255,255,255,.92); }
-
-    /* Title + sub + kudos centered */
-    #tyTitle{
-      text-align:center !important;
-      margin:0 auto 6px !important;
-      font-size: clamp(26px, 4vw, 34px);
-      line-height:1.15;
-      letter-spacing:-.01em;
-      font-weight:800;
-    }
-    .sub{
-      text-align:center;
-      max-width:740px;
-      margin:0 auto 18px;
-      color:rgba(255,255,255,.92);
-    }
-    .kudos{
-      text-align:center;
-      margin:0 auto 22px;
-      background:transparent !important;
-      border:none !important;
-      color:#fff !important;
-      box-shadow:none !important;
-      padding:0 !important;
-      font-weight:700;
-    }
-
-    /* Section headers (darker neutral per your tweak) */
-    body.thankyou h3{
-      margin:0 0 8px;
-      font-size:16px;
-      text-transform:uppercase;
-      letter-spacing:.06em;
-      color:#7a8596;                 /* keep this shade */
-      text-shadow:0 1px 1px rgba(0,0,0,.30);
-      font-weight:800;
-    }
-    .list{ margin:8px 0 0; padding-left:18px; }
-    .list li{ margin:6px 0; }
-
-    /* Button */
-    .btn{
-      display:block;
-      width:max-content;
-      margin:16px auto 0;
-      padding:12px 18px;
-      border-radius:12px;
-      border:1px solid rgba(255,255,255,.45);
-      background:rgba(0,0,0,.45);
-      color:#fff; font-weight:800; text-decoration:none;
-      box-shadow:0 8px 24px rgba(0,0,0,.28);
-      transition:transform .12s ease, background .12s ease, border-color .12s ease;
-    }
-    .btn:hover{ background:rgba(0,0,0,.60); border-color:rgba(255,255,255,.70); transform:translateY(-1px); }
-
-    @media (max-width:640px){
-      .cs-tile{ margin:4vh 12px; padding:20px; }
-    }
-    /* --- Vertical rhythm fixes --- */
-.section{
-  margin-top: 28px;              /* more space before each H3 */
-}
-
-.section h3{
-  margin: 0 0 6px;               /* tighter to the content below */
-}
-
-.section > .list{                /* list right under a header */
-  margin-top: 6px;               /* closer to the header */
-}
-
-.section > p{                    /* paragraph right under a header */
-  margin-top: 6px;               /* closer to the header */
-}
-/* === 640px tune: rhythm + legibility === */
-
-/* Narrow card (if you want it locked here) */
-.cs-tile{ width:min(640px, calc(100% - 56px)); }
-
-/* Give the H1 a touch more presence at this width */
-#tyTitle{ font-size: clamp(28px, 4.2vw, 34px); }
-
-/* Hero stack spacing */
-.sub{   margin-bottom:16px; }
-.kudos{ margin-bottom:20px; }
-
-/* Section rhythm: more air above headers, tighter to content below */
-.section{        margin-top:30px; }
-.section h3{     margin:0 0 8px; }
-.section > .list,
-.section > p{    margin-top:8px; }
-
-/* Bullet line spacing */
-.list li + li{   margin-top:6px; }
-
-/* Button breathing room from last paragraph */
-#enterBtn{       margin-top:22px; }
-
-  </style>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>ConciergeSync™ — Onboarding Complete</title>
+<style>
+  :root{--glass:rgba(255,255,255,.10);--brd:rgba(255,255,255,.28);--blur:blur(12px) saturate(1.2)}
+  html,body{height:100%}
+  body{
+    margin:0;color:#fff;font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif;
+    background:center/cover no-repeat fixed url("/beta/assets/bg/default.jpg"), #0b1220;
+  }
+  .shade{position:fixed; inset:0; background:linear-gradient(180deg, rgba(0,0,0,.35), rgba(0,0,0,.6))}
+  .wrap{position:relative; min-height:100%; display:grid; place-items:center; padding:24px}
+  .card{
+    width:min(820px,92vw);
+    border:1px solid var(--brd); background:var(--glass); backdrop-filter:var(--blur);
+    border-radius:24px; padding:28px 28px 22px; box-shadow:0 12px 40px rgba(0,0,0,.35); text-align:center;
+  }
+  h1{margin:6px 0 6px; font-size: clamp(28px, 4vw, 40px); line-height:1.12}
+  p{margin:8px 0 12px; color:#e6e9ee}
+  .row{display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin-top:16px}
+  .btn{
+    display:inline-flex; align-items:center; justify-content:center; padding:12px 16px; border-radius:999px;
+    border:1px solid rgba(255,255,255,.24); background:rgba(255,255,255,.12); color:#fff; text-decoration:none; cursor:pointer; font-weight:600;
+  }
+  .muted{color:#cbd5e1; font-size:14px}
+  footer{margin-top:12px; font-size:12px; color:#cdd3dd}
+</style>
+<script>
+  // Ensure the console guard lets them in
+  try { localStorage.setItem('cs_authed','1'); } catch(e) {}
+</script>
 </head>
+<body>
+  <div class="shade"></div>
+  <div class="wrap">
+    <div class="card">
+      <h1>Onboarding Complete ✔️</h1>
+      <p>Your profile is saved. You’re ready to use the ConciergeSync™ console.</p>
 
-<body class="thankyou">
-  <div class="cs-bg"></div>
-  <div class="cs-ov"></div>
-
-  <main class="cs-tile">
-    <section class="card">
-      <h1 id="tyTitle">Onboarding Complete</h1>
-      <p class="sub">Your ConciergeSync™ profile is fully set. Welcome to the inner circle.</p>
-      <div class="kudos">Nice work — your blueprint is locked.</div>
-
-      <div class="section">
-        <h3>Your role as a Beta User Client</h3>
-        <ul class="list">
-          <li>Use ConciergeSync™ with real trips and everyday points activity.</li>
-          <li>Share quick, honest feedback when something feels unclear or could be better.</li>
-          <li>Your input directly shapes what future members will experience.</li>
-        </ul>
+      <div class="row">
+        <button id="enter" class="btn">Enter Console</button>
+        <a class="btn" href="/index.html">What is ConciergeSync?</a>
       </div>
 
-      <div class="section">
-        <h3>What you’ve unlocked</h3>
-        <ul class="list">
-          <li>Smart transfer guidance across your points ecosystems and pooling preferences.</li>
-          <li>Family pooling strategies and guardrails to avoid costly redemption mistakes.</li>
-          <li>A clean data foundation for personalized insights and recommendations.</li>
-        </ul>
-      </div>
-
-      <div class="section">
-        <h3>What happens next</h3>
-        <p>We’re preparing your <strong>personalized insights</strong> based on everything you shared. We’ll let you know the moment they’re ready — it won’t be long.</p>
-      </div>
-
-      <a id="enterBtn" class="btn" href="#">Enter Console</a>
-    </section>
-  </main>
-
-<script>
-  // Mark onboarding complete on page load
-  localStorage.setItem('cs_onboarding_done','1');
-</script>
-
-<script>
-(function () {
-  const btn = document.getElementById('enterBtn');
-  if (!btn) return;
-
-  // Target: console root (no more 02-console.html)
-  const CONSOLE_URL = '/beta/01-index.html';
-
-  // Carry through any params we already have
-  const src = new URLSearchParams(location.search);
-  const qp  = new URLSearchParams({ enter: '1' });
-  ['uid','email','open'].forEach(k => { const v = src.get(k); if (v) qp.set(k, v); });
-
-  // Set the final link
-  btn.href = `${CONSOLE_URL}?${qp.toString()}`;
-
-  // Mark authed so 01-index won't bounce to auth.html
-  btn.addEventListener('click', () => {
-    sessionStorage.setItem('cs_authed','1');
-    localStorage.setItem('cs_authed','1'); // optional persistence
-    document.cookie = "cs_auth=1; path=/; max-age=7200; SameSite=Lax";
-  });
-})();
-</script>
-
-
+      <p class="muted">Tip: You can sign out from the console’s top-right menu anytime.</p>
+      <footer>© <span id="y"></span> ConciergeSync™</footer>
+    </div>
+  </div>
+  <script>
+    document.getElementById('y').textContent = new Date().getFullYear();
+    document.getElementById('enter').addEventListener('click', function () {
+      // Bullet-proof navigation into the console
+      location.replace('/beta/01-index.html');
+    });
+  </script>
 </body>
 </html>
