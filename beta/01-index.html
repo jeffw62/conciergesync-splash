@@ -226,6 +226,7 @@
   }
   fsGo.addEventListener('click', (e)=>{ e.preventDefault(); enterFS(); });
   fsSkip.addEventListener('click', (e)=>{ e.preventDefault(); fsCta.style.display='none'; });
+  // ONLY the top-right exit triggers logout confirm
   exitFs.addEventListener('click', (e)=>{ e.preventDefault(); leaveFS(); showLogoutConfirm(); });
 
   if (new URLSearchParams(location.search).get('enter') === '1'){
@@ -277,7 +278,8 @@
     tile.addEventListener('pointerdown', focus);
     tile.addEventListener('pointerup', blur);
     tile.addEventListener('pointercancel', blur);
-    tile.querySelector('.cs-close')?.addEventListener('click', () => dismiss(tile, 1));
+    // Close ONLY dismisses this tile
+    tile.querySelector('.cs-close')?.addEventListener('click', (e) => { e.stopPropagation(); dismiss(tile, 1); });
 
     let isDown=false, startX=0, startY=0, baseX=0, baseY=0, lastX=0, trail=[];
     const SLOP=2, ANG=60, FLICK=0.22, DISMISS_FRAC=0.12, COMMIT_FRAC=0.45, MIN=36;
@@ -382,43 +384,18 @@
   const yesBtn = document.getElementById('logoutYes');
   const noBtn  = document.getElementById('logoutNo');
 
-  // Put YOUR real login page first for instant redirect:
-  const LOGOUT_URLS = [
-    '/login.html',           // <-- change this to your actual login page
-    '/beta/login.html',
-    '/account/login.html',
-    '/auth/login.html',
-    '/auth/index.html',
-    '/',
-  ];
-
   function showLogoutConfirm(){ modal.hidden = false; modal.classList.add('show'); }
   function hideLogoutConfirm(){ modal.classList.remove('show'); modal.hidden = true; }
 
-  async function smartRedirectToLogin(){
-    // Try each candidate; pick the first that exists (same-origin)
-    for (const path of LOGOUT_URLS){
-      try{
-        const cb = (path.includes('?') ? '&' : '?') + 'cb=' + Date.now();
-        const res = await fetch(path + cb, { method:'HEAD', cache:'no-store', credentials:'same-origin' });
-        if (res.ok) { location.replace(path); return; }
-      }catch(e){ /* ignore and try next */ }
-    }
-    // Fallback to root
-    location.replace('/');
-  }
-
-  yesBtn.addEventListener('click', async () => {
+  yesBtn.addEventListener('click', () => {
     hideLogoutConfirm();
-    // clear auth everywhere
     try {
       sessionStorage.removeItem('cs_authed');
       localStorage.removeItem('cs_authed');
       document.cookie = 'cs_auth=; Max-Age=0; path=/; SameSite=Lax';
     } catch(_) {}
-    // make sure we are not in FS before navigating
     leaveFS();
-    await smartRedirectToLogin();
+    location.replace('/beta/auth.html'); // single gate
   });
 
   noBtn.addEventListener('click', () => {
@@ -431,21 +408,7 @@
     if (!document.fullscreenElement) showLogoutConfirm();
   });
 
-  // Also intercept any “exit/close” looking button on page (defensive)
-  document.addEventListener('click', (e) => {
-    const t = e.target.closest('button, a, [role="button"]');
-    if (!t) return;
-    const sig = [
-      t.id||'', t.className||'',
-      (t.getAttribute && (t.getAttribute('aria-label')||t.getAttribute('title'))) || '',
-      (t.textContent||'').trim()
-    ].join(' ').toLowerCase();
-    const looksLikeExit = /(^|[\s_-])exit(console)?([\s_-]|$)|(^|[\s_-])close([\s_-]|$)|×/.test(sig);
-    if (!looksLikeExit) return;
-    e.preventDefault(); e.stopImmediatePropagation();
-    leaveFS();
-    showLogoutConfirm();
-  }, true);
+  // 🔒 Removed the global “looks like exit/×” click-catcher that hijacked tile close.
 })();
 </script>
 </body>
