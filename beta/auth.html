@@ -9,7 +9,7 @@
   * { box-sizing: border-box; }
   html, body { height:100%; }
   body {
-    margin:0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Inter, Arial, sans-serif;
+    margin:0; font-family: system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif;
     background: radial-gradient(1200px 600px at 50% -20%, #2a3140 0%, #0b0f14 70%);
     color:#e8eef7; display:grid; place-items:center;
   }
@@ -37,7 +37,7 @@
 </style>
 </head>
 <body>
-  <div class="card" role="dialog" aria-modal="true">
+  <div class="card" role="dialog" aria-modal="true" id="signinCard" style="display:none">
     <h1>Sign in to ConciergeSync™</h1>
     <p>Welcome back. Continue to your console.</p>
     <div id="logoutNotice" class="notice" style="display:none;">You’ve been logged out.</div>
@@ -50,7 +50,13 @@
 
 <script>
 (function(){
+  // 🔧 Set this to your real login page:
+  // e.g. 'https://portal.conciergesync.ai/login' or 'https://portal.conciergesync.ai/'
+  const LOGIN_URL = 'https://portal.conciergesync.ai/login';
+
   const qs = new URLSearchParams(location.search);
+  const card = document.getElementById('signinCard');
+  const logoutNotice = document.getElementById('logoutNotice');
 
   function clearAuth(){
     try{
@@ -65,22 +71,25 @@
     }catch(_){}
   }
 
-  // If we arrived with ?logout=1, do NOT auto-redirect. Re-clear everything.
+  // If we arrived with ?logout=1, clear & forward to the real login immediately.
   if (qs.get('logout') === '1') {
     clearAuth();
-    document.getElementById('logoutNotice').style.display = 'block';
-  } else {
-    // Optional: if still fully authed, allow auto-forward.
-    const hasCookie = /(?:^|;\s*)cs_auth=1(?:;|$)/.test(document.cookie);
-    const hasStorage = (localStorage.getItem('cs_authed') === '1' || sessionStorage.getItem('cs_authed') === '1');
-    if (hasCookie || hasStorage) {
-      // Already signed in → go straight to the console landing (splash)
-      location.replace('/beta/01-index.html?enter=1');
-      return;
-    }
+    // Hard forward to the external login
+    location.replace(LOGIN_URL);
+    return;
   }
 
-  // Primary sign-in button: mark authed and proceed to console splash
+  // Otherwise: if still authed, fast-forward to the console splash
+  const hasCookie = /(?:^|;\s*)cs_auth=1(?:;|$)/.test(document.cookie);
+  const hasStorage = (localStorage.getItem('cs_authed') === '1' || sessionStorage.getItem('cs_authed') === '1');
+  if (hasCookie || hasStorage) {
+    location.replace('/beta/01-index.html?enter=1');
+    return;
+  }
+
+  // Show our simple sign-in card (manual entry to console)
+  card.style.display = 'block';
+
   document.getElementById('signin').addEventListener('click', function(e){
     e.preventDefault();
     try{
@@ -91,7 +100,6 @@
     location.assign('/beta/01-index.html?enter=1');
   });
 
-  // Secondary button can route to marketing or docs (placeholder)
   document.getElementById('learn').addEventListener('click', function(e){
     e.preventDefault();
     alert('ConciergeSync™ helps you earn, manage, and redeem travel rewards with clarity.');
