@@ -6,6 +6,11 @@
   <title>Sign in • ConciergeSync™</title>
   <style>
     :root{
+      /* 🔧 easy size knobs */
+      --card-max: 640px;       /* card max width (desktop) */
+      --card-pad: 18px;        /* inner padding */
+      --title-size: 32px;      /* H1 size on desktop */
+
       --glass: rgba(255,255,255,.08);
       --border: rgba(255,255,255,.22);
       --overlay-top: rgba(0,0,0,.32);
@@ -36,66 +41,77 @@
       opacity:.35;
     }
 
-    /* Card */
+    /* Centering */
     .wrap{
       position:relative; z-index:var(--ui);
       min-height:100%;
       display:grid; place-items:center;
-      padding:28px 18px;
+      padding:20px 14px;
     }
-    .card{
-      width:min(960px, calc(100vw - 28px));
-      background: rgba(15,15,18,.52);
-      backdrop-filter: blur(10px) saturate(1.1);
-      border:1px solid var(--border);
-      border-radius:16px;
-      box-shadow:0 14px 36px rgba(0,0,0,.32);
-      padding:24px;
-    }
-    h1{ margin:4px 0 12px; font-size:40px; line-height:1.2; }
-    p.sub{ margin:0 0 18px; color:#c8d0db; }
 
-    .row{ display:flex; gap:12px; align-items:stretch; flex-wrap:wrap; }
-    .row .grow{ flex:1 1 360px; min-width:260px; }
+    /* Compact card */
+    .card{
+      width:min(var(--card-max), calc(100vw - 28px));
+      background: rgba(15,15,18,.50);
+      backdrop-filter: blur(10px) saturate(1.08);
+      border:1px solid var(--border);
+      border-radius:14px;
+      box-shadow:0 12px 28px rgba(0,0,0,.28);
+      padding:var(--card-pad);
+    }
+    h1{
+      margin:2px 0 10px;
+      font-size:var(--title-size);
+      line-height:1.2;
+      letter-spacing:.2px;
+    }
+    p.sub{ margin:0 0 12px; color:#c8d0db; font-size:15px; }
+
+    .row{ display:flex; gap:10px; align-items:stretch; flex-wrap:wrap; }
+    .row + .row{ margin-top:10px; }
+    .row .grow{ flex:1 1 320px; min-width:240px; }
+
     input[type="email"], input[type="password"]{
       width:100%;
-      height:48px;
-      border-radius:12px;
+      height:44px;                  /* smaller */
+      border-radius:10px;
       border:1px solid var(--border);
       background: rgba(255,255,255,.06);
       color:#fff;
-      padding:0 14px;
-      font-size:16px;
+      padding:0 12px;
+      font-size:15px;
       outline:none;
     }
     input::placeholder{ color:#a8b0bc; }
 
     .btn{
-      height:48px; padding:0 16px; border-radius:12px;
+      height:44px; padding:0 14px; border-radius:10px;
       border:1px solid #fff; background:#fff; color:#121212;
-      font-weight:800; cursor:pointer;
+      font-weight:800; cursor:pointer; font-size:15px;
       transition: transform .08s var(--ease), box-shadow .08s var(--ease), opacity .2s;
       white-space:nowrap;
     }
-    .btn:hover{ transform: translateY(-1px); box-shadow:0 8px 18px rgba(0,0,0,.25); }
+    .btn:hover{ transform: translateY(-1px); box-shadow:0 6px 14px rgba(0,0,0,.22); }
     .btn:disabled{ opacity:.6; cursor:default; transform:none; box-shadow:none; }
-
     .btn.ghost{
       background:transparent; color:#fff; border-color:rgba(255,255,255,.55);
     }
 
-    .help{ margin-top:10px; color:#c2cad6; font-size:14px; }
+    .help{ margin-top:8px; color:#c2cad6; font-size:13px; }
     .error{
-      margin-top:10px;
+      margin-top:8px;
       background:#2b1212; border:1px solid #d66; color:#ffd7d7;
-      padding:10px 12px; border-radius:10px; display:none;
+      padding:9px 10px; border-radius:10px; display:none; font-size:14px;
     }
 
-    .split{
-      display:flex; gap:12px; flex-wrap:wrap; align-items:center;
-      margin-top:10px;
+    .split{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-top:8px; }
+    .split .spacer{ flex:1 1 10px; }
+
+    /* Even tighter on small screens */
+    @media (max-width: 520px){
+      :root{ --card-pad: 14px; --title-size: 28px; }
+      .btn, input{ height:42px; }
     }
-    .split .spacer{ flex:1 1 12px; }
   </style>
 </head>
 <body>
@@ -120,8 +136,8 @@
           <a class="btn ghost" href="/beta/01-index.html">What is ConciergeSync?</a>
         </div>
 
-        <!-- Optional password (keep hidden by default; flip to block if you enable password auth) -->
-        <div id="pwdRow" class="row" style="margin-top:10px; display:none;">
+        <!-- Optional password row (hidden unless you enable server password auth) -->
+        <div id="pwdRow" class="row" style="display:none;">
           <div class="grow">
             <input id="password" type="password" placeholder="Password" autocomplete="current-password"/>
           </div>
@@ -139,12 +155,11 @@
   </div>
 
   <script>
-    // ---------- CONFIG: adjust these if your backend routes differ ----------
+    // ---------- CONFIG: set to your backend routes ----------
     const API_LOGIN = 'https://portal.conciergesync.ai/auth/login'; // POST {email,password?} -> {ok:true}
     const API_CHECK = 'https://portal.conciergesync.ai/auth/check'; // GET  ?email=...          -> {ok:true}
-    const CONSOLE_URL = '/beta/01-index.html?enter=1';              // where to go on success
-    const ONBOARD_URL = '/beta/01-index.html';                      // “I’m new” entry (already linked above)
-    // -----------------------------------------------------------------------
+    const CONSOLE_URL = '/beta/01-index.html?enter=1';
+    // --------------------------------------------------------
 
     // If arriving with ?logout=1, hard-clear any auth breadcrumbs
     (() => {
@@ -166,47 +181,13 @@
     const btn = document.getElementById('btnLogin');
     const errBox = document.getElementById('err');
 
-    function showErr(msg){
-      errBox.textContent = msg;
-      errBox.style.display = 'block';
-    }
+    function showErr(msg){ errBox.textContent = msg; errBox.style.display = 'block'; }
     function clearErr(){ errBox.style.display = 'none'; errBox.textContent = ''; }
-
     function setBusy(b){
       btn.disabled = b;
       emailEl.disabled = b;
       if (pwdEl) pwdEl.disabled = b;
     }
-
-    async function verifyWithLogin(email, password){
-      // Attempt POST login if endpoint exists/enabled
-      try{
-        const res = await fetch(API_LOGIN, {
-          method:'POST',
-          headers:{'content-type':'application/json'},
-          body: JSON.stringify({ email, password })
-        });
-        if (!res.ok) return { ok:false, reason: 'login_http_'+res.status };
-        const data = await res.json().catch(()=>({}));
-        // accept a few possible shapes from backend
-        return { ok: !!(data && (data.ok || data.auth === true || data.status === 'ok')) };
-      }catch(e){
-        return { ok:false, reason:'login_net' };
-      }
-    }
-
-    async function verifyWithCheck(email){
-      try{
-        const url = API_CHECK + (API_CHECK.includes('?') ? '&' : '?') + 'email=' + encodeURIComponent(email);
-        const res = await fetch(url, { method:'GET' });
-        if (!res.ok) return { ok:false, reason:'check_http_'+res.status };
-        const data = await res.json().catch(()=>({}));
-        return { ok: !!(data && (data.ok || data.exists === true || data.valid === true)) };
-      }catch(e){
-        return { ok:false, reason:'check_net' };
-      }
-    }
-
     function markAuthed(email){
       try{
         sessionStorage.setItem('cs_authed','1');
@@ -217,6 +198,28 @@
         }
         document.cookie = 'cs_auth=1; path=/; max-age=7200; SameSite=Lax';
       }catch(_){}
+    }
+
+    async function verifyWithLogin(email, password){
+      try{
+        const res = await fetch(API_LOGIN, {
+          method:'POST',
+          headers:{'content-type':'application/json'},
+          body: JSON.stringify({ email, password })
+        });
+        if (!res.ok) return { ok:false };
+        const data = await res.json().catch(()=>({}));
+        return { ok: !!(data && (data.ok || data.auth === true || data.status === 'ok')) };
+      }catch{ return { ok:false }; }
+    }
+    async function verifyWithCheck(email){
+      try{
+        const url = API_CHECK + (API_CHECK.includes('?') ? '&' : '?') + 'email=' + encodeURIComponent(email);
+        const res = await fetch(url);
+        if (!res.ok) return { ok:false };
+        const data = await res.json().catch(()=>({}));
+        return { ok: !!(data && (data.ok || data.exists === true || data.valid === true)) };
+      }catch{ return { ok:false }; }
     }
 
     form.addEventListener('submit', async (e) => {
@@ -233,15 +236,12 @@
 
       setBusy(true);
 
-      // 1) Try POST /auth/login (if your backend supports it)
       let ok = false;
-      let res1 = await verifyWithLogin(email, password);
-      if (res1.ok) {
-        ok = true;
-      } else {
-        // 2) Fallback to GET /auth/check?email=…
-        const res2 = await verifyWithCheck(email);
-        ok = res2.ok;
+      const r1 = await verifyWithLogin(email, password);
+      ok = r1.ok;
+      if (!ok){
+        const r2 = await verifyWithCheck(email);
+        ok = r2.ok;
       }
 
       if (!ok){
@@ -250,13 +250,12 @@
         return;
       }
 
-      // success → set flags + go to console
       markAuthed(email);
       window.location.assign(CONSOLE_URL);
     });
 
-    // Pre-warm your portal (keeps it snappy)
-    (function prewarm(){
+    // Prewarm portal for snappier round-trips
+    (function () {
       try {
         const img = new Image();
         img.referrerPolicy = 'no-referrer';
