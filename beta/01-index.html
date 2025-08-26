@@ -214,7 +214,7 @@ body.splash-mode .console-exit {
 
     // swap to console view
     document.documentElement.classList.add('console-mode');
-
+    document.body.classList.remove('splash-mode'); // unhide the console UI
     // open your default tile
     if (window.openConsole) {
       window.openConsole('overview');
@@ -1248,6 +1248,7 @@ function openTile(key){
 
 </body>
 </html>
+
 
 
 
