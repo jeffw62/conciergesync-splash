@@ -1,60 +1,33 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>ConciergeSync™ — Onboarding Complete</title>
-<style>
-  :root{--glass:rgba(255,255,255,.10);--brd:rgba(255,255,255,.28);--blur:blur(12px) saturate(1.2)}
-  html,body{height:100%}
-  body{
-    margin:0;color:#fff;font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif;
-    background:center/cover no-repeat fixed url("/beta/assets/bg/default.jpg"), #0b1220;
-  }
-  .shade{position:fixed; inset:0; background:linear-gradient(180deg, rgba(0,0,0,.35), rgba(0,0,0,.6))}
-  .wrap{position:relative; min-height:100%; display:grid; place-items:center; padding:24px}
-  .card{
-    width:min(820px,92vw);
-    border:1px solid var(--brd); background:var(--glass); backdrop-filter:var(--blur);
-    border-radius:24px; padding:28px 28px 22px; box-shadow:0 12px 40px rgba(0,0,0,.35); text-align:center;
-  }
-  h1{margin:6px 0 6px; font-size: clamp(28px, 4vw, 40px); line-height:1.12}
-  p{margin:8px 0 12px; color:#e6e9ee}
-  .row{display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin-top:16px}
-  .btn{
-    display:inline-flex; align-items:center; justify-content:center; padding:12px 16px; border-radius:999px;
-    border:1px solid rgba(255,255,255,.24); background:rgba(255,255,255,.12); color:#fff; text-decoration:none; cursor:pointer; font-weight:600;
-  }
-  .muted{color:#cbd5e1; font-size:14px}
-  footer{margin-top:12px; font-size:12px; color:#cdd3dd}
-</style>
-<script>
-  // Ensure the console guard lets them in
-  try { localStorage.setItem('cs_authed','1'); } catch(e) {}
-</script>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>ConciergeSync™ — Redirecting…</title>
+  <!-- Fallback meta refresh in case JS is disabled -->
+  <meta http-equiv="refresh" content="1; url=/beta/01-index.html">
+  <style>
+    html,body{height:100%}
+    body{
+      margin:0; display:grid; place-items:center; font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif;
+      color:#e6e9ee; background:#0b1220;
+    }
+    .card{padding:24px 28px;border-radius:18px;background:#151a24;border:1px solid rgba(255,255,255,.18)}
+    a{color:#fff}
+  </style>
+  <script>
+    // Guarantee console access, then hard jump to the console.
+    (function(){
+      try { localStorage.setItem('cs_authed','1'); } catch(e) {}
+      var dest = '/beta/01-index.html';
+      // Fast, history-replacing redirect
+      location.replace(dest);
+    })();
+  </script>
 </head>
 <body>
-  <div class="shade"></div>
-  <div class="wrap">
-    <div class="card">
-      <h1>Onboarding Complete ✔️</h1>
-      <p>Your profile is saved. You’re ready to use the ConciergeSync™ console.</p>
-
-      <div class="row">
-        <button id="enter" class="btn">Enter Console</button>
-        <a class="btn" href="/index.html">What is ConciergeSync?</a>
-      </div>
-
-      <p class="muted">Tip: You can sign out from the console’s top-right menu anytime.</p>
-      <footer>© <span id="y"></span> ConciergeSync™</footer>
-    </div>
+  <div class="card">
+    Redirecting you to the console… If nothing happens, <a href="/beta/01-index.html">click here</a>.
   </div>
-  <script>
-    document.getElementById('y').textContent = new Date().getFullYear();
-    document.getElementById('enter').addEventListener('click', function () {
-      // Bullet-proof navigation into the console
-      location.replace('/beta/01-index.html');
-    });
-  </script>
 </body>
 </html>
