@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>ConciergeSync™ Console</title>
 
-  <!-- Preconnect (kept) -->
   <link rel="dns-prefetch" href="//portal.conciergesync.ai">
   <link rel="preconnect" href="https://portal.conciergesync.ai" crossorigin>
 
@@ -15,7 +14,6 @@
       --muted:#475569;
       --bg:#f6f7fb;
 
-      /* console backdrop tuning */
       --bg-brightness:1.15;
       --bg-contrast:1.05;
       --overlay:0.30;
@@ -35,7 +33,7 @@
       line-height:1.6;
     }
 
-    /* ---------- Landing (hidden in console-mode) ---------- */
+    /* ---------- Landing (hidden once console-mode is set) ---------- */
     .wrap{max-width:880px;margin:40px auto;padding:0 20px}
     .card{
       background:#fff;border:1px solid #e6eaf0;border-radius:16px;
@@ -48,10 +46,9 @@
     ul{margin:8px 0 0 24px}
     .center{text-align:center}
 
-    /* Hide landing content while in console-mode */
     .console-mode .wrap{display:none}
 
-    /* ---------- Backdrop under the console ---------- */
+    /* ---------- Backdrop ---------- */
     .backdrop{position:fixed;inset:0;z-index:0;overflow:hidden}
     .backdrop-image{
       position:absolute;inset:0;background:center/cover no-repeat;
@@ -82,12 +79,36 @@
     }
     .cs-tab:hover{background:rgba(255,255,255,.12)}
 
-    /* tiles container (empty at start) */
-    .cs-tiles{
-      position:relative; height:100%;
-    }
+    /* tiles container */
+    .cs-tiles{position:relative;height:100%}
 
-    /* top-right Exit (close) button */
+    /* simple glass tile */
+    .tile{
+      position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+      min-width:360px;max-width:640px;width:min(90vw,560px);
+      min-height:260px;max-height:70vh;overflow:auto;
+      color:#f5f7fb;
+      background:rgba(255,255,255,.10);
+      border:1px solid rgba(255,255,255,.28);
+      border-radius:18px;
+      box-shadow:0 10px 30px rgba(0,0,0,.18);
+      backdrop-filter:blur(12px) saturate(1.2);
+    }
+    .tile-head{
+      display:flex;align-items:center;justify-content:space-between;
+      padding:12px 14px;background:rgba(0,0,0,.18);
+      border-bottom:1px solid rgba(255,255,255,.18)
+    }
+    .tile-head h4{margin:0;font:700 15px/1.2 system-ui}
+    .tile-close{
+      width:30px;height:30px;border-radius:8px;cursor:pointer;
+      background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.25);
+      font-size:18px;line-height:28px;text-align:center;
+    }
+    .tile-close:hover{background:rgba(255,255,255,.20)}
+    .tile-body{padding:14px}
+
+    /* Exit (top-right) */
     .console-exit{
       position:fixed;top:18px;right:18px;z-index:var(--z-ui);
       width:40px;height:40px;border-radius:10px;
@@ -98,11 +119,11 @@
     }
     .console-exit:hover{ background:rgba(20,20,20,.6) }
 
-    /* ---------- Fullscreen pill ---------- */
+    /* ---------- Fullscreen CTA ---------- */
     .fs-cta{
       position:fixed; inset:0; z-index:5000;
       display:none; place-items:center;
-      pointer-events:none;  /* let clicks pass through except the button */
+      pointer-events:none;
     }
     .fs-cta.on{ display:grid }
     .fs-btn{
@@ -121,27 +142,21 @@
     }
   </style>
 </head>
-
 <body>
-
-  <!-- Landing content (auto-hidden once console-mode is set) -->
+  <!-- Landing -->
   <main class="wrap">
     <section class="card">
       <h1>Welcome to ConciergeSync™</h1>
       <p class="center">Your personal travel rewards strategist — earn, manage, and redeem points with clarity.</p>
     </section>
-
     <section class="card">
       <h2>Place Holder</h2>
-      <p>Place Holder</p>
-      <p>Place Holder</p>
-      <p>Place Holder</p>
-
+      <p>Place Holder</p><p>Place Holder</p><p>Place Holder</p>
       <h3>Your Role as a Beta User Client (BUC)</h3>
       <ul>
         <li><strong>Onboard (5–7 min):</strong> share your travel goals and programs.</li>
-        <li><strong>Explore ConciergeSync™ as it evolves:</strong> we’ll invite you to test features as they’re released and sanity-check how they work.</li>
-        <li><strong>Give quick feedback:</strong> reply to short prompts when something’s confusing or off.</li>
+        <li><strong>Explore ConciergeSync™ as it evolves:</strong> try features as they’re released and sanity-check how they work.</li>
+        <li><strong>Give quick feedback:</strong> reply to short prompts when something’s off.</li>
       </ul>
     </section>
   </main>
@@ -159,10 +174,10 @@
       <button class="cs-tab" data-key="itinerary">Itinerary</button>
       <button class="cs-tab" data-key="values">Value Calc</button>
     </div>
-    <div id="cs-tiles" class="cs-tiles"><!-- empty by design on entry --></div>
+    <div id="cs-tiles" class="cs-tiles"></div>
   </div>
 
-  <!-- Exit button (top-right) -->
+  <!-- Exit button -->
   <button id="exitConsole" class="console-exit" aria-label="Exit Console" type="button"
           onclick="window.location.href='exit.html'">×</button>
 
@@ -173,38 +188,36 @@
 
   <script>
   (function () {
-    /* --------- Backdrop image (static for now) --------- */
+    "use strict";
+
+    /* --------- Backdrop image (static) --------- */
     var bg = '/beta/assets/bg/IMG_5374.jpeg';
     var bgEl = document.getElementById('backdropImage');
     if (bgEl) bgEl.style.backgroundImage = 'url("'+bg+'")';
 
-    /* --------- If arriving from thank-you, enter console mode --------- */
+    /* --------- Enter console when coming from thank-you --------- */
     var qs = new URLSearchParams(location.search);
     var fromThankYou = qs.get('enter') === '1';
 
     if (fromThankYou) {
-      // Mark authed so guards won't bounce
       try {
         sessionStorage.setItem('cs_authed','1');
         localStorage.setItem('cs_authed','1');
         document.cookie = "cs_auth=1; path=/; max-age=7200; SameSite=Lax";
       } catch(_) {}
 
-      // Show console, hide landing
       document.documentElement.classList.add('console-mode');
-
-      // Show the fullscreen CTA (not a blocking overlay)
-      showFsCta();
+      showFsCtaIfNeeded();
     }
 
-    /* --------- Fullscreen CTA behavior --------- */
+    /* --------- Fullscreen CTA --------- */
     var fsWrap = document.getElementById('fs-cta');
     var fsBtn  = document.getElementById('fs-go');
 
     function isFS(){
-      return !!(document.fullscreenElement || document.webkitFullscreenElement);
+      return !!(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement);
     }
-    function showFsCta(){
+    function showFsCtaIfNeeded(){
       if (!isFS() && fsWrap) fsWrap.classList.add('on');
     }
     function hideFsCta(){
@@ -218,34 +231,55 @@
         var req = root.requestFullscreen || root.webkitRequestFullscreen || root.mozRequestFullScreen || root.msRequestFullscreen;
         if (req){
           Promise.resolve(req.call(root)).catch(function(){ /* ignore */ }).finally(hideFsCta);
-        }else{
-          // If not supported, just hide the pill
+        } else {
           hideFsCta();
         }
       });
     }
-    document.addEventListener('fullscreenchange', function(){
-      if (isFS()) hideFsCta();
-    });
+    document.addEventListener('fullscreenchange', function(){ if (isFS()) hideFsCta(); });
 
-    /* --------- (Optional) tab hooks (no auto-open) --------- */
+    /* --------- Simple tiles: open on tab click --------- */
+    var tilesHost = document.getElementById('cs-tiles');
+
+    var TILES = {
+      overview: { title:'Overview', html:'<p>Overview content goes here.</p>' },
+      itinerary:{ title:'Itinerary', html:'<p>Trip segments, dates, carriers.</p>' },
+      values:   { title:'Value Calc', html:'<p>CPP, cash vs award, transfer hints.</p>' }
+    };
+
+    function closeTile(el){
+      try { el.remove(); } catch(_){}
+    }
+    function openTile(key){
+      var spec = TILES[key]; if (!spec) return;
+      // remove any existing tile with same key (keep one visible)
+      Array.from(tilesHost.querySelectorAll('.tile[data-key="'+key+'"]')).forEach(closeTile);
+
+      var sec = document.createElement('section');
+      sec.className = 'tile';
+      sec.dataset.key = key;
+      sec.innerHTML =
+        '<div class="tile-head">' +
+          '<h4>'+spec.title+'</h4>' +
+          '<button class="tile-close" aria-label="Close">×</button>' +
+        '</div>' +
+        '<div class="tile-body">'+spec.html+'</div>';
+
+      sec.querySelector('.tile-close').addEventListener('click', function(){ closeTile(sec); });
+      tilesHost.appendChild(sec);
+    }
+
     document.querySelectorAll('.cs-tab').forEach(function(btn){
-      btn.addEventListener('click', function(){
-        // placeholder: your tile opening code would go here
-      });
+      btn.addEventListener('click', function(){ openTile(btn.dataset.key); });
     });
 
-    /* --------- Keep viewport unit stable on iOS --------- */
+    /* --------- iOS vh fix --------- */
     function setVh(){ document.documentElement.style.setProperty('--vh', window.innerHeight + 'px'); }
     setVh(); addEventListener('resize', setVh);
-  })();
-  </script>
 
-  <!-- Pre-warm the portal (no UI impact) -->
-  <script>
-    (function () {
-      try { var img = new Image(); img.referrerPolicy='no-referrer'; img.src='https://portal.conciergesync.ai/health?ts='+Date.now(); } catch(e){}
-    })();
+    /* --------- Pre-warm the portal (non-blocking) --------- */
+    try { var img = new Image(); img.referrerPolicy='no-referrer'; img.src='https://portal.conciergesync.ai/health?ts='+Date.now(); } catch(e){}
+  })();
   </script>
 </body>
 </html>
