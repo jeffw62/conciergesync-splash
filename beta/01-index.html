@@ -3,54 +3,239 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>ConciergeSync™ — Onboarding Complete</title>
+<title>ConciergeSync™ — Console</title>
 <style>
-  :root{--glass:rgba(255,255,255,.10);--brd:rgba(255,255,255,.28);--blur:blur(12px) saturate(1.2)}
+  :root{
+    --ink:#0f172a; --muted:#94a3b8;
+    --glass: rgba(255,255,255,.10);
+    --brd: rgba(255,255,255,.28);
+    --blur: blur(12px) saturate(1.2);
+    --lift: 0 16px 44px rgba(0,0,0,.28);
+  }
   html,body{height:100%}
   body{
     margin:0;color:#fff;font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif;
-    background:center/cover no-repeat fixed url("/beta/assets/bg/default.jpg"), #0b1220;
+    /* WING BACKGROUND */
+    background:center/cover no-repeat fixed url("/beta/assets/bg/wing.jpg"), #0b1220;
+    overflow:hidden;
   }
-  .shade{position:fixed; inset:0; background:linear-gradient(180deg, rgba(0,0,0,.35), rgba(0,0,0,.6))}
-  .wrap{position:relative; min-height:100%; display:grid; place-items:center; padding:24px}
-  .card{
-    width:min(820px,92vw);
-    border:1px solid var(--brd); background:var(--glass); backdrop-filter:var(--blur);
-    border-radius:24px; padding:28px 28px 22px; box-shadow:0 12px 40px rgba(0,0,0,.35); text-align:center;
+
+  /* Top bar */
+  .top{
+    position:fixed; inset:14px 14px auto 14px; display:flex; gap:8px; align-items:center; z-index:1000;
   }
-  h1{margin:6px 0 6px; font-size: clamp(28px, 4vw, 40px); line-height:1.12}
-  p{margin:8px 0 12px; color:#e6e9ee}
-  .row{display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin-top:16px}
-  a.btn,button.btn{
+  .pill{
+    padding:10px 14px; border-radius:999px; border:1px solid rgba(255,255,255,.24);
+    background:rgba(0,0,0,.20); backdrop-filter:var(--blur); color:#fff; text-decoration:none; cursor:pointer; font-weight:600;
+  }
+  .spacer{flex:1}
+  .link{opacity:.9; text-decoration:none; color:#fff}
+  .xbtn{
+    width:38px;height:38px;border-radius:999px;border:1px solid rgba(255,255,255,.28);
+    background:rgba(0,0,0,.25); display:grid;place-items:center; cursor:pointer; font-weight:700;
+  }
+
+  /* Tiles */
+  .tile{
+    position:absolute; top:50%; left:50%; width:min(560px, 92vw); height:min(360px, 70vh);
+    transform: translate(-50%,-50%);
+    border:1px solid var(--brd); border-radius:18px; background:var(--glass); backdrop-filter:var(--blur);
+    box-shadow: var(--lift);
+    touch-action:none; user-select:none;
+  }
+  .tile header{
+    display:flex; align-items:center; gap:10px; padding:10px 12px; border-bottom:1px solid rgba(255,255,255,.16);
+    cursor:grab; font-weight:700;
+  }
+  .tile header .close{
+    margin-left:auto; width:30px; height:30px; border-radius:999px; display:grid; place-items:center;
+    border:1px solid rgba(255,255,255,.22); background:rgba(255,255,255,.10); cursor:pointer;
+  }
+  .tile .body{padding:12px; color:#e6e9ee; font-size:14px}
+  .ghost{opacity:.75}
+  .dismissing{transition:transform 520ms cubic-bezier(.16,1,.3,1), opacity 320ms ease}
+
+  /* Fullscreen prompt pill */
+  .fs-veil{
+    position:fixed; inset:0; background:linear-gradient(180deg, rgba(0,0,0,.35), rgba(0,0,0,.7)); display:grid; place-items:center; z-index:1100;
+  }
+  .fs-card{
+    width:min(540px,92vw); border:1px solid var(--brd); background:var(--glass); backdrop-filter:var(--blur);
+    border-radius:24px; padding:24px; box-shadow:var(--lift); text-align:center;
+  }
+  .row{display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin-top:12px}
+  .btn{
     display:inline-flex; align-items:center; justify-content:center; padding:12px 16px; border-radius:999px;
     border:1px solid rgba(255,255,255,.24); background:rgba(255,255,255,.12); color:#fff; text-decoration:none; cursor:pointer; font-weight:600;
   }
-  .muted{color:#cbd5e1; font-size:14px}
-  footer{margin-top:12px; font-size:12px; color:#cdd3dd}
-</style>
 
-<!-- Ensure console access is guaranteed -->
-<script>
-  // If someone lands here from any older flow, make sure the console guard lets them in.
-  try { localStorage.setItem('cs_authed','1'); } catch(e) {}
-</script>
+  /* Logout modal */
+  .modal{position:fixed; inset:0; display:none; place-items:center; background:rgba(0,0,0,.45); z-index:1200}
+  .modal.open{display:grid}
+  .modal .card{
+    width:min(480px,92vw); border:1px solid var(--brd); background:var(--glass); backdrop-filter:var(--blur);
+    border-radius:20px; padding:22px; box-shadow:var(--lift);
+  }
+  .muted{color:#cdd3dd}
+</style>
 </head>
 <body>
-  <div class="shade"></div>
-  <div class="wrap">
-    <div class="card">
-      <h1>Onboarding Complete ✔️</h1>
-      <p>Your profile is saved. You’re ready to use the ConciergeSync™ console.</p>
 
-      <div class="row">
-        <a class="btn" href="/beta/01-index.html">Enter Console</a>
-        <a class="btn" href="/index.html">What is ConciergeSync?</a>
-      </div>
+<!-- Auth guard -->
+<script>
+  try {
+    if (!localStorage.getItem('cs_authed')) location.replace('/beta/auth.html');
+  } catch (e) {
+    location.replace('/beta/auth.html');
+  }
+</script>
 
-      <p class="muted">Tip: You can sign out from the console’s top-right menu anytime.</p>
-      <footer>© <span id="y"></span> ConciergeSync™</footer>
+<!-- Top bar -->
+<div class="top">
+  <button class="pill" data-tile="Wallet">Wallet</button>
+  <button class="pill" data-tile="Trips">Trips</button>
+  <button class="pill" data-tile="Engine">Redemption Engine</button>
+  <div class="spacer"></div>
+  <a class="link pill" href="/index.html">What is ConciergeSync?</a>
+  <button id="logoutBtn" class="xbtn" title="Logout">×</button>
+</div>
+
+<!-- Fullscreen prompt -->
+<div id="fsVeil" class="fs-veil" hidden>
+  <div class="fs-card">
+    <h2 style="margin:0 0 6px">Go Full Screen?</h2>
+    <p class="muted" style="margin:0 0 8px">For the calmest console, we recommend fullscreen.</p>
+    <div class="row">
+      <button class="btn" id="goFs">Go Full Screen</button>
+      <button class="btn" id="skipFs">Skip</button>
     </div>
   </div>
-  <script>document.getElementById('y').textContent = new Date().getFullYear()</script>
+</div>
+
+<!-- Logout confirm modal -->
+<div id="logoutModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="logoutTitle">
+  <div class="card">
+    <h3 id="logoutTitle" style="margin:0 0 8px">Sign out of ConciergeSync™?</h3>
+    <p class="muted" style="margin:0 0 14px">You can sign back in anytime with your email.</p>
+    <div class="row" style="justify-content:flex-end">
+      <button class="btn" id="stayBtn">No, stay here</button>
+      <button class="btn" id="confirmLogoutBtn">Yes, sign out</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ——— Fullscreen prompt behavior
+  const fsVeil = document.getElementById('fsVeil');
+  let userChoseFullscreen = false;
+
+  function showFsPrompt(){
+    if (sessionStorage.getItem('cs_fs_prompt') === '1') return;
+    fsVeil.hidden = false;
+  }
+  function hideFsPrompt(){ fsVeil.hidden = true; sessionStorage.setItem('cs_fs_prompt','1'); }
+
+  document.getElementById('goFs').onclick = async () => {
+    userChoseFullscreen = true;
+    hideFsPrompt();
+    try { await document.documentElement.requestFullscreen(); } catch(e){}
+  };
+  document.getElementById('skipFs').onclick = hideFsPrompt;
+
+  // ——— Tiles: fan/cascade, draggable, swipe-to-dismiss
+  const btns = document.querySelectorAll('[data-tile]');
+  let z = 10, fan = 0;
+
+  function createTile(title){
+    const t = document.createElement('div');
+    t.className = 'tile';
+    t.style.zIndex = ++z;
+    // cascade offsets
+    const dx = (fan++ % 5) * 22 - 44;
+    const dy = (fan % 5) * 16 - 32;
+    t.style.transform = `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px))`;
+    t.innerHTML = `
+      <header><span>${title}</span><div class="close" title="Close">×</div></header>
+      <div class="body">This is the <strong>${title}</strong> tile. Drag it anywhere; fast-swipe to dismiss.</div>
+    `;
+    const header = t.querySelector('header');
+    const close  = t.querySelector('.close');
+    close.onclick = () => dismissTile(t, {dx: 0, dy: -240});
+
+    let startX=0,startY=0, x=0,y=0, lastT=0, lastX=0, lastY=0, vx=0, vy=0;
+
+    function parseCurrent(){
+      const m = t.style.transform.match(/translate\(([-0-9.]+)px,\s*([-0-9.]+)px\)/);
+      if(m){ x = parseFloat(m[1]); y = parseFloat(m[2]); return; }
+      const rect = t.getBoundingClientRect();
+      x = window.innerWidth/2 - rect.width/2;
+      y = window.innerHeight/2 - rect.height/2;
+      t.style.transform = `translate(${x}px, ${y}px)`;
+    }
+    function onDown(e){
+      parseCurrent();
+      t.classList.add('ghost');
+      t.style.zIndex = ++z;
+      const p = getPoint(e);
+      startX = p.x - x; startY = p.y - y;
+      lastT = e.timeStamp; lastX = p.x; lastY = p.y;
+      window.addEventListener('pointermove', onMove);
+      window.addEventListener('pointerup', onUp, {once:true});
+    }
+    function onMove(e){
+      const p = getPoint(e);
+      x = p.x - startX; y = p.y - startY;
+      t.style.transform = `translate(${x}px, ${y}px)`;
+      const dt = e.timeStamp - lastT || 1;
+      vx = (p.x - lastX)/dt; vy = (p.y - lastY)/dt;
+      lastT = e.timeStamp; lastX = p.x; lastY = p.y;
+    }
+    function onUp(){
+      t.classList.remove('ghost');
+      const speed = Math.hypot(vx,vy);
+      const centerX = window.innerWidth/2 - t.offsetWidth/2;
+      const centerY = window.innerHeight/2 - t.offsetHeight/2;
+      const dist  = Math.hypot(x - centerX, y - centerY);
+      const shouldDismiss = speed > 0.9 || dist > Math.min(window.innerWidth, window.innerHeight)*0.65;
+      if(shouldDismiss){ dismissTile(t, {dx: vx*900, dy: vy*900}); }
+      window.removeEventListener('pointermove', onMove);
+    }
+    header.addEventListener('pointerdown', onDown);
+    document.body.appendChild(t);
+  }
+
+  function getPoint(e){ return {x: e.clientX, y: e.clientY}; }
+  function dismissTile(t, vec){
+    t.classList.add('dismissing');
+    const m = t.style.transform.match(/translate\(([-0-9.]+)px,\s*([-0-9.]+)px\)/);
+    const cx = m ? parseFloat(m[1]) : 0;
+    const cy = m ? parseFloat(m[2]) : 0;
+    const nx = cx + (vec.dx||0), ny = cy + (vec.dy||0);
+    t.style.opacity = '0';
+    t.style.transform = `translate(${nx}px, ${ny}px)`;
+    setTimeout(()=> t.remove(), 520);
+  }
+  btns.forEach(b => b.onclick = () => createTile(b.dataset.tile));
+
+  // ——— Logout flow
+  const modal = document.getElementById('logoutModal');
+  document.getElementById('logoutBtn').onclick = () => modal.classList.add('open');
+  document.getElementById('stayBtn').onclick   = async () => {
+    modal.classList.remove('open');
+    if (userChoseFullscreen && !document.fullscreenElement){
+      try { await document.documentElement.requestFullscreen(); } catch(e){}
+    }
+  };
+  document.getElementById('confirmLogoutBtn').onclick = csLogout;
+  document.addEventListener('keydown', (e)=>{ if(e.key === 'Escape') modal.classList.add('open'); });
+
+  function csLogout(){
+    try{ localStorage.removeItem('cs_authed'); }catch{}
+    location.replace('/beta/auth.html');
+  }
+
+  // Show fullscreen prompt on first entry of the session
+  showFsPrompt();
+</script>
 </body>
 </html>
