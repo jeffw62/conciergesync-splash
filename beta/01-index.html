@@ -11,7 +11,7 @@
     --glass-border: rgba(255,255,255,.28);
     --overlay-grad-top: rgba(0,0,0,.35);
     --overlay-grad-bot: rgba(0,0,0,.58);
-    --overlay: .30;                 /* tuned by luminance script if desired */
+    --overlay: .30;
     --vh: 100vh;
     --ui: 4000;
     --ease: cubic-bezier(.22,1,.36,1);
@@ -19,18 +19,16 @@
     --t: 640ms;
     --t-out: 900ms;
   }
-
   *{ box-sizing:border-box; }
-
   html,body{ height:100%; }
   body{
     margin:0;
     font-family: system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif;
     color:#eef2f8;
-    background: #0b0f14; /* safe base behind the photo */
+    background:#0b0f14;
   }
 
-  /* Backdrop image + overlay */
+  /* Backdrop */
   .backdrop{ position:fixed; inset:0; z-index:0; overflow:hidden; }
   .backdrop-image{
     position:absolute; inset:0;
@@ -39,7 +37,7 @@
     transform: scale(1.03) translateZ(0);
     will-change: transform, opacity, filter;
     transition: opacity 600ms ease, transform 900ms ease, filter 900ms ease;
-    opacity:.999; /* ensure visible immediately */
+    opacity:.999;
   }
   .backdrop-overlay{
     position:absolute; inset:0; pointer-events:none;
@@ -47,7 +45,7 @@
     opacity: var(--overlay);
   }
 
-  /* Tabs (top bar) */
+  /* Tabs */
   .cs-tabs{
     position: fixed; top: 18px; left: 50%; transform: translateX(-50%);
     z-index: var(--ui);
@@ -62,7 +60,7 @@
   }
   .cs-tab:hover{ background: rgba(255,255,255,.12); }
 
-  /* Exit fullscreen button */
+  /* Exit button */
   .console-exit{
     position:fixed; top:18px; right:18px; z-index:var(--ui);
     width:40px; height:40px; border-radius:10px;
@@ -74,16 +72,14 @@
   .console-exit:hover{ background: rgba(20,20,20,.6); }
 
   /* Tiles stage */
-  #cs-tiles{
-    position: fixed; inset: 0; z-index: 10; pointer-events: none;
-  }
+  #cs-tiles{ position: fixed; inset: 0; z-index: 10; pointer-events: none; }
 
-  /* Tile look */
+  /* Tile */
   .cs-tile{
     position:absolute;
-    width: 420px;                   /* narrower */
+    width: 420px;
     min-height: 320px;
-    max-height: 76vh;               /* taller */
+    max-height: 76vh;
     display:grid; grid-template-rows:auto 1fr;
     background: var(--glass-bg);
     color:#f5f7fb;
@@ -92,19 +88,18 @@
     box-shadow:0 10px 30px rgba(0,0,0,.22);
     backdrop-filter: blur(12px) saturate(1.22);
     overflow:hidden;
-    pointer-events:auto;            /* tiles remain interactive */
+    pointer-events:auto;
     user-select:none;
-    touch-action: pan-y;            /* keep vertical scroll inside body */
+    touch-action: pan-y;
     will-change: transform, opacity, left, top;
     transition: box-shadow var(--t-fast) ease;
   }
   .cs-tile.is-focused{
     box-shadow:0 16px 44px rgba(0,0,0,.32), 0 0 0 1px rgba(255,255,255,.18) inset;
   }
-
   .cs-tile-head{
     display:flex; align-items:center; justify-content:space-between;
-    padding: 12px 14px; background: rgba(0,0,0,.18);
+    padding:12px 14px; background: rgba(0,0,0,.18);
     border-bottom:1px solid rgba(255,255,255,.18);
   }
   .cs-tile-head h4{ margin:0; font-size:15px; font-weight:800; letter-spacing:.2px; }
@@ -116,8 +111,6 @@
   }
   .cs-close:hover{ background: rgba(255,255,255,.2); }
   .cs-tile-body{ padding:14px; overflow:auto; }
-
-  /* Dismiss animation */
   .cs-tile.dismissing{
     transition: transform var(--t-out) var(--ease), opacity var(--t-out) var(--ease);
     opacity:0;
@@ -137,8 +130,27 @@
   .btn.primary{ background:#fff; color:#111; border-color:#fff; }
   .btn.ghost{ background:transparent; color:#fff; }
 
-  /* Show CTA only while NOT fullscreen */
   body.console-mode:not(.fs-active) .fs-cta{ display:grid; }
+
+  /* Logout confirm modal */
+  #logoutConfirm {
+    position: fixed; inset: 0; z-index: 99999;
+    display: none; place-items: center;
+    background: rgba(0,0,0,.55);
+  }
+  #logoutConfirm.show { display: grid; }
+  #logoutConfirm .card {
+    background:#111; color:#fff; border-radius:14px;
+    padding:18px 20px; box-shadow:0 10px 34px rgba(0,0,0,.45);
+    font:600 16px system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif;
+    text-align:center; min-width:320px; max-width:420px;
+  }
+  #logoutConfirm .row { display:flex; gap:10px; justify-content:center; margin-top:12px; }
+  #logoutConfirm button {
+    padding:10px 14px; border-radius:12px; cursor:pointer; font-weight:700;
+    border:1px solid rgba(255,255,255,.55); background:transparent; color:#fff;
+  }
+  #logoutConfirm .primary { background:#fff; color:#111; border-color:#fff; }
 </style>
 </head>
 <body class="console-mode">
@@ -156,7 +168,7 @@
     <button class="cs-tab" data-key="values">Value Calc</button>
   </div>
 
-  <!-- Exit fullscreen -->
+  <!-- Exit -->
   <button id="exitFs" class="console-exit" aria-label="Exit Fullscreen">×</button>
 
   <!-- Tiles stage -->
@@ -173,67 +185,81 @@
     </div>
   </div>
 
+  <!-- Logout confirm -->
+  <div id="logoutConfirm" role="dialog" aria-modal="true" aria-labelledby="logoutTitle">
+    <div class="card">
+      <div id="logoutTitle" style="font-weight:800;margin-bottom:8px;">Do you want to log out?</div>
+      <div class="row">
+        <button id="logoutYes" class="primary">Yes, log me out</button>
+        <button id="logoutNo">No, take me back fullscreen</button>
+      </div>
+    </div>
+  </div>
+
 <script>
 (function(){
-  /* -------------------- Backdrop -------------------- */
+  /* ---------------- Backdrop ---------------- */
   const BG = '/beta/assets/bg/IMG_5374.jpeg';
   document.getElementById('backdropImage').style.backgroundImage = `url("${BG}")`;
 
-  /* -------------------- Fullscreen flow -------------------- */
-  const root = document.documentElement;
-  const fsGo   = document.getElementById('fs-go');
-  const fsSkip = document.getElementById('fs-skip');
-  const fsCta  = document.getElementById('fs-cta');
-  const exitFs = document.getElementById('exitFs');
+  /* ---------------- Fullscreen flow ---------------- */
+  const root  = document.documentElement;
+  const fsGo  = document.getElementById('fs-go');
+  const fsSkip= document.getElementById('fs-skip');
+  const fsCta = document.getElementById('fs-cta');
+  const exitFs= document.getElementById('exitFs');
 
-  function setVh(){ document.documentElement.style.setProperty('--vh', window.innerHeight + 'px'); }
+  function setVh(){ root.style.setProperty('--vh', window.innerHeight + 'px'); }
   setVh(); addEventListener('resize', setVh);
 
   function enterFS(){
     const req = root.requestFullscreen || root.webkitRequestFullscreen || root.msRequestFullscreen || root.mozRequestFullScreen;
     if (req) { Promise.resolve(req.call(root)).catch(()=>{}); }
-    document.body.classList.add('fs-active');
-    fsCta.style.display = 'none';
   }
   function leaveFS(){
     const ex = document.exitFullscreen || document.webkitExitFullscreen || document.msExitFullscreen || document.mozCancelFullScreen;
     if (document.fullscreenElement || document.webkitFullscreenElement) { try{ ex.call(document); }catch(e){} }
-    document.body.classList.remove('fs-active');
-    // keep console visible; CTA will reappear so user can re-enter
   }
+
+  // keep body flag in sync; show CTA when not FS
+  document.addEventListener('fullscreenchange', () => {
+    if (document.fullscreenElement) {
+      document.body.classList.add('fs-active');
+      fsCta.style.display = 'none';
+    } else {
+      document.body.classList.remove('fs-active');
+      fsCta.style.display = 'grid';
+    }
+  });
 
   fsGo.addEventListener('click', (e)=>{ e.preventDefault(); enterFS(); });
   fsSkip.addEventListener('click', (e)=>{ e.preventDefault(); fsCta.style.display='none'; });
-  exitFs.addEventListener('click', (e)=>{ e.preventDefault(); leaveFS(); });
 
-  // If coming from thank-you with ?enter=1 ensure console mode & show CTA
+  // If arriving with ?enter=1, show CTA initially
   if (new URLSearchParams(location.search).get('enter') === '1'){
     document.body.classList.add('console-mode');
     document.body.classList.remove('fs-active');
     fsCta.style.display = 'grid';
   }
 
-  /* -------------------- Tile system -------------------- */
+  /* ---------------- Tiles ---------------- */
   const stage = document.getElementById('cs-tiles');
-  let zTop = 10; // z-index cascade for tiles
+  let zTop = 10;
 
   const TEMPLATES = {
     overview: () => `
       <header class="cs-tile-head">
-        <h4>Overview</h4>
-        <button class="cs-close" aria-label="Close">×</button>
+        <h4>Overview</h4><button class="cs-close" aria-label="Close">×</button>
       </header>
       <div class="cs-tile-body"><p>Overview content goes here.</p></div>`,
     itinerary: () => `
       <header class="cs-tile-head">
-        <h4>Itinerary</h4>
-        <button class="cs-close" aria-label="Close">×</button>
+        <h4>Itinerary</h4><button class="cs-close" aria-label="Close">×</button>
       </header>
       <div class="cs-tile-body"><p>Trip segments, dates, carriers.</p></div>`,
     values: () => `
       <header class="cs-tile-head">
-        <h4>Value Calc</h4>
-        <button class="cs-close" aria-label="Close">×</button>
+        <h4>Value Calc</h4><button class="cs-close" aria-label="Close">×</button>
       </header>
       <div class="cs-tile-body"><p>CPP, cash vs award, transfer hints.</p></div>`
   };
@@ -247,7 +273,6 @@
   }
 
   function addHandlers(tile){
-    // focus/z-index on press
     function focus(){ tile.style.zIndex = ++zTop; tile.classList.add('is-focused'); }
     function blur(){ tile.classList.remove('is-focused'); }
     tile.addEventListener('pointerdown', focus);
@@ -255,82 +280,57 @@
     tile.addEventListener('pointercancel', blur);
     tile.querySelector('.cs-close')?.addEventListener('click', () => dismiss(tile, 1));
 
-    // drag + swipe
-    let isDown=false, startX=0, startY=0, baseX=0, baseY=0;
-    let lastX=0, trail=[]; // for recent velocity
+    let isDown=false, startX=0, startY=0, baseX=0, baseY=0, lastX=0, trail=[];
     const SLOP=2, ANG=60, FLICK=0.22, DISMISS_FRAC=0.12, COMMIT_FRAC=0.45, MIN=36;
-
-    function pxDismiss(){ return Math.max(MIN, tile.offsetWidth*DISMISS_FRAC); }
+    const pxDismiss=()=>Math.max(MIN, tile.offsetWidth*DISMISS_FRAC);
 
     function onDown(e){
       if (e.button!==0) return;
-      const t = e.target;
-      if (t.closest('button,a,input,textarea,select')) return;
-
+      if (e.target.closest('button,a,input,textarea,select')) return;
       isDown=true; focus();
       try{ tile.setPointerCapture?.(e.pointerId); }catch(_){}
-      startX = lastX = e.clientX; startY = e.clientY;
-      const r = tile.getBoundingClientRect();
-      baseX = r.left; baseY = r.top;
-      trail = [{t:performance.now(), x:lastX}];
+      startX=lastX=e.clientX; startY=e.clientY;
+      const r=tile.getBoundingClientRect(); baseX=r.left; baseY=r.top;
+      trail=[{t:performance.now(), x:lastX}];
       e.preventDefault();
     }
     function onMove(e){
       if(!isDown) return;
-      lastX = e.clientX;
-      const dx = lastX - startX, dy = e.clientY - startY;
-      const dist = Math.hypot(dx,dy);
+      lastX=e.clientX;
+      const dx=lastX-startX, dy=e.clientY-startY, dist=Math.hypot(dx,dy);
+      const now=performance.now(); trail.push({t:now, x:lastX}); while(trail.length && now-trail[0].t>120) trail.shift();
 
-      // build velocity trail
-      const now = performance.now();
-      trail.push({t:now, x:lastX});
-      while(trail.length && now - trail[0].t > 120) trail.shift();
-
-      // Decide swipe vs drag once past slop
-      if (!tile._mode && dist > SLOP){
-        const angle = Math.atan2(Math.abs(dy), Math.abs(dx)) * 180/Math.PI;
-        const thr = pxDismiss();
-        tile._mode = (angle <= ANG && (Math.abs(dx) > thr*0.3)) ? 'swipe' : 'drag';
+      if (!tile._mode && dist>SLOP){
+        const angle=Math.atan2(Math.abs(dy), Math.abs(dx))*180/Math.PI;
+        const thr=pxDismiss();
+        tile._mode = (angle<=ANG && (Math.abs(dx)>thr*0.3)) ? 'swipe':'drag';
       }
 
-      if (tile._mode === 'swipe'){
-        const thr = pxDismiss();
-        const fade = Math.min(0.7, Math.abs(dx) / (thr*0.9));
-        tile.style.transform = `translate(${dx}px,0) rotate(${dx*0.008}deg)`;
-        tile.style.opacity   = String(1 - fade);
-        e.preventDefault();
-        return;
+      if (tile._mode==='swipe'){
+        const thr=pxDismiss(); const fade=Math.min(0.7, Math.abs(dx)/(thr*0.9));
+        tile.style.transform=`translate(${dx}px,0) rotate(${dx*0.008}deg)`; tile.style.opacity=String(1-fade);
+        e.preventDefault(); return;
       }
 
-      // drag
-      tile.style.left = (baseX + dx) + 'px';
-      tile.style.top  = (baseY + dy) + 'px';
+      tile.style.left = (baseX+dx)+'px';
+      tile.style.top  = (baseY+dy)+'px';
       e.preventDefault();
     }
     function onUp(){
-      if(!isDown) return;
-      isDown=false;
+      if(!isDown) return; isDown=false;
+      const dx=lastX-startX; const now=performance.now(); while(trail.length && now-trail[0].t>120) trail.shift();
+      let vx=0; if(trail.length>=2){ const a=trail[0], b=trail[trail.length-1]; vx=Math.abs(b.x-a.x)/Math.max(1,b.t-a.t); }
+      const thr=pxDismiss();
 
-      const dx = lastX - startX;
-      const now = performance.now();
-      while(trail.length && now - trail[0].t > 120) trail.shift();
-      let vx = 0;
-      if (trail.length >= 2) {
-        const a = trail[0], b = trail[trail.length-1];
-        vx = Math.abs(b.x - a.x) / Math.max(1, b.t - a.t);
-      }
-      const thr = pxDismiss();
-
-      if (tile._mode === 'swipe'){
-        if (Math.abs(dx) >= thr*COMMIT_FRAC || vx >= FLICK){
-          dismiss(tile, dx>=0?1:-1);
-        } else {
-          tile.style.transition = `transform var(--t) var(--ease), opacity var(--t) var(--ease)`;
+      if (tile._mode==='swipe'){
+        if (Math.abs(dx)>=thr*COMMIT_FRAC || vx>=FLICK){ dismiss(tile, dx>=0?1:-1); }
+        else {
+          tile.style.transition=`transform var(--t) var(--ease), opacity var(--t) var(--ease)`;
           tile.style.transform=''; tile.style.opacity='';
-          tile.addEventListener('transitionend', () => { tile.style.transition=''; }, {once:true});
+          tile.addEventListener('transitionend', ()=>{ tile.style.transition=''; }, {once:true});
         }
       }
-      tile._mode = null;
+      tile._mode=null;
     }
 
     tile.addEventListener('pointerdown', onDown, {passive:false});
@@ -340,234 +340,81 @@
   }
 
   function dismiss(tile, dir){
-    const off = (window.innerWidth*0.55) * (dir||1);
+    const off=(window.innerWidth*0.55)*(dir||1);
     tile.classList.add('dismissing');
-    tile.style.transform = `translate(${off}px, 0) rotate(${off*0.002}deg)`;
-    tile.addEventListener('transitionend', () => tile.remove(), {once:true});
+    tile.style.transform=`translate(${off}px,0) rotate(${off*0.002}deg)`;
+    tile.addEventListener('transitionend', ()=>tile.remove(), {once:true});
   }
 
   function openTile(key){
-    // If already open, bring to front
     const existing = stage.querySelector(`.cs-tile[data-key="${key}"]`);
-    if (existing){ existing.style.zIndex = ++zTop; existing.classList.add('is-focused'); return; }
+    if (existing){ existing.style.zIndex=++zTop; existing.classList.add('is-focused'); return; }
 
-    const el = document.createElement('section');
-    el.className = 'cs-tile';
-    el.dataset.key = key;
-    el.innerHTML = (TEMPLATES[key] || (()=>`
+    const el=document.createElement('section');
+    el.className='cs-tile';
+    el.dataset.key=key;
+    el.innerHTML=(TEMPLATES[key] || (()=>`
       <header class="cs-tile-head">
         <h4>${key}</h4><button class="cs-close" aria-label="Close">×</button>
       </header>
       <div class="cs-tile-body"><p>${key} tile.</p></div>`))();
 
     stage.appendChild(el);
-    el.style.zIndex = ++zTop;
+    el.style.zIndex=++zTop;
 
-    // center + slight cascade
-    const {x,y} = centerPos(el);
-    const openCount = stage.querySelectorAll('.cs-tile').length - 1;
-    el.style.left = (x + openCount*24) + 'px';
-    el.style.top  = (y + openCount*18) + 'px';
+    const {x,y}=centerPos(el);
+    const openCount=stage.querySelectorAll('.cs-tile').length-1;
+    el.style.left=(x+openCount*24)+'px';
+    el.style.top =(y+openCount*18)+'px';
 
     addHandlers(el);
     el.classList.add('is-focused');
   }
 
-  // Tab wire-up
   document.querySelectorAll('.cs-tab').forEach(btn=>{
     btn.addEventListener('click', ()=> openTile(btn.dataset.key));
   });
 
-  // Optional autostart tile via ?open=values etc.
-  const qs = new URLSearchParams(location.search);
+  const qs=new URLSearchParams(location.search);
   if (qs.get('open')) openTile(qs.get('open'));
 
-})();
-</script>
-  <!-- ===== Logout confirm (modal) + handlers ===== -->
-<style>
-  #logoutConfirm {
-    position: fixed; inset: 0; z-index: 99999;
-    display: none; place-items: center;
-    background: rgba(0,0,0,.55);
-  }
-  #logoutConfirm.show { display: grid; }
-  #logoutConfirm .card {
-    background:#111; color:#fff; border-radius:14px;
-    padding:18px 20px; box-shadow:0 10px 34px rgba(0,0,0,.45);
-    font:600 16px system-ui, -apple-system, Segoe UI, Roboto, Inter, Arial, sans-serif;
-    text-align:center; min-width: 320px; max-width: 420px;
-  }
-  #logoutConfirm .row { display:flex; gap:10px; justify-content:center; margin-top:12px; }
-  #logoutConfirm button {
-    padding:10px 14px; border-radius:12px; cursor:pointer; font-weight:700;
-    border:1px solid rgba(255,255,255,.55); background:transparent; color:#fff;
-  }
-  #logoutConfirm .primary { background:#fff; color:#111; border-color:#fff; }
-</style>
-
-<div id="logoutConfirm" role="dialog" aria-modal="true" aria-labelledby="logoutTitle" hidden>
-  <div class="card">
-    <div id="logoutTitle" style="font-weight:800;margin-bottom:8px;">Do you want to log out?</div>
-    <div class="row">
-      <button id="logoutYes" class="primary">Yes, log me out</button>
-      <button id="logoutNo">No, take me back fullscreen</button>
-    </div>
-  </div>
-</div>
-
-<script>
-(() => {
-  const root   = document.documentElement;
-  const exitBtn= document.getElementById('exitConsole');
+  /* ---------------- Logout confirm ---------------- */
   const modal  = document.getElementById('logoutConfirm');
   const yesBtn = document.getElementById('logoutYes');
   const noBtn  = document.getElementById('logoutNo');
 
-  let suppressConfirm = false;  // set true when we *intend* to leave without showing modal
+  function showConfirm(){ modal.classList.add('show'); }
+  function hideConfirm(){ modal.classList.remove('show'); }
 
-  function showConfirm(){
-    modal.hidden = false;
-    modal.classList.add('show');
-  }
-  function hideConfirm(){
-    modal.classList.remove('show');
-    modal.hidden = true;
-  }
+  // Top-right X always shows confirm (don’t leave FS first)
+  exitFs.addEventListener('click', (e)=>{ e.preventDefault(); showConfirm(); });
 
-  function leaveFullscreenIfAny(){
-    try { document.exitFullscreen && document.exitFullscreen(); } catch(_) {}
-    root.classList.remove('pseudo-fullscreen');
-  }
-
-  // Intercept top-right X
-  exitBtn?.addEventListener('click', (e) => {
-    e.preventDefault(); e.stopImmediatePropagation();
-    leaveFullscreenIfAny();
-    showConfirm();
-  }, true); // capture so we run bef
-<!-- ===== Logout confirm (modal) + handlers ===== -->
-<style>
-  #logoutConfirm {
-    position: fixed; inset: 0; z-index: 99999;
-    display: none; place-items: center;
-    background: rgba(0,0,0,.55);
-  }
-  #logoutConfirm.show { display: grid; }
-  #logoutConfirm .card {
-    background:#111; color:#fff; border-radius:14px;
-    padding:18px 20px; box-shadow:0 10px 34px rgba(0,0,0,.45);
-    font:600 16px system-ui, -apple-system, Segoe UI, Roboto, Inter, Arial, sans-serif;
-    text-align:center; min-width: 320px; max-width: 420px;
-  }
-  #logoutConfirm .row { display:flex; gap:10px; justify-content:center; margin-top:12px; }
-  #logoutConfirm button {
-    padding:10px 14px; border-radius:12px; cursor:pointer; font-weight:700;
-    border:1px solid rgba(255,255,255,.55); background:transparent; color:#fff;
-  }
-  #logoutConfirm .primary { background:#fff; color:#111; border-color:#fff; }
-</style>
-
-<div id="logoutConfirm" role="dialog" aria-modal="true" aria-labelledby="logoutTitle" hidden>
-  <div class="card">
-    <div id="logoutTitle" style="font-weight:800;margin-bottom:8px;">Do you want to log out?</div>
-    <div class="row">
-      <button id="logoutYes" class="primary">Yes, log me out</button>
-      <button id="logoutNo">No, take me back fullscreen</button>
-    </div>
-  </div>
-</div>
-
-<script>
-(() => {
-  const root = document.documentElement;
-  const modal = document.getElementById('logoutConfirm');
-  const yesBtn = document.getElementById('logoutYes');
-  const noBtn  = document.getElementById('logoutNo');
-
-  let suppressConfirm = false; // set true when *intentionally* leaving
-
-  function showConfirm(){
-    modal.hidden = false;
-    modal.classList.add('show');
-  }
-  function hideConfirm(){
-    modal.classList.remove('show');
-    modal.hidden = true;
-  }
-  function leaveFullscreenIfAny(){
-    try { if (document.fullscreenElement) document.exitFullscreen(); } catch(_) {}
-    root.classList.remove('pseudo-fullscreen');
-  }
-  async function reEnterFullscreen(){
-    const req = root.requestFullscreen || root.webkitRequestFullscreen ||
-                root.mozRequestFullScreen || root.msRequestFullscreen;
-    try { if (req) await req.call(root); else root.classList.add('pseudo-fullscreen'); }
-    catch(_) { /* ignore */ }
-  }
-
-  // ❶ Intercept ANY click on an Exit control (id, class, aria-label, or text)
-  document.addEventListener('click', (e) => {
-    const t = e.target.closest('button, a, [role="button"]');
-    if (!t) return;
-
-    const sig = [
-      t.id || '', t.className || '',
-      (t.getAttribute && (t.getAttribute('aria-label')||t.getAttribute('title'))) || '',
-      (t.textContent || '').trim()
-    ].join(' ').toLowerCase();
-
-    const looksLikeExit =
-      /(^|[\s_-])exit(console)?([\s_-]|$)|(^|[\s_-])close([\s_-]|$)|×/.test(sig);
-
-    if (!looksLikeExit) return;
-
-    // Stop any old handlers/navigation
-    e.preventDefault(); e.stopImmediatePropagation();
-
-    // Leave FS so the confirm is visible, then show it
-    leaveFullscreenIfAny();
-    if (!suppressConfirm) showConfirm();
-  }, true); // capture=true so we run before anything else
-
-  // ❷ If user exits fullscreen via keyboard/OS, show confirm (unless we intended it)
-  document.addEventListener('fullscreenchange', () => {
-    if (!document.fullscreenElement && !suppressConfirm) showConfirm();
-  });
-
-  // ❸ Esc backstop (if browser didn’t fire fullscreenchange for some reason)
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && !document.fullscreenElement && !suppressConfirm) {
+  // If user exits FS via Esc/OS control, show confirm and the CTA will appear underneath
+  document.addEventListener('keydown', (e)=>{
+    if (e.key==='Escape' && document.fullscreenElement){ // user is in FS → show confirm
+      e.preventDefault();
+      leaveFS(); // drop out of FS so they can choose
       showConfirm();
     }
   }, true);
 
-  // ❹ YES → clear auth and go to login
-  yesBtn.addEventListener('click', () => {
-    suppressConfirm = true;
+  // YES → clear auth + to login
+  yesBtn.addEventListener('click', ()=>{
     hideConfirm();
     try {
       sessionStorage.removeItem('cs_authed');
       localStorage.removeItem('cs_authed');
       document.cookie = 'cs_auth=; Max-Age=0; path=/; SameSite=Lax';
     } catch(_) {}
-    document.body.classList.remove('in-console');
     window.location.assign('/beta/auth.html');
   });
 
-  // ❺ NO → immediately back to fullscreen + console
-  noBtn.addEventListener('click', async () => {
+  // NO → back to fullscreen immediately
+  noBtn.addEventListener('click', ()=>{
     hideConfirm();
-    suppressConfirm = true;
-    await reEnterFullscreen();
-    document.body.classList.add('in-console');
-    suppressConfirm = false;
+    enterFS();
   });
 })();
 </script>
-<!-- ===== /Logout confirm ===== -->
-
 </body>
 </html>
-
-
