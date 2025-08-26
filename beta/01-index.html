@@ -117,6 +117,8 @@ body.splash-mode .console-exit {
 
     // swap to console view immediately
     document.documentElement.classList.add('console-mode');
+    document.body.classList.remove('splash-mode'); // unhide console on auto-enter
+
 
     // open a default tile once DOM is ready
     const open = qs.get('open') || 'overview';
@@ -1248,6 +1250,7 @@ function openTile(key){
 
 </body>
 </html>
+
 
 
 
