@@ -446,7 +446,128 @@
     leaveFullscreenIfAny();
     showConfirm();
   }, true); // capture so we run bef
+<!-- ===== Logout confirm (modal) + handlers ===== -->
+<style>
+  #logoutConfirm {
+    position: fixed; inset: 0; z-index: 99999;
+    display: none; place-items: center;
+    background: rgba(0,0,0,.55);
+  }
+  #logoutConfirm.show { display: grid; }
+  #logoutConfirm .card {
+    background:#111; color:#fff; border-radius:14px;
+    padding:18px 20px; box-shadow:0 10px 34px rgba(0,0,0,.45);
+    font:600 16px system-ui, -apple-system, Segoe UI, Roboto, Inter, Arial, sans-serif;
+    text-align:center; min-width: 320px; max-width: 420px;
+  }
+  #logoutConfirm .row { display:flex; gap:10px; justify-content:center; margin-top:12px; }
+  #logoutConfirm button {
+    padding:10px 14px; border-radius:12px; cursor:pointer; font-weight:700;
+    border:1px solid rgba(255,255,255,.55); background:transparent; color:#fff;
+  }
+  #logoutConfirm .primary { background:#fff; color:#111; border-color:#fff; }
+</style>
+
+<div id="logoutConfirm" role="dialog" aria-modal="true" aria-labelledby="logoutTitle" hidden>
+  <div class="card">
+    <div id="logoutTitle" style="font-weight:800;margin-bottom:8px;">Do you want to log out?</div>
+    <div class="row">
+      <button id="logoutYes" class="primary">Yes, log me out</button>
+      <button id="logoutNo">No, take me back fullscreen</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(() => {
+  const root = document.documentElement;
+  const modal = document.getElementById('logoutConfirm');
+  const yesBtn = document.getElementById('logoutYes');
+  const noBtn  = document.getElementById('logoutNo');
+
+  let suppressConfirm = false; // set true when *intentionally* leaving
+
+  function showConfirm(){
+    modal.hidden = false;
+    modal.classList.add('show');
+  }
+  function hideConfirm(){
+    modal.classList.remove('show');
+    modal.hidden = true;
+  }
+  function leaveFullscreenIfAny(){
+    try { if (document.fullscreenElement) document.exitFullscreen(); } catch(_) {}
+    root.classList.remove('pseudo-fullscreen');
+  }
+  async function reEnterFullscreen(){
+    const req = root.requestFullscreen || root.webkitRequestFullscreen ||
+                root.mozRequestFullScreen || root.msRequestFullscreen;
+    try { if (req) await req.call(root); else root.classList.add('pseudo-fullscreen'); }
+    catch(_) { /* ignore */ }
+  }
+
+  // ❶ Intercept ANY click on an Exit control (id, class, aria-label, or text)
+  document.addEventListener('click', (e) => {
+    const t = e.target.closest('button, a, [role="button"]');
+    if (!t) return;
+
+    const sig = [
+      t.id || '', t.className || '',
+      (t.getAttribute && (t.getAttribute('aria-label')||t.getAttribute('title'))) || '',
+      (t.textContent || '').trim()
+    ].join(' ').toLowerCase();
+
+    const looksLikeExit =
+      /(^|[\s_-])exit(console)?([\s_-]|$)|(^|[\s_-])close([\s_-]|$)|×/.test(sig);
+
+    if (!looksLikeExit) return;
+
+    // Stop any old handlers/navigation
+    e.preventDefault(); e.stopImmediatePropagation();
+
+    // Leave FS so the confirm is visible, then show it
+    leaveFullscreenIfAny();
+    if (!suppressConfirm) showConfirm();
+  }, true); // capture=true so we run before anything else
+
+  // ❷ If user exits fullscreen via keyboard/OS, show confirm (unless we intended it)
+  document.addEventListener('fullscreenchange', () => {
+    if (!document.fullscreenElement && !suppressConfirm) showConfirm();
+  });
+
+  // ❸ Esc backstop (if browser didn’t fire fullscreenchange for some reason)
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && !document.fullscreenElement && !suppressConfirm) {
+      showConfirm();
+    }
+  }, true);
+
+  // ❹ YES → clear auth and go to login
+  yesBtn.addEventListener('click', () => {
+    suppressConfirm = true;
+    hideConfirm();
+    try {
+      sessionStorage.removeItem('cs_authed');
+      localStorage.removeItem('cs_authed');
+      document.cookie = 'cs_auth=; Max-Age=0; path=/; SameSite=Lax';
+    } catch(_) {}
+    document.body.classList.remove('in-console');
+    window.location.assign('/beta/auth.html');
+  });
+
+  // ❺ NO → immediately back to fullscreen + console
+  noBtn.addEventListener('click', async () => {
+    hideConfirm();
+    suppressConfirm = true;
+    await reEnterFullscreen();
+    document.body.classList.add('in-console');
+    suppressConfirm = false;
+  });
+})();
+</script>
+<!-- ===== /Logout confirm ===== -->
 
 </body>
 </html>
+
 
