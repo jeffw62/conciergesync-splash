@@ -1,110 +1,99 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>ConciergeSync™ — Sign in</title>
-<style>
-  :root { --ui: 4000; }
-  * { box-sizing: border-box; }
-  html, body { height:100%; }
-  body {
-    margin:0; font-family: system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif;
-    background: radial-gradient(1200px 600px at 50% -20%, #2a3140 0%, #0b0f14 70%);
-    color:#e8eef7; display:grid; place-items:center;
-  }
-  .card {
-    width:min(560px, 92vw);
-    background: rgba(255,255,255,.06);
-    border:1px solid rgba(255,255,255,.14);
-    border-radius:16px; padding:24px 22px;
-    backdrop-filter: blur(10px) saturate(1.15);
-    box-shadow: 0 12px 42px rgba(0,0,0,.35);
-  }
-  h1 { margin:0 0 6px; font-size:28px; }
-  p { margin:0 0 18px; color:#b8c4d6; }
-  .row { display:flex; gap:10px; flex-wrap:wrap; margin-top:10px; }
-  .btn {
-    padding:12px 16px; border-radius:12px; cursor:pointer; font-weight:800;
-    border:1px solid rgba(255,255,255,.55); background:transparent; color:#fff;
-  }
-  .btn.primary { background:#fff; color:#111; border-color:#fff; }
-  .fine { font-size:12px; color:#9fb0c8; margin-top:10px; }
-  .notice {
-    padding:8px 10px; border-radius:10px; background:rgba(0,0,0,.35);
-    border:1px solid rgba(255,255,255,.12); margin-bottom:12px; color:#dfe8f6;
-  }
-</style>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Sign in • ConciergeSync™</title>
+  <style>
+    :root{
+      --card:#11151b; --ink:#eaf0f7; --muted:#a6b0bf; --accent:#fff; --accentText:#0c1117;
+      --ring: rgba(255,255,255,.18);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0; background:#0a0f14; color:var(--ink);
+      font-family: system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif;
+      display:grid; place-items:center; padding:24px;
+    }
+    .card{
+      width:min(720px,92vw); border:1px solid var(--ring); background:rgba(17,21,27,.85);
+      border-radius:18px; padding:28px; box-shadow:0 20px 60px rgba(0,0,0,.35), 0 0 1px rgba(255,255,255,.06);
+    }
+    h1{margin:0 0 10px; font-size:32px; line-height:1.2}
+    p.sub{margin:0 0 20px; color:var(--muted)}
+    .row{display:flex; gap:10px; flex-wrap:wrap}
+    input[type="email"]{
+      flex:1 1 280px; min-width:260px; padding:12px 14px; border-radius:12px;
+      border:1px solid var(--ring); background:#0d131a; color:var(--ink); font-size:16px;
+      outline:none;
+    }
+    input[type="email"]:focus{border-color:#7cc4ff; box-shadow:0 0 0 3px rgba(124,196,255,.15)}
+    .btn{
+      padding:12px 16px; border-radius:12px; border:1px solid var(--ring); font-weight:800; cursor:pointer;
+      background:transparent; color:var(--ink);
+    }
+    .btn.primary{ background:var(--accent); color:var(--accentText); border-color:var(--accent) }
+    .btn.ghost{ background:transparent; }
+    .meta{margin-top:12px; color:#9aa6b2; font-size:.92rem}
+    .actions{display:flex; gap:10px; margin-top:12px; flex-wrap:wrap}
+    .right{margin-left:auto}
+  </style>
 </head>
 <body>
-  <div class="card" role="dialog" aria-modal="true" id="signinCard" style="display:none">
-    <h1>Sign in to ConciergeSync™</h1>
-    <p>Welcome back. Continue to your console.</p>
-    <div id="logoutNotice" class="notice" style="display:none;">You’ve been logged out.</div>
-    <div class="row">
-      <button id="signin" class="btn primary">Enter Console</button>
-      <button id="learn" class="btn">What is ConciergeSync?</button>
-    </div>
-    <div class="fine">No bank logins required.</div>
-  </div>
 
-<script>
-(function(){
-  // 🔧 Set this to your real login page:
-  // e.g. 'https://portal.conciergesync.ai/login' or 'https://portal.conciergesync.ai/'
-  const LOGIN_URL = 'https://portal.conciergesync.ai/login';
+  <main class="card" role="main" aria-labelledby="title">
+    <h1 id="title">Sign in to ConciergeSync™</h1>
+    <p class="sub">Enter your email to continue to your console.</p>
 
-  const qs = new URLSearchParams(location.search);
-  const card = document.getElementById('signinCard');
-  const logoutNotice = document.getElementById('logoutNotice');
+    <form id="signin" autocomplete="on">
+      <div class="row">
+        <input id="email" name="email" type="email" inputmode="email" autocomplete="email"
+               placeholder="you@example.com" required />
+        <button class="btn primary" type="submit">Enter Console</button>
+        <a class="btn ghost right" href="/beta/01-index.html?open=overview">What is ConciergeSync?</a>
+      </div>
+      <div class="meta">No bank logins required.</div>
+    </form>
+  </main>
 
-  function clearAuth(){
-    try{
-      sessionStorage.removeItem('cs_authed');
-      localStorage.removeItem('cs_authed');
-      localStorage.removeItem('cs_uid');
-      localStorage.removeItem('cs_email');
-      localStorage.removeItem('cs_onboarding_done');
-      localStorage.removeItem('cs_bg_src');
-      localStorage.removeItem('last_bg_idx');
-      document.cookie = 'cs_auth=; Max-Age=0; path=/; SameSite=Lax';
-    }catch(_){}
-  }
+  <script>
+    (function(){
+      // Always start truly logged-out on this page
+      try {
+        sessionStorage.removeItem('cs_authed');
+        localStorage.removeItem('cs_authed');
+        document.cookie = 'cs_auth=; Max-Age=0; path=/; SameSite=Lax';
 
-  // If we arrived with ?logout=1, clear & forward to the real login immediately.
-  if (qs.get('logout') === '1') {
-    clearAuth();
-    // Hard forward to the external login
-    location.replace(LOGIN_URL);
-    return;
-  }
+        // Optional: clear profile hints so the page never flips to a "welcome back" variant
+        sessionStorage.removeItem('cs_uid'); localStorage.removeItem('cs_uid');
+        // Keep email if you want the field prefilled; otherwise clear it:
+        // sessionStorage.removeItem('cs_email'); localStorage.removeItem('cs_email');
+      } catch(_) {}
 
-  // Otherwise: if still authed, fast-forward to the console splash
-  const hasCookie = /(?:^|;\s*)cs_auth=1(?:;|$)/.test(document.cookie);
-  const hasStorage = (localStorage.getItem('cs_authed') === '1' || sessionStorage.getItem('cs_authed') === '1');
-  if (hasCookie || hasStorage) {
-    location.replace('/beta/01-index.html?enter=1');
-    return;
-  }
+      // Prefill email if we still have it
+      const emailInput = document.getElementById('email');
+      const savedEmail = localStorage.getItem('cs_email') || sessionStorage.getItem('cs_email') || '';
+      if (savedEmail) emailInput.value = savedEmail;
 
-  // Show our simple sign-in card (manual entry to console)
-  card.style.display = 'block';
+      // Simple sign-in: store email, mark authed, jump to console
+      document.getElementById('signin').addEventListener('submit', function(e){
+        e.preventDefault();
+        const email = (emailInput.value || '').trim();
+        if (!email) { emailInput.focus(); return; }
 
-  document.getElementById('signin').addEventListener('click', function(e){
-    e.preventDefault();
-    try{
-      sessionStorage.setItem('cs_authed','1');
-      localStorage.setItem('cs_authed','1');
-      document.cookie = 'cs_auth=1; Max-Age=7200; path=/; SameSite=Lax';
-    }catch(_){}
-    location.assign('/beta/01-index.html?enter=1');
-  });
+        try {
+          sessionStorage.setItem('cs_email', email);
+          localStorage.setItem('cs_email', email);
+          sessionStorage.setItem('cs_authed','1');
+          localStorage.setItem('cs_authed','1');
+          document.cookie = 'cs_auth=1; path=/; max-age=7200; SameSite=Lax';
+        } catch(_) {}
 
-  document.getElementById('learn').addEventListener('click', function(e){
-    e.preventDefault();
-    alert('ConciergeSync™ helps you earn, manage, and redeem travel rewards with clarity.');
-  });
-})();
-</script>
+        // Go straight into console in "enter" mode
+        window.location.assign('/beta/01-index.html?enter=1&open=overview');
+      });
+    })();
+  </script>
 </body>
 </html>
