@@ -1,166 +1,147 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>ConciergeSync™ Console</title>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>ConciergeSync™ Console</title>
 
-  <link rel="dns-prefetch" href="//portal.conciergesync.ai">
-  <link rel="preconnect" href="https://portal.conciergesync.ai" crossorigin>
+<style>
+  :root{
+    --glass-bg: rgba(255,255,255,.12);
+    --glass-border: rgba(255,255,255,.28);
+    --overlay-grad-top: rgba(0,0,0,.35);
+    --overlay-grad-bot: rgba(0,0,0,.58);
+    --overlay: .30;                 /* tuned by luminance script if desired */
+    --vh: 100vh;
+    --ui: 4000;
+    --ease: cubic-bezier(.22,1,.36,1);
+    --t-fast: 220ms;
+    --t: 640ms;
+    --t-out: 900ms;
+  }
 
-  <style>
-    :root{
-      --ink:#0f172a;
-      --muted:#475569;
-      --bg:#f6f7fb;
+  *{ box-sizing:border-box; }
 
-      --bg-brightness:1.15;
-      --bg-contrast:1.05;
-      --overlay:0.30;
-      --overlay-top:rgba(0,0,0,.35);
-      --overlay-bot:rgba(0,0,0,.55);
+  html,body{ height:100%; }
+  body{
+    margin:0;
+    font-family: system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif;
+    color:#eef2f8;
+    background: #0b0f14; /* safe base behind the photo */
+  }
 
-      --z-ui:4000;
-    }
-    *{box-sizing:border-box}
-    html,body{height:100%}
-    body{
-      margin:0;
-      font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif;
-      color:var(--ink);
-      background:var(--bg);
-      line-height:1.6;
-    }
+  /* Backdrop image + overlay */
+  .backdrop{ position:fixed; inset:0; z-index:0; overflow:hidden; }
+  .backdrop-image{
+    position:absolute; inset:0;
+    background:center/cover no-repeat;
+    filter: brightness(1.12) contrast(1.05);
+    transform: scale(1.03) translateZ(0);
+    will-change: transform, opacity, filter;
+    transition: opacity 600ms ease, transform 900ms ease, filter 900ms ease;
+    opacity:.999; /* ensure visible immediately */
+  }
+  .backdrop-overlay{
+    position:absolute; inset:0; pointer-events:none;
+    background: linear-gradient(to bottom, var(--overlay-grad-top), var(--overlay-grad-bot));
+    opacity: var(--overlay);
+  }
 
-    /* ---------- Landing (hidden once console-mode is set on <body>) ---------- */
-    .wrap{max-width:880px;margin:40px auto;padding:0 20px}
-    .card{
-      background:#fff;border:1px solid #e6eaf0;border-radius:16px;
-      box-shadow:0 6px 24px rgba(15,23,42,.06);padding:28px;margin-bottom:24px
-    }
-    h1{font-size:34px;line-height:1.2;text-align:center;margin:0 0 8px}
-    h2{font-size:22px;margin:18px 0;text-align:center}
-    h3{font-size:18px;margin:16px 0 10px}
-    p,li{color:var(--muted)}
-    ul{margin:8px 0 0 24px}
-    .center{text-align:center}
+  /* Tabs (top bar) */
+  .cs-tabs{
+    position: fixed; top: 18px; left: 50%; transform: translateX(-50%);
+    z-index: var(--ui);
+    display:flex; gap:10px; padding:10px 12px;
+    background: rgba(15,15,18,.36);
+    border:1px solid rgba(255,255,255,.25);
+    border-radius:14px; backdrop-filter: blur(8px) saturate(1.1);
+  }
+  .cs-tab{
+    padding:10px 14px; border-radius:10px; border:1px solid rgba(255,255,255,.18);
+    background: rgba(255,255,255,.07); color:#fff; font-weight:700; cursor:pointer;
+  }
+  .cs-tab:hover{ background: rgba(255,255,255,.12); }
 
-    body.console-mode .wrap{display:none}
+  /* Exit fullscreen button */
+  .console-exit{
+    position:fixed; top:18px; right:18px; z-index:var(--ui);
+    width:40px; height:40px; border-radius:10px;
+    border:1px solid rgba(255,255,255,.35);
+    background: rgba(20,20,20,.45);
+    color:#fff; font-size:28px; line-height:36px; text-align:center; cursor:pointer;
+    backdrop-filter: blur(8px) saturate(1.1);
+  }
+  .console-exit:hover{ background: rgba(20,20,20,.6); }
 
-    /* ---------- Backdrop ---------- */
-    .backdrop{position:fixed;inset:0;z-index:0;overflow:hidden}
-    .backdrop-image{
-      position:absolute;inset:0;background:center/cover no-repeat;
-      filter:brightness(var(--bg-brightness)) contrast(var(--bg-contrast));
-      transform:translateZ(0);opacity:1
-    }
-    .backdrop-overlay{
-      position:absolute;inset:0;pointer-events:none;
-      background:linear-gradient(to bottom,var(--overlay-top),var(--overlay-bot));
-      opacity:var(--overlay)
-    }
+  /* Tiles stage */
+  #cs-tiles{
+    position: fixed; inset: 0; z-index: 10; pointer-events: none;
+  }
 
-    /* ---------- Console shell ---------- */
-    #cs-console{
-      position:absolute;inset:0;display:grid;grid-template-rows:auto 1fr;
-      padding:24px;pointer-events:auto;z-index:10;
-    }
-    .cs-tabs{
-      display:flex;justify-content:center;gap:10px;margin:0 auto 14px;
-      padding:10px 12px;border-radius:14px;
-      backdrop-filter:blur(8px) saturate(1.1);
-      background:rgba(20,20,20,.30);
-      border:1px solid rgba(255,255,255,.25);
-    }
-    .cs-tab{
-      padding:10px 14px;border-radius:10px;border:1px solid rgba(255,255,255,.18);
-      background:rgba(255,255,255,.06);color:#fff;font-weight:600;cursor:pointer;
-    }
-    .cs-tab:hover{background:rgba(255,255,255,.12)}
+  /* Tile look */
+  .cs-tile{
+    position:absolute;
+    width: 420px;                   /* narrower */
+    min-height: 320px;
+    max-height: 76vh;               /* taller */
+    display:grid; grid-template-rows:auto 1fr;
+    background: var(--glass-bg);
+    color:#f5f7fb;
+    border:1px solid var(--glass-border);
+    border-radius:18px;
+    box-shadow:0 10px 30px rgba(0,0,0,.22);
+    backdrop-filter: blur(12px) saturate(1.22);
+    overflow:hidden;
+    pointer-events:auto;            /* tiles remain interactive */
+    user-select:none;
+    touch-action: pan-y;            /* keep vertical scroll inside body */
+    will-change: transform, opacity, left, top;
+    transition: box-shadow var(--t-fast) ease;
+  }
+  .cs-tile.is-focused{
+    box-shadow:0 16px 44px rgba(0,0,0,.32), 0 0 0 1px rgba(255,255,255,.18) inset;
+  }
 
-    /* tiles host */
-    .cs-tiles{position:relative;height:100%}
+  .cs-tile-head{
+    display:flex; align-items:center; justify-content:space-between;
+    padding: 12px 14px; background: rgba(0,0,0,.18);
+    border-bottom:1px solid rgba(255,255,255,.18);
+  }
+  .cs-tile-head h4{ margin:0; font-size:15px; font-weight:800; letter-spacing:.2px; }
+  .cs-close{
+    width:30px; height:30px; border-radius:8px;
+    background: rgba(255,255,255,.12);
+    border:1px solid rgba(255,255,255,.25);
+    color:#fff; font-size:18px; line-height:28px; text-align:center; cursor:pointer;
+  }
+  .cs-close:hover{ background: rgba(255,255,255,.2); }
+  .cs-tile-body{ padding:14px; overflow:auto; }
 
-    /* simple glass tile */
-    .tile{
-      position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
-      min-width:360px;max-width:640px;width:min(90vw,560px);
-      min-height:260px;max-height:70vh;overflow:auto;
-      color:#f5f7fb;
-      background:rgba(255,255,255,.10);
-      border:1px solid rgba(255,255,255,.28);
-      border-radius:18px;
-      box-shadow:0 10px 30px rgba(0,0,0,.18);
-      backdrop-filter:blur(12px) saturate(1.2);
-    }
-    .tile-head{
-      display:flex;align-items:center;justify-content:space-between;
-      padding:12px 14px;background:rgba(0,0,0,.18);
-      border-bottom:1px solid rgba(255,255,255,.18)
-    }
-    .tile-head h4{margin:0;font:700 15px/1.2 system-ui}
-    .tile-close{
-      width:30px;height:30px;border-radius:8px;cursor:pointer;
-      background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.25);
-      font-size:18px;line-height:28px;text-align:center;
-    }
-    .tile-close:hover{background:rgba(255,255,255,.20)}
-    .tile-body{padding:14px}
+  /* Dismiss animation */
+  .cs-tile.dismissing{
+    transition: transform var(--t-out) var(--ease), opacity var(--t-out) var(--ease);
+    opacity:0;
+  }
 
-    /* Exit (top-right) */
-    .console-exit{
-      position:fixed;top:18px;right:18px;z-index:var(--z-ui);
-      width:40px;height:40px;border-radius:10px;
-      border:1px solid rgba(255,255,255,.35);
-      background:rgba(20,20,20,.45);color:#fff;
-      font-size:28px;line-height:36px;text-align:center;
-      cursor:pointer;backdrop-filter:blur(8px) saturate(1.1);
-    }
-    .console-exit:hover{background:rgba(20,20,20,.6)}
+  /* Fullscreen CTA (only when not fullscreen) */
+  .fs-cta{
+    position:fixed; inset:0; display:none; place-items:center; z-index:var(--ui);
+    background: rgba(0,0,0,.45);
+  }
+  .fs-card{
+    background:#111; color:#fff; padding:18px 22px; border-radius:14px;
+    box-shadow:0 10px 30px rgba(0,0,0,.35); text-align:center; font-weight:700;
+  }
+  .fs-actions{ display:flex; gap:10px; justify-content:center; margin-top:10px; }
+  .btn{ padding:10px 14px; border-radius:12px; font-weight:800; border:1px solid rgba(255,255,255,.55); }
+  .btn.primary{ background:#fff; color:#111; border-color:#fff; }
+  .btn.ghost{ background:transparent; color:#fff; }
 
-    /* ---------- Fullscreen CTA ---------- */
-    .fs-cta{
-      position:fixed;inset:0;z-index:5000;
-      display:none;place-items:center;
-      background:transparent;
-    }
-    /* KEY: show FS pill whenever we're in console mode and not yet fullscreen */
-    body.console-mode:not(.fs-active) .fs-cta{ display:grid }
-
-    .fs-btn{
-      padding:14px 20px;border-radius:14px;
-      border:1px solid rgba(255,255,255,.45);
-      background:rgba(20,20,20,.55);color:#fff;font-weight:800;
-      box-shadow:0 10px 28px rgba(0,0,0,.35);
-      backdrop-filter:blur(8px) saturate(1.1);
-      cursor:pointer;
-    }
-    .fs-btn:hover{background:rgba(20,20,20,.70)}
-
-    @media (prefers-reduced-motion:reduce){
-      .backdrop-image,.backdrop-overlay{transition:none}
-    }
-  </style>
+  /* Show CTA only while NOT fullscreen */
+  body.console-mode:not(.fs-active) .fs-cta{ display:grid; }
+</style>
 </head>
-<body>
-
-  <!-- Landing (hidden once console-mode is applied) -->
-  <main class="wrap">
-    <section class="card">
-      <h1>Welcome to ConciergeSync™</h1>
-      <p class="center">Your personal travel rewards strategist — earn, manage, and redeem points with clarity.</p>
-    </section>
-    <section class="card">
-      <h2>Place Holder</h2>
-      <p>Place Holder</p><p>Place Holder</p><p>Place Holder</p>
-      <h3>Your Role as a Beta User Client (BUC)</h3>
-      <ul>
-        <li><strong>Onboard (5–7 min):</strong> share your travel goals and programs.</li>
-        <li><strong>Explore ConciergeSync™ as it evolves:</strong> try features as they’re released and sanity-check how they work.</li>
-        <li><strong>Give quick feedback:</strong> reply to short prompts when something’s off.</li>
-      </ul>
-    </section>
-  </main>
+<body class="console-mode">
 
   <!-- Backdrop -->
   <div class="backdrop" aria-hidden="true">
@@ -168,106 +149,240 @@
     <div class="backdrop-overlay"></div>
   </div>
 
-  <!-- Console -->
-  <div id="cs-console" aria-live="polite" aria-busy="false">
-    <div class="cs-tabs" aria-label="Console Tabs">
-      <button class="cs-tab" data-key="overview">Overview</button>
-      <button class="cs-tab" data-key="itinerary">Itinerary</button>
-      <button class="cs-tab" data-key="values">Value Calc</button>
+  <!-- Tabs -->
+  <div class="cs-tabs" aria-label="Console Tabs">
+    <button class="cs-tab" data-key="overview">Overview</button>
+    <button class="cs-tab" data-key="itinerary">Itinerary</button>
+    <button class="cs-tab" data-key="values">Value Calc</button>
+  </div>
+
+  <!-- Exit fullscreen -->
+  <button id="exitFs" class="console-exit" aria-label="Exit Fullscreen">×</button>
+
+  <!-- Tiles stage -->
+  <div id="cs-tiles" aria-live="polite"></div>
+
+  <!-- Fullscreen CTA -->
+  <div id="fs-cta" class="fs-cta" role="dialog" aria-modal="true">
+    <div class="fs-card">
+      <div style="margin-bottom:8px;">Enter Fullscreen Mode</div>
+      <div class="fs-actions">
+        <button id="fs-go"   class="btn primary">Go Full Screen</button>
+        <button id="fs-skip" class="btn ghost">Skip</button>
+      </div>
     </div>
-    <div id="cs-tiles" class="cs-tiles"></div>
   </div>
 
-  <!-- Exit -->
-  <button id="exitConsole" class="console-exit" aria-label="Exit Console" type="button"
-          onclick="window.location.href='exit.html'">×</button>
+<script>
+(function(){
+  /* -------------------- Backdrop -------------------- */
+  const BG = '/beta/assets/bg/IMG_5374.jpeg';
+  document.getElementById('backdropImage').style.backgroundImage = `url("${BG}")`;
 
-  <!-- Center fullscreen pill -->
-  <div id="fs-cta" class="fs-cta" aria-hidden="false">
-    <button id="fs-go" class="fs-btn" type="button">Enter Fullscreen Mode</button>
-  </div>
+  /* -------------------- Fullscreen flow -------------------- */
+  const root = document.documentElement;
+  const fsGo   = document.getElementById('fs-go');
+  const fsSkip = document.getElementById('fs-skip');
+  const fsCta  = document.getElementById('fs-cta');
+  const exitFs = document.getElementById('exitFs');
 
-  <script>
-  (function(){
-    "use strict";
+  function setVh(){ document.documentElement.style.setProperty('--vh', window.innerHeight + 'px'); }
+  setVh(); addEventListener('resize', setVh);
 
-    /* Backdrop image (static) */
-    var bg = '/beta/assets/bg/IMG_5374.jpeg';
-    var bgEl = document.getElementById('backdropImage');
-    if (bgEl) bgEl.style.backgroundImage = 'url("'+bg+'")';
+  function enterFS(){
+    const req = root.requestFullscreen || root.webkitRequestFullscreen || root.msRequestFullscreen || root.mozRequestFullScreen;
+    if (req) { Promise.resolve(req.call(root)).catch(()=>{}); }
+    document.body.classList.add('fs-active');
+    fsCta.style.display = 'none';
+  }
+  function leaveFS(){
+    const ex = document.exitFullscreen || document.webkitExitFullscreen || document.msExitFullscreen || document.mozCancelFullScreen;
+    if (document.fullscreenElement || document.webkitFullscreenElement) { try{ ex.call(document); }catch(e){} }
+    document.body.classList.remove('fs-active');
+    // keep console visible; CTA will reappear so user can re-enter
+  }
 
-    /* Enter console when coming from thank-you (?enter=1) */
-    var qs = new URLSearchParams(location.search);
-    var fromThankYou = qs.get('enter') === '1';
-    if (fromThankYou){
-      try {
-        sessionStorage.setItem('cs_authed','1');
-        localStorage.setItem('cs_authed','1');
-        document.cookie = "cs_auth=1; path=/; max-age=7200; SameSite=Lax";
-      } catch(_) {}
-      document.body.classList.add('console-mode');
+  fsGo.addEventListener('click', (e)=>{ e.preventDefault(); enterFS(); });
+  fsSkip.addEventListener('click', (e)=>{ e.preventDefault(); fsCta.style.display='none'; });
+  exitFs.addEventListener('click', (e)=>{ e.preventDefault(); leaveFS(); });
+
+  // If coming from thank-you with ?enter=1 ensure console mode & show CTA
+  if (new URLSearchParams(location.search).get('enter') === '1'){
+    document.body.classList.add('console-mode');
+    document.body.classList.remove('fs-active');
+    fsCta.style.display = 'grid';
+  }
+
+  /* -------------------- Tile system -------------------- */
+  const stage = document.getElementById('cs-tiles');
+  let zTop = 10; // z-index cascade for tiles
+
+  const TEMPLATES = {
+    overview: () => `
+      <header class="cs-tile-head">
+        <h4>Overview</h4>
+        <button class="cs-close" aria-label="Close">×</button>
+      </header>
+      <div class="cs-tile-body"><p>Overview content goes here.</p></div>`,
+    itinerary: () => `
+      <header class="cs-tile-head">
+        <h4>Itinerary</h4>
+        <button class="cs-close" aria-label="Close">×</button>
+      </header>
+      <div class="cs-tile-body"><p>Trip segments, dates, carriers.</p></div>`,
+    values: () => `
+      <header class="cs-tile-head">
+        <h4>Value Calc</h4>
+        <button class="cs-close" aria-label="Close">×</button>
+      </header>
+      <div class="cs-tile-body"><p>CPP, cash vs award, transfer hints.</p></div>`
+  };
+
+  function centerPos(tile){
+    const r = tile.getBoundingClientRect();
+    const w = r.width, h = Math.min(r.height, window.innerHeight*0.76);
+    const x = (window.innerWidth  - w)/2;
+    const y = Math.max(18, (window.innerHeight - h)/2);
+    return { x, y };
+  }
+
+  function addHandlers(tile){
+    // focus/z-index on press
+    function focus(){ tile.style.zIndex = ++zTop; tile.classList.add('is-focused'); }
+    function blur(){ tile.classList.remove('is-focused'); }
+    tile.addEventListener('pointerdown', focus);
+    tile.addEventListener('pointerup', blur);
+    tile.addEventListener('pointercancel', blur);
+    tile.querySelector('.cs-close')?.addEventListener('click', () => dismiss(tile, 1));
+
+    // drag + swipe
+    let isDown=false, startX=0, startY=0, baseX=0, baseY=0;
+    let lastX=0, trail=[]; // for recent velocity
+    const SLOP=2, ANG=60, FLICK=0.22, DISMISS_FRAC=0.12, COMMIT_FRAC=0.45, MIN=36;
+
+    function pxDismiss(){ return Math.max(MIN, tile.offsetWidth*DISMISS_FRAC); }
+
+    function onDown(e){
+      if (e.button!==0) return;
+      const t = e.target;
+      if (t.closest('button,a,input,textarea,select')) return;
+
+      isDown=true; focus();
+      try{ tile.setPointerCapture?.(e.pointerId); }catch(_){}
+      startX = lastX = e.clientX; startY = e.clientY;
+      const r = tile.getBoundingClientRect();
+      baseX = r.left; baseY = r.top;
+      trail = [{t:performance.now(), x:lastX}];
+      e.preventDefault();
     }
+    function onMove(e){
+      if(!isDown) return;
+      lastX = e.clientX;
+      const dx = lastX - startX, dy = e.clientY - startY;
+      const dist = Math.hypot(dx,dy);
 
-    /* Fullscreen helpers */
-    function isFS(){
-      return !!(document.fullscreenElement || document.webkitFullscreenElement ||
-                document.mozFullScreenElement || document.msFullscreenElement);
-    }
-    function setFsClass(){
-      document.body.classList.toggle('fs-active', isFS());
-    }
-    ['fullscreenchange','webkitfullscreenchange','mozfullscreenchange','MSFullscreenChange']
-      .forEach(function(evt){ document.addEventListener(evt, setFsClass); });
-    setFsClass(); // set initial state so CSS can decide whether to show the pill
+      // build velocity trail
+      const now = performance.now();
+      trail.push({t:now, x:lastX});
+      while(trail.length && now - trail[0].t > 120) trail.shift();
 
-    var fsBtn = document.getElementById('fs-go');
-    if (fsBtn){
-      fsBtn.addEventListener('click', function(e){
+      // Decide swipe vs drag once past slop
+      if (!tile._mode && dist > SLOP){
+        const angle = Math.atan2(Math.abs(dy), Math.abs(dx)) * 180/Math.PI;
+        const thr = pxDismiss();
+        tile._mode = (angle <= ANG && (Math.abs(dx) > thr*0.3)) ? 'swipe' : 'drag';
+      }
+
+      if (tile._mode === 'swipe'){
+        const thr = pxDismiss();
+        const fade = Math.min(0.7, Math.abs(dx) / (thr*0.9));
+        tile.style.transform = `translate(${dx}px,0) rotate(${dx*0.008}deg)`;
+        tile.style.opacity   = String(1 - fade);
         e.preventDefault();
-        var root = document.documentElement;
-        var req = root.requestFullscreen || root.webkitRequestFullscreen ||
-                  root.mozRequestFullScreen || root.msRequestFullscreen;
-        if (req){
-          Promise.resolve(req.call(root)).catch(function(){ /* ignore */ }).finally(setFsClass);
+        return;
+      }
+
+      // drag
+      tile.style.left = (baseX + dx) + 'px';
+      tile.style.top  = (baseY + dy) + 'px';
+      e.preventDefault();
+    }
+    function onUp(){
+      if(!isDown) return;
+      isDown=false;
+
+      const dx = lastX - startX;
+      const now = performance.now();
+      while(trail.length && now - trail[0].t > 120) trail.shift();
+      let vx = 0;
+      if (trail.length >= 2) {
+        const a = trail[0], b = trail[trail.length-1];
+        vx = Math.abs(b.x - a.x) / Math.max(1, b.t - a.t);
+      }
+      const thr = pxDismiss();
+
+      if (tile._mode === 'swipe'){
+        if (Math.abs(dx) >= thr*COMMIT_FRAC || vx >= FLICK){
+          dismiss(tile, dx>=0?1:-1);
         } else {
-          // Not supported → hide pill so users aren’t stuck
-          document.body.classList.add('fs-active');
+          tile.style.transition = `transform var(--t) var(--ease), opacity var(--t) var(--ease)`;
+          tile.style.transform=''; tile.style.opacity='';
+          tile.addEventListener('transitionend', () => { tile.style.transition=''; }, {once:true});
         }
-      });
+      }
+      tile._mode = null;
     }
 
-    /* Simple tiles — open on tab click (no auto-open) */
-    var tilesHost = document.getElementById('cs-tiles');
-    var TILES = {
-      overview:{ title:'Overview',  html:'<p>Overview content goes here.</p>' },
-      itinerary:{ title:'Itinerary', html:'<p>Trip segments, dates, carriers.</p>' },
-      values:{   title:'Value Calc', html:'<p>CPP, cash vs award, transfer hints.</p>' }
-    };
-    function closeTile(el){ try{ el.remove(); }catch(_){} }
-    function openTile(key){
-      var spec = TILES[key]; if (!spec) return;
-      Array.from(tilesHost.querySelectorAll('.tile[data-key="'+key+'"]')).forEach(closeTile);
-      var sec = document.createElement('section');
-      sec.className = 'tile';
-      sec.dataset.key = key;
-      sec.innerHTML =
-        '<div class="tile-head"><h4>'+spec.title+
-        '</h4><button class="tile-close" aria-label="Close">×</button></div>'+
-        '<div class="tile-body">'+spec.html+'</div>';
-      sec.querySelector('.tile-close').addEventListener('click', function(){ closeTile(sec); });
-      tilesHost.appendChild(sec);
-    }
-    document.querySelectorAll('.cs-tab').forEach(function(btn){
-      btn.addEventListener('click', function(){ openTile(btn.dataset.key); });
-    });
+    tile.addEventListener('pointerdown', onDown, {passive:false});
+    window.addEventListener('pointermove', onMove, {passive:false});
+    window.addEventListener('pointerup', onUp);
+    window.addEventListener('pointercancel', onUp);
+  }
 
-    /* Pre-warm the portal (non-blocking) */
-    try {
-      var img = new Image();
-      img.referrerPolicy='no-referrer';
-      img.src='https://portal.conciergesync.ai/health?ts='+Date.now();
-    } catch(e){}
-  })();
-  </script>
+  function dismiss(tile, dir){
+    const off = (window.innerWidth*0.55) * (dir||1);
+    tile.classList.add('dismissing');
+    tile.style.transform = `translate(${off}px, 0) rotate(${off*0.002}deg)`;
+    tile.addEventListener('transitionend', () => tile.remove(), {once:true});
+  }
+
+  function openTile(key){
+    // If already open, bring to front
+    const existing = stage.querySelector(`.cs-tile[data-key="${key}"]`);
+    if (existing){ existing.style.zIndex = ++zTop; existing.classList.add('is-focused'); return; }
+
+    const el = document.createElement('section');
+    el.className = 'cs-tile';
+    el.dataset.key = key;
+    el.innerHTML = (TEMPLATES[key] || (()=>`
+      <header class="cs-tile-head">
+        <h4>${key}</h4><button class="cs-close" aria-label="Close">×</button>
+      </header>
+      <div class="cs-tile-body"><p>${key} tile.</p></div>`))();
+
+    stage.appendChild(el);
+    el.style.zIndex = ++zTop;
+
+    // center + slight cascade
+    const {x,y} = centerPos(el);
+    const openCount = stage.querySelectorAll('.cs-tile').length - 1;
+    el.style.left = (x + openCount*24) + 'px';
+    el.style.top  = (y + openCount*18) + 'px';
+
+    addHandlers(el);
+    el.classList.add('is-focused');
+  }
+
+  // Tab wire-up
+  document.querySelectorAll('.cs-tab').forEach(btn=>{
+    btn.addEventListener('click', ()=> openTile(btn.dataset.key));
+  });
+
+  // Optional autostart tile via ?open=values etc.
+  const qs = new URLSearchParams(location.search);
+  if (qs.get('open')) openTile(qs.get('open'));
+
+})();
+</script>
 </body>
 </html>
