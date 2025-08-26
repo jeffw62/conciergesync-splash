@@ -1,172 +1,60 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>ConciergeSync™ — Sign in / Create account</title>
-<style>
-  :root{--glass:rgba(255,255,255,.10);--brd:rgba(255,255,255,.28);--blur:blur(12px) saturate(1.2)}
-  html,body{height:100%}
-  body{
-    margin:0;color:#fff;font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif;
-    background:center/cover no-repeat fixed url("/beta/assets/bg/default.jpg"), #0b1220;
-  }
-  .shade{position:fixed;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.35),rgba(0,0,0,.6))}
-  .wrap{position:relative;min-height:100%;display:grid;place-items:center;padding:20px}
-  .card{
-    width:min(880px,94vw);border:1px solid var(--brd);background:var(--glass);backdrop-filter:var(--blur);
-    border-radius:24px;padding:28px;box-shadow:0 12px 40px rgba(0,0,0,.35)
-  }
-  h1{margin:0 0 6px;font-size:clamp(28px,4vw,40px);line-height:1.12;text-align:center}
-  p.lead{text-align:center;margin:6px 0 18px;color:#e6e9ee}
-  .tabs{display:flex;gap:10px;justify-content:center;margin:8px 0 18px}
-  .tab{
-    padding:10px 14px;border-radius:999px;border:1px solid rgba(255,255,255,.25);
-    background:rgba(255,255,255,.10);cursor:pointer;font-weight:600
-  }
-  .tab.is-active{background:#000;border-color:#000}
-  .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-  .grid .full{grid-column:1/-1}
-  label{font-size:13px;color:#dbe2ee}
-  input[type="text"],input[type="email"]{
-    width:100%;padding:12px 14px;border-radius:12px;border:1px solid rgba(255,255,255,.24);
-    background:rgba(0,0,0,.25);color:#fff;outline:none
-  }
-  .row{display:flex;align-items:center;gap:10px;margin-top:8px}
-  .err{color:#ffd0d0;font-size:13px;display:none}
-  .actions{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:16px}
-  button,.btn{
-    display:inline-flex;align-items:center;justify-content:center;gap:10px;padding:12px 16px;border-radius:999px;
-    color:#fff;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.12);cursor:pointer;
-    text-decoration:none;font-weight:600
-  }
-  button:hover,.btn:hover{transform:translateY(-1px)}
-  .foot{margin-top:12px;font-size:12px;color:#cdd3dd}
-  .right{margin-left:auto}
-  .muted{color:#cdd3dd}
-</style>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>ConciergeSync™ — What is ConciergeSync?</title>
+  <meta name="description" content="ConciergeSync™ turns points & miles into real trips with an elegant, AI-guided console."/>
+  <link rel="canonical" href="/index.html"/>
+  <style>
+    :root{--glass:rgba(255,255,255,.10);--brd:rgba(255,255,255,.28);--blur:blur(12px) saturate(1.2)}
+    html,body{height:100%}
+    body{
+      margin:0; color:#fff; font-family: system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif;
+      background: center/cover no-repeat fixed url("/beta/assets/bg/default.jpg"), #0b1220;
+    }
+    .shade{position:fixed; inset:0; background:linear-gradient(180deg, rgba(0,0,0,.35), rgba(0,0,0,.6))}
+    .wrap{position:relative; min-height:100%; display:grid; place-items:center; padding:24px}
+    .card{
+      width:min(880px,92vw);
+      border:1px solid var(--brd); background:var(--glass); backdrop-filter:var(--blur);
+      border-radius:24px; padding:28px 28px 22px; box-shadow:0 12px 40px rgba(0,0,0,.35);
+    }
+    h1{margin:8px 0 6px; font-size: clamp(28px, 4vw, 40px); line-height:1.1}
+    p{margin:10px 0 14px; color:#e6e9ee; font-size: clamp(15px, 2.1vw, 17px)}
+    .row{display:flex; flex-wrap:wrap; gap:10px; margin-top:16px}
+    a.btn{
+      display:inline-flex; align-items:center; justify-content:center; gap:10px;
+      padding:12px 16px; border-radius:999px; text-decoration:none; color:#fff;
+      border:1px solid rgba(255,255,255,.2); background:rgba(255,255,255,.12);
+      transition:transform .12s ease, background .12s ease, border-color .12s ease;
+    }
+    a.btn:hover{transform:translateY(-1px); background:rgba(255,255,255,.16); border-color:rgba(255,255,255,.28)}
+    .pill{font-size:13px; color:#cbd5e1; display:inline-block; border:1px solid rgba(255,255,255,.22); padding:6px 10px; border-radius:999px}
+    .hr{height:1px; background:linear-gradient(90deg, transparent, rgba(255,255,255,.2), transparent); margin:14px 0}
+    footer{margin-top:10px; font-size:12px; color:#cdd3dd}
+  </style>
 </head>
 <body>
-<div class="shade"></div>
-<div class="wrap">
-  <div class="card" role="form">
-    <h1>Welcome To ConciergeSync™ 👋</h1>
-    <p class="lead">Sign in or create your account with your email.</p>
+  <div class="shade"></div>
+  <div class="wrap">
+    <div class="card">
+      <span class="pill">What is ConciergeSync™</span>
+      <h1>Maximize the value of your points &amp; miles—without the spreadsheet grind.</h1>
+      <p>ConciergeSync™ is a premium, AI-guided console that helps you earn smarter, time transfers with bonuses, and book redemptions at standout cents-per-mile. Our goal: give you a calm, elegant cockpit that turns rewards into real trips.</p>
 
-    <div class="tabs" role="tablist" aria-label="Choose mode">
-      <button id="tabLogin" class="tab" role="tab" aria-selected="false">Returning user? Log in</button>
-      <button id="tabReg"   class="tab is-active" role="tab" aria-selected="true">New user? Register</button>
-    </div>
+      <div class="hr"></div>
 
-    <div class="grid" id="fields">
-      <div class="full" id="nameRow" style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-        <div>
-          <label for="first">First name</label>
-          <input id="first" type="text" autocomplete="given-name" placeholder="First name"/>
-        </div>
-        <div>
-          <label for="last">Last name</label>
-          <input id="last" type="text" autocomplete="family-name" placeholder="Last name"/>
-        </div>
+      <p style="margin:0 0 6px; color:#cbd5e1">Start here:</p>
+      <div class="row">
+        <a class="btn" href="/beta/auth.html">I’m returning — sign in</a>
+        <a class="btn" href="/beta/auth.html">I’m new — join the beta</a>
+        <a class="btn" href="/beta/auth.html">Open the console</a>
       </div>
 
-      <div class="full">
-        <label for="email">Email (your LoginID)</label>
-        <input id="email" type="email" autocomplete="email" inputmode="email" placeholder="you@example.com"/>
-        <div id="errEmail" class="err">Please enter a valid email address.</div>
-      </div>
-
-      <div class="full" id="agreeRow">
-        <label class="row">
-          <input id="agree" type="checkbox" style="width:16px;height:16px">
-          <span>I agree to the <a class="btn-link" href="/beta/02-agree.html" target="_self">Terms &amp; Privacy</a>.</span>
-        </label>
-        <div id="errAgree" class="err">You must agree to continue.</div>
-      </div>
+      <footer>© <span id="y"></span> ConciergeSync™</footer>
     </div>
-
-    <div class="actions">
-      <button id="submit">Create account</button>
-      <a class="btn right" href="/index.html">What is ConciergeSync?</a>
-    </div>
-
-    <div class="foot">Protected by rate-limiting and verification. We’ll never share your email.</div>
   </div>
-</div>
-
-<script>
-  const $ = s => document.querySelector(s);
-  const mode = { value: 'register' };  // 'login' or 'register'
-
-  const tabLogin = $('#tabLogin'), tabReg = $('#tabReg');
-  const nameRow = $('#nameRow'), agreeRow = $('#agreeRow');
-  const first = $('#first'), last = $('#last'), email = $('#email'), agree = $('#agree');
-  const errEmail = $('#errEmail'), errAgree = $('#errAgree'), submit = $('#submit');
-
-  function validEmail(v){ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v); }
-
-  function setMode(m){
-    mode.value = m;
-    const login = m === 'login';
-    tabLogin.classList.toggle('is-active', login);
-    tabReg.classList.toggle('is-active', !login);
-    tabLogin.setAttribute('aria-selected', login);
-    tabReg.setAttribute('aria-selected', !login);
-
-    nameRow.style.display = login ? 'none' : 'grid';
-    agreeRow.style.display = login ? 'none' : 'block';
-    submit.textContent    = login ? 'Log in' : 'Create account';
-  }
-
-  tabLogin.addEventListener('click', ()=> setMode('login'));
-  tabReg.addEventListener('click',   ()=> setMode('register'));
-
-  // Prefill from any earlier attempt
-  try{
-    const p = JSON.parse(localStorage.getItem('cs_profile')||'{}');
-    if(p.first) first.value = p.first;
-    if(p.last)  last.value  = p.last;
-    const em = localStorage.getItem('cs_prefill_email') || p.email || '';
-    if(em) email.value = em;
-  }catch{}
-
-  function clearErrors(){ errEmail.style.display='none'; errAgree.style.display='none'; }
-  email.addEventListener('input', clearErrors);
-  first.addEventListener('input', clearErrors);
-  last.addEventListener('input', clearErrors);
-  agree.addEventListener('change', clearErrors);
-
-  submit.addEventListener('click', () => {
-    clearErrors();
-    const e = email.value.trim();
-    if(!validEmail(e)){ errEmail.style.display='block'; return; }
-
-    if(mode.value === 'login'){
-      // Minimal client “session”
-      try{
-        localStorage.setItem('cs_prefill_email', e);
-        localStorage.setItem('cs_authed','1');
-      }catch{}
-      location.href = '/beta/01-index.html';
-      return;
-    }
-
-    // Register mode
-    const f = first.value.trim(), l = last.value.trim();
-    if(!f || !l){ errEmail.style.display='block'; errEmail.textContent='Please complete all fields.'; return; }
-    if(!agree.checked){ errAgree.style.display='block'; return; }
-
-    try{
-      localStorage.setItem('cs_profile', JSON.stringify({first:f,last:l,email:e,agreed:true}));
-      localStorage.setItem('cs_prefill_email', e);
-      localStorage.setItem('cs_authed','1');
-    }catch{}
-
-    // Hand off to your existing new-user flow
-    location.href = '/beta/02-agree.html';
-  });
-
-  // This gate is canonical on purpose—no auto-redirect when already authed.
-</script>
+  <script>document.getElementById('y').textContent = new Date().getFullYear()</script>
 </body>
 </html>
