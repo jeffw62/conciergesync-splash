@@ -21,100 +21,112 @@
   }
 
   *{ box-sizing:border-box; }
+
   html,body{ height:100%; }
   body{
     margin:0;
     font-family: system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif;
     color:#eef2f8;
-    background:#0b0f14;
+    background: #0b0f14;
   }
 
-  /* Backdrop */
+  /* Backdrop image + overlay */
   .backdrop{ position:fixed; inset:0; z-index:0; overflow:hidden; }
   .backdrop-image{
     position:absolute; inset:0;
     background:center/cover no-repeat;
-    filter:brightness(1.12) contrast(1.05);
-    transform:scale(1.03) translateZ(0);
-    will-change:transform,opacity,filter;
-    transition:opacity 600ms ease, transform 900ms ease, filter 900ms ease;
+    filter: brightness(1.12) contrast(1.05);
+    transform: scale(1.03) translateZ(0);
+    will-change: transform, opacity, filter;
+    transition: opacity 600ms ease, transform 900ms ease, filter 900ms ease;
     opacity:.999;
   }
   .backdrop-overlay{
     position:absolute; inset:0; pointer-events:none;
-    background:linear-gradient(to bottom, var(--overlay-grad-top), var(--overlay-grad-bot));
-    opacity:var(--overlay);
+    background: linear-gradient(to bottom, var(--overlay-grad-top), var(--overlay-grad-bot));
+    opacity: var(--overlay);
   }
 
-  /* Tabs */
+  /* Tabs (top bar) */
   .cs-tabs{
-    position:fixed; top:18px; left:50%; transform:translateX(-50%);
-    z-index:var(--ui);
+    position: fixed; top: 18px; left: 50%; transform: translateX(-50%);
+    z-index: var(--ui);
     display:flex; gap:10px; padding:10px 12px;
-    background:rgba(15,15,18,.36);
+    background: rgba(15,15,18,.36);
     border:1px solid rgba(255,255,255,.25);
-    border-radius:14px; backdrop-filter:blur(8px) saturate(1.1);
+    border-radius:14px; backdrop-filter: blur(8px) saturate(1.1);
   }
   .cs-tab{
     padding:10px 14px; border-radius:10px; border:1px solid rgba(255,255,255,.18);
-    background:rgba(255,255,255,.07); color:#fff; font-weight:700; cursor:pointer;
+    background: rgba(255,255,255,.07); color:#fff; font-weight:700; cursor:pointer;
   }
-  .cs-tab:hover{ background:rgba(255,255,255,.12); }
+  .cs-tab:hover{ background: rgba(255,255,255,.12); }
 
-  /* Exit (top-right) */
-  #exitFs{
+  /* Exit fullscreen button */
+  .console-exit{
     position:fixed; top:18px; right:18px; z-index:var(--ui);
     width:40px; height:40px; border-radius:10px;
     border:1px solid rgba(255,255,255,.35);
-    background:rgba(20,20,20,.45);
+    background: rgba(20,20,20,.45);
     color:#fff; font-size:28px; line-height:36px; text-align:center; cursor:pointer;
-    backdrop-filter:blur(8px) saturate(1.1);
+    backdrop-filter: blur(8px) saturate(1.1);
   }
-  #exitFs:hover{ background:rgba(20,20,20,.6); }
+  .console-exit:hover{ background: rgba(20,20,20,.6); }
 
   /* Tiles stage */
-  #cs-tiles{ position:fixed; inset:0; z-index:10; pointer-events:none; }
+  #cs-tiles{
+    position: fixed; inset: 0; z-index: 10; pointer-events: none;
+  }
 
-  /* Tile */
+  /* Tile look */
   .cs-tile{
     position:absolute;
-    width:420px;
-    min-height:320px;
-    max-height:76vh;
+    width: 420px;
+    min-height: 320px;
+    max-height: 76vh;
     display:grid; grid-template-rows:auto 1fr;
-    background:var(--glass-bg); color:#f5f7fb;
-    border:1px solid var(--glass-border); border-radius:18px;
+    background: var(--glass-bg);
+    color:#f5f7fb;
+    border:1px solid var(--glass-border);
+    border-radius:18px;
     box-shadow:0 10px 30px rgba(0,0,0,.22);
-    backdrop-filter:blur(12px) saturate(1.22);
-    overflow:hidden; pointer-events:auto; user-select:none; touch-action:pan-y;
-    will-change:transform,opacity,left,top;
-    transition:box-shadow var(--t-fast) ease;
+    backdrop-filter: blur(12px) saturate(1.22);
+    overflow:hidden;
+    pointer-events:auto;
+    user-select:none;
+    touch-action: pan-y;
+    will-change: transform, opacity, left, top;
+    transition: box-shadow var(--t-fast) ease;
   }
   .cs-tile.is-focused{
     box-shadow:0 16px 44px rgba(0,0,0,.32), 0 0 0 1px rgba(255,255,255,.18) inset;
   }
+
   .cs-tile-head{
     display:flex; align-items:center; justify-content:space-between;
-    padding:12px 14px; background:rgba(0,0,0,.18);
+    padding: 12px 14px; background: rgba(0,0,0,.18);
     border-bottom:1px solid rgba(255,255,255,.18);
   }
   .cs-tile-head h4{ margin:0; font-size:15px; font-weight:800; letter-spacing:.2px; }
   .cs-close{
     width:30px; height:30px; border-radius:8px;
-    background:rgba(255,255,255,.12); border:1px solid rgba(255,255,255,.25);
+    background: rgba(255,255,255,.12);
+    border:1px solid rgba(255,255,255,.25);
     color:#fff; font-size:18px; line-height:28px; text-align:center; cursor:pointer;
   }
-  .cs-close:hover{ background:rgba(255,255,255,.2); }
+  .cs-close:hover{ background: rgba(255,255,255,.2); }
   .cs-tile-body{ padding:14px; overflow:auto; }
+
+  /* Dismiss animation */
   .cs-tile.dismissing{
-    transition:transform var(--t-out) var(--ease), opacity var(--t-out) var(--ease);
+    transition: transform var(--t-out) var(--ease), opacity var(--t-out) var(--ease);
     opacity:0;
   }
 
-  /* Fullscreen CTA (we toggle via JS ONLY) */
+  /* Fullscreen CTA (only when not fullscreen) */
   .fs-cta{
     position:fixed; inset:0; display:none; place-items:center; z-index:var(--ui);
-    background:rgba(0,0,0,.45);
+    background: rgba(0,0,0,.45);
   }
   .fs-card{
     background:#111; color:#fff; padding:18px 22px; border-radius:14px;
@@ -125,7 +137,10 @@
   .btn.primary{ background:#fff; color:#111; border-color:#fff; }
   .btn.ghost{ background:transparent; color:#fff; }
 
-  /* Logout confirm */
+  /* Show CTA only while NOT fullscreen */
+  body.console-mode:not(.fs-active) .fs-cta{ display:grid; }
+
+  /* Logout confirm modal */
   #logoutConfirm {
     position: fixed; inset: 0; z-index: 99999;
     display: none; place-items: center;
@@ -135,8 +150,8 @@
   #logoutConfirm .card {
     background:#111; color:#fff; border-radius:14px;
     padding:18px 20px; box-shadow:0 10px 34px rgba(0,0,0,.45);
-    font:600 16px system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif;
-    text-align:center; min-width:320px; max-width:420px;
+    font:600 16px system-ui, -apple-system, Segoe UI, Roboto, Inter, Arial, sans-serif;
+    text-align:center; min-width: 320px; max-width: 520px;
   }
   #logoutConfirm .row { display:flex; gap:10px; justify-content:center; margin-top:12px; }
   #logoutConfirm button {
@@ -161,10 +176,10 @@
     <button class="cs-tab" data-key="values">Value Calc</button>
   </div>
 
-  <!-- Exit -->
-  <button id="exitFs" aria-label="Exit">×</button>
+  <!-- Exit fullscreen -->
+  <button id="exitConsole" class="console-exit" aria-label="Exit Fullscreen">×</button>
 
-  <!-- Tiles -->
+  <!-- Tiles stage -->
   <div id="cs-tiles" aria-live="polite"></div>
 
   <!-- Fullscreen CTA -->
@@ -179,9 +194,11 @@
   </div>
 
   <!-- Logout confirm -->
-  <div id="logoutConfirm" role="dialog" aria-modal="true" aria-labelledby="logoutTitle">
+  <div id="logoutConfirm" role="dialog" aria-modal="true" aria-labelledby="logoutTitle" hidden>
     <div class="card">
-      <div id="logoutTitle" style="font-weight:800;margin-bottom:8px;">Do you want to log out?</div>
+      <div id="logoutTitle" style="font-weight:800;margin-bottom:8px;">
+        Do you want to log out?
+      </div>
       <div class="row">
         <button id="logoutYes" class="primary">Yes, log me out</button>
         <button id="logoutNo">No, take me back fullscreen</button>
@@ -191,81 +208,82 @@
 
 <script>
 (function(){
-  /* ---------- Backdrop ---------- */
+  /* ------------------------------------------------
+     CONFIG: set your real login page here
+     e.g. '/login/index.html' or '/beta/login.html'
+  -------------------------------------------------*/
+  const LOGOUT_URL = '/login/index.html';
+
+  /* -------------------- Backdrop -------------------- */
   const BG = '/beta/assets/bg/IMG_5374.jpeg';
   document.getElementById('backdropImage').style.backgroundImage = `url("${BG}")`;
 
-  /* ---------- Fullscreen + CTA ---------- */
-  const root   = document.documentElement;
-  const body   = document.body;
+  /* -------------------- Fullscreen flow -------------------- */
+  const root = document.documentElement;
   const fsGo   = document.getElementById('fs-go');
   const fsSkip = document.getElementById('fs-skip');
   const fsCta  = document.getElementById('fs-cta');
-  const exitFs = document.getElementById('exitFs');
 
-  const qs = new URLSearchParams(location.search);
-
-  function setVh(){ root.style.setProperty('--vh', window.innerHeight + 'px'); }
+  function setVh(){ document.documentElement.style.setProperty('--vh', window.innerHeight + 'px'); }
   setVh(); addEventListener('resize', setVh);
 
-  function showCTA(){ fsCta.style.display = 'grid'; }
-  function hideCTA(){ fsCta.style.display = 'none'; }
-
-  async function enterFS(){
+  function enterFS(){
     const req = root.requestFullscreen || root.webkitRequestFullscreen ||
                 root.msRequestFullscreen || root.mozRequestFullScreen;
-    try { if (req) await req.call(root); } catch(_) {}
-    body.classList.add('fs-active');
-    hideCTA();
+    if (req) { Promise.resolve(req.call(root)).catch(()=>{}); }
+    document.body.classList.add('fs-active');
+    fsCta.style.display = 'none';
   }
-  async function leaveFS(){
+  function leaveFS(){
     const ex = document.exitFullscreen || document.webkitExitFullscreen ||
                document.msExitFullscreen || document.mozCancelFullScreen;
-    try { if (document.fullscreenElement || document.webkitFullscreenElement) await ex.call(document); } catch(_) {}
-    body.classList.remove('fs-active');
+    if (document.fullscreenElement || document.webkitFullscreenElement) {
+      try{ ex.call(document); }catch(e){}
+    }
+    document.body.classList.remove('fs-active');
   }
 
-  // Show CTA exactly once on entry (not when leaving FS later)
-  if (qs.get('enter') === '1') showCTA();
-
   fsGo.addEventListener('click', (e)=>{ e.preventDefault(); enterFS(); });
-  fsSkip.addEventListener('click', (e)=>{ e.preventDefault(); hideCTA(); });
+  fsSkip.addEventListener('click', (e)=>{ e.preventDefault(); fsCta.style.display='none'; });
 
-  /* ---------- Tiles ---------- */
+  // If coming from thank-you with ?enter=1 ensure CTA shows
+  if (new URLSearchParams(location.search).get('enter') === '1'){
+    document.body.classList.add('console-mode');
+    document.body.classList.remove('fs-active');
+    fsCta.style.display = 'grid';
+  }
+
+  /* -------------------- Tile system -------------------- */
   const stage = document.getElementById('cs-tiles');
   let zTop = 10;
 
   const TEMPLATES = {
     overview: () => `
       <header class="cs-tile-head">
-        <h4>Overview</h4><button class="cs-close" aria-label="Close">×</button>
+        <h4>Overview</h4>
+        <button class="cs-close" aria-label="Close">×</button>
       </header>
       <div class="cs-tile-body"><p>Overview content goes here.</p></div>`,
     itinerary: () => `
       <header class="cs-tile-head">
-        <h4>Itinerary</h4><button class="cs-close" aria-label="Close">×</button>
+        <h4>Itinerary</h4>
+        <button class="cs-close" aria-label="Close">×</button>
       </header>
       <div class="cs-tile-body"><p>Trip segments, dates, carriers.</p></div>`,
     values: () => `
       <header class="cs-tile-head">
-        <h4>Value Calc</h4><button class="cs-close" aria-label="Close">×</button>
+        <h4>Value Calc</h4>
+        <button class="cs-close" aria-label="Close">×</button>
       </header>
       <div class="cs-tile-body"><p>CPP, cash vs award, transfer hints.</p></div>`
   };
 
-  function centerPos(el){
-    const r = el.getBoundingClientRect();
-    const w = r.width, h = Math.min(r.height, innerHeight*0.76);
-    const x = (innerWidth - w)/2;
-    const y = Math.max(18, (innerHeight - h)/2);
-    return {x,y};
-  }
-
-  function dismiss(tile, dir){
-    const off = (innerWidth*0.55) * (dir||1);
-    tile.classList.add('dismissing');
-    tile.style.transform = `translate(${off}px,0) rotate(${off*0.002}deg)`;
-    tile.addEventListener('transitionend', () => tile.remove(), {once:true});
+  function centerPos(tile){
+    const r = tile.getBoundingClientRect();
+    const w = r.width, h = Math.min(r.height, window.innerHeight*0.76);
+    const x = (window.innerWidth  - w)/2;
+    const y = Math.max(18, (window.innerHeight - h)/2);
+    return { x, y };
   }
 
   function addHandlers(tile){
@@ -276,18 +294,22 @@
     tile.addEventListener('pointercancel', blur);
     tile.querySelector('.cs-close')?.addEventListener('click', () => dismiss(tile, 1));
 
-    let isDown=false, startX=0, startY=0, baseX=0, baseY=0, lastX=0, trail=[];
+    let isDown=false, startX=0, startY=0, baseX=0, baseY=0;
+    let lastX=0, trail=[];
     const SLOP=2, ANG=60, FLICK=0.22, DISMISS_FRAC=0.12, COMMIT_FRAC=0.45, MIN=36;
-    const pxDismiss = ()=>Math.max(MIN, tile.offsetWidth*DISMISS_FRAC);
+
+    function pxDismiss(){ return Math.max(MIN, tile.offsetWidth*DISMISS_FRAC); }
 
     function onDown(e){
       if (e.button!==0) return;
       if (e.target.closest('button,a,input,textarea,select')) return;
+
       isDown=true; focus();
       try{ tile.setPointerCapture?.(e.pointerId); }catch(_){}
-      startX=lastX=e.clientX; startY=e.clientY;
-      const r = tile.getBoundingClientRect(); baseX=r.left; baseY=r.top;
-      trail=[{t:performance.now(), x:lastX}];
+      startX = lastX = e.clientX; startY = e.clientY;
+      const r = tile.getBoundingClientRect();
+      baseX = r.left; baseY = r.top;
+      trail = [{t:performance.now(), x:lastX}];
       e.preventDefault();
     }
     function onMove(e){
@@ -297,45 +319,65 @@
       const dist = Math.hypot(dx,dy);
 
       const now = performance.now();
-      trail.push({t:now, x:lastX}); while(trail.length && now-trail[0].t>120) trail.shift();
+      trail.push({t:now, x:lastX});
+      while(trail.length && now - trail[0].t > 120) trail.shift();
 
-      if(!tile._mode && dist>SLOP){
-        const angle = Math.atan2(Math.abs(dy), Math.abs(dx))*180/Math.PI;
+      if (!tile._mode && dist > SLOP){
+        const angle = Math.atan2(Math.abs(dy), Math.abs(dx)) * 180/Math.PI;
         const thr = pxDismiss();
-        tile._mode = (angle<=ANG && Math.abs(dx)>thr*0.3) ? 'swipe' : 'drag';
+        tile._mode = (angle <= ANG && (Math.abs(dx) > thr*0.3)) ? 'swipe' : 'drag';
       }
-      if(tile._mode==='swipe'){
+
+      if (tile._mode === 'swipe'){
         const thr = pxDismiss();
-        const fade = Math.min(0.7, Math.abs(dx)/(thr*0.9));
+        const fade = Math.min(0.7, Math.abs(dx) / (thr*0.9));
         tile.style.transform = `translate(${dx}px,0) rotate(${dx*0.008}deg)`;
-        tile.style.opacity = String(1 - fade);
-        e.preventDefault(); return;
+        tile.style.opacity   = String(1 - fade);
+        e.preventDefault();
+        return;
       }
+
       tile.style.left = (baseX + dx) + 'px';
       tile.style.top  = (baseY + dy) + 'px';
       e.preventDefault();
     }
     function onUp(){
-      if(!isDown) return; isDown=false;
+      if(!isDown) return;
+      isDown=false;
+
       const dx = lastX - startX;
       const now = performance.now();
-      while(trail.length && now-trail[0].t>120) trail.shift();
-      let vx = 0; if(trail.length>=2){ const a=trail[0], b=trail[trail.length-1]; vx = Math.abs(b.x-a.x)/Math.max(1,b.t-a.t); }
+      while(trail.length && now - trail[0].t > 120) trail.shift();
+      let vx = 0;
+      if (trail.length >= 2) {
+        const a = trail[0], b = trail[trail.length-1];
+        vx = Math.abs(b.x - a.x) / Math.max(1, b.t - a.t);
+      }
       const thr = pxDismiss();
-      if(tile._mode==='swipe'){
-        if(Math.abs(dx)>=thr*COMMIT_FRAC || vx>=FLICK) dismiss(tile, dx>=0?1:-1);
-        else{
+
+      if (tile._mode === 'swipe'){
+        if (Math.abs(dx) >= thr*COMMIT_FRAC || vx >= FLICK){
+          dismiss(tile, dx>=0?1:-1);
+        } else {
           tile.style.transition = `transform var(--t) var(--ease), opacity var(--t) var(--ease)`;
           tile.style.transform=''; tile.style.opacity='';
-          tile.addEventListener('transitionend', ()=>{ tile.style.transition=''; }, {once:true});
+          tile.addEventListener('transitionend', () => { tile.style.transition=''; }, {once:true});
         }
       }
-      tile._mode=null;
+      tile._mode = null;
     }
+
     tile.addEventListener('pointerdown', onDown, {passive:false});
-    addEventListener('pointermove', onMove, {passive:false});
-    addEventListener('pointerup', onUp);
-    addEventListener('pointercancel', onUp);
+    window.addEventListener('pointermove', onMove, {passive:false});
+    window.addEventListener('pointerup', onUp);
+    window.addEventListener('pointercancel', onUp);
+  }
+
+  function dismiss(tile, dir){
+    const off = (window.innerWidth*0.55) * (dir||1);
+    tile.classList.add('dismissing');
+    tile.style.transform = `translate(${off}px, 0) rotate(${off*0.002}deg)`;
+    tile.addEventListener('transitionend', () => tile.remove(), {once:true});
   }
 
   function openTile(key){
@@ -343,90 +385,99 @@
     if (existing){ existing.style.zIndex = ++zTop; existing.classList.add('is-focused'); return; }
 
     const el = document.createElement('section');
-    el.className = 'cs-tile'; el.dataset.key = key;
+    el.className = 'cs-tile';
+    el.dataset.key = key;
     el.innerHTML = (TEMPLATES[key] || (()=>`
       <header class="cs-tile-head">
         <h4>${key}</h4><button class="cs-close" aria-label="Close">×</button>
       </header>
       <div class="cs-tile-body"><p>${key} tile.</p></div>`))();
-    stage.appendChild(el); el.style.zIndex = ++zTop;
+
+    stage.appendChild(el);
+    el.style.zIndex = ++zTop;
 
     const {x,y} = centerPos(el);
     const openCount = stage.querySelectorAll('.cs-tile').length - 1;
     el.style.left = (x + openCount*24) + 'px';
     el.style.top  = (y + openCount*18) + 'px';
 
-    addHandlers(el); el.classList.add('is-focused');
+    addHandlers(el);
+    el.classList.add('is-focused');
   }
 
   document.querySelectorAll('.cs-tab').forEach(btn=>{
     btn.addEventListener('click', ()=> openTile(btn.dataset.key));
   });
+
+  const qs = new URLSearchParams(location.search);
   if (qs.get('open')) openTile(qs.get('open'));
 
-  /* ---------- Logout confirm (Esc & top-right) ---------- */
+  /* -------------------- Logout confirm & routing -------------------- */
+  const exitBtn= document.getElementById('exitConsole');
   const modal  = document.getElementById('logoutConfirm');
   const yesBtn = document.getElementById('logoutYes');
   const noBtn  = document.getElementById('logoutNo');
 
-  let suppressConfirm = false; // when we *intend* to leave FS (e.g., re-enter flow)
+  let suppressConfirm = false;
 
-  function showConfirm(){ modal.classList.add('show'); }
-  function hideConfirm(){ modal.classList.remove('show'); }
-
-  function clearAuth(){
-    try{
-      sessionStorage.removeItem('cs_authed');
-      localStorage.removeItem('cs_authed');
-      localStorage.removeItem('cs_uid');
-      localStorage.removeItem('cs_email');
-      localStorage.removeItem('cs_onboarding_done');
-      localStorage.removeItem('cs_bg_src');
-      localStorage.removeItem('last_bg_idx');
-      document.cookie = 'cs_auth=; Max-Age=0; path=/; SameSite=Lax';
-    }catch(_){}
+  function showConfirm(){
+    modal.hidden = false;
+    modal.classList.add('show');
+  }
+  function hideConfirm(){
+    modal.classList.remove('show');
+    modal.hidden = true;
+  }
+  function leaveFullscreenIfAny(){
+    const ex = document.exitFullscreen || document.webkitExitFullscreen ||
+               document.msExitFullscreen || document.mozCancelFullScreen;
+    try { ex && ex.call(document); } catch(_) {}
+    document.body.classList.remove('fs-active');
+  }
+  async function reEnterFullscreen(){
+    const req = root.requestFullscreen || root.webkitRequestFullscreen ||
+                root.mozRequestFullScreen || root.msRequestFullscreen;
+    try { if (req) await req.call(root); } catch(_) {}
+    document.body.classList.add('fs-active');
   }
 
-  // Top-right X
-  exitFs.addEventListener('click', async (e)=>{
+  // Intercept the top-right X
+  exitBtn.addEventListener('click', (e) => {
     e.preventDefault();
-    await leaveFS(); // makes the confirm visible everywhere
+    leaveFullscreenIfAny();
     if (!suppressConfirm) showConfirm();
   });
 
-  // If user leaves fullscreen via Esc/OS menu, show confirm (not the CTA)
-  document.addEventListener('fullscreenchange', ()=>{
-    const isFs = !!(document.fullscreenElement || document.webkitFullscreenElement);
-    body.classList.toggle('fs-active', isFs);
-    if (!isFs && !suppressConfirm) {
-      hideCTA();      // do NOT show CTA on FS exit
-      showConfirm();  // show confirm instead
-    }
+  // Also show confirm if user escapes fullscreen via keyboard/OS
+  document.addEventListener('fullscreenchange', () => {
+    if (!document.fullscreenElement && !suppressConfirm) showConfirm();
   });
-
-  // Backstop for Esc (some browsers)
-  document.addEventListener('keydown', (e)=>{
-    if (e.key === 'Escape' && !document.fullscreenElement && !suppressConfirm){
-      hideCTA(); showConfirm();
-    }
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && !document.fullscreenElement && !suppressConfirm) showConfirm();
   }, true);
 
-  // Confirm buttons
-  yesBtn.addEventListener('click', ()=>{
+  // YES → clear auth and go straight to *login* screen
+  yesBtn.addEventListener('click', () => {
     suppressConfirm = true;
     hideConfirm();
-    clearAuth();
-    // hard replace to auth screen (prevents back-bounce)
-    location.replace('/beta/auth.html');
+    try {
+      sessionStorage.removeItem('cs_authed');
+      localStorage.removeItem('cs_authed');
+      document.cookie = 'cs_auth=; Max-Age=0; path=/; SameSite=Lax';
+    } catch(_) {}
+    // one clean hop to your login page
+    window.location.assign(LOGOUT_URL);
   });
 
-  noBtn.addEventListener('click', async ()=>{
+  // NO → straight back to fullscreen
+  noBtn.addEventListener('click', async () => {
     hideConfirm();
     suppressConfirm = true;
-    await enterFS();
+    await reEnterFullscreen();
     suppressConfirm = false;
   });
 })();
 </script>
+
 </body>
 </html>
