@@ -35,10 +35,10 @@
       transform:scale(1.03);
     }
 
-    /* Card */
+    /* Card (narrowed) */
     .wrap{position:relative; z-index:1; min-height:100%;}
     .card{
-      width:min(880px, 92vw);
+      width:min(700px, 90vw);
       margin: clamp(48px, 12vh, 120px) auto 40px;
       background:var(--glass);
       border:1px solid var(--glass-b);
@@ -152,18 +152,16 @@
     function getKnownEmails(){
       const known = new Set();
 
-      // Saved during previous sessions (don’t clear this on logout)
       const saved = (localStorage.getItem('cs_email') || '').trim().toLowerCase();
       if (saved) known.add(saved);
 
-      // Optional list you/JS add: localStorage.cs_known_emails = '["a@x.com","b@y.com"]'
       try {
         const arr = JSON.parse(localStorage.getItem('cs_known_emails') || '[]');
         arr.forEach(e => { if (e) known.add(String(e).toLowerCase()); });
       } catch(_) {}
 
-      // DEV convenience: allow your own domain (remove if you don’t want this)
-      known.add('@conciergesync.ai'); // domain marker, handled specially
+      // DEV convenience: allow your domain (remove if undesired)
+      known.add('@conciergesync.ai');
 
       return known;
     }
@@ -171,26 +169,19 @@
     function isRecognized(input){
       const e = (input||'').trim().toLowerCase();
       if (!e) return false;
-
       const known = getKnownEmails();
       if (known.has(e)) return true;
-
-      // allow domain rule
       if (known.has('@conciergesync.ai') && /@conciergesync\.ai$/i.test(e)) return true;
-
       return false;
     }
 
     function authAndEnter(email){
-      // Persist who signed in (used by 01-index.html etc.)
       try {
         localStorage.setItem('cs_email', email);
         sessionStorage.setItem('cs_authed', '1');
         localStorage.setItem('cs_authed', '1');
         document.cookie = "cs_auth=1; path=/; max-age=7200; SameSite=Lax";
       } catch(_){}
-
-      // Navigate straight into the console
       location.assign('/beta/01-index.html?enter=1');
     }
 
@@ -209,7 +200,6 @@
       }
     });
 
-    // Enter key on the input triggers the same flow
     emailInput.addEventListener('keydown', (e)=>{
       if (e.key === 'Enter') {
         e.preventDefault();
