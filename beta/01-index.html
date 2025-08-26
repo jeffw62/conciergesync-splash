@@ -261,27 +261,8 @@
     /* ---------- 4) If not autoEntering, stay on landing; otherwise we’re done ---------- */
     // Nothing else to open automatically; we intentionally start with an empty grid.
   })();
-  </script>
-  <script>
-/* Silent fullscreen on first interaction when arriving with ?enter=1 */
-(function () {
-  if (new URLSearchParams(location.search).get('enter') !== '1') return;
-
-  function tryFS() {
-    const el = document.documentElement;
-    const req = el.requestFullscreen || el.webkitRequestFullscreen ||
-                el.mozRequestFullScreen || el.msRequestFullscreen;
-    try { if (req) req.call(el); } catch (_) {}
-    window.removeEventListener('pointerdown', tryFS, true);
-    window.removeEventListener('keydown',     tryFS, true);
-  }
-
-  // First interaction anywhere in the page triggers fullscreen
-  window.addEventListener('pointerdown', tryFS, true);
-  window.addEventListener('keydown',     tryFS, true);
-})();
-</script>
-
+  </script> 
 </body>
 </html>
+
 
