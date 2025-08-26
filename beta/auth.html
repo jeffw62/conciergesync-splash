@@ -10,44 +10,41 @@
   :root{ --glass:rgba(255,255,255,.10); --brd:rgba(255,255,255,.28); --blur:blur(12px) saturate(1.2) }
   html,body{height:100%}
   body{
-    margin:0; font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif; color:#fff;
-    background:#0b1220;
+    margin:0; font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif; color:#fff; background:#0b1220;
   }
   .bg{position:fixed; inset:0; background:center/cover no-repeat; filter:brightness(1.08) contrast(1.04)}
   .ov{position:fixed; inset:0; background:linear-gradient(180deg, rgba(0,0,0,.35), rgba(0,0,0,.60))}
-  .wrap{position:relative; min-height:100%; display:grid; place-items:center; padding:20px}
+  .wrap{position:relative; min-height:100%; display:grid; place-items:center; padding:18px}
   .card{
-    width:min(900px,94vw);
+    width:min(720px,92vw);
     border:1px solid var(--brd); background:var(--glass); backdrop-filter:var(--blur);
-    border-radius:20px; padding:26px 26px 22px; box-shadow:0 14px 44px rgba(0,0,0,.35)
+    border-radius:18px; padding:22px; box-shadow:0 12px 40px rgba(0,0,0,.35)
   }
-  h1{margin:0 0 6px; font-weight:800; font-size:clamp(28px,4.6vw,48px); letter-spacing:-.01em; text-align:center}
-  p.lead{text-align:center; margin:6px 0 18px; color:#e7ecf6}
-  .tabs{display:flex; gap:10px; justify-content:center; margin:6px 0 18px}
+  h1{margin:0 0 6px; font-weight:800; font-size:clamp(24px,4.2vw,36px); letter-spacing:-.01em; text-align:center}
+  p.lead{text-align:center; margin:6px 0 16px; color:#e7ecf6; font-size:clamp(14px,2.2vw,16px)}
+  .tabs{display:flex; gap:8px; justify-content:center; margin:0 0 14px}
   .tab{
-    padding:10px 14px; border-radius:999px; border:1px solid rgba(255,255,255,.25);
-    background:rgba(0,0,0,.25); cursor:pointer; font-weight:700; color:#fff
+    padding:8px 12px; border-radius:999px; border:1px solid rgba(255,255,255,.25);
+    background:rgba(0,0,0,.25); cursor:pointer; font-weight:700; color:#fff; font-size:14px
   }
   .tab.is-active{background:#000;border-color:#000}
-  .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-  .grid .full{grid-column:1/-1}
-  label{font-size:13px;color:#dbe2ee}
+  /* Slimmed form column */
+  .form{width:min(480px, 92vw); margin:0 auto; display:grid; gap:10px}
+  .nameRow{display:grid; grid-template-columns:1fr 1fr; gap:10px}
+  label{font-size:12px;color:#dbe2ee}
   input[type="text"],input[type="email"]{
-    width:100%;padding:12px 14px;border-radius:12px;border:1px solid rgba(255,255,255,.24);
-    background:rgba(0,0,0,.35);color:#fff;outline:none
+    width:100%;padding:10px 12px;border-radius:12px;border:1px solid rgba(255,255,255,.24);
+    background:rgba(0,0,0,.35);color:#fff;outline:none; font-size:14px
   }
-  .row{display:flex;align-items:center;gap:10px;margin-top:8px}
-  .err{color:#ffd0d0;font-size:13px;display:none}
-  .actions{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:16px}
-  button,.btn{
-    display:inline-flex;align-items:center;justify-content:center;gap:10px;padding:12px 16px;border-radius:999px;
-    color:#111;font-weight:800;border:1px solid #fff;background:#fff;cursor:pointer;text-decoration:none
+  .row{display:flex;align-items:center;gap:8px;margin-top:2px}
+  .err{color:#ffd0d0;font-size:12px;display:none}
+  .actions{display:flex;gap:10px;align-items:center;margin-top:12px}
+  button{
+    display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:10px 14px;border-radius:999px;
+    color:#111;font-weight:800;border:1px solid #fff;background:#fff;cursor:pointer;font-size:14px
   }
-  .ghost{background:transparent;color:#fff;border-color:rgba(255,255,255,.24)}
-  .ghost:hover{border-color:rgba(255,255,255,.34);background:rgba(255,255,255,.08)}
-  .right{margin-left:auto}
-  .muted{color:#cdd3dd}
-  @media (max-width:720px){ .grid{grid-template-columns:1fr} #nameRow{grid-template-columns:1fr!important} }
+  .muted{color:#cdd3dd; font-size:12px; margin-top:10px}
+  @media (max-width:560px){ .nameRow{grid-template-columns:1fr} }
 </style>
 </head>
 <body>
@@ -64,8 +61,8 @@
         <button id="tabReg"   class="tab is-active" role="tab" aria-selected="true">New user? Register</button>
       </div>
 
-      <div class="grid" id="fields">
-        <div class="full" id="nameRow" style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="form" id="fields">
+        <div class="nameRow" id="nameRow">
           <div>
             <label for="first">First name</label>
             <input id="first" type="text" autocomplete="given-name" placeholder="First name"/>
@@ -76,43 +73,40 @@
           </div>
         </div>
 
-        <div class="full">
+        <div>
           <label for="email">Email (your LoginID)</label>
           <input id="email" type="email" autocomplete="email" inputmode="email" placeholder="you@example.com"/>
           <div id="errEmail" class="err">Please enter a valid email address.</div>
         </div>
 
-        <div class="full" id="agreeRow">
+        <div id="agreeRow">
           <label class="row">
             <input id="agree" type="checkbox" style="width:16px;height:16px">
-            <span>I agree to the <a class="btn-link" href="/beta/terms.html" target="_self" style="color:#fff;text-decoration:underline">Terms &amp; Privacy</a>.</span>
+            <span>I agree to the <a href="/beta/terms.html" target="_self" style="color:#fff;text-decoration:underline">Terms &amp; Privacy</a>.</span>
           </label>
           <div id="errAgree" class="err">You must agree to continue.</div>
         </div>
-      </div>
 
-      <div class="actions">
-        <button id="submit">Create account</button>
-        <a class="btn ghost" href="/index.html">What is ConciergeSync?</a>
-      </div>
+        <div class="actions">
+          <button id="submit">Create account</button>
+        </div>
 
-      <div class="muted" style="margin-top:12px;font-size:12px">
-        Protected by rate-limiting and verification. We’ll never share your email.
+        <div class="muted">Protected by rate-limiting and verification. We’ll never share your email.</div>
       </div>
     </div>
   </div>
 
 <script>
-  // Background: keep whatever was set earlier; fallback to the wing image.
+  // Background: last chosen, or default wing
   (function(){
     var src = localStorage.getItem('cs_bg_src') || '/beta/assets/bg/IMG_5374.jpeg';
     document.getElementById('bg').style.backgroundImage = 'url(' + src + ')';
   })();
 
-  // Canonical gate logic (tabs + validation + redirect to console)
+  // Gate logic
   (function(){
     const $ = s => document.querySelector(s);
-    const mode = { value: 'register' }; // or 'login'
+    const mode = { value: 'register' };
 
     const tabLogin = $('#tabLogin'), tabReg = $('#tabReg');
     const nameRow = $('#nameRow'), agreeRow = $('#agreeRow');
@@ -135,7 +129,7 @@
     tabLogin.addEventListener('click', ()=> setMode('login'));
     tabReg.addEventListener('click',   ()=> setMode('register'));
 
-    // Prefill convenience
+    // Prefill
     try{
       const p = JSON.parse(localStorage.getItem('cs_profile')||'{}');
       if(p.first) first.value = p.first;
@@ -145,16 +139,13 @@
     }catch{}
 
     function clearErrors(){ errEmail.style.display='none'; errAgree.style.display='none'; }
-    ['input','change'].forEach(evt=>{
-      [first,last,email,agree].forEach(el => el.addEventListener(evt, clearErrors));
-    });
+    ;['input','change'].forEach(evt=>[first,last,email,agree].forEach(el=>el.addEventListener(evt, clearErrors)));
 
     function goConsole(){
       try{
         localStorage.setItem('cs_authed','1');
         sessionStorage.setItem('cs_authed','1');
       }catch{}
-      // Send with ?enter=1 so the console shows the fullscreen pill
       location.replace('/beta/01-index.html?enter=1');
     }
 
@@ -180,7 +171,6 @@
       goConsole();
     });
 
-    // Submit on Enter in email
     email.addEventListener('keydown', e => { if(e.key==='Enter') submit.click(); });
   })();
 </script>
