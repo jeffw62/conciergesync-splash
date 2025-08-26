@@ -6,91 +6,120 @@
   <title>Sign in • ConciergeSync™</title>
   <style>
     :root{
-      --card:#11151b; --ink:#eaf0f7; --muted:#a6b0bf; --accent:#fff; --accentText:#0c1117;
-      --ring: rgba(255,255,255,.18);
+      --overlay: .32;
+      --ring: rgba(255,255,255,.22);
+      --glass-bg: rgba(255,255,255,.12);
+      --glass-border: rgba(255,255,255,.28);
     }
     *{box-sizing:border-box}
     html,body{height:100%}
     body{
-      margin:0; background:#0a0f14; color:var(--ink);
-      font-family: system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif;
-      display:grid; place-items:center; padding:24px;
+      margin:0; font-family: system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif;
+      color:#eef2f8; background:#0b0f14;
+      overflow:hidden;
     }
+
+    /* Backdrop */
+    .backdrop{position:fixed; inset:0; z-index:0; overflow:hidden}
+    .backdrop-image{
+      position:absolute; inset:0;
+      background:center/cover no-repeat;
+      filter:brightness(1.12) contrast(1.05);
+      transform:scale(1.03) translateZ(0);
+    }
+    .backdrop-overlay{
+      position:absolute; inset:0; pointer-events:none;
+      background: linear-gradient(to bottom, rgba(0,0,0,.35), rgba(0,0,0,.58));
+      opacity: var(--overlay);
+    }
+
+    /* Center tile */
+    .stage{position:fixed; inset:0; display:grid; place-items:center; padding:24px; z-index:10}
     .card{
-      width:min(720px,92vw); border:1px solid var(--ring); background:rgba(17,21,27,.85);
-      border-radius:18px; padding:28px; box-shadow:0 20px 60px rgba(0,0,0,.35), 0 0 1px rgba(255,255,255,.06);
+      width:min(820px, 92vw);
+      background: var(--glass-bg);
+      border:1px solid var(--glass-border);
+      border-radius:18px; backdrop-filter: blur(12px) saturate(1.22);
+      box-shadow:0 18px 50px rgba(0,0,0,.30);
+      padding:26px 26px 20px;
     }
-    h1{margin:0 0 10px; font-size:32px; line-height:1.2}
-    p.sub{margin:0 0 20px; color:var(--muted)}
-    .row{display:flex; gap:10px; flex-wrap:wrap}
+    .card h1{margin:0 0 6px; font-size:34px; line-height:1.2}
+    .sub{margin:0 0 18px; color:#c8d2de}
+    .row{display:flex; gap:10px; align-items:center; flex-wrap:wrap}
     input[type="email"]{
-      flex:1 1 280px; min-width:260px; padding:12px 14px; border-radius:12px;
-      border:1px solid var(--ring); background:#0d131a; color:var(--ink); font-size:16px;
-      outline:none;
+      flex:1 1 320px; min-width:280px;
+      padding:12px 14px; border-radius:12px; background:rgba(13,19,26,.6);
+      border:1px solid var(--ring); color:#eef2f8; font-size:16px; outline:none;
     }
-    input[type="email"]:focus{border-color:#7cc4ff; box-shadow:0 0 0 3px rgba(124,196,255,.15)}
+    input[type="email"]::placeholder{color:#a6b0bf}
+    input[type="email"]:focus{border-color:#7cc4ff; box-shadow:0 0 0 3px rgba(124,196,255,.18)}
     .btn{
-      padding:12px 16px; border-radius:12px; border:1px solid var(--ring); font-weight:800; cursor:pointer;
-      background:transparent; color:var(--ink);
+      padding:12px 16px; border-radius:12px; border:1px solid var(--ring);
+      font-weight:800; cursor:pointer; background:#fff; color:#0c1117;
+      box-shadow:0 8px 22px rgba(0,0,0,.20);
     }
-    .btn.primary{ background:var(--accent); color:var(--accentText); border-color:var(--accent) }
-    .btn.ghost{ background:transparent; }
-    .meta{margin-top:12px; color:#9aa6b2; font-size:.92rem}
-    .actions{display:flex; gap:10px; margin-top:12px; flex-wrap:wrap}
-    .right{margin-left:auto}
+    .btn.secondary{
+      background:transparent; color:#eef2f8;
+    }
+    .meta{margin-top:10px; color:#c0cad6; font-size:.92rem}
+    @media (max-width:560px){
+      .card h1{font-size:28px}
+    }
   </style>
 </head>
 <body>
 
-  <main class="card" role="main" aria-labelledby="title">
-    <h1 id="title">Sign in to ConciergeSync™</h1>
-    <p class="sub">Enter your email to continue to your console.</p>
+  <!-- Backdrop -->
+  <div class="backdrop" aria-hidden="true">
+    <div id="bg" class="backdrop-image"></div>
+    <div class="backdrop-overlay"></div>
+  </div>
 
-    <form id="signin" autocomplete="on">
+  <!-- Auth tile -->
+  <div class="stage">
+    <form id="signin" class="card" autocomplete="on" novalidate>
+      <h1>Sign in to ConciergeSync™</h1>
+      <p class="sub">Enter your email to continue to your console.</p>
       <div class="row">
         <input id="email" name="email" type="email" inputmode="email" autocomplete="email"
                placeholder="you@example.com" required />
-        <button class="btn primary" type="submit">Enter Console</button>
-        <a class="btn ghost right" href="/beta/01-index.html?open=overview">What is ConciergeSync?</a>
+        <button class="btn" type="submit">Enter Console</button>
+        <a class="btn secondary" href="/beta/01-index.html?open=overview">What is ConciergeSync?</a>
       </div>
       <div class="meta">No bank logins required.</div>
     </form>
-  </main>
+  </div>
 
   <script>
     (function(){
-      // Always start truly logged-out on this page
+      // Backdrop image (same as console)
+      var BG = '/beta/assets/bg/IMG_5374.jpeg';
+      document.getElementById('bg').style.backgroundImage = 'url("' + BG + '")';
+
+      // Optional: restore email if we have it
+      var emailInput = document.getElementById('email');
       try {
-        sessionStorage.removeItem('cs_authed');
-        localStorage.removeItem('cs_authed');
-        document.cookie = 'cs_auth=; Max-Age=0; path=/; SameSite=Lax';
+        var saved = localStorage.getItem('cs_email') || sessionStorage.getItem('cs_email') || '';
+        if (saved) emailInput.value = saved;
+      } catch(_){}
 
-        // Optional: clear profile hints so the page never flips to a "welcome back" variant
-        sessionStorage.removeItem('cs_uid'); localStorage.removeItem('cs_uid');
-        // Keep email if you want the field prefilled; otherwise clear it:
-        // sessionStorage.removeItem('cs_email'); localStorage.removeItem('cs_email');
-      } catch(_) {}
+      // Never auto-redirect on this page. Always show the tile.
 
-      // Prefill email if we still have it
-      const emailInput = document.getElementById('email');
-      const savedEmail = localStorage.getItem('cs_email') || sessionStorage.getItem('cs_email') || '';
-      if (savedEmail) emailInput.value = savedEmail;
-
-      // Simple sign-in: store email, mark authed, jump to console
+      // Submit → mark authed and enter console
       document.getElementById('signin').addEventListener('submit', function(e){
         e.preventDefault();
-        const email = (emailInput.value || '').trim();
-        if (!email) { emailInput.focus(); return; }
+        var v = (emailInput.value || '').trim();
+        if (!v) { emailInput.focus(); return; }
 
         try {
-          sessionStorage.setItem('cs_email', email);
-          localStorage.setItem('cs_email', email);
-          sessionStorage.setItem('cs_authed','1');
-          localStorage.setItem('cs_authed','1');
+          sessionStorage.setItem('cs_email', v);
+          localStorage.setItem('cs_email', v);
+          sessionStorage.setItem('cs_authed', '1');
+          localStorage.setItem('cs_authed', '1');
           document.cookie = 'cs_auth=1; path=/; max-age=7200; SameSite=Lax';
-        } catch(_) {}
+        } catch(_){}
 
-        // Go straight into console in "enter" mode
+        // Go straight into console "enter" flow
         window.location.assign('/beta/01-index.html?enter=1&open=overview');
       });
     })();
