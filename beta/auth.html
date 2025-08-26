@@ -29,7 +29,7 @@
 
   /* Slim form column */
   .form{width:min(480px, 92vw); margin:0 auto; display:grid; gap:10px}
-  .nameRow{ display:grid; grid-template-columns:1fr 1fr; gap:32px; } /* per your setting */
+  .nameRow{ display:grid; grid-template-columns:1fr 1fr; gap:32px; } /* keep your 32px */
   .nameRow > div{ min-width:0; }
   label{font-size:12px;color:#dbe2ee}
   input[type="text"],input[type="email"]{
@@ -54,7 +54,7 @@
 
   <div class="wrap">
     <div class="card">
-      <h1>Welcome To ConciergeSync™ 👋</h1>
+      <h1>Welcome To ConciergeSync™</h1>
       <p class="lead">Sign in or create your account with your email.</p>
 
       <div class="tabs" role="tablist" aria-label="Choose mode">
@@ -62,24 +62,24 @@
         <button id="tabReg"   class="tab is-active" role="tab" aria-selected="true">New user? Register</button>
       </div>
 
-      <!-- Use an actual form to control autocomplete -->
-      <form id="gate" class="form" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+      <!-- real form for better control -->
+      <form id="gate" class="form" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" novalidate>
         <div class="nameRow" id="nameRow">
           <div>
             <label for="first">First name</label>
-            <input id="first" name="cs_first" type="text" placeholder="First name" required autocomplete="off"/>
+            <input id="first" name="cs_first" type="text" placeholder="First name"/>
             <div id="errFirst" class="err">Please enter your first name.</div>
           </div>
           <div>
             <label for="last">Last name</label>
-            <input id="last" name="cs_last" type="text" placeholder="Last name" required autocomplete="off"/>
+            <input id="last" name="cs_last" type="text" placeholder="Last name"/>
             <div id="errLast" class="err">Please enter your last name.</div>
           </div>
         </div>
 
         <div>
           <label for="email">Email (your LoginID)</label>
-          <input id="email" name="cs_email" type="email" placeholder="you@example.com" required autocomplete="off" inputmode="email"/>
+          <input id="email" name="cs_email" type="email" placeholder="you@example.com" inputmode="email"/>
           <div id="errEmail" class="err">Please enter a valid email address.</div>
         </div>
 
@@ -107,7 +107,6 @@
     document.getElementById('bg').style.backgroundImage = 'url(' + src + ')';
   })();
 
-  // Gate logic: no prefill, no local profile storage; only cs_authed
   (function(){
     const $ = s => document.querySelector(s);
     const mode = { value: 'register' };
@@ -116,12 +115,28 @@
     const nameRow = $('#nameRow'), agreeRow = $('#agreeRow');
     const first = $('#first'), last = $('#last'), email = $('#email'), agree = $('#agree');
     const errFirst = $('#errFirst'), errLast = $('#errLast'), errEmail = $('#errEmail'), errAgree = $('#errAgree');
-    const form = $('#gate');
+    const form = $('#gate'), submitBtn = $('#submit');
 
-    // Force blank values on load (defense against persisted form restore)
+    // start clean
     [first,last,email].forEach(i => { try{ i.value=''; }catch{} });
 
     function validEmail(v){ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v); }
+    function hide(el){ el.style.display='none'; }
+    function show(el){ el.style.display='block'; }
+    function clearErrors(){
+      [first,last,email].forEach(i=>i.setAttribute('aria-invalid','false'));
+      [errFirst,errLast,errEmail,errAgree].forEach(hide);
+    }
+
+    function applyRequireds(){
+      const login = mode.value === 'login';
+      // email always required
+      email.required = true;
+      // first/last/agree required only in register
+      first.required = !login;
+      last.required  = !login;
+      agree.required = !login;
+    }
 
     function setMode(m){
       mode.value = m;
@@ -132,20 +147,16 @@
       tabReg.setAttribute('aria-selected', !login);
       nameRow.style.display = login ? 'none' : 'grid';
       agreeRow.style.display = login ? 'none' : 'block';
-      form.querySelector('#submit').textContent = login ? 'Log in' : 'Create account';
+      submitBtn.textContent = login ? 'Log in' : 'Create account';
+      [first,last].forEach(i => i.value=''); // clear names when switching
       clearErrors();
-      // Also clear values when switching
-      [first,last].forEach(i => i.value='');
+      applyRequireds();                      // <-- key fix
     }
+
     tabLogin.addEventListener('click', ()=> setMode('login'));
     tabReg.addEventListener('click',   ()=> setMode('register'));
+    applyRequireds(); // initialize for default register mode
 
-    function hide(el){ el.style.display='none'; }
-    function show(el){ el.style.display='block'; }
-    function clearErrors(){
-      [first,last,email].forEach(i=>i.setAttribute('aria-invalid','false'));
-      [errFirst,errLast,errEmail,errAgree].forEach(hide);
-    }
     ['input','change'].forEach(evt=>{
       [first,last,email,agree].forEach(el => el.addEventListener(evt, clearErrors));
     });
@@ -155,12 +166,12 @@
       let ok = true, focusEl = null;
 
       const e = email.value.trim();
-      if(!validEmail(e)){ ok = false; show(errEmail); email.setAttribute('aria-invalid','true'); focusEl = focusEl || email; }
+      if(!validEmail(e)){ ok=false; show(errEmail); email.setAttribute('aria-invalid','true'); focusEl = focusEl || email; }
 
       if(mode.value !== 'login'){
-        if(!first.value.trim()){ ok = false; show(errFirst); first.setAttribute('aria-invalid','true'); focusEl = focusEl || first; }
-        if(!last.value.trim()){  ok = false; show(errLast);  last.setAttribute('aria-invalid','true');  focusEl = focusEl || last; }
-        if(!agree.checked){ ok = false; show(errAgree); focusEl = focusEl || agree; }
+        if(!first.value.trim()){ ok=false; show(errFirst); first.setAttribute('aria-invalid','true'); focusEl = focusEl || first; }
+        if(!last.value.trim()){  ok=false; show(errLast);  last.setAttribute('aria-invalid','true');  focusEl = focusEl || last; }
+        if(!agree.checked){ ok=false; show(errAgree); focusEl = focusEl || agree; }
       }
 
       if(!ok && focusEl){ try{ focusEl.focus(); }catch{} }
@@ -178,11 +189,8 @@
     form.addEventListener('submit', (ev) => {
       ev.preventDefault();
       if(!validate()) return;
-      // Do NOT store profile or email locally
       goConsole();
     });
-
-    // Submit on Enter in any field already covered by form submit
   })();
 </script>
 </body>
