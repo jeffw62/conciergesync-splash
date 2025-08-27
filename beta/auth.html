@@ -62,7 +62,6 @@
   <div class="cs-bg"></div>
   <!-- existing page content follows -->
 
-  <div id="bg" class="bg"></div>
   <div class="ov"></div>
 
   <div class="wrap">
@@ -114,12 +113,6 @@
   </div>
 
 <!-- Firebase + gate logic -->
-<script type="module">
-  // ——— Background: last chosen, or default wing
-  (function(){
-    const src = localStorage.getItem('cs_bg_src') || '/beta/assets/bg/IMG_5374.jpeg';
-    document.getElementById('bg').style.backgroundImage = 'url(' + src + ')';
-  })();
 
   // ——— Firebase Web SDK (v9+ modular)
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
