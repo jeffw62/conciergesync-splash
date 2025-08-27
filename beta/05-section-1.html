@@ -5,47 +5,81 @@
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>ConciergeSync™ — Intake Section 1</title>
   <style>
-    body{
-      margin:0; font-family:system-ui,-apple-system,Segoe UI,Inter,Arial,sans-serif;
-      background:#0b0f14; color:#eaf2ff;
-      display:flex; align-items:center; justify-content:center;
-      min-height:100vh; padding:24px;
+    :root{
+      --page-bg:#0b0f14;
+      --ink:#eaf2ff; --muted:#9fb0c8;
+      --glass-bg:rgba(255,255,255,.10);
+      --glass-brd:rgba(255,255,255,.22);
+      --glass-blur:blur(14px) saturate(1.1);
+      --ring:0 0 0 3px rgba(255,255,255,.18);
     }
+    html,body{height:100%}
+    body{
+      margin:0; color:var(--ink);
+      font-family:system-ui,-apple-system,Segoe UI,Inter,Arial,sans-serif;
+      background:var(--page-bg);
+      display:flex; align-items:center; justify-content:center;
+      min-height:100vh; padding:24px; position:relative; overflow:auto;
+    }
+
+    /* BIG gold logo background (same as 03) */
     .cs-bg{
       position:fixed; inset:0; z-index:-2;
       background:url('/beta/assets/CS_Logo_Premium.png') center/500px repeat;
       opacity:.75; pointer-events:none;
     }
+
+    /* Vignette layer */
     body::after{
-      content:""; position:fixed; inset:0; z-index:-1;
+      content:""; position:fixed; inset:0; z-index:-1; pointer-events:none;
       background:
         radial-gradient(120% 120% at 50% 0%, rgba(255,255,255,.04), rgba(0,0,0,.28) 60%, rgba(0,0,0,.55) 100%),
         linear-gradient(180deg, rgba(255,255,255,.02), rgba(0,0,0,.08));
     }
+
+    /* Glass tile container for NoteForms */
     .card{
-      width:min(800px, 95vw);
+      width:min(900px, 95vw);
       border-radius:22px;
-      background:rgba(255,255,255,.10);
-      backdrop-filter:blur(14px) saturate(1.1);
-      box-shadow:0 18px 48px rgba(0,0,0,.45), inset 0 0 0 1px rgba(255,255,255,.22);
-      padding:36px 28px; text-align:left;
+      background:var(--glass-bg);
+      backdrop-filter:var(--glass-blur);
+      box-shadow:0 18px 48px rgba(0,0,0,.45), inset 0 0 0 1px var(--glass-brd);
+      padding:24px; text-align:left;
     }
-    h1{font-size:clamp(20px, 3vw, 26px); margin:0 0 18px}
+
+    header{display:flex; align-items:center; justify-content:space-between; gap:16px; margin-bottom:10px}
+    h1{font-size:clamp(18px, 2.6vw, 24px); margin:0}
+    .hint{color:var(--muted); font-size:13px}
+
+    /* NoteForms embed */
     iframe{
-      width:100%; min-height:600px; border:0;
-      border-radius:12px; background:rgba(0,0,0,.4);
+      width:100%;
+      min-height:78vh;              /* roomy on desktop */
+      border:0; border-radius:14px;
+      background:rgba(0,0,0,.35);  /* in case their theme is light */
+    }
+    @media (max-width:480px){
+      .card{padding:18px}
+      iframe{min-height:82vh}
     }
   </style>
 </head>
 <body>
   <div class="cs-bg"></div>
 
-  <main class="card">
-    <h1>Section 1 — Getting Started</h1>
+  <main class="card" role="main" aria-labelledby="hdr">
+    <header>
+      <h1 id="hdr">Section 1 — Getting started</h1>
+      <div class="hint">Takes ~2 minutes</div>
+    </header>
 
-    <!-- Embed your NoteForms -->
-    <iframe src="https://noteforms.com/forms/YOUR_FORM_ID"></iframe>
-
+    <!-- Replace with your real NoteForms URL -->
+    <iframe
+      src="https://noteforms.com/forms/YOUR_FORM_ID?theme=dark"
+      title="ConciergeSync — Intake Section 1"
+      allow="clipboard-write; fullscreen"
+      loading="eager">
+    </iframe>
   </main>
 </body>
 </html>
