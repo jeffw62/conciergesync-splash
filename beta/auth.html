@@ -10,15 +10,15 @@
 .cs-bg{
   position: fixed;
   inset: 0;
-  /* tile settings */
   background-image: url('/beta/assets/CS_Logo_Tile_Watermark.png');
-  background-size: 500px;        /* your spread; tweak to taste (480–560px) */
-  background-repeat: space;      /* ✅ prevents cut-off tiles at edges */
-  background-position: 40px 24px;/* optional nudge so rows look centered */
+  background-size: 480px;       /* sweet spot between 460–500px */
+  background-repeat: round;     /* ✅ tiles fill evenly, no cut-offs, no giant gaps */
+  background-position: center;  /* keeps it framed */
   opacity: 1;
   z-index: 0;
   pointer-events: none;
 }
+
 
   :root{ --glass:rgba(255,255,255,.10); --brd:rgba(255,255,255,.28); --blur:blur(12px) saturate(1.2) }
   html,body{height:100%}
