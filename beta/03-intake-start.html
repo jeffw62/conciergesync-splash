@@ -1,212 +1,46 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>Sign in — ConciergeSync™</title>
-  <style>
-    :root{
-      --glass: rgba(15,15,18,.36);
-      --glass-b: rgba(255,255,255,.22);
-      --ink: #eef2f8;
-      --muted: #cbd5e1;
-      --accent: #fff;
-      --danger-bg: rgba(190, 18, 60, .18);
-      --danger-b:  rgba(244, 63, 94, .55);
-      --danger-ink:#ffeef1;
-      --radius: 16px;
-    }
-    *{box-sizing:border-box}
-    html,body{height:100%}
-    body{
-      margin:0;
-      font-family: system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif;
-      color:var(--ink);
-      background:#0b0f14;
-    }
+<!-- Put this in the <head> of auth, thank-you, or the new index primer -->
+<style>
+  :root{
+    --page-bg: #0b0f14;              /* “pretty darn dark” */
+    --tile-size: 180px;              /* 160–200px looks great */
+    --tile-opacity: 0.055;           /* 3–6% is the sweet spot */
+  }
+  /* Watermarked backdrop */
+  body::before{
+    content:"";
+    position:fixed; inset:0; z-index:-2;
+    background-color: var(--page-bg);
+    background-image:
+      url('/beta/assets/brand/concierge_mark-mono.svg'),
+      url('/beta/assets/brand/concierge_mark-mono.svg');
+    background-size: var(--tile-size) var(--tile-size), var(--tile-size) var(--tile-size);
+    background-repeat: repeat, repeat;
+    /* offset the second layer half-a-tile for a diamond rhythm */
+    background-position: 0 0, calc(var(--tile-size)/2) calc(var(--tile-size)/2);
+    /* Tint the SVG via currentColor + opacity using an overlay trick */
+    -webkit-mask:
+      url('/beta/assets/brand/concierge_mark-mono.svg') repeat 0 0 / var(--tile-size) var(--tile-size),
+      url('/beta/assets/brand/concierge_mark-mono.svg') repeat calc(var(--tile-size)/2) calc(var(--tile-size)/2) / var(--tile-size) var(--tile-size);
+    mask:
+      url('/beta/assets/brand/concierge_mark-mono.svg') repeat 0 0 / var(--tile-size) var(--tile-size),
+      url('/beta/assets/brand/concierge_mark-mono.svg') repeat calc(var(--tile-size)/2) calc(var(--tile-size)/2) / var(--tile-size) var(--tile-size);
+    background-image: none; /* mask uses the same asset, we’ll color with background below */
+    background: none;
+    /* color layer that shows through the mask */
+    background-color: rgba(255,255,255,var(--tile-opacity));
+  }
 
-    /* Backdrop */
-    .backdrop{position:fixed; inset:0; z-index:0; overflow:hidden}
-    .backdrop::before{
-      content:"";
-      position:absolute; inset:0;
-      background:url("/beta/assets/bg/IMG_5374.jpeg") center/cover no-repeat;
-      filter:brightness(1.12) contrast(1.05);
-      transform:scale(1.03);
-    }
+  /* Subtle vignette + micro-noise on top to avoid banding and add depth */
+  body::after{
+    content:"";
+    position:fixed; inset:0; z-index:-1; pointer-events:none;
+    background:
+      radial-gradient(120% 120% at 50% 0%, rgba(255,255,255,.04), rgba(0,0,0,.28) 60%, rgba(0,0,0,.55) 100%),
+      linear-gradient(180deg, rgba(255,255,255,.02), rgba(0,0,0,.08));
+    mix-blend-mode: normal;
+  }
 
-    /* Card (narrowed) */
-    .wrap{position:relative; z-index:1; min-height:100%;}
-    .card{
-      width:min(700px, 90vw);
-      margin: clamp(48px, 12vh, 120px) auto 40px;
-      background:var(--glass);
-      border:1px solid var(--glass-b);
-      border-radius:var(--radius);
-      backdrop-filter: blur(12px) saturate(1.12);
-      box-shadow:0 14px 50px rgba(0,0,0,.35);
-      padding:28px;
-    }
-    h1{
-      margin:0 0 10px;
-      font-size:clamp(26px, 3.4vw, 40px);
-      line-height:1.2;
-      letter-spacing:.2px;
-    }
-    .sub{color:var(--muted); margin:0 0 14px; font-weight:600}
-
-    .row{display:flex; gap:12px; align-items:center}
-    .email{
-      flex:1 1 auto;
-      height:46px;
-      border-radius:12px;
-      padding:0 14px;
-      border:1px solid rgba(255,255,255,.22);
-      background:rgba(255,255,255,.08);
-      color:#fff;
-      outline:none;
-      font-size:16px;
-    }
-    .email::placeholder{color:#cbd5e1}
-    .cta{
-      height:46px;
-      border-radius:12px;
-      border:1px solid rgba(255,255,255,.55);
-      background:#fff; color:#111;
-      font-weight:800; padding:0 16px; cursor:pointer;
-      white-space:nowrap;
-    }
-
-    /* inline warning */
-    .warn{
-      display:none;
-      margin:10px 0 12px;
-      padding:10px 12px;
-      border-radius:10px;
-      background:var(--danger-bg);
-      border:1px solid var(--danger-b);
-      color:var(--danger-ink);
-      font-weight:700;
-    }
-    .warn.show{display:block}
-
-    /* bottom actions */
-    .actions{
-      display:flex; gap:12px; margin-top:12px; flex-wrap:wrap;
-    }
-    .btn{
-      flex:1 1 280px;
-      display:inline-flex; align-items:center; justify-content:center;
-      height:44px; border-radius:12px;
-      border:1px solid rgba(255,255,255,.35);
-      background:rgba(255,255,255,.08);
-      color:#fff; font-weight:800; cursor:pointer; text-decoration:none;
-    }
-    .btn:hover{background:rgba(255,255,255,.14)}
-    .btn.primary{background:#fff; color:#111; border-color:#fff}
-
-    .hint{color:var(--muted); font-size:14px; margin-top:6px}
-  </style>
-</head>
-<body>
-
-  <div class="backdrop" aria-hidden="true"></div>
-
-  <main class="wrap">
-    <section class="card" role="dialog" aria-modal="true" aria-labelledby="t">
-      <h1 id="t">Sign in to ConciergeSync™</h1>
-      <p class="sub">Enter your email (and password if enabled) to continue to your console.</p>
-
-      <div class="row" style="margin:10px 0 6px;">
-        <input id="email" class="email" type="email" inputmode="email" autocomplete="email"
-               placeholder="you@example.com" />
-        <button id="enter" class="cta">Enter Console</button>
-      </div>
-
-      <div id="warn" class="warn" role="alert">
-        That email wasn’t recognized. If you’re new, tap “I’m new — Join the beta.”
-      </div>
-
-      <div class="actions">
-        <a id="what" class="btn" href="/beta/whatis.html">What is ConciergeSync?</a>
-        <a id="new"  class="btn" href="/beta/02-agree.html">I’m new — Join the beta</a>
-      </div>
-
-      <div class="hint">No bank logins required.</div>
-    </section>
-  </main>
-
-  <script>
-  (function(){
-    // ——— helpers
-    const $ = (s,p=document)=>p.querySelector(s);
-    const emailInput = $('#email');
-    const warn = $('#warn');
-    const enterBtn = $('#enter');
-
-    // Prefill from ?email=
-    const qs = new URLSearchParams(location.search);
-    if (qs.get('email')) emailInput.value = (qs.get('email')||'').trim();
-
-    // Build the "known" set
-    function getKnownEmails(){
-      const known = new Set();
-
-      const saved = (localStorage.getItem('cs_email') || '').trim().toLowerCase();
-      if (saved) known.add(saved);
-
-      try {
-        const arr = JSON.parse(localStorage.getItem('cs_known_emails') || '[]');
-        arr.forEach(e => { if (e) known.add(String(e).toLowerCase()); });
-      } catch(_) {}
-
-      // DEV convenience: allow your domain (remove if undesired)
-      known.add('@conciergesync.ai');
-
-      return known;
-    }
-
-    function isRecognized(input){
-      const e = (input||'').trim().toLowerCase();
-      if (!e) return false;
-      const known = getKnownEmails();
-      if (known.has(e)) return true;
-      if (known.has('@conciergesync.ai') && /@conciergesync\.ai$/i.test(e)) return true;
-      return false;
-    }
-
-    function authAndEnter(email){
-      try {
-        localStorage.setItem('cs_email', email);
-        sessionStorage.setItem('cs_authed', '1');
-        localStorage.setItem('cs_authed', '1');
-        document.cookie = "cs_auth=1; path=/; max-age=7200; SameSite=Lax";
-      } catch(_){}
-      location.assign('/beta/01-index.html?enter=1');
-    }
-
-    function showWarn(){
-      warn.classList.add('show');
-      warn.scrollIntoView({behavior:'smooth', block:'nearest'});
-    }
-
-    enterBtn.addEventListener('click', (e)=>{
-      e.preventDefault();
-      const eaddr = emailInput.value.trim();
-      if (isRecognized(eaddr)) {
-        authAndEnter(eaddr.toLowerCase());
-      } else {
-        showWarn();
-      }
-    });
-
-    emailInput.addEventListener('keydown', (e)=>{
-      if (e.key === 'Enter') {
-        e.preventDefault();
-        enterBtn.click();
-      }
-    });
-  })();
-  </script>
-</body>
-</html>
+  @media (prefers-reduced-motion: reduce){
+    /* keep things completely static (we’re already static, just future-proofing) */
+  }
+</style>
