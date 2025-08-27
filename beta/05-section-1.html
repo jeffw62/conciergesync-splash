@@ -1,102 +1,51 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Section 1 — Beta Application • ConciergeSync™</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>ConciergeSync™ — Intake Section 1</title>
   <style>
-    :root{--card-bg:#fff;--bg:#f7f7f7;--text:#0f172a;--primary:#0b3b9e;--muted:#64748b;--radius:16px;--shadow:0 10px 30px rgba(2,6,23,.08)}
-    *{box-sizing:border-box}
-    body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,"Helvetica Neue",Arial}
-    .wrap{max-width:760px;margin:40px auto;padding:0 16px}
-    .card{background:var(--card-bg);border-radius:var(--radius);box-shadow:var(--shadow);padding:28px}
-    h1{font-size:32px;margin:4px 0 8px;text-align:center}
-    .sub{color:var(--muted);margin:0 0 18px;text-align:center;font-size:16px}
-    .embed{width:100%;min-height:4600px;border:0;border-radius:12px;background:#fff}
-    .footer{margin-top:18px;text-align:center;font-size:14px;color:var(--muted)}
-    .footer a{color:#0b3b9e;text-decoration:none}
-    .footer a:hover{text-decoration:underline}
-    /* --- TEMP: force taps through overlays to tiles --- */
-.cs-overlay,
-.cs-scrim,
-.cs-glow,
-.cs-shadow,
-.cs-bling,
-[data-overlay],
-[aria-hidden="true"]{
-  pointer-events: none !important;
-}
-
-/* Ensure the tiles themselves can still receive taps */
-.cs-tile,
-.cs-tile *{
-  pointer-events: auto;
-}
-
-/* Improve touch behavior on the tap targets */
-.cs-tile{
-  touch-action: manipulation;
-  -webkit-tap-highlight-color: transparent;
-}
-
+    body{
+      margin:0; font-family:system-ui,-apple-system,Segoe UI,Inter,Arial,sans-serif;
+      background:#0b0f14; color:#eaf2ff;
+      display:flex; align-items:center; justify-content:center;
+      min-height:100vh; padding:24px;
+    }
+    .cs-bg{
+      position:fixed; inset:0; z-index:-2;
+      background:url('/beta/assets/CS_Logo_Premium.png') center/500px repeat;
+      opacity:.75; pointer-events:none;
+    }
+    body::after{
+      content:""; position:fixed; inset:0; z-index:-1;
+      background:
+        radial-gradient(120% 120% at 50% 0%, rgba(255,255,255,.04), rgba(0,0,0,.28) 60%, rgba(0,0,0,.55) 100%),
+        linear-gradient(180deg, rgba(255,255,255,.02), rgba(0,0,0,.08));
+    }
+    .card{
+      width:min(800px, 95vw);
+      border-radius:22px;
+      background:rgba(255,255,255,.10);
+      backdrop-filter:blur(14px) saturate(1.1);
+      box-shadow:0 18px 48px rgba(0,0,0,.45), inset 0 0 0 1px rgba(255,255,255,.22);
+      padding:36px 28px; text-align:left;
+    }
+    h1{font-size:clamp(20px, 3vw, 26px); margin:0 0 18px}
+    iframe{
+      width:100%; min-height:600px; border:0;
+      border-radius:12px; background:rgba(0,0,0,.4);
+    }
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <div class="card">
-      <h1>Section 1 — Beta Application</h1>
-      <p class="sub">Complete the form below. When you submit, you’ll be taken to Section 2 automatically.</p>
+  <div class="cs-bg"></div>
 
-      <!-- Embed Section 1 -->
-      <!-- Embed Section 1 -->
-<iframe id="nf1" class="embed" title="ConciergeSync – Section 1"
-  src="https://noteforms.com/forms/beta-user-tracker-conciergesync-b4yxaf"
-  style="width:100%; height:1200px; border:0;"></iframe>
+  <main class="card">
+    <h1>Section 1 — Getting Started</h1>
 
-<script>
-  window.addEventListener('message', function (e) {
-  if (e.source !== (iframe && iframe.contentWindow)) return;
-  if (!ok(e.data)) return;
+    <!-- Embed your NoteForms -->
+    <iframe src="https://noteforms.com/forms/YOUR_FORM_ID"></iframe>
 
-  // 1) mark this section complete
-  const prog = JSON.parse(localStorage.getItem('cs_onboarding_progress') || '{}');
-  prog.s1 = true;  // ← s2/s3/s4 on the other pages
-  localStorage.setItem('cs_onboarding_progress', JSON.stringify(prog));
-
-  // 2) carry uid/email (whatever’s already in the URL) to NEXT
-  const url = new URL(NEXT, location.origin);
-  const qs = new URLSearchParams(location.search);
-  if ([...qs].length) url.search = qs.toString();
-
-  // 3) go to next page
-  window.location.replace(url.href);
-});
-
-(function () {
-  var NEXT = "https://conciergesync.ai/beta/06-section-2.html";
-  var iframe = document.getElementById("nf1");
-
-  function ok(data){
-    if (typeof data === "string") { try { data = JSON.parse(data); } catch(_) {} }
-    if (typeof data === "string") return data.toLowerCase().includes("form-success");
-    var ev = (data && (data.event||data.type||data.status)||"").toLowerCase();
-    return ["form-success","nf_submit_success","success","submitted"].some(function(k){ return ev.includes(k); });
-  }
-
-  window.addEventListener("message", function(e){
-    if (e.source !== (iframe && iframe.contentWindow)) return;
-    if (ok(e.data)) window.location.replace(NEXT);
-  });
-})();
-</script>
-
-
-      </iframe>
-
-      <div class="footer">
-        Questions? Email <a href="mailto:hello@conciergesync.ai">hello@conciergesync.ai</a>
-      </div>
-    </div>
-  </div>
+  </main>
 </body>
 </html>
