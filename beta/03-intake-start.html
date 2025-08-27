@@ -5,14 +5,13 @@
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>ConciergeSync™ — Begin Your Intake</title>
 
-  <!-- Watermarked backdrop (kept from your snippet) -->
   <style>
     :root{
       --page-bg:#0b0f14;
       --tile-size:180px;
       --tile-opacity:0.055;
-      --ink:#eaf2ff;            /* on-dark text */
-      --muted:#9fb0c8;          /* supportive text */
+      --ink:#eaf2ff;
+      --muted:#9fb0c8;
       --glass-bg:rgba(255,255,255,.10);
       --glass-brd:rgba(255,255,255,.22);
       --glass-blur:blur(14px) saturate(1.1);
@@ -20,19 +19,15 @@
     }
     html,body{height:100%}
     body{
-      margin:0;
-      color:var(--ink);
+      margin:0; color:var(--ink);
       font-family:system-ui,-apple-system,Segoe UI,Inter,Arial,sans-serif;
       background:var(--page-bg);
-      display:flex;
-      align-items:center;
-      justify-content:center;
+      display:flex; align-items:center; justify-content:center;
       padding:24px;
     }
-    /* backdrop watermark */
+    /* watermark backdrop */
     body::before{
-      content:"";
-      position:fixed; inset:0; z-index:-2;
+      content:""; position:fixed; inset:0; z-index:-2;
       background-color:var(--page-bg);
       -webkit-mask:
         url('/beta/assets/brand/concierge_mark-mono.svg') repeat 0 0 / var(--tile-size) var(--tile-size),
@@ -42,100 +37,57 @@
         url('/beta/assets/brand/concierge_mark-mono.svg') repeat calc(var(--tile-size)/2) calc(var(--tile-size)/2) / var(--tile-size) var(--tile-size);
       background-color:rgba(255,255,255,var(--tile-opacity));
     }
-    /* vignette for depth */
+    /* vignette */
     body::after{
-      content:"";
-      position:fixed; inset:0; z-index:-1; pointer-events:none;
+      content:""; position:fixed; inset:0; z-index:-1; pointer-events:none;
       background:
         radial-gradient(120% 120% at 50% 0%, rgba(255,255,255,.04), rgba(0,0,0,.28) 60%, rgba(0,0,0,.55) 100%),
         linear-gradient(180deg, rgba(255,255,255,.02), rgba(0,0,0,.08));
     }
-
-    /* glass tile card */
+    /* glass card */
     .card{
       width:min(780px, 92vw);
       border-radius:22px;
       background:var(--glass-bg);
       backdrop-filter:var(--glass-blur);
-      box-shadow:
-        0 18px 48px rgba(0,0,0,.45),
-        inset 0 0 0 1px var(--glass-brd);
-      padding:36px 28px;
-      text-align:center;
+      box-shadow:0 18px 48px rgba(0,0,0,.45), inset 0 0 0 1px var(--glass-brd);
+      padding:36px 28px; text-align:center;
     }
-    h1{
-      font-size:clamp(28px, 4.3vw, 42px);
-      margin:0 0 10px;
-      letter-spacing:.2px;
-    }
-    .lead{
-      color:var(--muted);
-      margin:6px 0 18px;
-      line-height:1.45;
-      font-size:clamp(15px, 2.4vw, 18px);
-    }
-    ul.bullets{
-      list-style:none; padding:0; margin:16px auto 8px; max-width:56ch; text-align:left;
-      color:#cdd8ea; line-height:1.5; font-size:clamp(14px, 2.2vw, 16px);
-    }
-    ul.bullets li{ margin:10px 0; padding-left:28px; position:relative }
-    ul.bullets li::before{
-      content:"•"; position:absolute; left:8px; top:0; opacity:.6
-    }
-
+    h1{font-size:clamp(28px,4.3vw,42px); margin:0 0 10px; letter-spacing:.2px}
+    .lead{color:var(--muted); margin:6px 0 18px; line-height:1.45; font-size:clamp(15px,2.4vw,18px)}
+    ul.bullets{list-style:none; padding:0; margin:16px auto 8px; max-width:56ch; text-align:left; color:#cdd8ea; line-height:1.5; font-size:clamp(14px,2.2vw,16px)}
+    ul.bullets li{margin:10px 0; padding-left:28px; position:relative}
+    ul.bullets li::before{content:"•"; position:absolute; left:8px; top:0; opacity:.6}
     .cta{
-      margin-top:22px;
-      display:inline-block;
-      padding:14px 22px;
-      border-radius:999px;
-      border:1px solid rgba(255,255,255,.35);
-      color:#fff; text-decoration:none;
-      outline:0;
+      margin-top:22px; display:inline-block; padding:14px 22px; border-radius:999px;
+      border:1px solid rgba(255,255,255,.35); color:#fff; text-decoration:none;
+      background:rgba(255,255,255,.06); backdrop-filter:blur(4px);
       transition:transform .15s ease, box-shadow .15s ease, background .15s ease;
-      background:rgba(255,255,255,.06);
-      backdrop-filter:blur(4px);
     }
-    .cta:focus{ box-shadow:var(--ring) }
-    .cta:hover{ transform:translateY(-1px) }
-    .cta:active{ transform:translateY(0) scale(.99) }
-
-    .footnote{
-      margin-top:14px; color:#a7b4c9; font-size:13px
-    }
-
-    @media (max-width:480px){
-      .card{ padding:28px 18px }
-    }
+    .cta:focus{box-shadow:var(--ring)}
+    .cta:hover{transform:translateY(-1px)}
+    .cta:active{transform:translateY(0) scale(.99)}
+    .footnote{margin-top:14px; color:#a7b4c9; font-size:13px}
+    @media (max-width:480px){ .card{padding:28px 18px} }
   </style>
 </head>
 <body>
   <main class="card" role="main" aria-labelledby="hdr">
     <h1 id="hdr">Welcome — let’s personalize your ConciergeSync™</h1>
     <p class="lead">This short onboarding gathers the essentials so your dashboard, recommendations, and alerts match <em>you</em>.</p>
-
     <ul class="bullets" aria-label="What we'll do">
       <li>Confirm a few basics (so we talk to the right programs and cards).</li>
       <li>Set how you earn and use points today (to tune your strategy).</li>
       <li>Prep your starter dashboard so you can see value immediately.</li>
     </ul>
-
-    <a id="beginBtn" class="cta" href="#" role="button" aria-label="Begin intake">Begin intake</a>
+    <a id="beginBtn" class="cta" href="/beta/05-section-1.html" role="button" aria-label="Begin intake">Begin intake</a>
     <div class="footnote">Takes about 3–5 minutes. You can pause and return anytime.</div>
   </main>
 
   <script>
-    // 🔗 Change this if your Section-1 file lives elsewhere.
-    const SECTION_ONE = "/beta/section-1.html";
-
-    const btn = document.getElementById("beginBtn");
-    btn.addEventListener("click", (e) => {
-      e.preventDefault();
-      window.location.assign(SECTION_ONE);
-    });
-
-    // Accessibility: press Enter anywhere to begin
+    // keyboard enter as alternate start
     document.addEventListener("keydown", (e) => {
-      if (e.key === "Enter") window.location.assign(SECTION_ONE);
+      if (e.key === "Enter") location.assign("/beta/05-section-1.html");
     });
   </script>
 </body>
