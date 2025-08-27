@@ -7,14 +7,16 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
-.cs-bg{
+.cs-bg {
   position: fixed;
   inset: 0;
-  background: url('/beta/assets/CS_Logo_Premium.png') center/500px repeat;
-  opacity: .25;   /* boosted so you can see it clearly */
+  background: url('/beta/assets/CS_Logo_Premium.png') center/450px repeat;
+  opacity: 0.2;   /* sweet spot: 0.15–0.25 */
+  filter: saturate(0.7) brightness(0.9) contrast(0.95);
   z-index: 0;
   pointer-events: none;
 }
+
 
   :root{ --glass:rgba(255,255,255,.10); --brd:rgba(255,255,255,.28); --blur:blur(12px) saturate(1.2) }
   html,body{height:100%}
