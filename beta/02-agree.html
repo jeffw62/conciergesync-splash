@@ -1,153 +1,190 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Before We Begin – ConciergeSync™ Beta Agreement</title>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Before We Begin — ConciergeSync™ Beta Agreement</title>
   <style>
-    .cs-bg {
+    /* --- Gold watermark background (same as auth) --- */
+    .cs-bg{
       position: fixed;
       inset: 0;
       background: url('/beta/assets/CS_Logo_Premium.png') center/500px repeat;
-      opacity: 0.75;  /* keeps the gold pop but tones glare */
+      opacity: 0.75;         /* confident gold pop */
       z-index: 0;
       pointer-events: none;
     }
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-color: #f7f7f7;
-      margin: 0;
-      padding: 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
+
+    /* --- Page base --- */
+    :root{
+      --glass: rgba(255,255,255,.10);
+      --brd:   rgba(255,255,255,.28);
+      --text:  #fff;
+    }
+    html,body{height:100%}
+    body{
+      margin:0;
+      color:var(--text);
+      background:#000;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Inter, Arial, sans-serif;
+      display:grid;
+      place-items:center;
+      padding:18px;
     }
 
-    .container {
-      background: white;
-      max-width: 700px;
-      margin-top: 60px;
-      padding: 40px;
-      box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
-      border-radius: 14px;
-      width: 90%;
+    /* --- Glass tile --- */
+    .tile{
+      position:relative;
+      z-index:1; /* above background */
+      width:min(700px, 92vw);
+      border:1px solid var(--brd);
+      background:var(--glass);
+      backdrop-filter: blur(12px) saturate(1.2);
+      border-radius:18px;
+      box-shadow: 0 18px 50px rgba(0,0,0,.40);
+      padding: clamp(18px, 3.2vw, 28px);
+      text-align:left;
     }
 
-    .logo {
-      display: block;
-      margin: 0 auto 20px;
-      max-width: 180px;
+    .title{
+      margin:0 0 8px;
+      font-size: clamp(22px, 3.2vw, 30px);
+      font-weight: 800;
+      letter-spacing:-.01em;
+      text-align:center;
+    }
+    .intro{
+      margin: 8px auto 16px;
+      max-width: 560px;
+      text-align:center;
+      color:#e8edf7;
+      font-size: clamp(14px, 2.1vw, 16px);
+      line-height:1.6;
     }
 
-    h1 {
-      font-size: 26px;
-      margin-bottom: 25px;
-      text-align: center;
+    /* Scroll area inside glass tile */
+    .scroll-box{
+      height: 44vh;                 /* visible window */
+      min-height: 300px;
+      max-height: 520px;
+      overflow: auto;
+      padding: 16px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,.22);
+      background: rgba(0,0,0,.25);
+      color:#f5f8ff;
+      line-height:1.6;
     }
+    .scroll-box h2{ margin: 0 0 8px; font-size: 18px; }
+    .scroll-box h3{ margin: 16px 0 6px; font-size: 15px; }
+    .scroll-box p, .scroll-box ul{ margin: 8px 0; font-size: 14px; color:#e8edf7; }
+    .scroll-box ul{ padding-left: 18px; }
 
-    .scroll-box {
-      border: 1px solid #ddd;
-      height: 360px;
-      overflow-y: scroll;
-      padding: 20px;
-      margin-bottom: 30px;
-      background: #fefefe;
-      border-radius: 8px;
+    .actions{
+      margin-top: 18px;
+      display:flex;
+      justify-content:center;
+      gap:10px;
+      align-items:center;
     }
-
-    .button-wrapper {
-      text-align: center;
+    .btn{
+      display:inline-flex; align-items:center; justify-content:center;
+      padding:10px 18px; border-radius:999px; font-weight:800;
+      color:#111; background:#fff; border:1px solid #fff; text-decoration:none;
+      transition: transform .06s ease, box-shadow .2s ease, opacity .2s ease;
+      box-shadow: 0 4px 18px rgba(0,0,0,.25);
+      cursor:pointer;
+      font-size:14px;
     }
+    .btn:active{ transform: translateY(1px); }
+    .btn[disabled]{ opacity:.45; cursor:not-allowed; }
 
-    button {
-      background-color: #10172A;
-      color: white;
-      padding: 14px 28px;
-      font-size: 16px;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: background-color 0.2s ease-in-out;
-    }
-
-    button:disabled {
-      background-color: #ccc;
-      cursor: not-allowed;
+    .sub{
+      text-align:center;
+      margin-top: 8px;
+      color: rgba(255,255,255,.75);
+      font-size: 12px;
     }
   </style>
 </head>
 <body>
+  <div class="cs-bg"></div>
 
-  <div class="container">
-  <!-- Logo REMOVED for now -->
+  <main class="tile" role="main" aria-labelledby="page-title">
+    <h1 id="page-title" class="title">Before We Begin…</h1>
+    <p class="intro">
+      Please review the Terms &amp; Conditions and Privacy Policy below.
+      Scroll to the bottom to unlock <strong>“I Agree”</strong> and continue.
+    </p>
 
-  <h1>Before We Begin...</h1>
+    <section id="termsBox" class="scroll-box" tabindex="0" aria-label="Terms and Privacy scroll box">
+      <!-- 🧠 Your content lives here -->
+      <h2>Terms &amp; Conditions — ConciergeSync™</h2>
+      <p><em>Last updated: 8/13/2025</em></p>
 
-  <p style="text-align:center; font-size: 16px; margin-bottom: 25px; color: #333;">
-    Please review the Terms & Conditions and Privacy Policy below. <br />
-    You must scroll to the bottom to unlock the <strong>"I Agree"</strong> button and continue.
-  </p>
+      <p>By accessing and using the ConciergeSync™ beta program, you agree to be bound by the following terms and conditions:</p>
+      <ul>
+        <li>You are voluntarily participating in a beta version of our platform, which may contain bugs or incomplete features.</li>
+        <li>You agree not to share any screenshots, data, or platform access with non-authorized individuals.</li>
+        <li>You understand that features and services may change at any time without notice during the beta period.</li>
+        <li>You retain ownership of any data you input. ConciergeSync™ may analyze anonymized usage data to improve the service.</li>
+        <li>We are not responsible for losses resulting from decisions based on beta recommendations. Use your own judgment when making travel or financial choices.</li>
+      </ul>
 
-  <div class="scroll-box" id="termsBox">
-    <!-- 🧠 DROP FULL CONTENT HERE (merged terms + privacy) -->
-    <h2>Terms & Conditions — ConciergeSync™</h2>
-<p><em>Last updated: 8/13/2025</em></p>
+      <p>We reserve the right to remove beta access at any time for any reason, especially in cases of misuse or abuse of the platform.</p>
 
-<p>By accessing and using the ConciergeSync™ beta program, you agree to be bound by the following terms and conditions:</p>
+      <hr />
 
-<ul>
-  <li>You are voluntarily participating in a beta version of our platform, which may contain bugs or incomplete features.</li>
-  <li>You agree not to share any screenshots, data, or platform access with non-authorized individuals.</li>
-  <li>You understand that features and services may change at any time without notice during the beta period.</li>
-  <li>You retain ownership of any data you input. ConciergeSync™ retains the right to analyze anonymized usage data for the purpose of improving the service.</li>
-  <li>We are not responsible for any losses resulting from decisions based on beta recommendations. Use your own judgment when making travel or financial choices.</li>
-</ul>
+      <h2>Privacy Policy — ConciergeSync™</h2>
+      <p><em>Last updated: 8/13/2025</em></p>
 
-<p>We reserve the right to remove beta access at any time for any reason, especially in cases of misuse or abuse of the platform.</p>
+      <h3>What We Collect</h3>
+      <ul>
+        <li>Name and email address during onboarding.</li>
+        <li>Answers to intake forms, trip evaluations, and preference settings.</li>
+        <li>Technical data (browser type, device info, IP-derived region) to improve performance.</li>
+      </ul>
 
+      <h3>How We Use It</h3>
+      <ul>
+        <li>To personalize the beta experience and optimize the product.</li>
+        <li>To analyze usage patterns and refine platform logic.</li>
+        <li>To send essential updates or feedback requests (we don’t spam).</li>
+      </ul>
 
-    <hr />
+      <h3>Your Rights</h3>
+      <p>If you wish to access, modify, or delete your data, email us at <strong>privacy@conciergesync.ai</strong>.</p>
+      <p>We do not sell your data. Ever.</p>
 
-    <h2>Privacy Policy — ConciergeSync™</h2>
-<p><em>Last updated: 8/13/2025</em></p>
+      <p style="margin-top:24px;opacity:.8"><em>Scroll to the very bottom to enable “I Agree”.</em></p>
+    </section>
 
-<h3>What We Collect</h3>
-<ul>
-  <li>Name and email address during onboarding.</li>
-  <li>Answers to intake forms, trip evaluations, and preference settings.</li>
-  <li>Technical data (browser type, device info, IP-derived region) to improve platform performance.</li>
-</ul>
+    <div class="actions">
+      <button id="agreeBtn" class="btn" disabled>I Agree</button>
+    </div>
+    <div class="sub">Solving what matters — Beautifully</div>
+  </main>
 
-<h3>How We Use It</h3>
-<ul>
-  <li>To personalize the beta experience and optimize the product.</li>
-  <li>To analyze usage patterns and refine platform logic.</li>
-  <li>To send essential updates or feedback requests (we don’t spam).</li>
-</ul>
+  <script>
+    // Enable the button once scrolled to bottom of the terms box
+    const box  = document.getElementById('termsBox');
+    const btn  = document.getElementById('agreeBtn');
 
-<h3>Your Rights</h3>
-<p>If you wish to access, modify, or delete your data, email us at <strong>privacy@conciergesync.ai</strong>.</p>
+    function checkBottom(){
+      const atBottom = box.scrollTop + box.clientHeight >= box.scrollHeight - 2;
+      btn.disabled = !atBottom;
+    }
+    box.addEventListener('scroll', checkBottom);
+    // If content is short (edge cases), enable on load
+    window.addEventListener('load', checkBottom);
 
-<p>We do not sell your data. Ever.</p>
-
-  </div>
-
-  <div class="button-wrapper">
-    <button id="agreeBtn" disabled onclick="window.location.href='03-intake-start.html'">
-      I Agree
-    </button>
-  </div>
-</div>
-
-<script>
-  const scrollBox = document.getElementById('termsBox');
-  const agreeBtn = document.getElementById('agreeBtn');
-
-  scrollBox.addEventListener('scroll', () => {
-    const atBottom = scrollBox.scrollTop + scrollBox.clientHeight >= scrollBox.scrollHeight;
-    agreeBtn.disabled = !atBottom;
-  });
-</script>
-
-
+    // On Agree: set flag and route forward
+    btn.addEventListener('click', () => {
+      try { localStorage.setItem('cs_agreed','1'); } catch(e) {}
+      const params = new URLSearchParams(location.search);
+      const dest = params.get('return') || '/beta/03-intake-start.html';
+      location.replace(dest);
+    });
+  </script>
 </body>
 </html>
