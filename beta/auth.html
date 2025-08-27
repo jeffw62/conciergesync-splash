@@ -7,11 +7,15 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
- .cs-bg{
+.cs-bg{
   position: fixed;
   inset: 0;
-  background: url('/beta/assets/CS_Logo_Tile_Watermark.png') center/500px repeat;
-  opacity: 1.00;   /* boosted so you can see it clearly */
+  /* tile settings */
+  background-image: url('/beta/assets/CS_Logo_Tile_Watermark.png');
+  background-size: 500px;        /* your spread; tweak to taste (480–560px) */
+  background-repeat: space;      /* ✅ prevents cut-off tiles at edges */
+  background-position: 40px 24px;/* optional nudge so rows look centered */
+  opacity: 1;
   z-index: 0;
   pointer-events: none;
 }
