@@ -8,17 +8,17 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
   .cs-bg{
-  position: fixed;
-  inset: 0;
-  background: url('/beta/assets/CS_Logo_Tile_Watermark.png') center/200px repeat;
-  opacity: 0.05; /* whisper-light */
-  z-index: -1;
-}
+    position: fixed;
+    inset: 0;
+    background: url('/beta/assets/CS_Logo_Tile_Watermark.png') center/200px repeat;
+    opacity: 0.075; /* subtle but visible */
+    z-index: 0;
+    pointer-events: none;
+  }
 
   :root{ --glass:rgba(255,255,255,.10); --brd:rgba(255,255,255,.28); --blur:blur(12px) saturate(1.2) }
   html,body{height:100%}
   body{ margin:0; font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif; color:#fff; background:#0b1220; }
-  .bg{position:fixed; inset:0; background:center/cover no-repeat; filter:brightness(1.08) contrast(1.04)}
   .ov{position:fixed; inset:0; background:linear-gradient(180deg, rgba(0,0,0,.35), rgba(0,0,0,.60))}
   .wrap{position:relative; min-height:100%; display:grid; place-items:center; padding:18px}
   .card{
@@ -35,9 +35,8 @@
   }
   .tab.is-active{background:#000;border-color:#000}
 
-  /* Slim form column */
   .form{width:min(480px, 92vw); margin:0 auto; display:grid; gap:10px}
-  .nameRow{ display:grid; grid-template-columns:1fr 1fr; gap:32px; } /* your 32px */
+  .nameRow{ display:grid; grid-template-columns:1fr 1fr; gap:32px; }
   .nameRow > div{ min-width:0; }
   label{font-size:12px;color:#dbe2ee}
   input[type="text"],input[type="email"]{
@@ -60,8 +59,6 @@
 </head>
 <body>
   <div class="cs-bg"></div>
-  <!-- existing page content follows -->
-
   <div class="ov"></div>
 
   <div class="wrap">
@@ -112,21 +109,20 @@
     </div>
   </div>
 
-<!-- Firebase + gate logic -->
-
+<script type="module">
   // ——— Firebase Web SDK (v9+ modular)
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
   import { getFirestore, doc, getDoc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
   // TODO: 🔧 paste your real Firebase config here
   const firebaseConfig = {
-  apiKey: "AIzaSyCcqBQtV3e1hGRMzBa_k5trNRqL0UmlByE",
-  authDomain: "conciergesync.firebaseapp.com",
-  projectId: "conciergesync",
-  storageBucket: "conciergesync.appspot.com",   // ← corrected
-  messagingSenderId: "882907448780",
-  appId: "1:882907448780:web:6e797ce9ad5bb84a9f8969"
-};
+    apiKey: "AIzaSyCcqBQtV3e1hGRMzBa_k5trNRqL0UmlByE",
+    authDomain: "conciergesync.firebaseapp.com",
+    projectId: "conciergesync",
+    storageBucket: "conciergesync.appspot.com",   // ← corrected
+    messagingSenderId: "882907448780",
+    appId: "1:882907448780:web:6e797ce9ad5bb84a9f8969"
+  };
 
   // Init Firebase
   let app, db;
@@ -147,7 +143,6 @@
   const errFirst = $('#errFirst'), errLast = $('#errLast'), errEmail = $('#errEmail'), errAgree = $('#errAgree');
   const form = $('#gate'), submitBtn = $('#doSubmit'), statusEl = $('#status');
 
-  // Force blank values on load (defense vs restore)
   [first,last,email].forEach(i => { try{ i.value=''; }catch{} });
 
   function validEmail(v){ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v); }
@@ -284,7 +279,6 @@
       await handleRegister(first.value, last.value, e);
     }
   });
-
 </script>
 </body>
 </html>
