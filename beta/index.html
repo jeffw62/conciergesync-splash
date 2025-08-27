@@ -3,8 +3,33 @@
 <head>
   <meta charset="utf-8">
   <title>ConciergeSync</title>
+  <!-- Don’t let search engines index this hop page -->
+  <meta name="robots" content="noindex,follow">
+  <!-- Quick meta refresh fallback -->
   <meta http-equiv="refresh" content="0; url=/beta/auth.html">
-  <script>location.replace('/beta/auth.html');</script>
+  <script>
+    (function () {
+      var qs   = location.search || "";
+      var hash = location.hash   || "";
+
+      // If user is already authed (we set these in auth/console), drop them right into console.
+      try {
+        if (localStorage.getItem('cs_authed') === '1' ||
+            sessionStorage.getItem('cs_authed') === '1') {
+          location.replace('/beta/01-index.html?enter=1' + qs + hash);
+          return;
+        }
+      } catch (e) {}
+
+      // Otherwise → Auth (preserve UTMs & hash)
+      location.replace('/beta/auth.html' + qs + hash);
+    })();
+  </script>
 </head>
-<body></body>
+<body>
+  <noscript>
+    <meta http-equiv="refresh" content="0; url=/beta/auth.html">
+    <p><a href="/beta/auth.html">Continue to ConciergeSync</a></p>
+  </noscript>
+</body>
 </html>
