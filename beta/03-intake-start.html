@@ -6,6 +6,13 @@
   <title>ConciergeSync™ — Begin Your Intake</title>
 
   <style>
+    body::before{
+      content:"";
+      position:fixed; inset:0; z-index:-2;
+      background:url('/beta/assets/CS_Logo_Premium.png') center/500px repeat;
+      opacity:0.75;
+      pointer-events:none;
+    }
     :root{
       --page-bg:#0b0f14;
       --tile-size:180px;
@@ -53,7 +60,8 @@
       box-shadow:0 18px 48px rgba(0,0,0,.45), inset 0 0 0 1px var(--glass-brd);
       padding:36px 28px; text-align:center;
     }
-    h1{font-size:clamp(28px,4.3vw,42px); margin:0 0 10px; letter-spacing:.2px}
+    h1{
+  font-size:clamp(20px, 3vw, 28px);margin:0 0 10px;letter-spacing:.2px;}
     .lead{color:var(--muted); margin:6px 0 18px; line-height:1.45; font-size:clamp(15px,2.4vw,18px)}
     ul.bullets{list-style:none; padding:0; margin:16px auto 8px; max-width:56ch; text-align:left; color:#cdd8ea; line-height:1.5; font-size:clamp(14px,2.2vw,16px)}
     ul.bullets li{margin:10px 0; padding-left:28px; position:relative}
