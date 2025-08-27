@@ -7,30 +7,14 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
-  .cs-bg {
+  .cs-bg{
   position: fixed;
   inset: 0;
-  background: url('/beta/assets/CS_Logo_Tile_Watermark.png') center/260px repeat; 
-  /* 260px instead of 200px = looser grid */
-  opacity: 1;
+  background: url('/beta/assets/CS_Logo_Tile_Watermark.png') center/200px repeat;
+  opacity: 1.00;   /* boosted so you can see it clearly */
   z-index: 0;
   pointer-events: none;
 }
-
-/* Mobile: even more breathing room */
-@media (max-width: 768px) {
-  .cs-bg {
-    background-size: 320px;
-  }
-}
-
-@media (max-width: 480px) {
-  .cs-bg {
-    background-size: 360px;
-  }
-}
-
-
   :root{ --glass:rgba(255,255,255,.10); --brd:rgba(255,255,255,.28); --blur:blur(12px) saturate(1.2) }
   html,body{height:100%}
   body{ margin:0; font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif; color:#fff; background:#0b1220; }
