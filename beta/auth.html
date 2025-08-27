@@ -8,17 +8,10 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
   .cs-bg {
-  background: url('/beta/assets/CS_Logo_Tile_Watermark.png') 40px 0 / 240px repeat;
-  opacity: 1;
-}
-
-/* every other row nudged for staggered effect */
-.cs-bg {
-  background-position: 40px 0, 160px 120px;
-  background-image:
-    url('/beta/assets/CS_Logo_Tile_Watermark.png'),
-    url('/beta/assets/CS_Logo_Tile_Watermark.png');
-  background-size: 240px 240px;
+  background: url('/beta/assets/CS_Logo_Tile_Watermark.png') 40px 0 / 300px repeat;
+  opacity: 1.00;   /* solidly visible, but not screaming */
+  z-index: 0;
+  pointer-events: none;
 }
 
   :root{ --glass:rgba(255,255,255,.10); --brd:rgba(255,255,255,.28); --blur:blur(12px) saturate(1.2) }
