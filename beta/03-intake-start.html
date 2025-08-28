@@ -86,10 +86,19 @@
   </main>
 
   <script>
-    // Enter key also begins intake
-    document.addEventListener("keydown", (e) => {
-      if (e.key === "Enter") location.assign("/beta/05-section-1.html");
-    });
-  </script>
+(function () {
+  // Build the next URL while preserving any ?email=&first=&last=&uid=&return=...
+  const qs   = location.search;               // includes the leading "?" if present
+  const NEXT = '/beta/05-section-1.html' + (qs || '');
+
+  // Wire the "Begin intake" CTA to include the query string
+  const begin = document.querySelector('a.cta') || document.querySelector('a[role="button"]');
+  if (begin) begin.href = NEXT;
+
+  // Also support pressing Enter to continue
+  document.addEventListener('keydown', (e) => { if (e.key === 'Enter') location.assign(NEXT); });
+})();
+</script>
+
 </body>
 </html>
