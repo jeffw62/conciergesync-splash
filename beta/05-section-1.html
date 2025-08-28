@@ -81,5 +81,45 @@
       loading="eager">
     </iframe>
   </main>
+  <script>
+(function () {
+  var NEXT = "/beta/06-section-2.html";
+
+  // Grab the iframe (works with your usual ids/classes)
+  var iframe =
+    document.getElementById("nf1") ||
+    document.querySelector("iframe.embed") ||
+    document.querySelector("iframe");
+
+  function isSuccessPayload(data){
+    // Handle strings and objects from NoteForms
+    if (typeof data === "string") {
+      try { data = JSON.parse(data); } catch(_) {}
+      if (typeof data === "string") {
+        var s = data.toLowerCase();
+        return s.includes("form-success") || s.includes("nf_submit_success")
+            || s.includes("submitted")   || s.includes("success");
+      }
+    }
+    if (data && typeof data === "object") {
+      var ev = (data.event || data.type || data.status || "").toString().toLowerCase();
+      return ["form-success","nf_submit_success","submitted","success"]
+        .some(function(k){ return ev.includes(k); });
+    }
+    return false;
+  }
+
+  window.addEventListener("message", function(e){
+    if (!iframe || e.source !== iframe.contentWindow) return; // only our iframe
+    // Optional hard origin check:
+    // if (!/^https:\/\/(www\.)?noteforms\.com$/i.test(e.origin)) return;
+    if (isSuccessPayload(e.data)) {
+      var qs = location.search || "";
+      window.location.replace(NEXT + qs);   // go to Section 2
+    }
+  });
+})();
+</script>
+
 </body>
 </html>
