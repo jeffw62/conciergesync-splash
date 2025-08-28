@@ -81,6 +81,13 @@
   style="width:100%;height:90vh;border:0;"
 ></iframe>
 
+<!-- IFRAME -->
+<iframe
+  id="nf-embed"
+  data-src="https://noteforms.com/forms/beta-user-tracker-conciergesync-b4yxaf?embed=true&theme=dark"
+  style="width:100%;height:90vh;border:0;"
+></iframe>
+
 <script>
 (() => {
   const qs = new URLSearchParams(location.search);
@@ -90,22 +97,25 @@
   const name  = [first, last].filter(Boolean).join(' ').trim();
 
   const iframe = document.getElementById('nf-embed');
-  const base   = iframe.dataset.src || iframe.src;
-  const url    = new URL(base, location.href);
+  const url    = new URL(iframe.dataset.src || iframe.src, location.href);
 
-  // ✅ Use the NoteForms FIELD IDs as keys:
-  url.searchParams.set('cf891a43-1e3c-4403-886c-3a7550291a22', name);   // Name
-  url.searchParams.set('aafd8404-ef8a-4b17-ab3d-15e2357e93a5', email);   // Email
+  // ✅ Use Section 1 FIELD IDs as keys
+  url.searchParams.set('cf891a43-1e3c-4403-886c-3a7550291a22', name);   // Name (Full)
+  url.searchParams.set('aafd8404-ef8a-4b17-ab3d-15e2357e93a5', email);   // Client Email
+
+  // (Redundant but harmless: also set canonical keys if NoteForms maps them)
+  url.searchParams.set('title', name);
+  url.searchParams.set('hWDd', email);
 
   iframe.src = url.toString();
 
-  // Optional: debug line (remove later)
+  // Debug so we can see exactly what's being sent (remove later)
   const dbg = document.createElement('pre');
   dbg.textContent = 'NF src → ' + iframe.src;
   dbg.style.cssText = 'font:12px/1.4 monospace;background:#0b0f14;color:#9fe;padding:8px;white-space:pre-wrap;word-break:break-all;margin:0';
   document.body.prepend(dbg);
 
-  // On submit → Section 2 (preserve query string from outer page)
+  // On successful submit → Section 2 (preserve full query string)
   const FORM_SLUG = 'beta-user-tracker-conciergesync-b4yxaf';
   window.addEventListener('message', (e) => {
     if (!String(e.origin).includes('noteforms.com')) return;
