@@ -19,8 +19,6 @@
       display:flex; align-items:center; justify-content:center;
       padding:24px; position:relative; overflow:auto;
     }
-
-    /* Gold logo background + vignette (matches other pages) */
     .cs-bg{
       position:fixed; inset:0; z-index:-2;
       background:url('/beta/assets/CS_Logo_Premium.png') center/500px repeat;
@@ -32,8 +30,6 @@
         radial-gradient(120% 120% at 50% 0%, rgba(255,255,255,.04), rgba(0,0,0,.28) 60%, rgba(0,0,0,.55) 100%),
         linear-gradient(180deg, rgba(255,255,255,.02), rgba(0,0,0,.08));
     }
-
-    /* Glass tile — fixed 500px (responsive down) */
     .tile{
       width:min(500px,95vw);
       border-radius:20px;
@@ -42,18 +38,14 @@
       box-shadow:0 18px 48px rgba(0,0,0,.45), inset 0 0 0 1px var(--glass-brd);
       padding:20px 18px 22px;
     }
-
     .title{
-      margin:0 0 8px;
-      font-size:clamp(18px,2.6vw,22px);
+      margin:0 0 8px; font-size:clamp(18px,2.6vw,22px);
       font-weight:800; letter-spacing:-.01em; text-align:center;
     }
     .intro{
       margin:6px auto 14px; max-width:56ch; text-align:center;
       color:#e8edf7; font-size:14px; line-height:1.55;
     }
-
-    /* Scrollable terms */
     .scroll-box{
       height:44vh; min-height:300px; max-height:520px;
       overflow:auto; padding:14px;
@@ -66,7 +58,6 @@
     .scroll-box h3{ margin:14px 0 6px; font-size:15px }
     .scroll-box p, .scroll-box ul{ margin:8px 0; font-size:14px; color:#e8edf7 }
     .scroll-box ul{ padding-left:18px }
-
     .actions{
       margin-top:16px; display:flex; justify-content:center; gap:10px; align-items:center;
     }
@@ -80,11 +71,10 @@
     .cta:active{ transform:translateY(1px) }
     .cta[disabled]{ opacity:.45; cursor:not-allowed }
     .cta.ghost{
-      background:rgba(0,0,0,.35); border-color:rgba(255,255,255,.35); color:#fff;
-      box-shadow:none;
+      background:rgba(0,0,0,.35); border-color:rgba(255,255,255,.35); color:#fff; box-shadow:none;
     }
-
     .sub{ text-align:center; margin-top:8px; color:rgba(255,255,255,.75); font-size:12px }
+    .warn{ display:none; margin:10px 0 0; text-align:center; color:#ffd7a8; font-size:13px }
   </style>
 </head>
 <body>
@@ -98,20 +88,18 @@
     </p>
 
     <section id="termsBox" class="scroll-box" tabindex="0" aria-label="Terms and Privacy scroll box">
-      <!-- Replace with your full legal text as needed -->
+      <!-- Replace with your full legal text -->
       <h2>Terms &amp; Conditions — ConciergeSync™</h2>
       <p><em>Last updated: 8/13/2025</em></p>
       <p>By accessing and using the ConciergeSync™ beta program, you agree to be bound by the following terms and conditions:</p>
       <ul>
         <li>The beta may contain bugs or incomplete features.</li>
-        <li>Don’t share screenshots, data, or access with non-authorized individuals.</li>
+        <li>Do not share screenshots, data, or access with non-authorized individuals.</li>
         <li>Features/services may change at any time without notice during the beta.</li>
         <li>You retain ownership of your data; we may analyze anonymized usage to improve the service.</li>
-        <li>We aren’t responsible for losses resulting from actions you take based on beta recommendations.</li>
+        <li>We aren’t responsible for losses from actions you take based on beta recommendations.</li>
       </ul>
-
       <hr/>
-
       <h2>Privacy Policy — ConciergeSync™</h2>
       <p><em>Last updated: 8/13/2025</em></p>
       <h3>What We Collect</h3>
@@ -128,7 +116,6 @@
       </ul>
       <h3>Your Rights</h3>
       <p>To access, modify, or delete your data, email <strong>privacy@conciergesync.ai</strong>. We do not sell your data.</p>
-
       <p style="margin-top:24px;opacity:.8"><em>Scroll to the very bottom to enable “I agree — continue”.</em></p>
     </section>
 
@@ -137,15 +124,18 @@
       <a id="declineBtn" class="cta ghost" href="#">I don’t agree</a>
     </div>
 
+    <div id="missingEmail" class="warn">
+      We couldn’t confirm your email. <a href="/beta/auth.html" style="color:#fff;text-decoration:underline">Return to registration</a>.
+    </div>
+
     <div class="sub">Solving what matters — Beautifully</div>
   </main>
 
-  <!-- Single modern script: handles UI + Firestore consent -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
     import { getFirestore, doc, setDoc, getDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-    // Same project as your other pages
+    // Firebase project (same as other pages)
     const firebaseConfig = {
       apiKey: "AIzaSyCcqBQtV3e1hGRMzBa_k5trNRqL0UmlByE",
       authDomain: "conciergesync.firebaseapp.com",
@@ -157,35 +147,49 @@
     const app = initializeApp(firebaseConfig);
     const db  = getFirestore(app);
 
-    // Params & constants
-    const qs    = new URLSearchParams(location.search);
-    const email = (qs.get("email") || "").toLowerCase().trim();
-    const NEXT  = "/beta/03-intake-start.html";
+    // Read email robustly: ?email → sessionStorage → localStorage
+    const qs = new URLSearchParams(location.search);
+    let email = (qs.get("email") || sessionStorage.getItem("cs_email") || localStorage.getItem("cs_email") || "").toLowerCase().trim();
+
+    // If auth page sets it, keep it fresh for later pages
+    if (email) {
+      try {
+        sessionStorage.setItem("cs_email", email);
+        localStorage.setItem("cs_email", email);
+      } catch(e) {}
+    }
+
     const TERMS_VERSION = "2025-08-28";
+    const NEXT = "/beta/03-intake-start.html";
 
-    // If we don't know who this is, send back to auth
-    if (!email) location.replace("/beta/auth.html");
-
-    // UI elements
     const box = document.getElementById("termsBox");
     const agreeBtn = document.getElementById("agreeBtn");
     const declineBtn = document.getElementById("declineBtn");
+    const missingEl = document.getElementById("missingEmail");
 
-    // Scroll-to-enable for Agree
+    // Scroll-to-enable
     agreeBtn.disabled = true;
     function checkBottom(){
       const atBottom = box.scrollTop + box.clientHeight >= box.scrollHeight - 2;
-      agreeBtn.disabled = !atBottom;
+      agreeBtn.disabled = !atBottom || !email; // also require a known email
     }
     box.addEventListener("scroll", checkBottom);
-    window.addEventListener("load", checkBottom);
+    window.addEventListener("load", () => {
+      if (!email) {
+        missingEl.style.display = "block";
+      }
+      checkBottom();
+    });
 
-    // Persist consent to Firestore, then move forward
+    // Persist consent in Firestore, then route
     async function recordConsentAndContinue(){
+      if (!email) {
+        alert("We couldn’t confirm your email. Please return to registration.");
+        return;
+      }
       try {
         const ref = doc(db, "beta_users", email);
         const snap = await getDoc(ref);
-        // Only set createdAt if the doc didn't exist already
         const base = snap.exists() ? {} : { email, createdAt: serverTimestamp() };
         await setDoc(ref, {
           ...base,
@@ -196,7 +200,6 @@
         }, { merge: true });
 
         try { localStorage.setItem("cs_agreed","1"); } catch(e){}
-        // carry any existing query params forward
         location.replace(NEXT + (location.search || ""));
       } catch (e) {
         console.error("Consent save failed:", e);
@@ -209,12 +212,13 @@
       recordConsentAndContinue();
     });
 
-    // Decline → send to TCP-Decline.html with same query params (email, etc.)
+    // Decline → TCP-Decline.html (carry params if present)
     declineBtn.addEventListener("click", (e)=>{
       e.preventDefault();
-      const q2 = new URLSearchParams(location.search);
-      q2.set("declined","1");
-      location.replace("/beta/TCP-Decline.html?" + q2.toString());
+      const out = new URLSearchParams(location.search);
+      if (email && !out.get("email")) out.set("email", email);
+      out.set("declined","1");
+      location.replace("/beta/TCP-Decline.html?" + out.toString());
     });
   </script>
 </body>
