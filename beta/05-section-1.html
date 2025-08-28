@@ -90,6 +90,24 @@
     document.getElementById("nf1") ||
     document.querySelector("iframe.embed") ||
     document.querySelector("iframe");
+// Append email/first/last/uid from the page URL (or localStorage) to the NoteForms iframe.
+(function () {
+  if (!iframe) return;
+
+  const qs   = new URLSearchParams(location.search);
+  const pick = (k) => qs.get(k) || localStorage.getItem('cs_' + k) || '';
+
+  const carry = new URLSearchParams();
+  ['email','first','last','uid'].forEach(k => {
+    const v = pick(k);
+    if (v) carry.set(k, v);
+  });
+
+  if (carry.toString()) {
+    const base = iframe.getAttribute('src') || '';
+    iframe.setAttribute('src', base + (base.includes('?') ? '&' : '?') + carry.toString());
+  }
+})();
 
   function isSuccessPayload(data){
     // Handle strings and objects from NoteForms
