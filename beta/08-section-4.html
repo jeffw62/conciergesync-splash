@@ -20,13 +20,11 @@
       display:flex; align-items:center; justify-content:center;
       padding:24px; position:relative; overflow:auto;
     }
-    /* BIG gold logo background */
     .cs-bg{
       position:fixed; inset:0; z-index:-2;
       background:url('/beta/assets/CS_Logo_Premium.png') center/500px repeat;
       opacity:.75; pointer-events:none;
     }
-    /* vignette */
     body::after{
       content:""; position:fixed; inset:0; z-index:-1; pointer-events:none;
       background:
@@ -34,29 +32,25 @@
         linear-gradient(180deg, rgba(255,255,255,.02), rgba(0,0,0,.08));
     }
 
-    /* Glass tile (same sizing as Section 3) */
+    /* Card sized to viewport (same as Sections 3) */
     .card{
       width:min(560px, 96vw);
-      height: calc(100vh - 48px);         /* definite height -> iframe can flex */
-      max-height: 980px;                   /* soft upper cap for huge screens */
+      height: calc(100vh - 48px);
+      max-height: 980px;
       border-radius:20px;
       background:var(--glass-bg);
       backdrop-filter:var(--glass-blur);
       box-shadow:0 18px 48px rgba(0,0,0,.45), inset 0 0 0 1px var(--glass-brd);
       padding:18px 18px 22px;
-
-      display:flex;
-      flex-direction:column;
-      overflow:hidden;                     /* keep internals tidy */
+      display:flex; flex-direction:column; overflow:hidden;
     }
     h1{font-size:clamp(18px,2.6vw,22px); margin:0 0 6px;}
     .sub{color:var(--muted); margin:0 0 12px; font-size:14px;}
 
-    /* NoteForms embed fills remaining space */
+    /* NF iframe fills remaining space */
     #nf-embed{
       display:block; width:100%;
-      flex:1 1 auto;
-      min-height:0;                        /* critical so it can shrink in flex */
+      flex:1 1 auto; min-height:0;
       border:0; border-radius:14px;
       background:transparent !important;
     }
@@ -65,7 +59,6 @@
     .footer a{ color:#dbe3f4; text-decoration:none }
     .footer a:hover{ text-decoration:underline }
 
-    /* Mobile: smaller padding → full-height card */
     @media (max-width:480px){
       body{ padding:16px; }
       .card{ height: calc(100vh - 32px); }
@@ -79,7 +72,7 @@
     <h1 id="hdr">Section 4 — Transferable Points Programs</h1>
     <p class="sub">Tell us about your points programs so we can optimize your strategy.</p>
 
-    <!-- PUBLIC NoteForms URL for Section 4 (src set by script) -->
+    <!-- Single iframe; src set by script below -->
     <iframe
       id="nf-embed"
       data-src="https://noteforms.com/forms/section-4-transferable-points-programs-wp4ujy?embed=true&theme=dark"
@@ -93,34 +86,39 @@
 
   <script>
   (() => {
-    // Section 4 — field IDs from NoteForms prefill
+    // Remove any stray duplicate iframes from cached/stale HTML
+    document.querySelectorAll('iframe:not(#nf-embed)').forEach(n => n.remove());
+
+    // Field IDs from NoteForms prefill (Section 4)
     const NAME_ID  = '9052d9fd-994b-4e0b-adc8-d0a44c563dbb';
     const EMAIL_ID = '3142ee5f-e390-475c-8c6b-c8285434188c';
     const FORM_SLUG = 'section-4-transferable-points-programs-wp4ujy';
     const NEXT_PAGE = '09-onboarding-thank-you.html';
 
-    // Pull values from QS / localStorage
+    // Values from QS / localStorage
     const qs = new URLSearchParams(location.search);
     const email = qs.get('email') || localStorage.getItem('cs_email') || '';
     const first = qs.get('first') || localStorage.getItem('cs_first') || '';
     const last  = qs.get('last')  || localStorage.getItem('cs_last')  || '';
     const name  = [first, last].filter(Boolean).join(' ').trim();
 
-    // Build embed URL with prefill
-    const iframe = document.getElementById('nf-embed') || document.querySelector('iframe');
-    if (!iframe) return;
-
-    const base = iframe.dataset.src || iframe.src ||
-      'https://noteforms.com/forms/section-4-transferable-points-programs-wp4ujy?embed=true&theme=dark';
+    const iframe = document.getElementById('nf-embed');
+    const base   = iframe.getAttribute('data-src');
 
     const url = new URL(base, location.href);
+    // Prefill by field IDs
     if (name)  url.searchParams.set(NAME_ID,  name);
     if (email) url.searchParams.set(EMAIL_ID, email);
-    url.searchParams.set('_ts', Date.now().toString()); // cache-bust
+    // Harmless fallbacks
+    if (name)  url.searchParams.set('name',  name);
+    if (email) url.searchParams.set('email', email);
+
+    // Cache-bust
+    url.searchParams.set('_ts', String(Date.now()));
 
     iframe.src = url.toString();
 
-    // On successful submit → Thank You (preserve full QS)
+    // On successful submit → Thank You (preserve QS)
     window.addEventListener('message', (e) => {
       if (!String(e.origin).includes('noteforms.com')) return;
       const d = e.data;
@@ -130,12 +128,5 @@
     });
   })();
   </script>
-  <iframe id="nf-embed"
-  data-form-slug="section-4-transferable-points-programs-wp4ujy"
-  data-next="09-onboarding-thank-you.html"
-  data-src="https://noteforms.com/forms/section-4-transferable-points-programs-wp4ujy?embed=true&theme=dark">
-</iframe>
-<script src="/beta/assets/intake.js?v=1"></script>
-
 </body>
 </html>
