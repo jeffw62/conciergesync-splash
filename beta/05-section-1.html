@@ -82,48 +82,45 @@
 ></iframe>
 
 <!-- IFRAME -->
-<iframe
-  id="nf-embed"
-  data-src="https://noteforms.com/forms/beta-user-tracker-conciergesync-b4yxaf?embed=true&theme=dark"
-  style="width:100%;height:90vh;border:0;"
-></iframe>
-
 <script>
-(() => {
+(function () {
   const qs = new URLSearchParams(location.search);
-  const email = qs.get('email') || localStorage.getItem('cs_email') || '';
-  const first = qs.get('first') || localStorage.getItem('cs_first') || '';
-  const last  = qs.get('last')  || localStorage.getItem('cs_last')  || '';
-  const name  = [first, last].filter(Boolean).join(' ').trim();
+  const email = qs.get('email') || '';
+  const first = qs.get('first') || '';
+  const last  = qs.get('last')  || '';
+  const uid   = qs.get('uid')   || '';
+  const ret   = qs.get('return') || '/beta/03-intake-start.html';
 
-  const iframe = document.getElementById('nf-embed');
-  const url    = new URL(iframe.dataset.src || iframe.src, location.href);
+  // Guard: must have email + uid to continue
+  if (!email || !uid) {
+    const back = encodeURIComponent(location.pathname + location.search);
+    location.replace(`auth.html?mode=login&return=${back}`);
+    return;
+  }
 
-  // ✅ Use Section 1 FIELD IDs as keys
-  url.searchParams.set('cf891a43-1e3c-4403-886c-3a7550291a22', name);   // Name (Full)
-  url.searchParams.set('aafd8404-ef8a-4b17-ab3d-15e2357e93a5', email);   // Client Email
+  // Persist for all downstream pages
+  localStorage.setItem('cs_email', email);
+  localStorage.setItem('cs_first', first);
+  localStorage.setItem('cs_last',  last);
+  localStorage.setItem('cs_uid',   uid);
+  localStorage.setItem('cs_return', ret);
 
-  // (Redundant but harmless: also set canonical keys if NoteForms maps them)
-  url.searchParams.set('title', name);
-  url.searchParams.set('hWDd', email);
+  // Build the exact QS we want to carry forward
+  const carry = new URLSearchParams({ email, first, last, uid, return: ret });
 
-  iframe.src = url.toString();
+  // 1) Wire the primary Begin link/button
+  const begin = document.querySelector('#begin-intake, a[href$="05-section-1.html"]');
+  if (begin) {
+    const u = new URL('05-section-1.html', location.href);
+    carry.forEach((v,k) => u.searchParams.set(k, v));
+    begin.setAttribute('href', u.pathname + '?' + u.searchParams.toString());
+  }
 
-  // Debug so we can see exactly what's being sent (remove later)
-  const dbg = document.createElement('pre');
-  dbg.textContent = 'NF src → ' + iframe.src;
-  dbg.style.cssText = 'font:12px/1.4 monospace;background:#0b0f14;color:#9fe;padding:8px;white-space:pre-wrap;word-break:break-all;margin:0';
-  document.body.prepend(dbg);
-
-  // On successful submit → Section 2 (preserve full query string)
-  const FORM_SLUG = 'beta-user-tracker-conciergesync-b4yxaf';
-  window.addEventListener('message', (e) => {
-    if (!String(e.origin).includes('noteforms.com')) return;
-    const d = e.data;
-    if (d?.type === 'form-submitted' && d?.form?.slug === FORM_SLUG) {
-      const keepQS = location.search.replace(/^\?/, '');
-      location.href = `06-section-2.html?${keepQS}`;
-    }
+  // 2) Any link marked .keepqs also gets the QS
+  document.querySelectorAll('a.keepqs').forEach(a => {
+    const u = new URL(a.getAttribute('href'), location.href);
+    carry.forEach((v,k) => u.searchParams.set(k, v));
+    a.setAttribute('href', u.pathname + '?' + u.searchParams.toString());
   });
 })();
 </script>
