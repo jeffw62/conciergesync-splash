@@ -282,59 +282,53 @@
       }
     }
 
-    async function handleRegister(firstStr,lastStr,emailStr){
-      const key = emailStr.toLowerCase().trim();
-      if (!db){ show(errEmail); errEmail.textContent = 'Cannot reach database. Check Firebase config.'; return; }
+    async function handleRegister(firstStr, lastStr, emailStr){
+  const key = emailStr.toLowerCase().trim();
+  if (!db){ show(errEmail); errEmail.textContent = 'Cannot reach database. Check Firebase config.'; return; }
 
-      setWorking(true);
-      try{
-        const ref = doc(db, 'beta_users', key);
-        await setDoc(ref, {
-          first: firstStr.trim(),
-          last:  lastStr.trim(),
-          email: key,
-          // agreed status will be set by 02-agree.html
-          updatedAt: serverTimestamp(),
-          createdAt: serverTimestamp()
-        }, { merge: true });
+  setWorking(true);
+  try{
+    const ref = doc(db, 'beta_users', key);
+    await setDoc(ref, {
+      first: firstStr.trim(),
+      last:  lastStr.trim(),
+      email: key,
+      // agreed status set later by 02-agree.html
+      updatedAt: serverTimestamp(),
+      createdAt: serverTimestamp()
+    }, { merge: true });
 
-        // Ensure UID exists and carry it forward to 02
-        const uid = await getOrCreateUid(db, key);
+    // Ensure UID exists and keep it
+    const uid = await getOrCreateUid(db, key);
 
-        // Carry values forward (and keep as fallback)
-try{
-  localStorage.setItem('cs_email', key);
-  localStorage.setItem('cs_first', firstStr.trim());
-  localStorage.setItem('cs_last',  lastStr.trim());
-  localStorage.setItem('cs_uid',   uid || '');
-}catch(_){}
+    // stash for later pages as fallback
+    try{
+      localStorage.setItem('cs_email', key);
+      localStorage.setItem('cs_first', firstStr.trim());
+      localStorage.setItem('cs_last',  lastStr.trim());
+      localStorage.setItem('cs_uid',   uid || '');
+    }catch(_){}
 
-// stop the spinner
-setWorking(false);
+    setWorking(false);
 
-// Send to the Terms page with prefilled query params
-const ret = '/beta/03-intake-start.html';
-const qs  = new URLSearchParams({
-  email: key,
-  first: firstStr.trim(),
-  last:  lastStr.trim(),
-  uid:   uid || '',
-  return: ret
-});
-location.assign('/beta/02-agree.html?' + qs.toString());
-return; // prevent any later code from running
+    // send to Terms with prefilled params
+    const qs = new URLSearchParams({
+      email: key,
+      first: firstStr.trim(),
+      last:  lastStr.trim(),
+      uid:   uid || '',
+      return: '/beta/03-intake-start.html'
+    });
+    location.assign('/beta/02-agree.html?' + qs.toString());
+  }catch(e){
+    console.warn(e);
+    setWorking(false);
+    show(errEmail);
+    errEmail.textContent = 'Registration unavailable (rules or network).';
+    email.setAttribute('aria-invalid','true');
+  }
+}
 
-        setWorking(false);
-        const qs = new URLSearchParams({ email: key, uid });
-        location.replace('/beta/02-agree.html?' + qs.toString());
-      }catch(e){
-        console.warn(e);
-        setWorking(false);
-        show(errEmail);
-        errEmail.textContent = 'Registration unavailable (rules or network).';
-        email.setAttribute('aria-invalid','true');
-      }
-    }
 
     function validate(){
       clearErrors();
