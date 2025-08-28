@@ -8,7 +8,7 @@
     :root{
       --page-bg:#0b0f14;
       --ink:#eaf2ff; --muted:#9fb0c8;
-      --glass-bg:rgba(255,255,255,.20);
+      --glass-bg:rgba(255,255,255,.10);
       --glass-brd:rgba(255,255,255,.22);
       --glass-blur:blur(14px) saturate(1.1);
     }
@@ -20,7 +20,7 @@
       padding:24px; position:relative; overflow:auto;
     }
 
-    /* Gold logo background (vibrant; no dimming overlay) */
+    /* Vibrant gold background */
     .cs-bg{
       position:fixed; inset:0; z-index:-2;
       background:url('/beta/assets/CS_Logo_Premium.png') center/500px repeat;
@@ -88,7 +88,7 @@
     <h1 id="page-title" class="title">Before We Begin…</h1>
     <p class="intro">
       Please review the Terms &amp; Conditions and Privacy Policy below.
-      Scroll to the bottom to unlock <strong>“I Agree — Continue”</strong>.
+      Scroll to the bottom to unlock <strong>“I agree — continue”</strong>.
     </p>
 
     <section id="termsBox" class="scroll-box" tabindex="0" aria-label="Terms and Privacy scroll box">
@@ -120,11 +120,12 @@
       </ul>
       <h3>Your Rights</h3>
       <p>To access, modify, or delete your data, email <strong>privacy@conciergesync.ai</strong>. We do not sell your data.</p>
+      <p style="margin-top:24px;opacity:.8"><em>Scroll to the very bottom to enable “I agree — continue”.</em></p>
     </section>
 
     <div class="actions">
-      <button id="agreeBtn" class="cta" type="button">I Agree — Continue</button>
-      <a id="declineBtn" class="cta ghost" href="#">I Decline</a>
+      <button id="agreeBtn" class="cta" type="button">I agree — continue</button>
+      <a id="declineBtn" class="cta ghost" href="#">I don’t agree</a>
     </div>
 
     <div id="missingEmail" class="warn">
@@ -134,7 +135,7 @@
     <div class="sub">Solving what matters — Beautifully</div>
   </main>
 
-  <!-- UI logic (plain script: runs even if module imports fail) -->
+  <!-- UI first (plain script). Ensures the button enables even if modules fail. -->
   <script>
     (function(){
       const qs = new URLSearchParams(location.search);
@@ -148,61 +149,52 @@
       const declineBtn = document.getElementById("declineBtn");
       const missingEl  = document.getElementById("missingEmail");
 
-      // --- Enable "I agree" only after reaching the bottom of #termsBox ---
       function enableAgree(){ agreeBtn.disabled = false; agreeBtn.removeAttribute("aria-disabled"); }
       function disableAgree(){ agreeBtn.disabled = true;  agreeBtn.setAttribute("aria-disabled","true"); }
 
-      // start disabled; also require known email
+      // Start disabled
       disableAgree();
 
-      // Sentinel approach + scroll math fallback + small timeout safety
+      // Create & observe a sentinel at the end of the scrollbox
       const sentinel = document.createElement("div");
       sentinel.setAttribute("aria-hidden","true");
-      sentinel.style.height = "1px";
+      sentinel.style.cssText = "height:1px";
       box.appendChild(sentinel);
 
-      let io;
+      // Primary: IntersectionObserver
       if ('IntersectionObserver' in window) {
-        io = new IntersectionObserver(
+        const io = new IntersectionObserver(
           (entries) => {
             const vis = entries.some(e => e.isIntersecting);
-            if (vis && email) enableAgree(); else disableAgree();
+            if (vis) enableAgree(); else disableAgree();
           },
-          { root: box, threshold: [0, 0.5, 1] }
+          { root: box, threshold: [0, 0.75, 1] }
         );
         io.observe(sentinel);
       }
 
-      function checkBottomFallback(){
+      // Fallbacks: math, load/resize/orientation changes, and a tiny timeout
+      function checkBottom(){
         const atBottom = Math.ceil(box.scrollTop + box.clientHeight) >= (box.scrollHeight - 1);
-        if (atBottom && email) enableAgree(); else disableAgree();
+        if (atBottom) enableAgree(); else disableAgree();
       }
-      box.addEventListener("scroll", checkBottomFallback);
-      window.addEventListener("load", () => {
-        if (!email) missingEl.style.display = "block";
-        checkBottomFallback();
-        // If content is short / no scroll, enable after a brief delay
-        setTimeout(checkBottomFallback, 100);
-      });
+      box.addEventListener("scroll", checkBottom);
+      window.addEventListener("load", checkBottom);
+      window.addEventListener("resize", checkBottom);
+      window.addEventListener("orientationchange", checkBottom);
+      setTimeout(checkBottom, 120);
 
-      // Agree: call Firestore write if available, then continue
+      // Agree → write consent if writer is available; always proceed to NEXT
       agreeBtn.addEventListener("click", async (e)=>{
         if (agreeBtn.disabled) { e.preventDefault(); return; }
-
         try { localStorage.setItem("cs_agreed","1"); } catch(e){}
         try {
-          if (typeof window.csWriteConsent === "function") {
-            await window.csWriteConsent(email);
-          } else {
-            console.warn("Consent writer not ready; proceeding without server record.");
-          }
-        } catch(err) {
-          console.warn("Consent write failed; proceeding anyway.", err);
-        }
+          if (typeof window.csWriteConsent === "function") await window.csWriteConsent(email);
+        } catch(err) { console.warn("Consent write failed; proceeding.", err); }
         location.replace(NEXT + (location.search || ""));
       });
 
-      // Decline → TCP-Decline.html (carry params)
+      // Decline → TCP-Decline
       declineBtn.addEventListener("click", (e)=>{
         e.preventDefault();
         const out = new URLSearchParams(location.search);
@@ -210,10 +202,13 @@
         out.set("declined","1");
         location.replace("/beta/TCP-Decline.html?" + out.toString());
       });
+
+      // Show hint if we truly have no email on this page
+      if (!email) { missingEl.style.display = "block"; }
     })();
   </script>
 
-  <!-- Firestore write (module). If this fails to load, UI still works. -->
+  <!-- Firestore writer (module). If it fails, the UI still works. -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
     import { getFirestore, doc, setDoc, getDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
@@ -231,9 +226,9 @@
 
     const TERMS_VERSION = "2025-08-28";
 
-    // Expose a tiny writer the plain script can call
+    // Expose a consent writer for the plain script
     window.csWriteConsent = async function(email){
-      if (!email) throw new Error("Missing email");
+      if (!email) return; // let UI proceed; auth will sort it out later
       const ref  = doc(db, "beta_users", email);
       const snap = await getDoc(ref);
       const base = snap.exists() ? {} : { email, createdAt: serverTimestamp() };
