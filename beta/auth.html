@@ -301,6 +301,29 @@
         // Ensure UID exists and carry it forward to 02
         const uid = await getOrCreateUid(db, key);
 
+        // Carry values forward (and keep as fallback)
+try{
+  localStorage.setItem('cs_email', key);
+  localStorage.setItem('cs_first', firstStr.trim());
+  localStorage.setItem('cs_last',  lastStr.trim());
+  localStorage.setItem('cs_uid',   uid || '');
+}catch(_){}
+
+// stop the spinner
+setWorking(false);
+
+// Send to the Terms page with prefilled query params
+const ret = '/beta/03-intake-start.html';
+const qs  = new URLSearchParams({
+  email: key,
+  first: firstStr.trim(),
+  last:  lastStr.trim(),
+  uid:   uid || '',
+  return: ret
+});
+location.assign('/beta/02-agree.html?' + qs.toString());
+return; // prevent any later code from running
+
         setWorking(false);
         const qs = new URLSearchParams({ email: key, uid });
         location.replace('/beta/02-agree.html?' + qs.toString());
