@@ -34,9 +34,11 @@
       opacity:.75; pointer-events:none;
     }
     /* Overlay for legibility */
-    .cs-ov{
-      position:fixed; inset:0; z-index:-1;
-      background:linear-gradient(to bottom, rgba(0,0,0,.42), rgba(0,0,0,.66));
+   .cs-ov{
+      position:fixed; inset:0; z-index:-1; pointer-events:none;
+      background:
+      radial-gradient(120% 120% at 50% 0%, rgba(255,255,255,.04), rgba(0,0,0,.28) 60%, rgba(0,0,0,.55) 100%),
+      linear-gradient(180deg, rgba(255,255,255,.02), rgba(0,0,0,.08));
     }
 
     /* Glass card — fixed 500px width (shrinks on very small screens) */
