@@ -16,34 +16,33 @@
       margin:0;
       font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
       color:#fff;
+      background:#0b0f14;
       -webkit-font-smoothing:antialiased;
       -moz-osx-font-smoothing:grayscale;
-      background:#0b0f14;
     }
 
-    /* Scenic/photo layer (optional; sits BEHIND gold logos) */
+    /* Scenic/photo (optional) sits behind logos */
     .cs-photo{
       position:fixed; inset:0; z-index:-3;
       background:center/cover no-repeat;
       filter:brightness(1.05) contrast(1.04);
     }
-
     /* Premium gold logo background */
     .cs-logo-bg{
       position:fixed; inset:0; z-index:-2;
       background:url('/beta/assets/CS_Logo_Premium.png') center/500px repeat;
       opacity:.75; pointer-events:none;
     }
-
-    /* Gradient overlay above backgrounds */
+    /* Overlay for legibility */
     .cs-ov{
       position:fixed; inset:0; z-index:-1;
-      background:linear-gradient(to bottom, rgba(0,0,0,.35), rgba(0,0,0,.60));
+      background:linear-gradient(to bottom, rgba(0,0,0,.42), rgba(0,0,0,.66));
     }
 
-    /* Glass card — fixed 500px width, responsive down */
+    /* Glass card — fixed 500px width (shrinks on very small screens) */
     .cs-tile{
-      width:min(500px, 95vw);
+      width:500px;
+      max-width:calc(100% - 56px);
       margin:6vh auto;
       padding:24px;
       background:var(--glass-bg);
@@ -60,21 +59,24 @@
 
     #tyTitle{
       text-align:center; margin:0 auto 6px;
-      font-size: clamp(26px, 4vw, 34px);
+      font-size:clamp(24px, 3.6vw, 30px);
       line-height:1.15; letter-spacing:-.01em; font-weight:800;
     }
-    .sub{ text-align:center; max-width:740px; margin:0 auto 18px; color:rgba(255,255,255,.92); }
-    .kudos{ text-align:center; margin:0 auto 22px; font-weight:700; }
+    .sub{ text-align:center; margin:0 auto 16px; color:rgba(255,255,255,.92); }
+    .kudos{ text-align:center; margin:0 auto 20px; font-weight:700; }
 
-    body.thankyou h3{
+    h3{
       margin:0 0 8px; font-size:16px; text-transform:uppercase; letter-spacing:.06em;
       color:#7a8596; text-shadow:0 1px 1px rgba(0,0,0,.30); font-weight:800;
     }
     .list{ margin:8px 0 0; padding-left:18px; }
     .list li{ margin:6px 0; }
 
+    .section{ margin-top:28px; }
+    .section > .list, .section > p{ margin-top:6px; }
+
     .btn{
-      display:block; width:max-content; margin:16px auto 0; padding:12px 18px;
+      display:block; width:max-content; margin:18px auto 0; padding:12px 18px;
       border-radius:12px; border:1px solid rgba(255,255,255,.45);
       background:rgba(0,0,0,.45); color:#fff; font-weight:800; text-decoration:none;
       box-shadow:0 8px 24px rgba(0,0,0,.28);
@@ -85,18 +87,13 @@
     @media (max-width:640px){
       .cs-tile{ margin:4vh auto; padding:20px; }
     }
-
-    .section{ margin-top:28px; }
-    .section h3{ margin:0 0 6px; }
-    .section > .list{ margin-top:6px; }
-    .section > p{ margin-top:6px; }
   </style>
 </head>
 <body class="thankyou">
-  <!-- Optional scenic/photo (behind logos). Remove if not used -->
+  <!-- Optional scenic/photo (behind gold logos). Remove if not used -->
   <div class="cs-photo"></div>
 
-  <!-- Gold logo background + gradient overlay -->
+  <!-- Gold logo background + overlay -->
   <div class="cs-logo-bg"></div>
   <div class="cs-ov"></div>
 
@@ -148,13 +145,16 @@
     (function(){
       var btn = document.getElementById('enterBtn');
       if (!btn) return;
+
       var src = new URLSearchParams(location.search);
       var qp  = new URLSearchParams({ enter: '1' });
       ['uid','email','open'].forEach(function(k){
         var v = src.get(k); if (v) qp.set(k, v);
       });
+
       var CONSOLE_URL = '/beta/01-index.html';
       btn.href = CONSOLE_URL + '?' + qp.toString();
+
       btn.addEventListener('click', function(){
         try {
           sessionStorage.setItem('cs_authed','1');
