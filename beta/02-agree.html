@@ -8,8 +8,8 @@
     :root{
       --page-bg:#0b0f14;
       --ink:#eaf2ff; --muted:#9fb0c8;
-      --glass-bg:rgba(10, 12, 18, .58);
-      --glass-brd:rgba(255,255,255,.18);
+      --glass-bg:rgba(255,255,255,.10);
+      --glass-brd:rgba(255,255,255,.22);
       --glass-blur:blur(14px) saturate(1.1);
     }
     html,body{height:100%}
@@ -33,7 +33,7 @@
       width:min(500px,95vw);
       border-radius:20px;
       background:var(--glass-bg);
-      backdrop-filter: blur(18px) saturate(1.05);;
+      backdrop-filter:var(--glass-blur);
       box-shadow:0 18px 48px rgba(0,0,0,.45), inset 0 0 0 1px var(--glass-brd);
       padding:20px 18px 22px;
     }
@@ -52,8 +52,8 @@
       height:44vh; min-height:300px; max-height:520px;
       overflow:auto; padding:14px;
       border-radius:12px;
-      border:1px solid rgba(255,255,255,.14);
-      background:rgba(0,0,0,.46);
+      border:1px solid rgba(255,255,255,.18);
+      background:rgba(0,0,0,.30);
       color:#f5f8ff; line-height:1.55;
     }
     .scroll-box h2{ margin:0 0 8px; font-size:18px }
@@ -120,12 +120,11 @@
       </ul>
       <h3>Your Rights</h3>
       <p>To access, modify, or delete your data, email <strong>privacy@conciergesync.ai</strong>. We do not sell your data.</p>
-      <p style="margin-top:24px;opacity:.8"><em>Scroll to the very bottom to enable “I agree — continue”.</em></p>
     </section>
 
     <div class="actions">
-      <button id="agreeBtn" class="cta" type="button">I agree — continue</button>
-      <a id="declineBtn" class="cta ghost" href="#">I don’t agree</a>
+      <button id="agreeBtn" class="cta" type="button">I Agree — Continue</button>
+      <a id="declineBtn" class="cta ghost" href="#">I Decline</a>
     </div>
 
     <div id="missingEmail" class="warn">
