@@ -79,35 +79,37 @@
   id="nf-embed"
   data-src="https://noteforms.com/forms/beta-user-tracker-conciergesync-b4yxaf?embed=true&theme=dark"
   style="width:100%;height:90vh;border:0;"
-  allow="clipboard-write *">
-</iframe>
+></iframe>
 
 <script>
 (() => {
-  // pull values from URL (fallback to localStorage)
   const qs = new URLSearchParams(location.search);
   const email = qs.get('email') || localStorage.getItem('cs_email') || '';
   const first = qs.get('first') || localStorage.getItem('cs_first') || '';
   const last  = qs.get('last')  || localStorage.getItem('cs_last')  || '';
-  const uid   = qs.get('uid')   || localStorage.getItem('cs_uid')   || '';
   const name  = [first, last].filter(Boolean).join(' ').trim();
 
-  // build clean src using the *real* NoteForms keys
   const iframe = document.getElementById('nf-embed');
   const base   = iframe.dataset.src || iframe.src;
   const url    = new URL(base, location.href);
-  url.searchParams.set('title', name);   // Name
-  url.searchParams.set('hWDd', email);   // Email
-  // If/when you add a hidden UID field, replace 'XYZ' with its key and un-comment:
-  // url.searchParams.set('XYZ', uid);
+
+  // ✅ Use the NoteForms FIELD IDs as keys:
+  url.searchParams.set('cf891a43-1e3c-4403-886c-3a7550291a22', name);   // Name
+  url.searchParams.set('aafd8404-ef8a-4b17-ab3d-15e2357e93a5', email);   // Email
 
   iframe.src = url.toString();
 
-  // success → Section 2 (preserve full query string)
+  // Optional: debug line (remove later)
+  const dbg = document.createElement('pre');
+  dbg.textContent = 'NF src → ' + iframe.src;
+  dbg.style.cssText = 'font:12px/1.4 monospace;background:#0b0f14;color:#9fe;padding:8px;white-space:pre-wrap;word-break:break-all;margin:0';
+  document.body.prepend(dbg);
+
+  // On submit → Section 2 (preserve query string from outer page)
   const FORM_SLUG = 'beta-user-tracker-conciergesync-b4yxaf';
-  window.addEventListener('message', (event) => {
-    if (!String(event.origin).includes('noteforms.com')) return;
-    const d = event.data;
+  window.addEventListener('message', (e) => {
+    if (!String(e.origin).includes('noteforms.com')) return;
+    const d = e.data;
     if (d?.type === 'form-submitted' && d?.form?.slug === FORM_SLUG) {
       const keepQS = location.search.replace(/^\?/, '');
       location.href = `06-section-2.html?${keepQS}`;
@@ -115,8 +117,6 @@
   });
 })();
 </script>
-
-
 
 </body>
 </html>
