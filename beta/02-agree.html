@@ -184,14 +184,17 @@
       setTimeout(checkBottom, 120);
 
       // Agree → write consent if writer is available; always proceed to NEXT
-      agreeBtn.addEventListener("click", async (e)=>{
-        if (agreeBtn.disabled) { e.preventDefault(); return; }
-        try { localStorage.setItem("cs_agreed","1"); } catch(e){}
-        try {
-          if (typeof window.csWriteConsent === "function") await window.csWriteConsent(email);
-        } catch(err) { console.warn("Consent write failed; proceeding.", err); }
-        location.replace(NEXT + (location.search || ""));
-      });
+      // On Agree: set flag and route forward, preserving all params
+  btn.addEventListener('click', () => {
+    try { localStorage.setItem('cs_agreed','1'); } catch(e) {}
+
+    const params = new URLSearchParams(location.search);
+    const dest   = params.get('return') || '/beta/03-intake-start.html';
+    params.delete('return'); // keep the rest (email/first/last/uid)
+
+    const next = dest + (params.toString() ? ('?' + params.toString()) : '');
+    location.replace(next);
+  });
 
       // Decline → TCP-Decline
       declineBtn.addEventListener("click", (e)=>{
