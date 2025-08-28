@@ -31,7 +31,6 @@
         radial-gradient(120% 120% at 50% 0%, rgba(255,255,255,.04), rgba(0,0,0,.28) 60%, rgba(0,0,0,.55) 100%),
         linear-gradient(180deg, rgba(255,255,255,.02), rgba(0,0,0,.08));
     }
-
     /* Card sized to viewport */
     .card{
       width:min(560px, 96vw);
@@ -42,30 +41,20 @@
       backdrop-filter:var(--glass-blur);
       box-shadow:0 18px 48px rgba(0,0,0,.45), inset 0 0 0 1px var(--glass-brd);
       padding:18px 18px 22px;
-      display:flex;
-      flex-direction:column;
-      overflow:hidden;
+      display:flex; flex-direction:column; overflow:hidden;
     }
     h1{font-size:clamp(18px,2.6vw,22px); margin:0 0 6px;}
     .sub{color:var(--muted); margin:0 0 12px; font-size:14px;}
-
-    /* NF iframe fills remaining space */
     #nf-embed{
-      display:block; width:100%;
-      flex:1 1 auto;
-      min-height:0;
-      border:0; border-radius:14px;
-      background:transparent !important;
+      display:block; width:100%; flex:1 1 auto; min-height:0;
+      border:0; border-radius:14px; background:transparent !important;
     }
-
     .footer{margin-top:10px; text-align:center; font-size:12px; color:#a7b4c9;}
     .footer a{ color:#dbe3f4; text-decoration:none }
     .footer a:hover{ text-decoration:underline }
-
-    @media (max-width:480px){
-      body{ padding:16px; }
-      .card{ height: calc(100vh - 32px); }
-    }
+    @media (max-width:480px){ body{ padding:16px; } .card{ height: calc(100vh - 32px); } }
+    /* tiny debug line */
+    #dbg{font:11px/1.4 ui-monospace,Menlo,Consolas,monospace;color:#9fe;background:#0b0f14;padding:6px;word-break:break-all;margin:0 0 8px;border-radius:6px;opacity:.8}
   </style>
 </head>
 <body>
@@ -89,6 +78,9 @@
 
   <script>
   (() => {
+    // Kill any stray iframes injected by stale HTML/CDN
+    document.querySelectorAll('iframe:not(#nf-embed)').forEach(n => n.remove());
+
     // Field IDs from NoteForms prefill (Section 3)
     const NAME_ID  = '6fcce27d-c4ee-455a-a89d-0ff481d5d96f';
     const EMAIL_ID = '891daeda-3fce-4725-9133-8c301eebc237';
@@ -102,16 +94,27 @@
     const last  = qs.get('last')  || localStorage.getItem('cs_last')  || '';
     const name  = [first, last].filter(Boolean).join(' ').trim();
 
-    // Build embed URL with prefill
     const iframe = document.getElementById('nf-embed');
-    const base   = iframe.dataset.src;
-    const url    = new URL(base, location.href);
+    const base   = iframe.getAttribute('data-src'); // be explicit
 
+    const url = new URL(base, location.href);
+    // Preferred: field-ID prefill
     if (name)  url.searchParams.set(NAME_ID,  name);
     if (email) url.searchParams.set(EMAIL_ID, email);
-    url.searchParams.set('_ts', Date.now().toString()); // cache-bust
+    // Redundant fallbacks (harmless if ignored)
+    if (name)  url.searchParams.set('name',  name);
+    if (email) url.searchParams.set('email', email);
+
+    // hard cache-bust
+    url.searchParams.set('_ts', String(Date.now()));
 
     iframe.src = url.toString();
+
+    // Tiny on-page debug so you can see the exact URL we set
+    const dbg = document.createElement('div');
+    dbg.id = 'dbg';
+    dbg.textContent = 'NF src → ' + iframe.src;
+    document.querySelector('.card').insertAdjacentElement('afterbegin', dbg);
 
     // On successful submit → Section 4 (preserve QS)
     window.addEventListener('message', (e) => {
