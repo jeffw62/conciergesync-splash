@@ -76,30 +76,49 @@
   </main>
 
   <script>
-    (function(){
-      const NEXT = "/beta/08-section-4.html";
-      const iframe = document.getElementById("nf3");
+(function(){
+  const NEXT   = "/beta/08-section-4.html";
+  const iframe = document.getElementById("nf2");
 
-      function isSuccessPayload(data){
-        try { if (typeof data === "string") data = JSON.parse(data); } catch(_) {}
-        const s = (data && (data.event || data.type || data.status || "")).toString().toLowerCase();
-        return s.includes("form-success") || s.includes("nf_submit_success") || s.includes("success") || s.includes("submitted");
-      }
+  // --- Carry email/first/last/uid into the NoteForms iframe (from URL or localStorage)
+  (function carryParamsToIframe(){
+    if (!iframe) return;
+    const qs   = new URLSearchParams(location.search);
+    const pick = (k) => qs.get(k) || localStorage.getItem('cs_' + k) || '';
 
-      window.addEventListener("message", function(e){
-        if (!iframe || e.source !== iframe.contentWindow) return;   // only our iframe
-        if (!isSuccessPayload(e.data)) return;
+    const carry = new URLSearchParams();
+    ['email','first','last','uid'].forEach(k => {
+      const v = pick(k);
+      if (v) carry.set(k, v);
+    });
 
-        // mark section 3 complete
-        const prog = JSON.parse(localStorage.getItem("cs_onboarding_progress") || "{}");
-        prog.s3 = true;
-        localStorage.setItem("cs_onboarding_progress", JSON.stringify(prog));
+    if (carry.toString()){
+      const base = iframe.getAttribute('src') || '';
+      iframe.setAttribute('src', base + (base.includes('?') ? '&' : '?') + carry.toString());
+    }
+  })();
 
-        // carry query params forward
-        const qs = location.search || "";
-        location.replace(NEXT + qs);
-      });
-    })();
-  </script>
+  function isSuccessPayload(data){
+    try { if (typeof data === "string") data = JSON.parse(data); } catch(_) {}
+    const s = (data && (data.event || data.type || data.status || "")).toLowerCase();
+    return s.includes("form-success") || s.includes("nf_submit_success") || s.includes("success") || s.includes("submitted");
+  }
+
+  window.addEventListener("message", function(e){
+    if (!iframe || e.source !== iframe.contentWindow) return; // only our iframe
+    if (!isSuccessPayload(e.data)) return;
+
+    // mark section 2 complete
+    const prog = JSON.parse(localStorage.getItem("cs_onboarding_progress") || "{}");
+    prog.s2 = true;
+    localStorage.setItem("cs_onboarding_progress", JSON.stringify(prog));
+
+    // carry any existing query params forward
+    const qs = location.search || "";
+    location.replace(NEXT + qs);
+  });
+})();
+</script>
+
 </body>
 </html>
