@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>ConciergeSync™ • Consent Declined</title>
+  <style>
+    :root{
+      --page-bg:#0b0f14;
+      --ink:#eaf2ff; --muted:#9fb0c8;
+      --glass-bg:rgba(255,255,255,.10);
+      --glass-brd:rgba(255,255,255,.22);
+      --glass-blur:blur(14px) saturate(1.1);
+    }
+    html,body{height:100%}
+    body{
+      margin:0; background:var(--page-bg); color:var(--ink);
+      font-family:system-ui,-apple-system,Segoe UI,Inter,Arial,sans-serif;
+      display:flex; align-items:center; justify-content:center;
+      padding:24px; position:relative; overflow:auto;
+    }
+    .cs-bg{ position:fixed; inset:0; z-index:-2;
+      background:url('/beta/assets/CS_Logo_Premium.png') center/500px repeat;
+      opacity:.75; pointer-events:none; }
+    body::after{ content:""; position:fixed; inset:0; z-index:-1; pointer-events:none;
+      background:
+        radial-gradient(120% 120% at 50% 0%, rgba(255,255,255,.04), rgba(0,0,0,.28) 60%, rgba(0,0,0,.55) 100%),
+        linear-gradient(180deg, rgba(255,255,255,.02), rgba(0,0,0,.08));
+    }
+    .card{
+      width:min(500px,95vw);
+      border-radius:20px;
+      background:var(--glass-bg);
+      backdrop-filter:var(--glass-blur);
+      box-shadow:0 18px 48px rgba(0,0,0,.45), inset 0 0 0 1px var(--glass-brd);
+      padding:20px 18px 22px; text-align:left;
+    }
+    h1{font-size:clamp(18px,2.6vw,22px); margin:0 0 8px}
+    .sub{color:var(--muted); margin:0 0 14px; font-size:14px}
+    .cta{
+      display:inline-block; margin-top:14px; padding:12px 16px; border-radius:999px;
+      border:1px solid rgba(255,255,255,.35); color:#fff; text-decoration:none;
+      background:rgba(255,255,255,.06); backdrop-filter:blur(4px);
+      transition:transform .15s ease, box-shadow .15s ease;
+    }
+    .cta:hover{ transform:translateY(-1px) }
+    .muted{ color:#a7b4c9; font-size:12px; margin-top:10px }
+    /* Optional feedback block (hidden by default) */
+    .feedback{ display:none; margin-top:16px }
+    .feedback h2{ font-size:16px; margin:0 0 8px }
+    .feedback iframe{ width:100%; min-height:300px; border:0; border-radius:12px; background:transparent!important; }
+  </style>
+</head>
+<body>
+  <div class="cs-bg"></div>
+
+  <main class="card" role="main" aria-labelledby="hdr">
+    <h1 id="hdr">We’ve noted your choice</h1>
+    <p class="sub" id="resultCopy">
+      We respect that you declined our Terms &amp; Privacy. Your information has been removed.
+    </p>
+
+    <!-- Optional feedback (enable via JS constant below) -->
+    <section class="feedback" id="fbBlock" aria-labelledby="fbHdr">
+      <h2 id="fbHdr">Mind sharing why?</h2>
+      <p class="sub">Totally optional — your feedback helps us improve.</p>
+      <iframe id="fbFrame" title="ConciergeSync — Decline Feedback"></iframe>
+    </section>
+
+    <a class="cta" href="/beta/auth.html">Return to registration</a>
+    <div class="muted">You can close this window if you prefer.</div>
+  </main>
+
+  <script type="module">
+    // --- Behavior switches ---
+    const PURGE_ON_DECLINE = true;  // true = delete doc; false = keep doc & mark declined
+    const ENABLE_FEEDBACK  = false; // set true to show feedback form
+    const FEEDBACK_URL     = "https://noteforms.com/forms/YOUR_DECLINE_FEEDBACK_FORM?theme=dark";
+
+    // Firebase (same project as other pages)
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getFirestore, doc, deleteDoc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCcqBQtV3e1hGRMzBa_k5trNRqL0UmlByE",
+      authDomain: "conciergesync.firebaseapp.com",
+      projectId: "conciergesync",
+      storageBucket: "conciergesync.appspot.com",
+      messagingSenderId: "882907448780",
+      appId: "1:882907448780:web:6e797ce9ad5bb84a9f8969"
+    };
+    const app = initializeApp(firebaseConfig);
+    const db  = getFirestore(app);
+
+    const qs = new URLSearchParams(location.search);
+    const email = (qs.get("email") || "").toLowerCase().trim();
+    const resultCopy = document.getElementById("resultCopy");
+
+    // Clear any local/session flags & cookies
+    try {
+      localStorage.removeItem("cs_onboarding_progress");
+      localStorage.removeItem("cs_onboarding_done");
+      localStorage.removeItem("cs_authed");
+      sessionStorage.removeItem("cs_authed");
+      document.cookie = "cs_auth=; path=/; max-age=0; SameSite=Lax";
+    } catch(e){}
+
+    (async function handleDecline(){
+      if (!email) {
+        resultCopy.textContent = "We respect that you declined. No information was retained.";
+        return;
+      }
+      try{
+        const ref = doc(db, "beta_users", email);
+        if (PURGE_ON_DECLINE) {
+          await deleteDoc(ref);
+          resultCopy.textContent = "We’ve removed your information. You can register again anytime.";
+        } else {
+          await setDoc(ref, {
+            agreed: false,
+            consentStatus: "declined",
+            declinedAt: serverTimestamp(),
+            termsVersion: "2025-08-28"
+          }, { merge: true });
+          resultCopy.textContent = "We’ve recorded your choice. You can change your mind anytime.";
+        }
+      } catch(e){
+        console.warn("Decline handling error:", e);
+        resultCopy.textContent = "We noted your choice, though we couldn’t update the record. You can register again anytime.";
+      }
+    })();
+
+    // Optional feedback block
+    (function setupFeedback(){
+      if (!ENABLE_FEEDBACK) return;
+      const fb = document.getElementById("fbBlock");
+      const fr = document.getElementById("fbFrame");
+      if (fb && fr){
+        fb.style.display = "block";
+        fr.src = FEEDBACK_URL;
+      }
+    })();
+  </script>
+</body>
+</html>
