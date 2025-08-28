@@ -33,28 +33,41 @@
         radial-gradient(120% 120% at 50% 0%, rgba(255,255,255,.04), rgba(0,0,0,.28) 60%, rgba(0,0,0,.55) 100%),
         linear-gradient(180deg, rgba(255,255,255,.02), rgba(0,0,0,.08));
     }
-    /* Glass tile (fixed width = 500px, responsive down) */
+
+    /* Glass tile */
     .card{
       width:min(500px, 95vw);
+      max-height: calc(100vh - 48px);       /* keeps entire tile on-screen */
       border-radius:20px;
       background:var(--glass-bg);
       backdrop-filter:var(--glass-blur);
       box-shadow:0 18px 48px rgba(0,0,0,.45), inset 0 0 0 1px var(--glass-brd);
       padding:18px 18px 22px;
+
+      display:flex;                          /* allow content to size within */
+      flex-direction:column;
     }
     h1{font-size:clamp(18px,2.6vw,22px); margin:0 0 6px;}
     .sub{color:var(--muted); margin:0 0 12px; font-size:14px;}
 
-    /* NoteForms embed (Dark + Transparent on NF side) */
-    iframe.embed{
+    /* NoteForms embed */
+    #nf-embed{
       display:block; width:100%;
-      min-height:78vh; border:0; border-radius:14px;
+      flex:1 1 auto;            /* consume remaining space */
+      min-height:0;             /* allow shrinking within flex container */
+      border:0; border-radius:14px;
       background:transparent !important;
     }
+
     .footer{margin-top:10px; text-align:center; font-size:12px; color:#a7b4c9;}
     .footer a{ color:#dbe3f4; text-decoration:none }
     .footer a:hover{ text-decoration:underline }
-    @media (max-width:480px){ iframe.embed{ min-height:84vh } }
+
+    /* Small screens: soften padding so the card fits comfortably */
+    @media (max-width:480px){
+      body{ padding:16px; }
+      .card{ max-height: calc(100vh - 32px); }
+    }
   </style>
 </head>
 <body>
@@ -64,14 +77,12 @@
     <h1 id="hdr">Section 3 — Loyalty Program Overview</h1>
     <p class="sub">Tell us how you currently earn and use points so we can tune your strategy.</p>
 
-    <!-- PUBLIC NoteForms URL for Section 3 -->
+    <!-- PUBLIC NoteForms URL for Section 3 (src set by script) -->
     <iframe
       id="nf-embed"
       data-src="https://noteforms.com/forms/section-3-loyalty-program-overview-40ya0y?embed=true&theme=dark"
-      style="width:100%; height:92vh; border:0; border-radius:14px; background:rgba(0,0,0,.35);"
       allow="clipboard-write">
     </iframe>
-
 
     <div class="footer">
       Questions? Email <a href="mailto:hello@conciergesync.ai">hello@conciergesync.ai</a>
@@ -79,44 +90,44 @@
   </main>
 
   <script>
-(() => {
-  // Section 3 — field IDs from NoteForms prefill
-  const NAME_ID  = '6fcce27d-c4ee-455a-a89d-0ff481d5d96f';
-  const EMAIL_ID = '891daeda-3fce-4725-9133-8c301eebc237';
-  const FORM_SLUG = 'section-3-loyalty-program-overview-40ya0y';
-  const NEXT_PAGE = '08-section-4.html';
+  (() => {
+    // Section 3 — field IDs from NoteForms prefill
+    const NAME_ID  = '6fcce27d-c4ee-455a-a89d-0ff481d5d96f';
+    const EMAIL_ID = '891daeda-3fce-4725-9133-8c301eebc237';
+    const FORM_SLUG = 'section-3-loyalty-program-overview-40ya0y';
+    const NEXT_PAGE = '08-section-4.html';
 
-  // Pull values from QS / localStorage
-  const qs = new URLSearchParams(location.search);
-  const email = qs.get('email') || localStorage.getItem('cs_email') || '';
-  const first = qs.get('first') || localStorage.getItem('cs_first') || '';
-  const last  = qs.get('last')  || localStorage.getItem('cs_last')  || '';
-  const name  = [first, last].filter(Boolean).join(' ').trim();
+    // Pull values from QS / localStorage
+    const qs = new URLSearchParams(location.search);
+    const email = qs.get('email') || localStorage.getItem('cs_email') || '';
+    const first = qs.get('first') || localStorage.getItem('cs_first') || '';
+    const last  = qs.get('last')  || localStorage.getItem('cs_last')  || '';
+    const name  = [first, last].filter(Boolean).join(' ').trim();
 
-  // Build embed URL with prefill
-  const iframe = document.getElementById('nf-embed') || document.querySelector('iframe');
-  if (!iframe) return;
+    // Build embed URL with prefill
+    const iframe = document.getElementById('nf-embed') || document.querySelector('iframe');
+    if (!iframe) return;
 
-  const base = iframe.dataset.src || iframe.src ||
-    'https://noteforms.com/forms/section-3-loyalty-program-overview-40ya0y?embed=true&theme=dark';
+    const base = iframe.dataset.src || iframe.src ||
+      'https://noteforms.com/forms/section-3-loyalty-program-overview-40ya0y?embed=true&theme=dark';
 
-  const url = new URL(base, location.href);
-  if (name)  url.searchParams.set(NAME_ID,  name);
-  if (email) url.searchParams.set(EMAIL_ID, email);
-  url.searchParams.set('_ts', Date.now().toString()); // cache-bust
+    const url = new URL(base, location.href);
+    if (name)  url.searchParams.set(NAME_ID,  name);
+    if (email) url.searchParams.set(EMAIL_ID, email);
+    url.searchParams.set('_ts', Date.now().toString()); // cache-bust
 
-  iframe.src = url.toString();
+    iframe.src = url.toString();
 
-  // On successful submit → Section 4 (preserve full QS)
-  window.addEventListener('message', (e) => {
-    if (!String(e.origin).includes('noteforms.com')) return;
-    const d = e.data;
-    if (d?.type === 'form-submitted' && d?.form?.slug === FORM_SLUG) {
-      location.href = `${NEXT_PAGE}${location.search}`;
-    }
-  });
-})();
-</script>
+    // On successful submit → Section 4 (preserve full QS)
+    window.addEventListener('message', (e) => {
+      if (!String(e.origin).includes('noteforms.com')) return;
+      const d = e.data;
+      if (d?.type === 'form-submitted' && d?.form?.slug === FORM_SLUG) {
+        location.href = `${NEXT_PAGE}${location.search}`;
+      }
+    });
+  })();
+  </script>
 
 </body>
 </html>
