@@ -2,76 +2,104 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Section 3 • ConciergeSync™</title>
+  <title>Section 3 — Loyalty Program Overview • ConciergeSync™</title>
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <style>
-    :root{--card-bg:#fff;--bg:#f7f7f7;--text:#0f172a;--primary:#0b3b9e;--muted:#64748b;--radius:16px;--shadow:0 10px 30px rgba(2,6,23,.08)}
+    :root{
+      --page-bg:#0b0f14;
+      --ink:#eaf2ff; --muted:#9fb0c8;
+      --glass-bg:rgba(255,255,255,.10);
+      --glass-brd:rgba(255,255,255,.22);
+      --glass-blur:blur(14px) saturate(1.1);
+    }
     *{box-sizing:border-box}
-    body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,"Helvetica Neue",Arial}
-    .wrap{max-width:760px;margin:40px auto;padding:0 16px}
-    .card{background:var(--card-bg);border-radius:var(--radius);box-shadow:var(--shadow);padding:28px}
-    h1{font-size:32px;margin:4px 0 8px;text-align:center}
-    .sub{color:var(--muted);margin:0 0 18px;text-align:center;font-size:16px}
-    .banner{background:#eef2ff;border:1px solid #c7d2fe;color:#1e3a8a;border-radius:10px;padding:10px 14px;margin-bottom:14px;text-align:center;font-weight:600}
-    .embed{width:100%;min-height:900px;border:0;border-radius:12px;background:#fff}
-    .footer{margin-top:18px;text-align:center;font-size:14px;color:var(--muted)}
-    .footer a{color:#0b3b9e;text-decoration:none}
-    .footer a:hover{text-decoration:underline}
+    html,body{height:100%}
+    body{
+      margin:0; background:var(--page-bg); color:var(--ink);
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,"Helvetica Neue",Arial,sans-serif;
+      display:flex; align-items:center; justify-content:center;
+      padding:24px; position:relative; overflow:auto;
+    }
+    /* BIG gold logo background */
+    .cs-bg{
+      position:fixed; inset:0; z-index:-2;
+      background:url('/beta/assets/CS_Logo_Premium.png') center/500px repeat;
+      opacity:.75; pointer-events:none;
+    }
+    /* vignette */
+    body::after{
+      content:""; position:fixed; inset:0; z-index:-1; pointer-events:none;
+      background:
+        radial-gradient(120% 120% at 50% 0%, rgba(255,255,255,.04), rgba(0,0,0,.28) 60%, rgba(0,0,0,.55) 100%),
+        linear-gradient(180deg, rgba(255,255,255,.02), rgba(0,0,0,.08));
+    }
+    /* Glass tile (fixed width = 500px, responsive down) */
+    .card{
+      width:min(500px, 95vw);
+      border-radius:20px;
+      background:var(--glass-bg);
+      backdrop-filter:var(--glass-blur);
+      box-shadow:0 18px 48px rgba(0,0,0,.45), inset 0 0 0 1px var(--glass-brd);
+      padding:18px 18px 22px;
+    }
+    h1{font-size:clamp(18px,2.6vw,22px); margin:0 0 6px;}
+    .sub{color:var(--muted); margin:0 0 12px; font-size:14px;}
+
+    /* NoteForms embed (Dark + Transparent on NF side) */
+    iframe.embed{
+      display:block; width:100%;
+      min-height:78vh; border:0; border-radius:14px;
+      background:transparent !important;
+    }
+    .footer{margin-top:10px; text-align:center; font-size:12px; color:#a7b4c9;}
+    .footer a{ color:#dbe3f4; text-decoration:none }
+    .footer a:hover{ text-decoration:underline }
+    @media (max-width:480px){ iframe.embed{ min-height:84vh } }
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <div class="card">
-      <h1>Section 3</h1>
-      <p class="sub">Continue your onboarding below.</p>
+  <div class="cs-bg"></div>
 
-      <iframe id="nf3" class="embed"
-        title="ConciergeSync – Section 3"
-        src="https://noteforms.com/forms/section-3-loyalty-program-overview-40ya0y">
-</iframe>
+  <main class="card" role="main" aria-labelledby="hdr">
+    <h1 id="hdr">Section 3 — Loyalty Program Overview</h1>
+    <p class="sub">Tell us how you currently earn and use points so we can tune your strategy.</p>
 
-<script>
-  window.addEventListener('message', function (e) {
-  if (e.source !== (iframe && iframe.contentWindow)) return;
-  if (!ok(e.data)) return;
+    <!-- PUBLIC NoteForms URL for Section 3 -->
+    <iframe id="nf3" class="embed"
+      title="ConciergeSync – Section 3"
+      src="https://noteforms.com/forms/section-3-loyalty-program-overview-40ya0y">
+    </iframe>
 
-  // 1) mark this section complete
-  const prog = JSON.parse(localStorage.getItem('cs_onboarding_progress') || '{}');
-  prog.s1 = true;  // ← s2/s3/s4 on the other pages
-  localStorage.setItem('cs_onboarding_progress', JSON.stringify(prog));
-
-  // 2) carry uid/email (whatever’s already in the URL) to NEXT
-  const url = new URL(NEXT, location.origin);
-  const qs = new URLSearchParams(location.search);
-  if ([...qs].length) url.search = qs.toString();
-
-  // 3) go to next page
-  window.location.replace(url.href);
-});
-
-(function () {
-  var NEXT = "/beta/08-section-4.html";
-  var iframe = document.getElementById("nf3");
-
-  function isSuccessPayload(data) {
-    if (typeof data === "string") { try { data = JSON.parse(data); } catch(_) {} }
-    if (typeof data === "string") return data.toLowerCase().includes("form-success");
-    var ev = (data && (data.event || data.type || data.status) || "").toLowerCase();
-    return ["form-success","nf_submit_success","success","submitted"].some(function(k){ return ev.includes(k); });
-  }
-
-  window.addEventListener("message", function(e){
-    if (e.source !== (iframe && iframe.contentWindow)) return; // only this iframe
-    if (isSuccessPayload(e.data)) window.location.replace(NEXT);
-  });
-})();
-</script>
-
-</script>
-
-
-      <div class="footer">Questions? Email <a href="mailto:hello@conciergesync.ai">hello@conciergesync.ai</a></div>
+    <div class="footer">
+      Questions? Email <a href="mailto:hello@conciergesync.ai">hello@conciergesync.ai</a>
     </div>
-  </div>
+  </main>
+
+  <script>
+    (function(){
+      const NEXT = "/beta/08-section-4.html";
+      const iframe = document.getElementById("nf3");
+
+      function isSuccessPayload(data){
+        try { if (typeof data === "string") data = JSON.parse(data); } catch(_) {}
+        const s = (data && (data.event || data.type || data.status || "")).toString().toLowerCase();
+        return s.includes("form-success") || s.includes("nf_submit_success") || s.includes("success") || s.includes("submitted");
+      }
+
+      window.addEventListener("message", function(e){
+        if (!iframe || e.source !== iframe.contentWindow) return;   // only our iframe
+        if (!isSuccessPayload(e.data)) return;
+
+        // mark section 3 complete
+        const prog = JSON.parse(localStorage.getItem("cs_onboarding_progress") || "{}");
+        prog.s3 = true;
+        localStorage.setItem("cs_onboarding_progress", JSON.stringify(prog));
+
+        // carry query params forward
+        const qs = location.search || "";
+        location.replace(NEXT + qs);
+      });
+    })();
+  </script>
 </body>
 </html>
