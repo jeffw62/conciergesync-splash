@@ -65,10 +65,13 @@
     <p class="sub">Tell us how you currently earn and use points so we can tune your strategy.</p>
 
     <!-- PUBLIC NoteForms URL for Section 3 -->
-    <iframe id="nf3" class="embed"
-      title="ConciergeSync – Section 3"
-      src="https://noteforms.com/forms/section-3-loyalty-program-overview-40ya0y">
+    <iframe
+      id="nf-embed"
+      data-src="https://noteforms.com/forms/section-3-loyalty-program-overview-40ya0y?embed=true&theme=dark"
+      style="width:100%;height:90vh;border:0;"
+      allow="clipboard-write">
     </iframe>
+
 
     <div class="footer">
       Questions? Email <a href="mailto:hello@conciergesync.ai">hello@conciergesync.ai</a>
@@ -76,71 +79,44 @@
   </main>
 
   <script>
-  (function(){
-    var NEXT   = "/beta/08-section-4.html";
+(() => {
+  // Section 3 — field IDs from NoteForms prefill
+  const NAME_ID  = '6fcce27d-c4ee-455a-a89d-0ff481d5d96f';
+  const EMAIL_ID = '891daeda-3fce-4725-9133-8c301eebc237';
+  const FORM_SLUG = 'section-3-loyalty-program-overview-40ya0y';
+  const NEXT_PAGE = '08-section-4.html';
 
-    // Use the correct iframe for this page
-    var iframe =
-      document.getElementById("nf3") ||
-      document.querySelector("iframe.embed") ||
-      document.querySelector("iframe");
+  // Pull values from QS / localStorage
+  const qs = new URLSearchParams(location.search);
+  const email = qs.get('email') || localStorage.getItem('cs_email') || '';
+  const first = qs.get('first') || localStorage.getItem('cs_first') || '';
+  const last  = qs.get('last')  || localStorage.getItem('cs_last')  || '';
+  const name  = [first, last].filter(Boolean).join(' ').trim();
 
-    // Carry email/first/last/uid (+combined name) into the NoteForms iframe (from URL or localStorage)
-    (function carryParamsToIframe(){
-      if (!iframe) return;
+  // Build embed URL with prefill
+  const iframe = document.getElementById('nf-embed') || document.querySelector('iframe');
+  if (!iframe) return;
 
-      var qs   = new URLSearchParams(location.search);
-      var pick = function(k){ return qs.get(k) || localStorage.getItem('cs_' + k) || ''; };
+  const base = iframe.dataset.src || iframe.src ||
+    'https://noteforms.com/forms/section-3-loyalty-program-overview-40ya0y?embed=true&theme=dark';
 
-      var carry = new URLSearchParams();
-      ['email','first','last','uid'].forEach(function(k){
-        var v = pick(k);
-        if (v) carry.set(k, v);
-      });
-      if (!carry.get('name')) {
-        var nm = (pick('first') + ' ' + pick('last')).trim();
-        if (nm) carry.set('name', nm);
-      }
+  const url = new URL(base, location.href);
+  if (name)  url.searchParams.set(NAME_ID,  name);
+  if (email) url.searchParams.set(EMAIL_ID, email);
+  url.searchParams.set('_ts', Date.now().toString()); // cache-bust
 
-      if (carry.toString()){
-        var base = iframe.getAttribute('src') || '';
-        iframe.setAttribute('src', base + (base.includes('?') ? '&' : '?') + carry.toString());
-      }
-    })();
+  iframe.src = url.toString();
 
-    function isSuccessPayload(data){
-      if (typeof data === "string") {
-        try { data = JSON.parse(data); } catch(_) {}
-        if (typeof data === "string") {
-          var s = data.toLowerCase();
-          return s.includes("form-success") || s.includes("nf_submit_success")
-              || s.includes("submitted")   || s.includes("success");
-        }
-      }
-      if (data && typeof data === "object") {
-        var ev = (data.event || data.type || data.status || "").toString().toLowerCase();
-        return ["form-success","nf_submit_success","submitted","success"]
-          .some(function(k){ return ev.includes(k); });
-      }
-      return false;
+  // On successful submit → Section 4 (preserve full QS)
+  window.addEventListener('message', (e) => {
+    if (!String(e.origin).includes('noteforms.com')) return;
+    const d = e.data;
+    if (d?.type === 'form-submitted' && d?.form?.slug === FORM_SLUG) {
+      location.href = `${NEXT_PAGE}${location.search}`;
     }
+  });
+})();
+</script>
 
-    window.addEventListener("message", function(e){
-      if (!iframe || e.source !== iframe.contentWindow) return; // only our iframe
-      // Optional strict origin: if (!/^https:\/\/(www\.)?noteforms\.com$/i.test(e.origin)) return;
-
-      if (!isSuccessPayload(e.data)) return;
-
-      // mark section 3 complete
-      var prog = JSON.parse(localStorage.getItem("cs_onboarding_progress") || "{}");
-      prog.s3 = true;
-      localStorage.setItem("cs_onboarding_progress", JSON.stringify(prog));
-
-      // carry any existing query params forward
-      var sameQs = location.search || "";
-      location.replace(NEXT + sameQs);
-    });
-  })();
-  </script>
 </body>
 </html>
