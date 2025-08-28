@@ -94,10 +94,16 @@
 
         <div id="agreeRow">
           <label class="row">
-            <input id="agree" name="cs_agree" type="checkbox" style="width:16px;height:16px">
-            <span>I agree to the <a href="/beta/terms.html" target="_self" style="color:#fff;text-decoration:underline">Terms &amp; Privacy</a>.</span>
+            <input id="agree" name="cs_agree" type="checkbox" style="width:16px;height:16px" disabled>
+            <span>
+               You’ll review and agree to our
+              <a href="/legal/terms.html" target="_blank" rel="noopener" style="color:#fff;text-decoration:underline">Terms</a>
+               &amp;
+              <a href="/legal/privacy.html" target="_blank" rel="noopener" style="color:#fff;text-decoration:underline">Privacy</a>
+              on the next screen.
+            </span>
           </label>
-          <div id="errAgree" class="err">You must agree to continue.</div>
+          <div id="errAgree" class="err" style="display:none"></div>
         </div>
 
         <div class="actions">
@@ -115,24 +121,20 @@
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
   import { getFirestore, doc, getDoc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-  // TODO: 🔧 paste your real Firebase config here
+  // Your config (from your message)
   const firebaseConfig = {
     apiKey: "AIzaSyCcqBQtV3e1hGRMzBa_k5trNRqL0UmlByE",
     authDomain: "conciergesync.firebaseapp.com",
     projectId: "conciergesync",
-    storageBucket: "conciergesync.appspot.com",   // ← corrected
+    storageBucket: "conciergesync.appspot.com",
     messagingSenderId: "882907448780",
     appId: "1:882907448780:web:6e797ce9ad5bb84a9f8969"
   };
 
   // Init Firebase
   let app, db;
-  try {
-    app = initializeApp(firebaseConfig);
-    db  = getFirestore(app);
-  } catch (e) {
-    console.warn("Firebase init error:", e);
-  }
+  try { app = initializeApp(firebaseConfig); db = getFirestore(app); }
+  catch (e) { console.warn("Firebase init error:", e); }
 
   // ——— Gate UI + Firestore integration
   const $ = s => document.querySelector(s);
@@ -147,10 +149,10 @@
   [first,last,email].forEach(i => { try{ i.value=''; }catch{} });
 
   function validEmail(v){ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v); }
-  function hide(el){ el.style.display='none'; }
-  function show(el){ el.style.display='block'; }
+  function hide(el){ if (el) el.style.display='none'; }
+  function show(el){ if (el) el.style.display='block'; }
   function clearErrors(){
-    [first,last,email].forEach(i=>i.setAttribute('aria-invalid','false'));
+    [first,last,email].forEach(i=>i && i.setAttribute('aria-invalid','false'));
     [errFirst,errLast,errEmail,errAgree].forEach(hide);
     statusEl.classList.remove('show');
   }
@@ -161,34 +163,35 @@
     statusEl.classList.toggle('show', on);
   }
 
+  // 👉 We’ll collect the legal agreement on /beta/02-agree.html
   function applyRequireds(){
     const login = mode.value === 'login';
     email.required = true;
     first.required = !login;
     last.required  = !login;
-    agree.required = !login;
+    if (agree) agree.required = false; // agreement handled on 02-agree
   }
 
   function setMode(m){
     mode.value = m;
     const login = m === 'login';
-    tabLogin.classList.toggle('is-active', login);
-    tabReg.classList.toggle('is-active', !login);
-    tabLogin.setAttribute('aria-selected', login);
-    tabReg.setAttribute('aria-selected', !login);
-    nameRow.style.display = login ? 'none' : 'grid';
-    agreeRow.style.display = login ? 'none' : 'block';
+    tabLogin?.classList.toggle('is-active', login);
+    tabReg?.classList.toggle('is-active', !login);
+    tabLogin?.setAttribute('aria-selected', login);
+    tabReg?.setAttribute('aria-selected', !login);
+    if (nameRow) nameRow.style.display = login ? 'none' : 'grid';
+    if (agreeRow) agreeRow.style.display = 'none'; // hide here; handle on 02-agree
     submitBtn.textContent = login ? 'Log in' : 'Create account';
-    [first,last].forEach(i => i.value='');
+    [first,last].forEach(i => i && (i.value=''));
     clearErrors();
     applyRequireds();
   }
-  tabLogin.addEventListener('click', ()=> setMode('login'));
-  tabReg.addEventListener('click',   ()=> setMode('register'));
+  tabLogin?.addEventListener('click', ()=> setMode('login'));
+  tabReg?.addEventListener('click',   ()=> setMode('register'));
   applyRequireds(); // init
 
   ['input','change'].forEach(evt=>{
-    [first,last,email,agree].forEach(el => el.addEventListener(evt, clearErrors));
+    [first,last,email,agree].forEach(el => el && el.addEventListener(evt, clearErrors));
   });
 
   function goConsole(){
@@ -196,7 +199,12 @@
       localStorage.setItem('cs_authed','1');
       sessionStorage.setItem('cs_authed','1');
     }catch{}
-    location.replace('/beta/01-index.html?enter=1');
+    location.replace('/beta/01-index.html?enter=1' + (location.search || ''));
+  }
+  function goAgree(emailStr){
+    const qs = new URLSearchParams(location.search);
+    qs.set('email', emailStr.toLowerCase().trim());
+    location.replace('/beta/02-agree.html?' + qs.toString());
   }
 
   async function handleLogin(emailStr){
@@ -207,15 +215,21 @@
     try{
       const ref = doc(db, 'beta_users', key);
       const snap = await getDoc(ref);
-      if (snap.exists()){
-        setWorking(false);
-        goConsole();
-      } else {
-        setWorking(false);
+      setWorking(false);
+
+      if (!snap.exists()){
         show(errEmail);
         errEmail.textContent = 'We couldn’t find that email. Please register first.';
         email.setAttribute('aria-invalid','true');
         email.focus();
+        return;
+      }
+
+      const data = snap.data() || {};
+      if (data.agreed === true){
+        goConsole();
+      } else {
+        goAgree(key);
       }
     }catch(e){
       console.warn(e);
@@ -237,13 +251,13 @@
         first: firstStr.trim(),
         last:  lastStr.trim(),
         email: key,
-        agreed: !!agree.checked,
+        agreed: false,                         // ← agreement will be captured on 02-agree
         updatedAt: serverTimestamp(),
         createdAt: serverTimestamp()
       }, { merge: true });
 
       setWorking(false);
-      goConsole();
+      goAgree(key);                            // ← go collect agreement
     }catch(e){
       console.warn(e);
       setWorking(false);
@@ -263,7 +277,7 @@
     if(mode.value !== 'login'){
       if(!first.value.trim()){ ok=false; show(errFirst); first.setAttribute('aria-invalid','true'); focusEl = focusEl || first; }
       if(!last.value.trim()){  ok=false; show(errLast);  last.setAttribute('aria-invalid','true');  focusEl = focusEl || last; }
-      if(!agree.checked){ ok=false; show(errAgree); focusEl = focusEl || agree; }
+      // agree checkbox no longer required here
     }
     if(!ok && focusEl){ try{ focusEl.focus(); }catch{} }
     return ok;
@@ -281,5 +295,6 @@
     }
   });
 </script>
+
 </body>
 </html>
