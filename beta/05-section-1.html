@@ -83,70 +83,63 @@
       loading="eager">
     </iframe>
   </main>
+<script>
+(function () {
+  var NEXT = "/beta/06-section-2.html";
 
-  <script>
-  (function () {
-    var NEXT = "/beta/06-section-2.html";
+  // Find the iframe
+  var iframe =
+    document.getElementById("nf1") ||
+    document.querySelector("iframe.embed") ||
+    document.querySelector("iframe");
 
-    // Grab the iframe (id first, then sensible fallbacks)
-    var iframe =
-      document.getElementById("nf1") ||
-      document.querySelector("iframe.embed") ||
-      document.querySelector("iframe");
+  // --- PATCH: send email + computed name + keep first/last/uid
+  (function carryParamsToIframe(){
+    if (!iframe) return;
 
-    // --- Append email/first/last/name/uid from URL (or localStorage) to the NoteForms iframe
-    (function () {
-      if (!iframe) return;
+    const qs   = new URLSearchParams(location.search);
+    const get  = (k, d='') => (qs.get(k) || localStorage.getItem('cs_'+k) || d).trim();
 
-      var qs   = new URLSearchParams(location.search);
-      var pick = function (k) { return qs.get(k) || localStorage.getItem('cs_' + k) || ''; };
+    const first = get('first');
+    const last  = get('last');
+    const email = get('email').toLowerCase();
 
-      var carry = new URLSearchParams();
-      ['email','first','last','uid'].forEach(function(k){
-        var v = pick(k);
-        if (v) carry.set(k, v);
-      });
+    const out = new URLSearchParams();
+    if (email) out.set('email', email);
+    if (first || last) out.set('name', `${first} ${last}`.trim());   // <-- NoteForms will prefill this
+    ['first','last','uid'].forEach(k => { const v = get(k); if (v) out.set(k, v); });
 
-      // Provide a single "name" param (some forms use one name field)
-      if (!carry.get('name')) {
-        var nm = (pick('first') + ' ' + pick('last')).trim();
-        if (nm) carry.set('name', nm);
-      }
-
-      if (carry.toString()) {
-        var base = iframe.getAttribute('src') || '';
-        iframe.setAttribute('src', base + (base.includes('?') ? '&' : '?') + carry.toString());
-      }
-    })();
-
-    // --- Detect NoteForms "submit success" via postMessage and move to Section 2
-    function isSuccessPayload(data){
-      if (typeof data === "string") {
-        try { data = JSON.parse(data); } catch(_) {}
-        if (typeof data === "string") {
-          var s = data.toLowerCase();
-          return s.includes("form-success") || s.includes("nf_submit_success")
-              || s.includes("submitted")   || s.includes("success");
-        }
-      }
-      if (data && typeof data === "object") {
-        var ev = (data.event || data.type || data.status || "").toString().toLowerCase();
-        return ["form-success","nf_submit_success","submitted","success"]
-          .some(function(k){ return ev.includes(k); });
-      }
-      return false;
+    if (out.toString()){
+      const base = iframe.getAttribute('src') || '';
+      iframe.setAttribute('src', base + (base.includes('?') ? '&' : '?') + out.toString());
     }
-
-    window.addEventListener("message", function(e){
-      if (!iframe || e.source !== iframe.contentWindow) return; // only our iframe
-      // Optional strict origin:
-      // if (!/^https:\/\/(www\.)?noteforms\.com$/i.test(e.origin)) return;
-      if (isSuccessPayload(e.data)) {
-        var sameQs = location.search || "";
-        window.location.replace(NEXT + sameQs);
-      }
-    });
   })();
-  </script>
+
+  function isSuccessPayload(data){
+    if (typeof data === "string") {
+      try { data = JSON.parse(data); } catch(_) {}
+      if (typeof data === "string") {
+        const s = data.toLowerCase();
+        return s.includes("form-success")||s.includes("nf_submit_success")||s.includes("submitted")||s.includes("success");
+      }
+    }
+    if (data && typeof data === "object") {
+      const ev = (data.event||data.type||data.status||"").toString().toLowerCase();
+      return ["form-success","nf_submit_success","submitted","success"].some(k=>ev.includes(k));
+    }
+    return false;
+  }
+
+  window.addEventListener("message", function(e){
+    if (!iframe || e.source !== iframe.contentWindow) return;
+    if (isSuccessPayload(e.data)){
+      const carry = location.search || "";
+      location.replace(NEXT + carry);
+    }
+  });
+})();
+</script>
+
+ 
 </body>
 </html>
