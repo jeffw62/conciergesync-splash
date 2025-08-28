@@ -25,7 +25,6 @@
       position:fixed; inset:0; z-index:-2;
       background:url('/beta/assets/CS_Logo_Premium.png') center/500px repeat;
       opacity:.75; pointer-events:none;
-      /* subtle pop so it matches your brighter pages */
       filter:contrast(1.06) saturate(1.05) brightness(1.03);
     }
 
@@ -89,7 +88,7 @@
     <h1 id="page-title" class="title">Before We Begin…</h1>
     <p class="intro">
       Please review the Terms &amp; Conditions and Privacy Policy below.
-      Scroll to the bottom to unlock <strong>“I agree — continue”</strong>.
+      Scroll to the bottom to unlock <strong>“I Agree — Continue”</strong>.
     </p>
 
     <section id="termsBox" class="scroll-box" tabindex="0" aria-label="Terms and Privacy scroll box">
@@ -121,7 +120,6 @@
       </ul>
       <h3>Your Rights</h3>
       <p>To access, modify, or delete your data, email <strong>privacy@conciergesync.ai</strong>. We do not sell your data.</p>
-      <p style="margin-top:24px;opacity:.8"><em>Scroll to the very bottom to enable “I agree — continue”.</em></p>
     </section>
 
     <div class="actions">
@@ -136,12 +134,90 @@
     <div class="sub">Solving what matters — Beautifully</div>
   </main>
 
-  <!-- Single modern script -->
+  <!-- UI logic (plain script: runs even if module imports fail) -->
+  <script>
+    (function(){
+      const qs = new URLSearchParams(location.search);
+      let email = (qs.get("email") || sessionStorage.getItem("cs_email") || localStorage.getItem("cs_email") || "").toLowerCase().trim();
+      if (email) { try { sessionStorage.setItem("cs_email", email); localStorage.setItem("cs_email", email); } catch(e){} }
+
+      const NEXT = "/beta/03-intake-start.html";
+
+      const box        = document.getElementById("termsBox");
+      const agreeBtn   = document.getElementById("agreeBtn");
+      const declineBtn = document.getElementById("declineBtn");
+      const missingEl  = document.getElementById("missingEmail");
+
+      // --- Enable "I agree" only after reaching the bottom of #termsBox ---
+      function enableAgree(){ agreeBtn.disabled = false; agreeBtn.removeAttribute("aria-disabled"); }
+      function disableAgree(){ agreeBtn.disabled = true;  agreeBtn.setAttribute("aria-disabled","true"); }
+
+      // start disabled; also require known email
+      disableAgree();
+
+      // Sentinel approach + scroll math fallback + small timeout safety
+      const sentinel = document.createElement("div");
+      sentinel.setAttribute("aria-hidden","true");
+      sentinel.style.height = "1px";
+      box.appendChild(sentinel);
+
+      let io;
+      if ('IntersectionObserver' in window) {
+        io = new IntersectionObserver(
+          (entries) => {
+            const vis = entries.some(e => e.isIntersecting);
+            if (vis && email) enableAgree(); else disableAgree();
+          },
+          { root: box, threshold: [0, 0.5, 1] }
+        );
+        io.observe(sentinel);
+      }
+
+      function checkBottomFallback(){
+        const atBottom = Math.ceil(box.scrollTop + box.clientHeight) >= (box.scrollHeight - 1);
+        if (atBottom && email) enableAgree(); else disableAgree();
+      }
+      box.addEventListener("scroll", checkBottomFallback);
+      window.addEventListener("load", () => {
+        if (!email) missingEl.style.display = "block";
+        checkBottomFallback();
+        // If content is short / no scroll, enable after a brief delay
+        setTimeout(checkBottomFallback, 100);
+      });
+
+      // Agree: call Firestore write if available, then continue
+      agreeBtn.addEventListener("click", async (e)=>{
+        if (agreeBtn.disabled) { e.preventDefault(); return; }
+
+        try { localStorage.setItem("cs_agreed","1"); } catch(e){}
+        try {
+          if (typeof window.csWriteConsent === "function") {
+            await window.csWriteConsent(email);
+          } else {
+            console.warn("Consent writer not ready; proceeding without server record.");
+          }
+        } catch(err) {
+          console.warn("Consent write failed; proceeding anyway.", err);
+        }
+        location.replace(NEXT + (location.search || ""));
+      });
+
+      // Decline → TCP-Decline.html (carry params)
+      declineBtn.addEventListener("click", (e)=>{
+        e.preventDefault();
+        const out = new URLSearchParams(location.search);
+        if (email && !out.get("email")) out.set("email", email);
+        out.set("declined","1");
+        location.replace("/beta/TCP-Decline.html?" + out.toString());
+      });
+    })();
+  </script>
+
+  <!-- Firestore write (module). If this fails to load, UI still works. -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
     import { getFirestore, doc, setDoc, getDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-    // Firebase project
     const firebaseConfig = {
       apiKey: "AIzaSyCcqBQtV3e1hGRMzBa_k5trNRqL0UmlByE",
       authDomain: "conciergesync.firebaseapp.com",
@@ -153,103 +229,22 @@
     const app = initializeApp(firebaseConfig);
     const db  = getFirestore(app);
 
-    // Robust email lookup: ?email → session → local
-    const qs = new URLSearchParams(location.search);
-    let email = (qs.get("email") || sessionStorage.getItem("cs_email") || localStorage.getItem("cs_email") || "").toLowerCase().trim();
-    if (email) {
-      try {
-        sessionStorage.setItem("cs_email", email);
-        localStorage.setItem("cs_email", email);
-      } catch(e){}
-    }
-
     const TERMS_VERSION = "2025-08-28";
-    const NEXT = "/beta/03-intake-start.html";
 
-    const box        = document.getElementById("termsBox");
-    const agreeBtn   = document.getElementById("agreeBtn");
-    const declineBtn = document.getElementById("declineBtn");
-    const missingEl  = document.getElementById("missingEmail");
-
-    // --- Enable "I agree" only after reaching the bottom of #termsBox ---
-    agreeBtn.disabled = true;
-    agreeBtn.setAttribute("aria-disabled","true");
-
-    function enableAgree(){
-      agreeBtn.disabled = false;
-      agreeBtn.removeAttribute("aria-disabled");
-    }
-    function disableAgree(){
-      agreeBtn.disabled = true;
-      agreeBtn.setAttribute("aria-disabled","true");
-    }
-
-    // Sentinel at the very end of the scroll area
-    const sentinel = document.createElement("div");
-    sentinel.setAttribute("aria-hidden","true");
-    sentinel.style.height = "1px";
-    box.appendChild(sentinel);
-
-    // Primary: IntersectionObserver (robust across zoom/devices)
-    const io = new IntersectionObserver(
-      (entries) => {
-        const vis = entries.some(e => e.isIntersecting && e.intersectionRatio >= 0.98);
-        if (vis && email) enableAgree(); else disableAgree();
-      },
-      { root: box, threshold: [0.98] }
-    );
-    io.observe(sentinel);
-
-    // Fallback for older browsers
-    function checkBottomFallback(){
-      const atBottom = Math.ceil(box.scrollTop + box.clientHeight) >= (box.scrollHeight - 1);
-      if (atBottom && email) enableAgree(); else disableAgree();
-    }
-    box.addEventListener("scroll", checkBottomFallback);
-    window.addEventListener("load", () => {
-      if (!email) missingEl.style.display = "block";
-      checkBottomFallback();
-    });
-
-    // Write consent to Firestore, then continue
-    async function recordConsentAndContinue(){
-      if (!email) {
-        alert("We couldn’t confirm your email. Please return to registration.");
-        return;
-      }
-      try {
-        const ref  = doc(db, "beta_users", email);
-        const snap = await getDoc(ref);
-        const base = snap.exists() ? {} : { email, createdAt: serverTimestamp() };
-        await setDoc(ref, {
-          ...base,
-          agreed: true,
-          agreedAt: serverTimestamp(),
-          termsVersion: TERMS_VERSION,
-          updatedAt: serverTimestamp()
-        }, { merge: true });
-
-        try { localStorage.setItem("cs_agreed","1"); } catch(e){}
-        location.replace(NEXT + (location.search || ""));
-      } catch (e) {
-        console.error("Consent save failed:", e);
-        alert("Sorry — couldn’t save your agreement. Please try again.");
-      }
-    }
-
-    agreeBtn.addEventListener("click", (e)=>{
-      if (agreeBtn.disabled) { e.preventDefault(); return; }
-      recordConsentAndContinue();
-    });
-
-    // Decline → TCP-Decline.html (carry params if present)
-    declineBtn.addEventListener("click", (e)=>{
-      e.preventDefault();
-      const out = new URLSearchParams(location.search);
-      if (email && !out.get("email")) out.set("email", email);
-      out.set("declined","1");
-      location.replace("/beta/TCP-Decline.html?" + out.toString());
-    });
+    // Expose a tiny writer the plain script can call
+    window.csWriteConsent = async function(email){
+      if (!email) throw new Error("Missing email");
+      const ref  = doc(db, "beta_users", email);
+      const snap = await getDoc(ref);
+      const base = snap.exists() ? {} : { email, createdAt: serverTimestamp() };
+      await setDoc(ref, {
+        ...base,
+        agreed: true,
+        agreedAt: serverTimestamp(),
+        termsVersion: TERMS_VERSION,
+        updatedAt: serverTimestamp()
+      }, { merge: true });
+    };
   </script>
 </body>
 </html>
