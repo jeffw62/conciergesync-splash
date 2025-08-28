@@ -4,6 +4,22 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <title>ConciergeSync™ Console</title>
+<script>
+(function () {
+  try {
+    var isAuthed =
+      sessionStorage.getItem('cs_authed') === '1' ||
+      localStorage.getItem('cs_authed') === '1' ||
+      /(?:^|;\s*)cs_auth=1(?:;|$)/.test(document.cookie);
+
+    if (!isAuthed) {
+      location.replace('/beta/auth.html?mode=login');
+    }
+  } catch (e) {
+    location.replace('/beta/auth.html?mode=login');
+  }
+})();
+</script>
 
 <style>
   :root{
@@ -413,3 +429,4 @@
 </script>
 </body>
 </html>
+
