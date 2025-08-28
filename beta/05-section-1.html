@@ -140,6 +140,47 @@
 })();
 </script>
 
- 
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  // 1) Pull values from query params (fallback to localStorage)
+  const qs = new URLSearchParams(location.search);
+  const email = qs.get('email') || localStorage.getItem('cs_email') || '';
+  const first = qs.get('first') || localStorage.getItem('cs_first') || '';
+  const last  = qs.get('last')  || localStorage.getItem('cs_last')  || '';
+  const uid   = qs.get('uid')   || localStorage.getItem('cs_uid')   || '';
+  const name  = [first, last].filter(Boolean).join(' ').trim();
+
+  // 2) Find the NoteForms iframe
+  const iframe = document.getElementById('nf-embed') || document.querySelector('iframe');
+  if (!iframe) { console.warn('No NoteForms iframe found.'); return; }
+
+  // 3) Take the existing iframe src as the base (so you don't have to hardcode it)
+  const rawSrc = iframe.getAttribute('src') || '';
+  const [base, q] = rawSrc.split('?', 2);
+  const params = new URLSearchParams(q || '');
+
+  // 4) Be liberal with key names so we hit whatever NF/Notion mapping you used
+  const put = (keys, value) => keys.forEach(k => value ? params.set(k, value) : params.delete(k));
+
+  // Common aliases for NoteForms/Notion
+  put(['title','name','Name','full_name','fullName','Full Name'], name);
+  put(['email','Email','e-mail','Email Address','email_address','emailAddress'], email);
+  put(['uid','UID','Uid','cs_uid'], uid);
+  put(['first','First','first_name','firstName','given_name'], first);
+  put(['last','Last','last_name','lastName','family_name'], last);
+
+  // 5) Apply the new src
+  const newSrc = base + '?' + params.toString();
+  iframe.src = newSrc;
+
+  // 6) Debug: print the exact URL we’re sending to NF (and show it on-page)
+  console.log('[NF EMBED SRC]', newSrc);
+  const dbg = document.createElement('pre');
+  dbg.textContent = 'NF src → ' + newSrc;
+  dbg.style.cssText = 'font:12px/1.4 monospace;background:#0b0f14;color:#9fe;padding:8px;white-space:pre-wrap;word-break:break-all;margin:0';
+  document.body.prepend(dbg);
+});
+</script>
+
 </body>
 </html>
