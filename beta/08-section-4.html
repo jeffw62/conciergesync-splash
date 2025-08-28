@@ -75,54 +75,71 @@
     </div>
   </main>
 
- <script>
-(function(){
-  // Go to the thank-you page after successful submit
-  const NEXT   = "/beta/09-onboarding-thank-you.html";
-  const iframe = document.getElementById("nf4");
+  <script>
+  (function(){
+    var NEXT   = "/beta/09-onboarding-thank-you.html";
 
-  // Carry email/first/last/uid into the NoteForms iframe (from URL or localStorage)
-  (function carryParamsToIframe(){
-    if (!iframe) return;
-    const qs   = new URLSearchParams(location.search);
-    const pick = (k) => qs.get(k) || localStorage.getItem('cs_' + k) || '';
+    // correct iframe handle
+    var iframe =
+      document.getElementById("nf4") ||
+      document.querySelector("iframe.embed") ||
+      document.querySelector("iframe");
 
-    const carry = new URLSearchParams();
-    ['email','first','last','uid'].forEach(k => {
-      const v = pick(k);
-      if (v) carry.set(k, v);
-    });
+    // Carry email/first/last/uid (+combined name) into the NoteForms iframe
+    (function carryParamsToIframe(){
+      if (!iframe) return;
+      var qs   = new URLSearchParams(location.search);
+      var pick = function(k){ return qs.get(k) || localStorage.getItem('cs_' + k) || ''; };
 
-    if (carry.toString()){
-      const base = iframe.getAttribute('src') || '';
-      iframe.setAttribute('src', base + (base.includes('?') ? '&' : '?') + carry.toString());
+      var carry = new URLSearchParams();
+      ['email','first','last','uid'].forEach(function(k){
+        var v = pick(k);
+        if (v) carry.set(k, v);
+      });
+      if (!carry.get('name')) {
+        var nm = (pick('first') + ' ' + pick('last')).trim();
+        if (nm) carry.set('name', nm);
+      }
+
+      if (carry.toString()){
+        var base = iframe.getAttribute('src') || '';
+        iframe.setAttribute('src', base + (base.includes('?') ? '&' : '?') + carry.toString());
+      }
+    })();
+
+    function isSuccessPayload(data){
+      if (typeof data === "string") {
+        try { data = JSON.parse(data); } catch(_) {}
+        if (typeof data === "string") {
+          var s = data.toLowerCase();
+          return s.includes("form-success") || s.includes("nf_submit_success")
+              || s.includes("submitted")   || s.includes("success");
+        }
+      }
+      if (data && typeof data === "object") {
+        var ev = (data.event || data.type || data.status || "").toString().toLowerCase();
+        return ["form-success","nf_submit_success","submitted","success"]
+          .some(function(k){ return ev.includes(k); });
+      }
+      return false;
     }
+
+    window.addEventListener("message", function(e){
+      if (!iframe || e.source !== iframe.contentWindow) return; // only our iframe
+      // Optional strict origin: if (!/^https:\/\/(www\.)?noteforms\.com$/i.test(e.origin)) return;
+
+      if (!isSuccessPayload(e.data)) return;
+
+      // mark section 4 complete
+      var prog = JSON.parse(localStorage.getItem("cs_onboarding_progress") || "{}");
+      prog.s4 = true;
+      localStorage.setItem("cs_onboarding_progress", JSON.stringify(prog));
+
+      // keep any query params (email/uid/etc.) when routing forward
+      var sameQs = location.search || "";
+      location.replace(NEXT + sameQs);
+    });
   })();
-
-  function isSuccessPayload(data){
-    try { if (typeof data === "string") data = JSON.parse(data); } catch(_) {}
-    const s = (data && (data.event || data.type || data.status || "")).toLowerCase();
-    return s.includes("form-success") ||
-           s.includes("nf_submit_success") ||
-           s.includes("success") ||
-           s.includes("submitted");
-  }
-
-  window.addEventListener("message", function(e){
-    if (!iframe || e.source !== iframe.contentWindow) return; // only our iframe
-    if (!isSuccessPayload(e.data)) return;
-
-    // mark section 4 complete
-    const prog = JSON.parse(localStorage.getItem("cs_onboarding_progress") || "{}");
-    prog.s4 = true;
-    localStorage.setItem("cs_onboarding_progress", JSON.stringify(prog));
-
-    // keep any query params (email/uid/etc.) when routing forward
-    const qs = location.search || "";
-    location.replace(NEXT + qs);
-  });
-})();
-</script>
-
+  </script>
 </body>
 </html>
