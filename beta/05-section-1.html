@@ -73,51 +73,52 @@
       <div class="hint">Takes ~2 minutes</div>
     </header>
 
-    <!-- Replace with your real NoteForms URL -->
-  <!-- IFRAME -->
-<!-- Clean embed base (no prefill here) -->
-<iframe
-  id="nf-embed"
-  data-src="https://noteforms.com/forms/beta-user-tracker-conciergesync-b4yxaf?embed=true&theme=dark"
-  style="width:100%;height:90vh;border:0;"
-></iframe>
+    <!-- Base NoteForms embed (src set by script) -->
+    <iframe
+      id="nf-embed"
+      data-src="https://noteforms.com/forms/beta-user-tracker-conciergesync-b4yxaf?embed=true&theme=dark"
+      style="width:100%;height:90vh;border:0;"
+      allow="clipboard-write *">
+    </iframe>
+  </main>
 
-<script>
-(() => {
-  const qs = new URLSearchParams(location.search);
-  const email = qs.get('email') || localStorage.getItem('cs_email') || '';
-  const first = qs.get('first') || localStorage.getItem('cs_first') || '';
-  const last  = qs.get('last')  || localStorage.getItem('cs_last')  || '';
-  const name  = [first, last].filter(Boolean).join(' ').trim();
+  <script>
+  (() => {
+    // --- Pull values from query/localStorage ---
+    const qs = new URLSearchParams(location.search);
+    const email = qs.get('email') || localStorage.getItem('cs_email') || '';
+    const first = qs.get('first') || localStorage.getItem('cs_first') || '';
+    const last  = qs.get('last')  || localStorage.getItem('cs_last')  || '';
+    const name  = [first, last].filter(Boolean).join(' ').trim();
 
-  const iframe = document.getElementById('nf-embed');
-  const url = new URL(iframe.dataset.src, location.href);
+    // --- Section 1 FIELD IDs (from NF prefill) ---
+    const NAME_ID  = 'cf891a43-1e3c-4403-886c-3a7550291a22'; // Name (First/Last)
+    const EMAIL_ID = 'aafd8404-ef8a-4b17-ab3d-15e2357e93a5'; // Client Email
 
-  // ✅ Only the official keys from NF's prefill tool:
-  if (name)  url.searchParams.set('title', name);
-  if (email) url.searchParams.set('hWDd', email);
+    // --- Build embed URL with prefill ---
+    const iframe = document.getElementById('nf-embed');
+    const url    = new URL(iframe.dataset.src, location.href);
+    if (name)  url.searchParams.set(NAME_ID,  name);
+    if (email) url.searchParams.set(EMAIL_ID, email);
+    url.searchParams.set('_ts', Date.now().toString()); // cache-bust
 
-  iframe.src = url.toString();
+    iframe.src = url.toString();
 
-  // Debug (remove later)
-  const dbg = document.createElement('pre');
-  dbg.textContent = 'NF src → ' + iframe.src;
-  dbg.style.cssText = 'font:12px/1.4 monospace;background:#0b0f14;color:#9fe;padding:8px;white-space:pre-wrap;word-break:break-all;margin:0';
-  document.body.prepend(dbg);
+    // Debug (remove when confirmed)
+    const dbg = document.createElement('pre');
+    dbg.textContent = 'NF src → ' + iframe.src;
+    dbg.style.cssText = 'font:12px/1.4 monospace;background:#0b0f14;color:#9fe;padding:8px;white-space:pre-wrap;word-break:break-all;margin:0';
+    document.body.prepend(dbg);
 
-  // On submit → Section 2 (preserving the outer page QS)
-  const FORM_SLUG = 'beta-user-tracker-conciergesync-b4yxaf';
-  window.addEventListener('message', (e) => {
-    if (!String(e.origin).includes('noteforms.com')) return;
-    const d = e.data;
-    if (d?.type === 'form-submitted' && d?.form?.slug === FORM_SLUG) {
-      const keepQS = location.search.replace(/^\?/, '');
-      location.href = `06-section-2.html?${keepQS}`;
-    }
-  });
-})();
-</script>
-
-
+    // --- Success → Section 2 (preserve QS) ---
+    window.addEventListener('message', (e) => {
+      if (!String(e.origin).includes('noteforms.com')) return;
+      const d = e.data;
+      if (d?.type === 'form-submitted') {
+        location.href = `06-section-2.html${location.search}`;
+      }
+    });
+  })();
+  </script>
 </body>
 </html>
