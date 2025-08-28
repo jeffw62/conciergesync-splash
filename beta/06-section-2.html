@@ -35,37 +35,39 @@
         linear-gradient(180deg, rgba(255,255,255,.02), rgba(0,0,0,.08));
     }
 
-    /* Glass tile (fixed width = 500px, responsive down) */
+    /* Card sized to viewport (matches 3/4) */
     .card{
-      width:min(500px, 95vw);
+      width:min(560px, 96vw);
+      height: calc(100vh - 48px);
+      max-height: 980px;
       border-radius:20px;
       background:var(--glass-bg);
       backdrop-filter:var(--glass-blur);
       box-shadow:0 18px 48px rgba(0,0,0,.45), inset 0 0 0 1px var(--glass-brd);
       padding:18px 18px 22px;
+      display:flex;
+      flex-direction:column;
+      overflow:hidden;
     }
-    h1{
-      font-size:clamp(18px,2.6vw,22px);
-      margin:0 0 6px;
-    }
-    .sub{
-      color:var(--muted); margin:0 0 12px; font-size:14px;
-    }
+    h1{font-size:clamp(18px,2.6vw,22px); margin:0 0 6px;}
+    .sub{color:var(--muted); margin:0 0 12px; font-size:14px;}
 
-    /* NoteForms embed */
-    iframe.embed{
+    /* NF iframe fills remaining space */
+    #nf-embed{
       display:block; width:100%;
-      min-height:78vh; border:0; border-radius:14px;
+      flex:1 1 auto;
+      min-height:0;
+      border:0; border-radius:14px;
       background:transparent !important;
     }
 
-    .footer{
-      margin-top:10px; text-align:center; font-size:12px; color:#a7b4c9;
-    }
+    .footer{margin-top:10px; text-align:center; font-size:12px; color:#a7b4c9;}
     .footer a{ color:#dbe3f4; text-decoration:none }
     .footer a:hover{ text-decoration:underline }
+
     @media (max-width:480px){
-      iframe.embed{ min-height:84vh }
+      body{ padding:16px; }
+      .card{ height: calc(100vh - 32px); }
     }
   </style>
 </head>
@@ -76,12 +78,11 @@
     <h1 id="hdr">Section 2 — Authorized User & Credit Cards</h1>
     <p class="sub">Add your authorized users and cards so we can sync and personalize recommendations.</p>
 
-    <!-- NoteForms (Dark + Transparent background on NF side) -->
+    <!-- Single iframe; src set by script below -->
     <iframe
-      id="nf2"
-      class="embed"
-      title="ConciergeSync – Section 2"
-      src="https://noteforms.com/forms/section-2-authorized-user-card-setup-conciergesync-xnkw5k">
+      id="nf-embed"
+      data-src="https://noteforms.com/forms/section-2-authorized-user-card-setup-conciergesync-xnkw5k?embed=true&theme=dark"
+      allow="clipboard-write">
     </iframe>
 
     <div class="footer">
@@ -91,49 +92,40 @@
 
   <script>
   (() => {
-  // Section 2 — field IDs from NoteForms prefill
-  const NAME_ID  = '90fae08a-5750-47e6-9080-f8ac7c501f39';
-  const EMAIL_ID = '0146e3fa-ca0c-4dd0-9bed-cf4142693f79';
-  const FORM_SLUG = 'section-2-authorized-user-card-setup-conciergesync-xnkw5k';
-  const NEXT_PAGE = '07-section-3.html';
+    // Section 2 — field IDs from NoteForms prefill
+    const NAME_ID  = '90fae08a-5750-47e6-9080-f8ac7c501f39';
+    const EMAIL_ID = '0146e3fa-ca0c-4dd0-9bed-cf4142693f79';
+    const FORM_SLUG = 'section-2-authorized-user-card-setup-conciergesync-xnkw5k';
+    const NEXT_PAGE = '07-section-3.html';
 
-  // Pull values from QS / localStorage
-  const qs = new URLSearchParams(location.search);
-  const email = qs.get('email') || localStorage.getItem('cs_email') || '';
-  const first = qs.get('first') || localStorage.getItem('cs_first') || '';
-  const last  = qs.get('last')  || localStorage.getItem('cs_last')  || '';
-  const name  = [first, last].filter(Boolean).join(' ').trim();
+    // Pull values from QS / localStorage
+    const qs = new URLSearchParams(location.search);
+    const email = qs.get('email') || localStorage.getItem('cs_email') || '';
+    const first = qs.get('first') || localStorage.getItem('cs_first') || '';
+    const last  = qs.get('last')  || localStorage.getItem('cs_last')  || '';
+    const name  = [first, last].filter(Boolean).join(' ').trim();
 
-  // Build embed URL with prefill
-  const iframe = document.getElementById('nf-embed') || document.querySelector('iframe');
-  if (!iframe) return;
+    // Build embed URL with prefill
+    const iframe = document.getElementById('nf-embed');
+    if (!iframe) return;
 
-  const base = iframe.dataset.src || iframe.src ||
-    'https://noteforms.com/forms/section-2-authorized-user-card-setup-conciergesync-xnkw5k?embed=true&theme=dark';
+    const base = iframe.dataset.src;
+    const url  = new URL(base, location.href);
+    if (name)  url.searchParams.set(NAME_ID,  name);
+    if (email) url.searchParams.set(EMAIL_ID, email);
+    url.searchParams.set('_ts', Date.now().toString()); // cache-bust
+    iframe.src = url.toString();
 
-  const url = new URL(base, location.href);
-  if (name)  url.searchParams.set(NAME_ID,  name);
-  if (email) url.searchParams.set(EMAIL_ID, email);
-  url.searchParams.set('_ts', Date.now().toString()); // cache-bust
-
-  iframe.src = url.toString();
-
-  // On successful submit → Section 3 (preserve full QS)
-  window.addEventListener('message', (e) => {
-    if (!String(e.origin).includes('noteforms.com')) return;
-    const d = e.data;
-    if (d?.type === 'form-submitted' && d?.form?.slug === FORM_SLUG) {
-      location.href = `${NEXT_PAGE}${location.search}`;
-    }
-  });
-})();
-</script>
-<iframe id="nf-embed"
-  data-form-slug="section-2-authorized-user-card-setup-conciergesync-xnkw5k"
-  data-next="07-section-3.html"
-  data-src="https://noteforms.com/forms/section-2-authorized-user-card-setup-conciergesync-xnkw5k?embed=true&theme=dark">
-</iframe>
-<script src="/beta/assets/intake.js?v=1"></script>
+    // On successful submit → Section 3 (preserve QS)
+    window.addEventListener('message', (e) => {
+      if (!String(e.origin).includes('noteforms.com')) return;
+      const d = e.data;
+      if (d?.type === 'form-submitted' && d?.form?.slug === FORM_SLUG) {
+        location.href = `${NEXT_PAGE}${location.search}`;
+      }
+    });
+  })();
+  </script>
 
 </body>
 </html>
