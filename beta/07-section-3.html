@@ -20,13 +20,11 @@
       display:flex; align-items:center; justify-content:center;
       padding:24px; position:relative; overflow:auto;
     }
-    /* BIG gold logo background */
     .cs-bg{
       position:fixed; inset:0; z-index:-2;
       background:url('/beta/assets/CS_Logo_Premium.png') center/500px repeat;
       opacity:.75; pointer-events:none;
     }
-    /* vignette */
     body::after{
       content:""; position:fixed; inset:0; z-index:-1; pointer-events:none;
       background:
@@ -34,29 +32,28 @@
         linear-gradient(180deg, rgba(255,255,255,.02), rgba(0,0,0,.08));
     }
 
-    /* Glass tile */
+    /* Card sized to viewport */
     .card{
       width:min(560px, 96vw);
-      height: calc(100vh - 48px);         /* definite height -> iframe can flex */
-      max-height: 980px;                   /* soft upper cap for huge screens */
+      height: calc(100vh - 48px);
+      max-height: 980px;
       border-radius:20px;
       background:var(--glass-bg);
       backdrop-filter:var(--glass-blur);
       box-shadow:0 18px 48px rgba(0,0,0,.45), inset 0 0 0 1px var(--glass-brd);
       padding:18px 18px 22px;
-
-      display:flex;                        /* layout */
+      display:flex;
       flex-direction:column;
-      overflow:hidden;                     /* keep internals tidy */
+      overflow:hidden;
     }
     h1{font-size:clamp(18px,2.6vw,22px); margin:0 0 6px;}
     .sub{color:var(--muted); margin:0 0 12px; font-size:14px;}
 
-    /* NoteForms embed fills remaining space */
+    /* NF iframe fills remaining space */
     #nf-embed{
       display:block; width:100%;
       flex:1 1 auto;
-      min-height:0;                        /* critical so it can shrink in flex */
+      min-height:0;
       border:0; border-radius:14px;
       background:transparent !important;
     }
@@ -65,7 +62,6 @@
     .footer a{ color:#dbe3f4; text-decoration:none }
     .footer a:hover{ text-decoration:underline }
 
-    /* Mobile: smaller padding → full-height card */
     @media (max-width:480px){
       body{ padding:16px; }
       .card{ height: calc(100vh - 32px); }
@@ -79,7 +75,7 @@
     <h1 id="hdr">Section 3 — Loyalty Program Overview</h1>
     <p class="sub">Tell us how you currently earn and use points so we can tune your strategy.</p>
 
-    <!-- PUBLIC NoteForms URL for Section 3 (src set by script) -->
+    <!-- Single iframe; src set by the inline script -->
     <iframe
       id="nf-embed"
       data-src="https://noteforms.com/forms/section-3-loyalty-program-overview-40ya0y?embed=true&theme=dark"
@@ -93,13 +89,13 @@
 
   <script>
   (() => {
-    // Section 3 — field IDs from NoteForms prefill
+    // Field IDs from NoteForms prefill (Section 3)
     const NAME_ID  = '6fcce27d-c4ee-455a-a89d-0ff481d5d96f';
     const EMAIL_ID = '891daeda-3fce-4725-9133-8c301eebc237';
     const FORM_SLUG = 'section-3-loyalty-program-overview-40ya0y';
     const NEXT_PAGE = '08-section-4.html';
 
-    // Pull values from QS / localStorage
+    // Values from QS / localStorage
     const qs = new URLSearchParams(location.search);
     const email = qs.get('email') || localStorage.getItem('cs_email') || '';
     const first = qs.get('first') || localStorage.getItem('cs_first') || '';
@@ -107,20 +103,17 @@
     const name  = [first, last].filter(Boolean).join(' ').trim();
 
     // Build embed URL with prefill
-    const iframe = document.getElementById('nf-embed') || document.querySelector('iframe');
-    if (!iframe) return;
+    const iframe = document.getElementById('nf-embed');
+    const base   = iframe.dataset.src;
+    const url    = new URL(base, location.href);
 
-    const base = iframe.dataset.src || iframe.src ||
-      'https://noteforms.com/forms/section-3-loyalty-program-overview-40ya0y?embed=true&theme=dark';
-
-    const url = new URL(base, location.href);
     if (name)  url.searchParams.set(NAME_ID,  name);
     if (email) url.searchParams.set(EMAIL_ID, email);
     url.searchParams.set('_ts', Date.now().toString()); // cache-bust
 
     iframe.src = url.toString();
 
-    // On successful submit → Section 4 (preserve full QS)
+    // On successful submit → Section 4 (preserve QS)
     window.addEventListener('message', (e) => {
       if (!String(e.origin).includes('noteforms.com')) return;
       const d = e.data;
@@ -130,13 +123,5 @@
     });
   })();
   </script>
-  <iframe id="nf-embed"
-  data-form-slug="section-3-loyalty-program-overview-40ya0y"
-  data-next="08-section-4.html"
-  data-src="https://noteforms.com/forms/section-3-loyalty-program-overview-40ya0y?embed=true&theme=dark">
-</iframe>
-<script src="/beta/assets/intake.js?v=1"></script>
-
 </body>
 </html>
-
