@@ -85,60 +85,42 @@
   </main>
 <script>
 (function () {
-  var NEXT = "/beta/06-section-2.html";
+  // Read user values from URL (fallback to localStorage)
+  const qs = new URLSearchParams(location.search);
+  const email = qs.get('email') || localStorage.getItem('cs_email') || '';
+  const first = qs.get('first') || localStorage.getItem('cs_first') || '';
+  const last  = qs.get('last')  || localStorage.getItem('cs_last')  || '';
+  const uid   = qs.get('uid')   || localStorage.getItem('cs_uid')   || '';
+  const name  = [first, last].filter(Boolean).join(' ').trim();
 
-  // Find the iframe
-  var iframe =
-    document.getElementById("nf1") ||
-    document.querySelector("iframe.embed") ||
-    document.querySelector("iframe");
+  // TODO: replace these with the real keys from the prefill tool
+  const NF_NAME_KEY  = 'title';   // very likely 'title' for Name
+  const NF_EMAIL_KEY = 'REPLACE_ME'; // e.g. hWDd (copy yours)
+  const NF_UID_KEY   = 'UID';     // if you added a hidden UID field; replace with its key or remove line
 
-  // --- PATCH: send email + computed name + keep first/last/uid
-  (function carryParamsToIframe(){
-    if (!iframe) return;
+  // Pick the iframe and construct a clean URL (keeps theme/embed)
+  const iframe = document.getElementById('nf-embed') || document.querySelector('iframe');
+  if (!iframe) return;
 
-    const qs   = new URLSearchParams(location.search);
-    const get  = (k, d='') => (qs.get(k) || localStorage.getItem('cs_'+k) || d).trim();
+  // Prefer a clean base in data-src; fall back to current src
+  const base = iframe.dataset.src || iframe.src;
+  const url  = new URL(base, location.origin); // origin only used if src is relative
 
-    const first = get('first');
-    const last  = get('last');
-    const email = get('email').toLowerCase();
+  // Preserve existing params (e.g., theme=dark, embed=true), then set real keys
+  if (name)  url.searchParams.set(NF_NAME_KEY,  name);
+  if (email) url.searchParams.set(NF_EMAIL_KEY, email);
+  if (uid)   url.searchParams.set(NF_UID_KEY,   uid);
 
-    const out = new URLSearchParams();
-    if (email) out.set('email', email);
-    if (first || last) out.set('name', `${first} ${last}`.trim());   // <-- NoteForms will prefill this
-    ['first','last','uid'].forEach(k => { const v = get(k); if (v) out.set(k, v); });
+  iframe.src = url.toString();
 
-    if (out.toString()){
-      const base = iframe.getAttribute('src') || '';
-      iframe.setAttribute('src', base + (base.includes('?') ? '&' : '?') + out.toString());
-    }
-  })();
-
-  function isSuccessPayload(data){
-    if (typeof data === "string") {
-      try { data = JSON.parse(data); } catch(_) {}
-      if (typeof data === "string") {
-        const s = data.toLowerCase();
-        return s.includes("form-success")||s.includes("nf_submit_success")||s.includes("submitted")||s.includes("success");
-      }
-    }
-    if (data && typeof data === "object") {
-      const ev = (data.event||data.type||data.status||"").toString().toLowerCase();
-      return ["form-success","nf_submit_success","submitted","success"].some(k=>ev.includes(k));
-    }
-    return false;
-  }
-
-  window.addEventListener("message", function(e){
-    if (!iframe || e.source !== iframe.contentWindow) return;
-    if (isSuccessPayload(e.data)){
-      const carry = location.search || "";
-      location.replace(NEXT + carry);
-    }
-  });
+  // Debug line you can remove later
+  const dbg = document.createElement('pre');
+  dbg.textContent = 'NF src → ' + iframe.src;
+  dbg.style.cssText = 'font:12px/1.4 monospace;background:#0b0f14;color:#9fe;padding:8px;white-space:pre-wrap;word-break:break-all;margin:0';
+  document.body.prepend(dbg);
 })();
 </script>
+
 
 </body>
 </html>
