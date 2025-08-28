@@ -21,42 +21,33 @@
       display:flex; align-items:center; justify-content:center;
       min-height:100vh; padding:24px; position:relative; overflow:auto;
     }
-
-    /* BIG gold logo background (same as 03) */
     .cs-bg{
       position:fixed; inset:0; z-index:-2;
       background:url('/beta/assets/CS_Logo_Premium.png') center/500px repeat;
       opacity:.75; pointer-events:none;
     }
-
-    /* Vignette layer */
     body::after{
       content:""; position:fixed; inset:0; z-index:-1; pointer-events:none;
       background:
         radial-gradient(120% 120% at 50% 0%, rgba(255,255,255,.04), rgba(0,0,0,.28) 60%, rgba(0,0,0,.55) 100%),
         linear-gradient(180deg, rgba(255,255,255,.02), rgba(0,0,0,.08));
     }
-
-    /* Glass tile container for NoteForms */
     .card{
-      width:min(500px, 95vw);
+      width:min(540px, 96vw);
       border-radius:22px;
       background:var(--glass-bg);
       backdrop-filter:var(--glass-blur);
       box-shadow:0 18px 48px rgba(0,0,0,.45), inset 0 0 0 1px var(--glass-brd);
       padding:24px; text-align:left;
     }
-
     header{display:flex; align-items:center; justify-content:space-between; gap:16px; margin-bottom:10px}
     h1{font-size:clamp(18px, 2.6vw, 24px); margin:0}
     .hint{color:var(--muted); font-size:13px}
-
-    /* NoteForms embed */
     iframe{
       width:100%;
-      min-height:78vh;              /* roomy on desktop */
+      min-height:78vh;
       border:0; border-radius:14px;
-      background:rgba(0,0,0,.35);  /* in case their theme is light */
+      background:rgba(0,0,0,.35);
     }
     @media (max-width:480px){
       .card{padding:18px}
@@ -78,24 +69,24 @@
       id="nf-embed"
       data-src="https://noteforms.com/forms/beta-user-tracker-conciergesync-b4yxaf?embed=true&theme=dark"
       style="width:100%;height:90vh;border:0;"
-      allow="clipboard-write *">
+      allow="clipboard-write">
     </iframe>
   </main>
 
   <script>
   (() => {
-    // --- Pull values from query/localStorage ---
+    // Read values from QS / localStorage
     const qs = new URLSearchParams(location.search);
     const email = qs.get('email') || localStorage.getItem('cs_email') || '';
     const first = qs.get('first') || localStorage.getItem('cs_first') || '';
     const last  = qs.get('last')  || localStorage.getItem('cs_last')  || '';
     const name  = [first, last].filter(Boolean).join(' ').trim();
 
-    // --- Section 1 FIELD IDs (from NF prefill) ---
+    // Section 1 field IDs (from NoteForms prefill)
     const NAME_ID  = 'cf891a43-1e3c-4403-886c-3a7550291a22'; // Name (First/Last)
     const EMAIL_ID = 'aafd8404-ef8a-4b17-ab3d-15e2357e93a5'; // Client Email
 
-    // --- Build embed URL with prefill ---
+    // Build embed URL with prefill
     const iframe = document.getElementById('nf-embed');
     const url    = new URL(iframe.dataset.src, location.href);
     if (name)  url.searchParams.set(NAME_ID,  name);
@@ -104,17 +95,10 @@
 
     iframe.src = url.toString();
 
-    // Debug (remove when confirmed)
-    const dbg = document.createElement('pre');
-    dbg.textContent = 'NF src → ' + iframe.src;
-    dbg.style.cssText = 'font:12px/1.4 monospace;background:#0b0f14;color:#9fe;padding:8px;white-space:pre-wrap;word-break:break-all;margin:0';
-    document.body.prepend(dbg);
-
-    // --- Success → Section 2 (preserve QS) ---
+    // On successful submit → Section 2, keeping the QS
     window.addEventListener('message', (e) => {
       if (!String(e.origin).includes('noteforms.com')) return;
-      const d = e.data;
-      if (d?.type === 'form-submitted') {
+      if (e.data?.type === 'form-submitted') {
         location.href = `06-section-2.html${location.search}`;
       }
     });
