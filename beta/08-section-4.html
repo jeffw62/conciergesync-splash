@@ -65,81 +65,58 @@
     <p class="sub">Final step — submit to finish.</p>
 
     <!-- PUBLIC NoteForms URL for Section 4 -->
-    <iframe id="nf4" class="embed"
-      title="ConciergeSync – Section 4"
-      src="https://noteforms.com/forms/section-4-transferable-points-programs-wp4ujy">
+    <iframe
+      id="nf-embed"
+      data-src="https://noteforms.com/forms/section-4-transferable-points-programs-wp4ujy?embed=true&theme=dark"
+      style="width:100%;height:90vh;border:0;"
+      allow="clipboard-write">
     </iframe>
+
 
     <div class="footer">
       Questions? Email <a href="mailto:hello@conciergesync.ai">hello@conciergesync.ai</a>
     </div>
   </main>
 
-  <script>
-  (function(){
-    var NEXT   = "/beta/09-onboarding-thank-you.html";
+ <script>
+(() => {
+  // Section 4 — field IDs from NoteForms prefill
+  const NAME_ID  = '9052d9fd-994b-4e0b-adc8-d0a44c563dbb';
+  const EMAIL_ID = '3142ee5f-e390-475c-8c6b-c8285434188c';
+  const FORM_SLUG = 'section-4-transferable-points-programs-wp4ujy';
+  const NEXT_PAGE = '09-onboarding-thank-you.html';
 
-    // correct iframe handle
-    var iframe =
-      document.getElementById("nf4") ||
-      document.querySelector("iframe.embed") ||
-      document.querySelector("iframe");
+  // Pull values from QS / localStorage
+  const qs = new URLSearchParams(location.search);
+  const email = qs.get('email') || localStorage.getItem('cs_email') || '';
+  const first = qs.get('first') || localStorage.getItem('cs_first') || '';
+  const last  = qs.get('last')  || localStorage.getItem('cs_last')  || '';
+  const name  = [first, last].filter(Boolean).join(' ').trim();
 
-    // Carry email/first/last/uid (+combined name) into the NoteForms iframe
-    (function carryParamsToIframe(){
-      if (!iframe) return;
-      var qs   = new URLSearchParams(location.search);
-      var pick = function(k){ return qs.get(k) || localStorage.getItem('cs_' + k) || ''; };
+  // Build embed URL with prefill
+  const iframe = document.getElementById('nf-embed') || document.querySelector('iframe');
+  if (!iframe) return;
 
-      var carry = new URLSearchParams();
-      ['email','first','last','uid'].forEach(function(k){
-        var v = pick(k);
-        if (v) carry.set(k, v);
-      });
-      if (!carry.get('name')) {
-        var nm = (pick('first') + ' ' + pick('last')).trim();
-        if (nm) carry.set('name', nm);
-      }
+  const base = iframe.dataset.src || iframe.src ||
+    'https://noteforms.com/forms/section-4-transferable-points-programs-wp4ujy?embed=true&theme=dark';
 
-      if (carry.toString()){
-        var base = iframe.getAttribute('src') || '';
-        iframe.setAttribute('src', base + (base.includes('?') ? '&' : '?') + carry.toString());
-      }
-    })();
+  const url = new URL(base, location.href);
+  if (name)  url.searchParams.set(NAME_ID,  name);
+  if (email) url.searchParams.set(EMAIL_ID, email);
+  url.searchParams.set('_ts', Date.now().toString()); // cache-bust
 
-    function isSuccessPayload(data){
-      if (typeof data === "string") {
-        try { data = JSON.parse(data); } catch(_) {}
-        if (typeof data === "string") {
-          var s = data.toLowerCase();
-          return s.includes("form-success") || s.includes("nf_submit_success")
-              || s.includes("submitted")   || s.includes("success");
-        }
-      }
-      if (data && typeof data === "object") {
-        var ev = (data.event || data.type || data.status || "").toString().toLowerCase();
-        return ["form-success","nf_submit_success","submitted","success"]
-          .some(function(k){ return ev.includes(k); });
-      }
-      return false;
+  iframe.src = url.toString();
+
+  // On successful submit → Thank You (preserve full QS)
+  window.addEventListener('message', (e) => {
+    if (!String(e.origin).includes('noteforms.com')) return;
+    const d = e.data;
+    if (d?.type === 'form-submitted' && d?.form?.slug === FORM_SLUG) {
+      location.href = `${NEXT_PAGE}${location.search}`;
     }
+  });
+})();
+</script>
 
-    window.addEventListener("message", function(e){
-      if (!iframe || e.source !== iframe.contentWindow) return; // only our iframe
-      // Optional strict origin: if (!/^https:\/\/(www\.)?noteforms\.com$/i.test(e.origin)) return;
-
-      if (!isSuccessPayload(e.data)) return;
-
-      // mark section 4 complete
-      var prog = JSON.parse(localStorage.getItem("cs_onboarding_progress") || "{}");
-      prog.s4 = true;
-      localStorage.setItem("cs_onboarding_progress", JSON.stringify(prog));
-
-      // keep any query params (email/uid/etc.) when routing forward
-      var sameQs = location.search || "";
-      location.replace(NEXT + sameQs);
-    });
-  })();
-  </script>
 </body>
 </html>
