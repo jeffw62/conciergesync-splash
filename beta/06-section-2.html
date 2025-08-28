@@ -20,21 +20,17 @@
       display:flex; align-items:center; justify-content:center;
       padding:24px; position:relative; overflow:auto;
     }
-
-    /* BIG gold logo background */
     .cs-bg{
       position:fixed; inset:0; z-index:-2;
       background:url('/beta/assets/CS_Logo_Premium.png') center/500px repeat;
       opacity:.75; pointer-events:none;
     }
-    /* vignette */
     body::after{
       content:""; position:fixed; inset:0; z-index:-1; pointer-events:none;
       background:
         radial-gradient(120% 120% at 50% 0%, rgba(255,255,255,.04), rgba(0,0,0,.28) 60%, rgba(0,0,0,.55) 100%),
         linear-gradient(180deg, rgba(255,255,255,.02), rgba(0,0,0,.08));
     }
-
     /* Card sized to viewport (matches 3/4) */
     .card{
       width:min(560px, 96vw);
@@ -51,7 +47,6 @@
     }
     h1{font-size:clamp(18px,2.6vw,22px); margin:0 0 6px;}
     .sub{color:var(--muted); margin:0 0 12px; font-size:14px;}
-
     /* NF iframe fills remaining space */
     #nf-embed{
       display:block; width:100%;
@@ -60,11 +55,9 @@
       border:0; border-radius:14px;
       background:transparent !important;
     }
-
     .footer{margin-top:10px; text-align:center; font-size:12px; color:#a7b4c9;}
     .footer a{ color:#dbe3f4; text-decoration:none }
     .footer a:hover{ text-decoration:underline }
-
     @media (max-width:480px){
       body{ padding:16px; }
       .card{ height: calc(100vh - 32px); }
@@ -92,6 +85,9 @@
 
   <script>
   (() => {
+    // Hard kill any stray iframes that might be lingering from old markup
+    document.querySelectorAll('iframe:not(#nf-embed)').forEach(el => el.remove());
+
     // Section 2 — field IDs from NoteForms prefill
     const NAME_ID  = '90fae08a-5750-47e6-9080-f8ac7c501f39';
     const EMAIL_ID = '0146e3fa-ca0c-4dd0-9bed-cf4142693f79';
