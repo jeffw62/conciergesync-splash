@@ -36,25 +36,27 @@
 
     /* Glass tile */
     .card{
-      width:min(500px, 95vw);
-      max-height: calc(100vh - 48px);       /* keeps entire tile on-screen */
+      width:min(560px, 96vw);
+      height: calc(100vh - 48px);         /* definite height -> iframe can flex */
+      max-height: 980px;                   /* soft upper cap for huge screens */
       border-radius:20px;
       background:var(--glass-bg);
       backdrop-filter:var(--glass-blur);
       box-shadow:0 18px 48px rgba(0,0,0,.45), inset 0 0 0 1px var(--glass-brd);
       padding:18px 18px 22px;
 
-      display:flex;                          /* allow content to size within */
+      display:flex;                        /* layout */
       flex-direction:column;
+      overflow:hidden;                     /* keep internals tidy */
     }
     h1{font-size:clamp(18px,2.6vw,22px); margin:0 0 6px;}
     .sub{color:var(--muted); margin:0 0 12px; font-size:14px;}
 
-    /* NoteForms embed */
+    /* NoteForms embed fills remaining space */
     #nf-embed{
       display:block; width:100%;
-      flex:1 1 auto;            /* consume remaining space */
-      min-height:0;             /* allow shrinking within flex container */
+      flex:1 1 auto;
+      min-height:0;                        /* critical so it can shrink in flex */
       border:0; border-radius:14px;
       background:transparent !important;
     }
@@ -63,10 +65,10 @@
     .footer a{ color:#dbe3f4; text-decoration:none }
     .footer a:hover{ text-decoration:underline }
 
-    /* Small screens: soften padding so the card fits comfortably */
+    /* Mobile: smaller padding → full-height card */
     @media (max-width:480px){
       body{ padding:16px; }
-      .card{ max-height: calc(100vh - 32px); }
+      .card{ height: calc(100vh - 32px); }
     }
   </style>
 </head>
@@ -131,3 +133,4 @@
 
 </body>
 </html>
+
