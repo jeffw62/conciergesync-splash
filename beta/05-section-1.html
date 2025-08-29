@@ -89,38 +89,31 @@
   </main>
 
   <script>
-  (() => {
-    // Pull values from QS / localStorage
-    const qs = new URLSearchParams(location.search);
-    const email = qs.get('email') || localStorage.getItem('cs_email') || '';
-    const first = qs.get('first') || localStorage.getItem('cs_first') || '';
-    const last  = qs.get('last')  || localStorage.getItem('cs_last')  || '';
-    const name  = [first, last].filter(Boolean).join(' ').trim();
+(() => {
+  // ...existing constants...
+  const UID_ID = 'PUT-SECTION-SPECIFIC-UID-GUID-HERE';
 
-    // Section 1 field IDs (from NoteForms prefill)
-    const NAME_ID  = 'cf891a43-1e3c-4403-886c-3a7550291a22'; // Name (First/Last)
-    const EMAIL_ID = 'aafd8404-ef8a-4b17-ab3d-15e2357e93a5'; // Client Email
+  const qs = new URLSearchParams(location.search);
+  const email = qs.get('email') || localStorage.getItem('cs_email') || '';
+  const first = qs.get('first') || localStorage.getItem('cs_first') || '';
+  const last  = qs.get('last')  || localStorage.getItem('cs_last')  || '';
+  const uid   = qs.get('uid')   || localStorage.getItem('cs_uid')   || '';
+  const name  = [first, last].filter(Boolean).join(' ').trim();
 
-    // Build embed URL with prefill (field IDs are reliable regardless of mapping)
-    const iframe = document.getElementById('nf-embed');
-    const base   = iframe.dataset.src;
-    const url    = new URL(base, location.href);
+  const iframe = document.getElementById('nf-embed');
+  const url = new URL(iframe.getAttribute('data-src'), location.href);
 
-    if (name)  url.searchParams.set(NAME_ID,  name);
-    if (email) url.searchParams.set(EMAIL_ID, email);
-    url.searchParams.set('_ts', Date.now().toString()); // cache-bust
+  if (name)  url.searchParams.set(NAME_ID,  name);
+  if (email) url.searchParams.set(EMAIL_ID, email);
+  if (uid)   url.searchParams.set(UID_ID,   uid);   // <-- add this
+  if (uid)   url.searchParams.set('uid',    uid);   // (harmless fallback)
 
-    iframe.src = url.toString();
+  url.searchParams.set('_ts', Date.now().toString());
+  iframe.src = url.toString();
 
-    // On successful submit → Section 2 (preserve QS)
-    window.addEventListener('message', (e) => {
-      if (!String(e.origin).includes('noteforms.com')) return;
-      const d = e.data;
-      if (d?.type === 'form-submitted' && d?.form?.slug === 'beta-user-tracker-conciergesync-b4yxaf') {
-        location.href = `06-section-2.html${location.search}`;
-      }
-    });
-  })();
-  </script>
+  // ...existing postMessage -> next page...
+})();
+</script>
+
 </body>
 </html>
