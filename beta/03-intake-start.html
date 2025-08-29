@@ -21,22 +21,19 @@
       display:flex; align-items:center; justify-content:center;
       padding:24px; position:relative; overflow:hidden;
     }
-
-    /* BIG gold logo background (separate layer, so no conflicts) */
+    /* BIG gold logo background */
     .cs-bg{
       position:fixed; inset:0; z-index:-2;
       background:url('/beta/assets/CS_Logo_Premium.png') center/500px repeat;
       opacity:.75; pointer-events:none;
     }
-
-    /* Vignette for depth above bg, below content */
+    /* Vignette for depth */
     body::after{
       content:""; position:fixed; inset:0; z-index:-1; pointer-events:none;
       background:
         radial-gradient(120% 120% at 50% 0%, rgba(255,255,255,.04), rgba(0,0,0,.28) 60%, rgba(0,0,0,.55) 100%),
         linear-gradient(180deg, rgba(255,255,255,.02), rgba(0,0,0,.08));
     }
-
     /* Glass card */
     .card{
       width:min(500px, 92vw);
@@ -46,13 +43,7 @@
       box-shadow:0 18px 48px rgba(0,0,0,.45), inset 0 0 0 1px var(--glass-brd);
       padding:36px 28px; text-align:center;
     }
-
-    /* Smaller header */
-    h1{
-      font-size:clamp(20px, 3vw, 28px);
-      margin:0 0 10px; letter-spacing:.2px;
-    }
-
+    h1{ font-size:clamp(20px, 3vw, 28px); margin:0 0 10px; letter-spacing:.2px; }
     .lead{color:var(--muted); margin:6px 0 18px; line-height:1.45; font-size:clamp(15px,2.4vw,18px)}
     ul.bullets{list-style:none; padding:0; margin:16px auto 8px; max-width:56ch; text-align:left; color:#cdd8ea; line-height:1.5; font-size:clamp(14px,2.2vw,16px)}
     ul.bullets li{margin:10px 0; padding-left:28px; position:relative}
@@ -81,48 +72,60 @@
       <li>Set how you earn and use points today (to tune your strategy).</li>
       <li>Prep your starter dashboard so you can see value immediately.</li>
     </ul>
+    <!-- Fallback href is harmless; script will overwrite it -->
     <a class="cta" href="/beta/05-section-1.html" role="button" aria-label="Begin intake">Begin intake</a>
     <div class="footnote">Takes about 3–5 minutes. You can pause and return anytime.</div>
   </main>
-<script>
-(() => {
-  const qs = new URLSearchParams(location.search);
-  ['email','first','last','uid'].forEach(k => {
-    const v = qs.get(k);
-    if (v) localStorage.setItem('cs_' + k, v);
-  });
-})();
-</script>
 
+  <!-- Preserve any qs (email/first/last/uid) into localStorage for later pages -->
   <script>
-(function () {
-  // Build the next URL while preserving any ?email=&first=&last=&uid=&return=...
-  const qs   = location.search;               // includes the leading "?" if present
-  const NEXT = '/beta/05-section-1.html' + (qs || '');
+  (() => {
+    const qs = new URLSearchParams(location.search);
+    ['email','first','last','uid'].forEach(k => {
+      const v = qs.get(k);
+      if (v) try{ localStorage.setItem('cs_' + k, v); }catch{}
+    });
+  })();
+  </script>
 
-  // Wire the "Begin intake" CTA to include the query string
-  const begin = document.querySelector('a.cta') || document.querySelector('a[role="button"]');
-  if (begin) begin.href = NEXT;
+  <!-- Point CTA to NoteForms Section-1 with both UID keys in the URL -->
+  <script>
+  (() => {
+    const NOTEFORMS_URL = "https://noteforms.com/forms/beta-user-tracker-conciergesync-b4yxaf";
+    const GUID_KEY = "78ddd51d-9ccb-4fc7-a3cd-d17f7cd37ff4"; // NoteForms prefill key
 
-  // Also support pressing Enter to continue
-  document.addEventListener('keydown', (e) => { if (e.key === 'Enter') location.assign(NEXT); });
-})();
-</script>
-<script>
-(() => {
-  // Build QS from localStorage
-  const p = new URLSearchParams();
-  ['email','first','last','uid'].forEach(k => {
-    const v = localStorage.getItem('cs_' + k);
-    if (v) p.set(k, v);
-  });
+    const qs = new URLSearchParams(location.search);
+    const fromQS = k => qs.get(k) || "";
+    const fromLS = k => { try{ return localStorage.getItem('cs_' + k) || ""; }catch{ return ""; } };
 
-  // Rewrite links to Section 1 to include those params
-  document.querySelectorAll('a[href$="05-section-1.html"]').forEach(a => {
-    a.href = '05-section-1.html?' + p.toString();
-  });
-})();
-</script>
+    const uid   = fromQS('uid')   || fromLS('uid');
+    const email = fromQS('email') || fromLS('email');
+    const first = fromQS('first') || fromLS('first');
+    const last  = fromQS('last')  || fromLS('last');
 
+    let dest;
+    if (uid) {
+      const u = new URL(NOTEFORMS_URL);
+      // Include BOTH keys so your form can consume either
+      u.searchParams.set('uid', uid);
+      u.searchParams.set(GUID_KEY, uid);
+      if (email) u.searchParams.set('email', email);
+      if (first) u.searchParams.set('first', first);
+      if (last)  u.searchParams.set('last',  last);
+      dest = u.toString();
+    } else {
+      // No UID? send them to login to generate it
+      dest = '/beta/auth.html?mode=login';
+    }
+
+    const begin = document.querySelector('a.cta') || document.querySelector('a[role="button"]');
+    if (begin) begin.href = dest;
+
+    // Enter key acts like clicking the CTA
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && begin && begin.href) location.assign(begin.href);
+    });
+  })();
+  </script>
 </body>
 </html>
