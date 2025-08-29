@@ -84,6 +84,15 @@
     <a class="cta" href="/beta/05-section-1.html" role="button" aria-label="Begin intake">Begin intake</a>
     <div class="footnote">Takes about 3–5 minutes. You can pause and return anytime.</div>
   </main>
+<script>
+(() => {
+  const qs = new URLSearchParams(location.search);
+  ['email','first','last','uid'].forEach(k => {
+    const v = qs.get(k);
+    if (v) localStorage.setItem('cs_' + k, v);
+  });
+})();
+</script>
 
   <script>
 (function () {
