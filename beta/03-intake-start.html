@@ -108,6 +108,21 @@
   document.addEventListener('keydown', (e) => { if (e.key === 'Enter') location.assign(NEXT); });
 })();
 </script>
+<script>
+(() => {
+  // Build QS from localStorage
+  const p = new URLSearchParams();
+  ['email','first','last','uid'].forEach(k => {
+    const v = localStorage.getItem('cs_' + k);
+    if (v) p.set(k, v);
+  });
+
+  // Rewrite links to Section 1 to include those params
+  document.querySelectorAll('a[href$="05-section-1.html"]').forEach(a => {
+    a.href = '05-section-1.html?' + p.toString();
+  });
+})();
+</script>
 
 </body>
 </html>
