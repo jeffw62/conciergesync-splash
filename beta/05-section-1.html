@@ -95,11 +95,13 @@
     const email = qs.get('email') || localStorage.getItem('cs_email') || '';
     const first = qs.get('first') || localStorage.getItem('cs_first') || '';
     const last  = qs.get('last')  || localStorage.getItem('cs_last')  || '';
+    const uid = qs.get('uid') || localStorage.getItem('cs_uid') || '';
     const name  = [first, last].filter(Boolean).join(' ').trim();
 
     // Section 1 field IDs (from NoteForms prefill)
     const NAME_ID  = 'cf891a43-1e3c-4403-886c-3a7550291a22'; // Name (First/Last)
     const EMAIL_ID = 'aafd8404-ef8a-4b17-ab3d-15e2357e93a5'; // Client Email
+    const UID_ID = '78ddd51d-9ccb-4fc7-a3cd-d17f7cd37ff4';
 
     // Build embed URL with prefill (field IDs are reliable regardless of mapping)
     const iframe = document.getElementById('nf-embed');
@@ -108,6 +110,8 @@
 
     if (name)  url.searchParams.set(NAME_ID,  name);
     if (email) url.searchParams.set(EMAIL_ID, email);
+    if (uid)   url.searchParams.set(UID_ID,   uid);   // ← add this
+    if (uid)   url.searchParams.set('uid',    uid);   // optional fallback
     url.searchParams.set('_ts', Date.now().toString()); // cache-bust
 
     iframe.src = url.toString();
