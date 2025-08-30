@@ -427,6 +427,31 @@
   // 🔒 Removed the global “looks like exit/×” click-catcher that hijacked tile close.
 })();
 </script>
+
+<a id="edit-sec1" class="cta" href="#" aria-label="Edit Section 1">Edit Section 1</a>
+  
+  <script>
+(() => {
+  const uid   = localStorage.getItem('cs_uid')   || "";
+  const email = localStorage.getItem('cs_email') || "";
+  const first = localStorage.getItem('cs_first') || "";
+  const last  = localStorage.getItem('cs_last')  || "";
+
+  const btn = document.getElementById("edit-sec1");
+  if (!btn) return;
+  if (!uid) { btn.style.display = "none"; return; } // hide if no UID
+
+  const NF = new URL("https://noteforms.com/forms/beta-user-tracker-conciergesync-b4yxaf");
+  const GUID = "78ddd51d-9ccb-4fc7-a3cd-d17f7cd37ff4";
+  NF.searchParams.set("uid", uid);
+  NF.searchParams.set(GUID, uid);
+  if (email) NF.searchParams.set("email", email);
+  if (first) NF.searchParams.set("first", first);
+  if (last)  NF.searchParams.set("last",  last);
+  btn.href = NF.toString();
+})();
+</script>
 </body>
 </html>
+
 
