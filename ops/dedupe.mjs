@@ -1,107 +1,209 @@
-// Runs on Node 20+ (no packages). Uses fetch to call Notion API.
-const {
-  NOTION_TOKEN,          // secret: Notion integration token
-  NOTION_DB_ID,          // your database id
-  UID_PROP = "uid",      // text/rich_text property name holding your cs_... id
-  PRIMARY_PROP = "Primary", // checkbox property name
-  NOTION_VERSION = "2022-06-28"
-} = process.env;
+// ops/dedupe.mjs
+// Deduplicate Notion DB rows by UID, stamp "Last deduped" on kept Primary.
+// Resilient to column-name casing/spacing differences and adds clear logs.
+
+import { Client } from "@notionhq/client";
+
+// ---------- Env ----------
+const NOTION_TOKEN = process.env.NOTION_TOKEN;
+const NOTION_DB_ID = process.env.NOTION_DB_ID;
 
 if (!NOTION_TOKEN || !NOTION_DB_ID) {
-  console.error("Missing NOTION_TOKEN or NOTION_DB_ID"); process.exit(1);
+  console.error("Missing NOTION_TOKEN or NOTION_DB_ID.");
+  process.exit(1);
 }
 
-const H = {
-  "Authorization": `Bearer ${NOTION_TOKEN}`,
-  "Notion-Version": NOTION_VERSION,
-  "Content-Type": "application/json"
-};
+const UID_PROP_ENV = process.env.UID_PROP || "uid";
+const PRIMARY_PROP_ENV = process.env.PRIMARY_PROP || "Primary";
+const LAST_DEDUPE_ENV = process.env.LAST_DEDUPE_PROP || "Last deduped";
 
-async function notionQuery(cursor) {
-  const body = {
-    page_size: 100,
-    sorts: [{ timestamp: "created_time", direction: "descending" }],
-    ...(cursor ? { start_cursor: cursor } : {})
+const AUTO_ARCHIVE = process.env.AUTO_ARCHIVE === "1";
+const ARCHIVE_STATUS_NAME = process.env.ARCHIVE_STATUS_NAME || "Archived";
+
+const notion = new Client({ auth: NOTION_TOKEN });
+
+// ---------- Utils ----------
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+const trimLower = (s) => (s || "").trim().toLowerCase();
+
+function getPlainText(prop) {
+  if (!prop) return "";
+  switch (prop.type) {
+    case "title": return (prop.title || []).map(t => t.plain_text).join("");
+    case "rich_text": return (prop.rich_text || []).map(t => t.plain_text).join("");
+    case "email": return prop.email || "";
+    case "number": return prop.number != null ? String(prop.number) : "";
+    case "select": return prop.select?.name || "";
+    case "multi_select": return (prop.multi_select || []).map(s => s.name).join(",") || "";
+    case "url": return prop.url || "";
+    default: return "";
+  }
+}
+
+// ---------- DB schema helpers ----------
+async function getDbSchema(dbId) {
+  const db = await notion.databases.retrieve({ database_id: dbId });
+  return db.properties || {};
+}
+
+/** Resolve a property name in the DB schema (case/space tolerant). Optionally enforce type. */
+function resolvePropName(props, desiredName, wantedType /* e.g., "date" or "checkbox" */) {
+  const keys = Object.keys(props);
+  // Exact name first
+  if (keys.includes(desiredName)) {
+    if (!wantedType || props[desiredName]?.type === wantedType) return desiredName;
+  }
+  // Case/space-insensitive fallback
+  const target = trimLower(desiredName);
+  for (const k of keys) {
+    if (trimLower(k) === target) {
+      if (!wantedType || props[k]?.type === wantedType) return k;
+    }
+  }
+  return null;
+}
+
+// ---------- Fetch all pages ----------
+async function fetchAllPages(dbId) {
+  const out = [];
+  let cursor;
+  let hasMore = true;
+  while (hasMore) {
+    const resp = await notion.databases.query({
+      database_id: dbId,
+      start_cursor: cursor,
+      page_size: 100,
+      sorts: [{ timestamp: "created_time", direction: "ascending" }],
+    });
+    out.push(...resp.results);
+    hasMore = resp.has_more;
+    cursor = resp.next_cursor;
+  }
+  return out;
+}
+
+// ---------- Update helpers ----------
+async function markPrimaryAndStamp({
+  primaryPage,
+  olderPages,
+  primaryProp,
+  lastDedupedPropName, // may be null if not found
+}) {
+  const nowISO = new Date().toISOString();
+
+  const primaryProps = {
+    [primaryProp]: { checkbox: true },
   };
-  const res = await fetch(`https://api.notion.com/v1/databases/${NOTION_DB_ID}/query`, {
-    method: "POST", headers: H, body: JSON.stringify(body)
-  });
-  if (!res.ok) throw new Error(`Query failed: ${res.status} ${await res.text()}`);
-  return res.json();
+  if (lastDedupedPropName) {
+    primaryProps[lastDedupedPropName] = { date: { start: nowISO } };
+  }
+
+  await notion.pages.update({ page_id: primaryPage.id, properties: primaryProps });
+  await sleep(180);
+
+  for (const p of olderPages) {
+    const props = { [primaryProp]: { checkbox: false } };
+    if (AUTO_ARCHIVE) {
+      props["Status"] = { select: { name: ARCHIVE_STATUS_NAME } }; // only works if "Status" exists
+    }
+    await notion.pages.update({ page_id: p.id, properties: props });
+    await sleep(120);
+  }
 }
 
-async function notionUpdate(page_id, props) {
-  const res = await fetch(`https://api.notion.com/v1/pages/${page_id}`, {
-    method: "PATCH", headers: H, body: JSON.stringify({ properties: props })
-  });
-  if (!res.ok) throw new Error(`Update failed: ${res.status} ${await res.text()}`);
-  return res.json();
-}
-
-function readUid(page) {
-  const p = page.properties?.[UID_PROP];
-  if (!p) return "";
-  if (p.type === "rich_text") return (p.rich_text || []).map(t=>t.plain_text).join("").trim();
-  if (p.type === "title")     return (p.title || []).map(t=>t.plain_text).join("").trim();
-  if (p.type === "url")       return p.url || "";
-  if (p.type === "email")     return p.email || "";
-  if (p.type === "number")    return String(p.number ?? "");
-  if (p.type === "formula")   return p.formula?.string || "";
-  return "";
-}
-
-function isPrimary(page) {
-  const p = page.properties?.[PRIMARY_PROP];
-  return p?.type === "checkbox" ? !!p.checkbox : false;
-}
-
-async function sleep(ms){ return new Promise(r=>setTimeout(r, ms)); }
-
+// ---------- Main ----------
 async function run() {
-  // 1) fetch all pages
-  const pages = [];
-  let cursor; 
-  do {
-    const data = await notionQuery(cursor);
-    pages.push(...data.results);
-    cursor = data.has_more ? data.next_cursor : undefined;
-  } while (cursor);
+  console.log("Starting Notion dedupe…");
+  console.log(
+    JSON.stringify(
+      {
+        db: NOTION_DB_ID,
+        uidPropDesired: UID_PROP_ENV,
+        primaryPropDesired: PRIMARY_PROP_ENV,
+        lastDedupedDesired: LAST_DEDUPE_ENV,
+        autoArchive: AUTO_ARCHIVE,
+        archiveStatusName: ARCHIVE_STATUS_NAME,
+      },
+      null,
+      2
+    )
+  );
 
-  // 2) group by uid (ignore empties)
+  // Resolve property names from schema (handles case mismatches)
+  const props = await getDbSchema(NOTION_DB_ID);
+
+  const UID_PROP = resolvePropName(props, UID_PROP_ENV);
+  const PRIMARY_PROP = resolvePropName(props, PRIMARY_PROP_ENV, "checkbox");
+  const LAST_DEDUPE_PROP = resolvePropName(props, LAST_DEDUPE_ENV, "date");
+
+  if (!UID_PROP) {
+    console.error(`UID property "${UID_PROP_ENV}" not found in DB schema.`);
+    process.exit(1);
+  }
+  if (!PRIMARY_PROP) {
+    console.error(`Primary checkbox property "${PRIMARY_PROP_ENV}" not found in DB schema.`);
+    process.exit(1);
+  }
+  if (!LAST_DEDUPE_PROP) {
+    console.warn(
+      `Date property "${LAST_DEDUPE_ENV}" not found (or not a Date). Will update Primary only.`
+    );
+  }
+
+  console.log(
+    JSON.stringify(
+      {
+        uidPropResolved: UID_PROP,
+        primaryPropResolved: PRIMARY_PROP,
+        lastDedupedResolved: LAST_DEDUPE_PROP || null,
+      },
+      null,
+      2
+    )
+  );
+
+  const pages = await fetchAllPages(NOTION_DB_ID);
+  console.log(`Fetched ${pages.length} pages.`);
+
+  // Group by UID
   const groups = new Map();
-  for (const p of pages) {
-    const uid = readUid(p);
+  for (const page of pages) {
+    const prop = page.properties?.[UID_PROP];
+    const uid = getPlainText(prop).trim();
     if (!uid) continue;
     if (!groups.has(uid)) groups.set(uid, []);
-    groups.get(uid).push(p);
+    groups.get(uid).push(page);
   }
+  console.log(`Found ${groups.size} UID groups.`);
 
-  // 3) for each uid with >1, mark newest Primary=true, others false
-  let touched = 0, uids = 0;
-  for (const [uid, group] of groups) {
-    uids++;
-    if (group.length <= 1) continue; // nothing to do
+  let touched = 0;
+  for (const [uid, list] of groups.entries()) {
+    // Created ascending already; newest is last
+    const primary = list[list.length - 1];
+    const older = list.slice(0, -1);
 
-    // group is already in created_time DESC because of query sort
-    const newest = group[0], older = group.slice(1);
+    try {
+      await markPrimaryAndStamp({
+        primaryPage: primary,
+        olderPages: older,
+        primaryProp: PRIMARY_PROP,
+        lastDedupedPropName: LAST_DEDUPE_PROP, // null = skip stamping
+      });
 
-    // newest → Primary = true
-    if (!isPrimary(newest)) {
-      await notionUpdate(newest.id, { [PRIMARY_PROP]: { checkbox: true } });
-      await sleep(350);
+      console.log(
+        `[uid: ${uid}] keep=${primary.id} older=${older.map(p => p.id).join(",") || "—"} ${LAST_DEDUPE_PROP ? "(stamped Last deduped)" : "(no Last deduped column)"}`
+      );
       touched++;
-    }
-    // older → Primary = false
-    for (const p of older) {
-      if (isPrimary(p)) {
-        await notionUpdate(p.id, { [PRIMARY_PROP]: { checkbox: false } });
-        await sleep(350);
-        touched++;
-      }
+      if (touched % 25 === 0) console.log(`Processed ${touched} groups…`);
+    } catch (e) {
+      console.error(`[uid: ${uid}] update failed:`, e?.message || e);
     }
   }
 
-  console.log(`Examined ${uids} UIDs. Updated ${touched} pages.`);
+  console.log(`Done. Processed ${touched} groups.`);
 }
 
-run().catch(e => { console.error(e); process.exit(1); });
+run().catch((e) => {
+  console.error("Fatal error:", e?.message || e);
+  process.exit(1);
+});
