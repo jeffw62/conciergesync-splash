@@ -1,0 +1,21 @@
+name: Notion Dedupe
+on:
+  schedule:
+    - cron: "*/15 * * * *"   # every 15 min (UTC)
+  workflow_dispatch: {}       # allow manual run
+
+jobs:
+  dedupe:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Run dedupe
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+          NOTION_DB_ID: ${{ secrets.NOTION_DB_ID }}
+          UID_PROP: uid
+          PRIMARY_PROP: Primary
+        run: node ops/dedupe.mjs
