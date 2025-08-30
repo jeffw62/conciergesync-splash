@@ -470,8 +470,13 @@
     .tools-card{ right:12px; bottom:calc(146px + env(safe-area-inset-bottom)); min-width:200px; }
   }
   /* anchor the dropdown to the tabs bar */
-.cs-tabs { position: relative; }
-
+  /* keep the bar sized to its pills */
+.cs-tabs{
+  position: relative;
+  display: inline-flex; /* shrink to content */
+  width: auto;
+}
+  
 /* Tools dropdown */
 #tools-menu{
   position: absolute;
@@ -554,6 +559,7 @@
 
 </body>
 </html>
+
 
 
 
