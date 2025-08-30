@@ -289,19 +289,32 @@
   setWorking(true);
   try{
     const ref = doc(db, 'beta_users', key);
+    const existing = await getDoc(ref);
+
+    // If the email is already registered → nudge to Login
+    if (existing.exists()){
+      setWorking(false);
+      show(errEmail);
+      errEmail.textContent = 'This email is already registered. Please log in as a returning user.';
+      setMode('login');                         // switch UI to Login tab
+      email.setAttribute('aria-invalid','true');
+      try{ email.focus(); }catch(_){}
+      return;
+    }
+
+    // New user → create doc
     await setDoc(ref, {
       first: firstStr.trim(),
       last:  lastStr.trim(),
       email: key,
-      // agreed status set later by 02-agree.html
-      updatedAt: serverTimestamp(),
-      createdAt: serverTimestamp()
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp()
     }, { merge: true });
 
     // Ensure UID exists and keep it
     const uid = await getOrCreateUid(db, key);
 
-    // stash for later pages as fallback
+    // Stash for later pages
     try{
       localStorage.setItem('cs_email', key);
       localStorage.setItem('cs_first', firstStr.trim());
@@ -311,7 +324,7 @@
 
     setWorking(false);
 
-    // send to Terms with prefilled params
+    // Send to Terms with prefilled params
     const qs = new URLSearchParams({
       email: key,
       first: firstStr.trim(),
