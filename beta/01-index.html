@@ -4,18 +4,18 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <title>ConciergeSync™ Console</title>
+
+<!-- Gate: require auth -->
 <script>
 (function () {
   try {
-    var isAuthed =
+    const isAuthed =
       sessionStorage.getItem('cs_authed') === '1' ||
       localStorage.getItem('cs_authed') === '1' ||
       /(?:^|;\s*)cs_auth=1(?:;|$)/.test(document.cookie);
 
-    if (!isAuthed) {
-      location.replace('/beta/auth.html?mode=login');
-    }
-  } catch (e) {
+    if (!isAuthed) location.replace('/beta/auth.html?mode=login');
+  } catch {
     location.replace('/beta/auth.html?mode=login');
   }
 })();
@@ -62,7 +62,7 @@
     opacity: var(--overlay);
   }
 
-  /* Tabs */
+  /* Tabs bar */
   .cs-tabs{
     position: fixed; top: 18px; left: 50%; transform: translateX(-50%);
     z-index: var(--ui);
@@ -76,6 +76,12 @@
     background: rgba(255,255,255,.07); color:#fff; font-weight:700; cursor:pointer;
   }
   .cs-tab:hover{ background: rgba(255,255,255,.12); }
+  /* make links styled like buttons not show underlines */
+  a.cs-tab,
+  a.cs-tab:hover,
+  a.cs-tab:focus,
+  a.cs-tab:active,
+  a.cs-tab:visited { text-decoration: none; }
 
   /* Exit button */
   .console-exit{
@@ -183,13 +189,8 @@
     <button class="cs-tab" data-key="overview">Overview</button>
     <button class="cs-tab" data-key="itinerary">Itinerary</button>
     <button class="cs-tab" data-key="values">Value Calc</button>
-
-    <!-- Tools button + hidden menu -->
-    <button id="tools-toggle" class="cs-tab" data-key="tools"
-      aria-expanded="false" aria-controls="tools-menu">
-      User Tools
-    </button>
-   </div>
+    <button class="cs-tab" data-key="tools">User Tools</button>
+  </div>
 
   <!-- Exit -->
   <button id="exitFs" class="console-exit" aria-label="Exit Fullscreen">×</button>
@@ -261,6 +262,38 @@
   const stage = document.getElementById('cs-tiles');
   let zTop = 10;
 
+  // Build/refresh the "Edit Section 1" link for NoteForms
+  const FORM_URL = "https://noteforms.com/forms/beta-user-tracker-conciergesync-b4yxaf";
+  const UID_GUID = "78ddd51d-9ccb-4fc7-a3cd-d17f7cd37ff4";
+  function wireEditLink(scope){
+    const root = scope || document;
+    const a = root.querySelector('#tool-edit-sec1');
+    if (!a) return;
+
+    const uid   = localStorage.getItem('cs_uid')   || "";
+    const email = localStorage.getItem('cs_email') || "";
+    const first = localStorage.getItem('cs_first') || "";
+    const last  = localStorage.getItem('cs_last')  || "";
+
+    if (!uid){
+      a.href = "/beta/auth.html?mode=login&next=/beta/05-section-1.html";
+      a.removeAttribute('target');
+      a.title = "Log in to edit your answers";
+      return;
+    }
+    const url = new URL(FORM_URL);
+    url.searchParams.set("uid", uid);
+    url.searchParams.set(UID_GUID, uid);
+    if (email) url.searchParams.set("email", email);
+    if (first) url.searchParams.set("first", first);
+    if (last)  url.searchParams.set("last",  last);
+
+    a.href = url.toString();
+    a.target = "_blank";
+    a.rel = "noopener";
+    a.title = "Edit your Section 1 answers (opens in a new tab)";
+  }
+
   const TEMPLATES = {
     overview: () => `
       <header class="cs-tile-head">
@@ -276,19 +309,19 @@
       <header class="cs-tile-head">
         <h4>Value Calc</h4><button class="cs-close" aria-label="Close">×</button>
       </header>
-      <div class="cs-tile-body"><p>CPP, cash vs award, transfer hints.</p></div>`
-     , tools: () => `
+      <div class="cs-tile-body"><p>CPP, cash vs award, transfer hints.</p></div>`,
+    tools: () => `
       <header class="cs-tile-head">
         <h4>User Tools</h4><button class="cs-close" aria-label="Close">×</button>
       </header>
       <div class="cs-tile-body">
         <a id="tool-edit-sec1"
-         class="cs-tab"
-         href="#"
-         target="_blank"
-         rel="noopener"
-         title="Update your onboarding answers from Section 1 (opens in a new tab)"
-         aria-label="Update your onboarding answers from Section 1">
+           class="cs-tab"
+           href="#"
+           target="_blank"
+           rel="noopener"
+           title="Edit your Section 1 answers (opens in a new tab)"
+           aria-label="Edit your Section 1 answers">
           ✏️ Edit
         </a>
       </div>`
@@ -407,12 +440,17 @@
 
     addHandlers(el);
     el.classList.add('is-focused');
+
+    // Populate Edit link when User Tools tile is created
+    if (key === 'tools') wireEditLink(el);
   }
 
+  // click -> open tiles
   document.querySelectorAll('.cs-tab').forEach(btn=>{
     btn.addEventListener('click', ()=> openTile(btn.dataset.key));
   });
 
+  // support ?open=tools etc.
   const qs = new URLSearchParams(location.search);
   if (qs.get('open')) openTile(qs.get('open'));
 
@@ -449,147 +487,5 @@
 })();
 </script>
 
-<style>
-  /* Floating “Tools” pill */
-  .tools-pill{
-    position:fixed; right:16px; bottom:calc(96px + env(safe-area-inset-bottom)); /* 96px to clear chat bubble; tweak if needed */
-    z-index:10000; padding:10px 14px; border-radius:9999px;
-    background:#0b5cff; color:#fff; border:0; font-weight:600; cursor:pointer;
-    box-shadow:0 8px 20px rgba(0,0,0,.25);
-  }
-  .tools-pill:hover{ transform:translateY(-1px); }
-
-  /* Full-screen click catcher (closes when clicking outside the card) */
-  .tools-overlay{ position:fixed; inset:0; z-index:10000; background:transparent; }
-
-  /* The little tools menu card */
-  .tools-card{
-    position:absolute; right:16px; bottom:calc(146px + env(safe-area-inset-bottom)); /* 50px above pill */
-    min-width:240px; padding:12px; border-radius:16px;
-    background:rgba(255,255,255,.10); backdrop-filter:blur(14px) saturate(1.1);
-    box-shadow:0 18px 48px rgba(0,0,0,.45), inset 0 0 0 1px rgba(255,255,255,.22);
-  }
-
-  .tool-item{
-    display:block; padding:10px 12px; border-radius:10px; color:#eaf2ff; text-decoration:none;
-  }
-  .tool-item:hover{ background:rgba(255,255,255,.12); }
-
-  @media (max-width:520px){
-    .tools-pill{ right:12px; bottom:calc(96px + env(safe-area-inset-bottom)); }
-    .tools-card{ right:12px; bottom:calc(146px + env(safe-area-inset-bottom)); min-width:200px; }
-  }
-  /* anchor the dropdown to the tabs bar */
-  /* keep the bar sized to its pills */
-.cs-tabs{
-  position: relative;
-  display: inline-flex; /* shrink to content */
-  width: auto;
-}
-  
-/* Tools dropdown */
-#tools-menu{
-  position: absolute;
-  right: 0;
-  top: calc(100% + 8px);
-  min-width: 220px;
-  padding: 8px;
-  border-radius: 12px;
-  background: var(--glass-bg, rgba(255,255,255,.10));
-  backdrop-filter: var(--glass-blur, blur(14px) saturate(1.1));
-  border: 1px solid var(--glass-brd, rgba(255,255,255,.22));
-  box-shadow: 0 18px 48px rgba(0,0,0,.45);
-}
-#tools-menu a{
-  display: block;
-  padding: 10px 12px;
-  border-radius: 8px;
-  color: var(--ink, #eaf2ff);
-  text-decoration: none;
-}
-#tools-menu a:hover { background: rgba(255,255,255,.12); }
-
-  a.cs-tab,
-  a.cs-tab:hover,
-  a.cs-tab:focus,
-  a.cs-tab:active,
-  a.cs-tab:visited { text-decoration: none; }
-  
-</style>
-
-<script>
-(() => {
-  // Build the Edit Section 1 link from stored UID
-  const uid   = localStorage.getItem('cs_uid')   || "";
-  const email = localStorage.getItem('cs_email') || "";
-  const first = localStorage.getItem('cs_first') || "";
-  const last  = localStorage.getItem('cs_last')  || "";
-
-  const EDIT = document.getElementById('tool-edit-sec1');
-  if (EDIT){
-    if (!uid){
-      // If somehow not authed, hide this tool (you can instead point to /beta/auth.html?mode=login)
-      EDIT.style.display = 'none';
-    }else{
-      const NF   = new URL("https://noteforms.com/forms/beta-user-tracker-conciergesync-b4yxaf");
-      const GUID = "78ddd51d-9ccb-4fc7-a3cd-d17f7cd37ff4";
-      NF.searchParams.set("uid", uid);
-      NF.searchParams.set(GUID, uid);
-      if (email) NF.searchParams.set("email", email);
-      if (first) NF.searchParams.set("first", first);
-      if (last)  NF.searchParams.set("last",  last);
-      EDIT.href = NF.toString();
-    }
-  }
-
-  // Toggle logic
-  const pill   = document.getElementById('tools-toggle');
-  const panel  = document.getElementById('tools-panel');
-
-  function openPanel(){
-    panel.hidden = false;
-    pill.setAttribute('aria-expanded','true');
-    // focus first item if visible
-    const firstItem = panel.querySelector('.tool-item:not([style*="display: none"])');
-    if (firstItem) firstItem.focus();
-  }
-  function closePanel(){
-    panel.hidden = true;
-    pill.setAttribute('aria-expanded','false');
-    pill.focus();
-  }
-  pill?.addEventListener('click', (e) => {
-    e.preventDefault();
-    panel.hidden ? openPanel() : closePanel();
-  });
-  // Close when clicking outside the card
-  panel?.addEventListener('click', (e) => {
-    if (e.target === panel) closePanel();
-  });
-  // Close with Esc
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && !panel.hidden) closePanel();
-  });
-})();
-</script>
-
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
