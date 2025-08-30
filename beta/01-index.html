@@ -428,7 +428,7 @@
 })();
 </script>
 
-<a id="edit-sec1" class="cta" href="#" aria-label="Edit Section 1">Edit Section 1</a>
+<a id="edit-sec1" class="cta" href="#" target="_blank" rel="noopener">Edit Section 1</a>
   
   <script>
 (() => {
@@ -438,6 +438,7 @@
   const last  = localStorage.getItem('cs_last')  || "";
 
   const btn = document.getElementById("edit-sec1");
+  btn.target = "_blank"; btn.rel = "noopener";
   if (!btn) return;
   if (!uid) { btn.style.display = "none"; return; } // hide if no UID
 
@@ -453,5 +454,6 @@
 </script>
 </body>
 </html>
+
 
 
