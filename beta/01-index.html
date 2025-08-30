@@ -189,16 +189,7 @@
       aria-expanded="false" aria-controls="tools-menu">
       User Tools
     </button>
-  <a id="tool-edit-sec1"
-   class="cs-tab"
-   href="#"
-   target="_blank"
-   rel="noopener"
-   aria-label="Update your onboarding answers (Section 1)">
-    Update onboarding answers (Section 1)
-  </a>
-  </div>
-  </div>
+   </div>
 
   <!-- Exit -->
   <button id="exitFs" class="console-exit" aria-label="Exit Fullscreen">×</button>
@@ -286,6 +277,20 @@
         <h4>Value Calc</h4><button class="cs-close" aria-label="Close">×</button>
       </header>
       <div class="cs-tile-body"><p>CPP, cash vs award, transfer hints.</p></div>`
+     , tools: () => `
+      <header class="cs-tile-head">
+        <h4>User Tools</h4><button class="cs-close" aria-label="Close">×</button>
+      </header>
+      <div class="cs-tile-body">
+        <a id="tool-edit-sec1"
+           class="cs-tab"
+           href="#"
+           target="_blank"
+           rel="noopener"
+           aria-label="Update your onboarding answers (Section 1)">
+          Update onboarding answers (Section 1)
+        </a>
+      </div>`
   };
 
   function centerPos(tile){
@@ -563,6 +568,7 @@
 
 </body>
 </html>
+
 
 
 
