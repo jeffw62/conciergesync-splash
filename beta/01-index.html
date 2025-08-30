@@ -428,7 +428,7 @@
 })();
 </script>
 
-<a id="edit-sec1" class="cta" href="#" target="_blank" rel="noopener">Edit Section 1</a>
+<a id="edit-sec1" class="cta fab-edit" href="#" target="_blank" rel="noopener">Edit Section 1</a>
   
   <script>
 (() => {
@@ -452,8 +452,26 @@
   btn.href = NF.toString();
 })();
 </script>
+  <style>
+  .fab-edit{
+    position: fixed;
+    right: 16px;
+    bottom: calc(16px + env(safe-area-inset-bottom));
+    z-index: 10000;
+    padding: 12px 18px;
+    border-radius: 9999px;
+    background: #2563eb; color: #fff; text-decoration: none; font-weight: 600;
+    box-shadow: 0 8px 20px rgba(0,0,0,.25);
+  }
+  .fab-edit:hover { transform: translateY(-1px); }
+  @media (max-width:520px){
+    .fab-edit{ right:12px; bottom:calc(12px + env(safe-area-inset-bottom)); padding:10px 14px; }
+  }
+</style>
+
 </body>
 </html>
+
 
 
 
