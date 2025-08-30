@@ -16,22 +16,21 @@ jobs:
       contents: read
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v4
+      # No cache to avoid "Dependencies lock file not found" error
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: "npm"
 
-      # Install deps (ephemeral). If your repo has a lockfile, we'll use npm ci.
-      - name: Install dependencies
+      - name: Install @notionhq/client
         run: |
-          if [ -f package-lock.json ] || [ -f npm-shrinkwrap.json ]; then
-            npm ci --no-audit --no-fund
-          else
-            npm init -y >/dev/null 2>&1 || true
-            npm i @notionhq/client --no-audit --no-fund
+          if [ ! -f package.json ]; then
+            npm init -y >/dev/null 2>&1
           fi
+          npm i @notionhq/client --no-audit --no-fund
 
       - name: Run dedupe
         env:
@@ -39,8 +38,7 @@ jobs:
           NOTION_DB_ID: ${{ secrets.NOTION_DB_ID }}
           UID_PROP: uid
           PRIMARY_PROP: Primary
-          LAST_DEDUPE_PROP: Last deduped
-          # Set to "1" if you want older rows auto-archived and you have a "Status" select
+          LAST_DEDUPE_PROP: "Last deduped"
           # AUTO_ARCHIVE: "1"
           # ARCHIVE_STATUS_NAME: Archived
         run: node ops/dedupe.mjs
