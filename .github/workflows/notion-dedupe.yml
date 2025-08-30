@@ -1,21 +1,188 @@
-name: Notion Dedupe
-on:
-  schedule:
-    - cron: "*/5 * * * *"   # every 15 min (UTC)
-  workflow_dispatch: {}       # allow manual run
+// ops/dedupe.mjs
+// Deduplicate Notion DB rows by UID.
+// - Keeps the newest page (created_time) per UID as Primary
+// - Sets Primary=false on older duplicates
+// - Stamps "Last deduped" date on the kept Primary row
+// - (Optional) Auto-archive older rows if AUTO_ARCHIVE=1 and a "Status" select exists
+//
+// Requires env (see your workflow YAML):
+//   NOTION_TOKEN
+//   NOTION_DB_ID
+//   UID_PROP       (default: "uid")
+//   PRIMARY_PROP   (default: "Primary")
+// Optional env:
+//   LAST_DEDUPE_PROP (default: "Last deduped")
+//   AUTO_ARCHIVE      ("1" to enable; default off)
+//   ARCHIVE_STATUS_NAME (default: "Archived")
+//
+// Node 20+, ESM. Notion SDK: @notionhq/client
 
-jobs:
-  dedupe:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: "20"
-      - name: Run dedupe
-        env:
-          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
-          NOTION_DB_ID: ${{ secrets.NOTION_DB_ID }}
-          UID_PROP: uid
-          PRIMARY_PROP: Primary
-        run: node ops/dedupe.mjs
+import { Client } from "@notionhq/client";
+
+// ---------- Env & Notion client ----------
+const NOTION_TOKEN = process.env.NOTION_TOKEN;
+const NOTION_DB_ID = process.env.NOTION_DB_ID;
+
+if (!NOTION_TOKEN || !NOTION_DB_ID) {
+  console.error("Missing NOTION_TOKEN or NOTION_DB_ID.");
+  process.exit(1);
+}
+
+const UID_PROP = process.env.UID_PROP || "uid";
+const PRIMARY_PROP = process.env.PRIMARY_PROP || "Primary";
+const LAST_DEDUPE_PROP = process.env.LAST_DEDUPE_PROP || "Last deduped";
+
+const AUTO_ARCHIVE = process.env.AUTO_ARCHIVE === "1";
+const ARCHIVE_STATUS_NAME = process.env.ARCHIVE_STATUS_NAME || "Archived";
+
+const notion = new Client({ auth: NOTION_TOKEN });
+
+// ---------- Utils ----------
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+function getPlainText(prop) {
+  if (!prop) return "";
+  switch (prop.type) {
+    case "title":
+      return (prop.title || []).map((t) => t.plain_text).join("") || "";
+    case "rich_text":
+      return (prop.rich_text || []).map((t) => t.plain_text).join("") || "";
+    case "url":
+      return prop.url || "";
+    case "email":
+      return prop.email || "";
+    case "phone_number":
+      return prop.phone_number || "";
+    case "number":
+      return prop.number != null ? String(prop.number) : "";
+    case "select":
+      return prop.select?.name || "";
+    case "multi_select":
+      return (prop.multi_select || []).map((s) => s.name).join(",") || "";
+    default:
+      // other types won't be used for UID
+      return "";
+  }
+}
+
+function hasProperty(page, name) {
+  return page?.properties && Object.prototype.hasOwnProperty.call(page.properties, name);
+}
+
+// ---------- Fetch all pages ----------
+async function fetchAllPages(dbId) {
+  const out = [];
+  let hasMore = true;
+  let cursor = undefined;
+
+  while (hasMore) {
+    const resp = await notion.databases.query({
+      database_id: dbId,
+      start_cursor: cursor,
+      page_size: 100,
+      // Sorting by created_time ascending simplifies later grouping logic
+      sorts: [{ timestamp: "created_time", direction: "ascending" }],
+    });
+    out.push(...resp.results);
+    hasMore = resp.has_more;
+    cursor = resp.next_cursor;
+  }
+  return out;
+}
+
+// ---------- Update helpers ----------
+async function markPrimaryAndStamp({ primaryPage, olderPages }) {
+  const nowISO = new Date().toISOString();
+
+  // 1) Ensure Primary on newest + stamp Last deduped
+  await notion.pages.update({
+    page_id: primaryPage.id,
+    properties: {
+      [PRIMARY_PROP]: { checkbox: true },
+      [LAST_DEDUPE_PROP]: { date: { start: nowISO } },
+    },
+  });
+  // gentle pacing
+  await sleep(220);
+
+  // 2) Flip Primary off on older duplicates
+  for (const p of olderPages) {
+    const props = {
+      [PRIMARY_PROP]: { checkbox: false },
+    };
+
+    if (AUTO_ARCHIVE && hasProperty(p, "Status")) {
+      // Only set if "Status" exists on the DB
+      props["Status"] = { select: { name: ARCHIVE_STATUS_NAME } };
+    }
+
+    await notion.pages.update({
+      page_id: p.id,
+      properties: props,
+    });
+    await sleep(220);
+  }
+}
+
+// ---------- Core dedupe ----------
+async function run() {
+  console.log("Starting Notion dedupe…");
+  console.log(
+    JSON.stringify(
+      {
+        db: NOTION_DB_ID,
+        uidProp: UID_PROP,
+        primaryProp: PRIMARY_PROP,
+        lastDedupedProp: LAST_DEDUPE_PROP,
+        autoArchive: AUTO_ARCHIVE,
+        archiveStatusName: ARCHIVE_STATUS_NAME,
+      },
+      null,
+      2
+    )
+  );
+
+  const pages = await fetchAllPages(NOTION_DB_ID);
+  console.log(`Fetched ${pages.length} pages.`);
+
+  // Group by UID (skip blanks)
+  /** @type {Map<string, any[]>} */
+  const groups = new Map();
+
+  for (const page of pages) {
+    if (!hasProperty(page, UID_PROP)) continue; // no UID column
+    const uid = getPlainText(page.properties[UID_PROP]).trim();
+    if (!uid) continue; // ignore rows without UID
+
+    if (!groups.has(uid)) groups.set(uid, []);
+    groups.get(uid).push(page);
+  }
+
+  console.log(`Found ${groups.size} UID groups (non-blank).`);
+
+  let touchedGroups = 0;
+  for (const [uid, list] of groups.entries()) {
+    // list is already in ascending created_time because of the DB sort
+    const primary = list[list.length - 1];
+    const older = list.slice(0, -1);
+
+    // If there is only one page, still enforce Primary on it and stamp date
+    try {
+      await markPrimaryAndStamp({ primaryPage: primary, olderPages: older });
+      touchedGroups++;
+      if (touchedGroups % 25 === 0) {
+        console.log(`Processed ${touchedGroups} UID groups…`);
+      }
+    } catch (err) {
+      console.error(`Failed to update group uid="${uid}":`, err?.message || err);
+    }
+  }
+
+  console.log(`Done. Processed ${touchedGroups} groups.`);
+}
+
+// ---------- Execute ----------
+run().catch((e) => {
+  console.error("Fatal error:", e?.message || e);
+  process.exit(1);
+});
