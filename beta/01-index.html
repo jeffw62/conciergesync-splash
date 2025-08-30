@@ -469,6 +469,31 @@
     .tools-pill{ right:12px; bottom:calc(96px + env(safe-area-inset-bottom)); }
     .tools-card{ right:12px; bottom:calc(146px + env(safe-area-inset-bottom)); min-width:200px; }
   }
+  /* anchor the dropdown to the tabs bar */
+.cs-tabs { position: relative; }
+
+/* Tools dropdown */
+#tools-menu{
+  position: absolute;
+  right: 0;
+  top: calc(100% + 8px);
+  min-width: 220px;
+  padding: 8px;
+  border-radius: 12px;
+  background: var(--glass-bg, rgba(255,255,255,.10));
+  backdrop-filter: var(--glass-blur, blur(14px) saturate(1.1));
+  border: 1px solid var(--glass-brd, rgba(255,255,255,.22));
+  box-shadow: 0 18px 48px rgba(0,0,0,.45);
+}
+#tools-menu a{
+  display: block;
+  padding: 10px 12px;
+  border-radius: 8px;
+  color: var(--ink, #eaf2ff);
+  text-decoration: none;
+}
+#tools-menu a:hover { background: rgba(255,255,255,.12); }
+
 </style>
 
 <script>
@@ -529,6 +554,7 @@
 
 </body>
 </html>
+
 
 
 
