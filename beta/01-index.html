@@ -183,7 +183,17 @@
     <button class="cs-tab" data-key="overview">Overview</button>
     <button class="cs-tab" data-key="itinerary">Itinerary</button>
     <button class="cs-tab" data-key="values">Value Calc</button>
-    <button class="cs-tab" data-key="values">Tools</button>
+
+    <!-- Tools button + hidden menu -->
+    <button id="tools-toggle" class="cs-tab" data-key="tools"
+      aria-expanded="false" aria-controls="tools-menu">
+      Tools
+    </button>
+  <div id="tools-menu" hidden>
+    <a id="tool-edit-sec1" href="#" target="_blank" rel="noopener">
+    Edit Your Info (Section 1)
+    </a>
+  </div>
   </div>
 
   <!-- Exit -->
@@ -519,6 +529,7 @@
 
 </body>
 </html>
+
 
 
 
