@@ -291,16 +291,20 @@
     const ref = doc(db, 'beta_users', key);
     const existing = await getDoc(ref);
 
-    // If the email is already registered → nudge to Login
-    if (existing.exists()){
-      setWorking(false);
-      show(errEmail);
-      errEmail.textContent = 'This email is already registered. Please log in as a returning user.';
-      setMode('login');                         // switch UI to Login tab
-      email.setAttribute('aria-invalid','true');
-      try{ email.focus(); }catch(_){}
-      return;
-    }
+   // Already has an account → nudge to Login (show message ON the Login tab)
+if (existing.exists()){
+  setWorking(false);
+
+  setMode('login');          // 1) switch tabs first (this clears old errors)
+  email.value = key;         // 2) keep their email filled in
+
+  show(errEmail);            // 3) now show the message on the Login tab
+  errEmail.textContent = 'This email is already registered. Please log in as a returning user.';
+  email.setAttribute('aria-invalid','true');
+  try { email.focus(); } catch {}
+
+  return;
+}
 
     // New user → create doc
     await setDoc(ref, {
