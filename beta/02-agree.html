@@ -9,7 +9,7 @@
     .cs-bg {
       position: fixed;
       inset: 0;
-      background: url('/beta/assets/CS_monogram.png') center/620px repeat;
+      background: url('/beta/assets/CS_monogram.png') center/500px repeat;
       opacity: .4;
       pointer-events: none;
     }
@@ -20,20 +20,7 @@
          font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
          display:grid;place-items:center;padding:18px}
 
-    /* Header logo */
-    .cs-header {
-      text-align: center;
-      margin-bottom: 20px;
-    }
-    .cs-header img {
-      max-width: 260px;
-      height: auto;
-    }
-    @media (max-width: 600px) {
-      .cs-header img { max-width: 180px; }
-    }
-
-    /* Glass tile (500px) */
+    /* Glass tile */
     .tile{width:min(500px,92vw);border:1px solid var(--brd);border-radius:18px;background:var(--glass);
           backdrop-filter:blur(12px) saturate(1.2);box-shadow:0 20px 60px rgba(0,0,0,.45);
           padding:20px 18px 16px}
@@ -62,10 +49,6 @@
   <div class="cs-bg"></div>
 
   <main class="tile" role="main" aria-labelledby="title">
-    <div class="cs-header">
-      <img src="/beta/assets/CS_logo.png" alt="ConciergeSync Logo">
-    </div>
-
     <h1 id="title">Before We Begin…</h1>
     <p class="intro">Please review the Terms &amp; Privacy below. Scroll to the bottom to unlock <strong>“I agree — continue”</strong>.</p>
 
