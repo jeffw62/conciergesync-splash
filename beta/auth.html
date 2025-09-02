@@ -138,8 +138,219 @@
 
   <!-- Firebase + auth logic -->
   <script type="module">
-    // Firebase SDK + Firestore logic unchanged...
-    // (your entire script block stays the same)
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getFirestore, doc, getDoc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCcqBQtV3e1hGRMzBa_k5trNRqL0UmlByE",
+      authDomain: "conciergesync.firebaseapp.com",
+      projectId: "conciergesync",
+      storageBucket: "conciergesync.appspot.com",
+      messagingSenderId: "882907448780",
+      appId: "1:882907448780:web:6e797ce9ad5bb84a9f8969"
+    };
+
+    let app, db;
+    try { app = initializeApp(firebaseConfig); db = getFirestore(app); }
+    catch (e) { console.warn("Firebase init error:", e); }
+
+    // ---- UID helpers ----
+    function genCsUid() {
+      const r = crypto.getRandomValues(new Uint8Array(12));
+      return 'cs_' + Array.from(r).map(b => b.toString(16).padStart(2,'0')).join('').slice(0,20);
+    }
+    async function getOrCreateUid(db, email) {
+      const key = email.toLowerCase().trim();
+      const ref = doc(db, 'beta_users', key);
+      const snap = await getDoc(ref);
+      let uid = snap.exists() && snap.data().uid;
+      if (!uid) {
+        uid = genCsUid();
+        await setDoc(ref, { uid, updatedAt: serverTimestamp() }, { merge: true });
+      }
+      try {
+        localStorage.setItem('cs_uid', uid);
+        localStorage.setItem('cs_email', key);
+      } catch (e) {}
+      return uid;
+    }
+
+    const $ = s => document.querySelector(s);
+    const mode = { value: 'register' };
+
+    const tabLogin = $('#tabLogin'), tabReg = $('#tabReg');
+    const nameRow  = $('#nameRow'), agreeRow = $('#agreeRow');
+    const first = $('#first'), last = $('#last'), email = $('#email'), agree = $('#agree');
+    const errFirst = $('#errFirst'), errLast = $('#errLast'), errEmail = $('#errEmail'), errAgree = $('#errAgree');
+    const form = $('#gate'), submitBtn = $('#doSubmit'), statusEl = $('#status');
+
+    [first,last,email].forEach(i => { try{ i.value=''; }catch{} });
+
+    function validEmail(v){ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v); }
+    function hide(el){ el && (el.style.display='none'); }
+    function show(el){ el && (el.style.display='block'); }
+    function clearErrors(){
+      [first,last,email].forEach(i=>i.setAttribute('aria-invalid','false'));
+      [errFirst,errLast,errEmail,errAgree].forEach(hide);
+      statusEl.classList.remove('show');
+    }
+    function setWorking(on){
+      submitBtn.disabled = on;
+      submitBtn.style.opacity = on ? .7 : 1;
+      statusEl.textContent = on ? 'Working…' : '';
+      statusEl.classList.toggle('show', on);
+    }
+
+    function applyRequireds(){
+      const login = mode.value === 'login';
+      email.required = true;
+      first.required = !login;
+      last.required  = !login;
+    }
+
+    function setMode(m){
+      mode.value = m;
+      const login = m === 'login';
+      tabLogin.classList.toggle('is-active', login);
+      tabReg.classList.toggle('is-active', !login);
+      tabLogin.setAttribute('aria-selected', login);
+      tabReg.setAttribute('aria-selected', !login);
+      nameRow.style.display = login ? 'none' : 'grid';
+      agreeRow.style.display = 'none';
+      submitBtn.textContent = login ? 'Log in' : 'Create account';
+      [first,last].forEach(i => i.value='');
+      clearErrors();
+      applyRequireds();
+    }
+    tabLogin.addEventListener('click', ()=> setMode('login'));
+    tabReg  .addEventListener('click', ()=> setMode('register'));
+    applyRequireds(); // init
+
+    ['input','change'].forEach(evt=>{
+      [first,last,email,agree].forEach(el => el && el.addEventListener(evt, clearErrors));
+    });
+
+    function goConsole(){
+      try{
+        localStorage.setItem('cs_authed','1');
+        sessionStorage.setItem('cs_authed','1');
+      }catch{}
+      location.replace('/beta/01-index.html?enter=1');
+    }
+
+    async function handleLogin(emailStr){
+      const key = emailStr.toLowerCase().trim();
+      if (!db){ show(errEmail); errEmail.textContent = 'Cannot reach database.'; return; }
+
+      setWorking(true);
+      try{
+        const ref = doc(db, 'beta_users', key);
+        const snap = await getDoc(ref);
+        if (snap.exists()){
+          await getOrCreateUid(db, key);
+          setWorking(false);
+          goConsole();
+        } else {
+          setWorking(false);
+          show(errEmail);
+          errEmail.textContent = 'We couldn’t find that email. Please register first.';
+          email.setAttribute('aria-invalid','true');
+          email.focus();
+        }
+      }catch(e){
+        console.warn(e);
+        setWorking(false);
+        show(errEmail);
+        errEmail.textContent = 'Login unavailable.';
+        email.setAttribute('aria-invalid','true');
+      }
+    }
+
+    async function handleRegister(firstStr, lastStr, emailStr){
+      const key = emailStr.toLowerCase().trim();
+      if (!db){ show(errEmail); errEmail.textContent = 'Cannot reach database.'; return; }
+
+      setWorking(true);
+      try{
+        const ref = doc(db, 'beta_users', key);
+        const existing = await getDoc(ref);
+
+        if (existing.exists()){
+          setWorking(false);
+          setMode('login');
+          email.value = key;
+          show(errEmail);
+          errEmail.textContent = 'This email is already registered. Please log in.';
+          email.setAttribute('aria-invalid','true');
+          try { email.focus(); } catch {}
+          return;
+        }
+
+        await setDoc(ref, {
+          first: firstStr.trim(),
+          last:  lastStr.trim(),
+          email: key,
+          createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp()
+        }, { merge: true });
+
+        const uid = await getOrCreateUid(db, key);
+        try{
+          localStorage.setItem('cs_email', key);
+          localStorage.setItem('cs_first', firstStr.trim());
+          localStorage.setItem('cs_last',  lastStr.trim());
+          localStorage.setItem('cs_uid',   uid || '');
+        }catch(_){}
+
+        setWorking(false);
+
+        const qs = new URLSearchParams({
+          email: key,
+          first: firstStr.trim(),
+          last:  lastStr.trim(),
+          uid:   uid || '',
+          return: '/beta/03-intake-start.html'
+        });
+        location.assign('/beta/02-agree.html?' + qs.toString());
+      }catch(e){
+        console.warn(e);
+        setWorking(false);
+        show(errEmail);
+        errEmail.textContent = 'Registration unavailable.';
+        email.setAttribute('aria-invalid','true');
+      }
+    }
+
+    function validate(){
+      clearErrors();
+      let ok = true, focusEl = null;
+      const e = email.value.trim();
+
+      if(!validEmail(e)){ ok=false; show(errEmail); errEmail.textContent='Please enter a valid email address.'; email.setAttribute('aria-invalid','true'); focusEl = focusEl || email; }
+
+      if(mode.value !== 'login'){
+        if(!first.value.trim()){ ok=false; show(errFirst); first.setAttribute('aria-invalid','true'); focusEl = focusEl || first; }
+        if(!last.value.trim()){  ok=false; show(errLast);  last.setAttribute('aria-invalid','true');  focusEl = focusEl || last; }
+      }
+      if(!ok && focusEl){ try{ focusEl.focus(); }catch{} }
+      return ok;
+    }
+
+    form.addEventListener('submit', async (ev) => {
+      ev.preventDefault();
+      if(!validate()) return;
+      const e = email.value.trim();
+      if (mode.value === 'login'){
+        await handleLogin(e);
+      } else {
+        await handleRegister(first.value, last.value, e);
+      }
+    });
+
+    (function defaultToLoginIfRequested(){
+      const q = new URLSearchParams(location.search);
+      if (q.get('mode') === 'login') setMode('login');
+    })();
   </script>
 </body>
 </html>
