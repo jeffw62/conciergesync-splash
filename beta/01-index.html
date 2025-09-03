@@ -367,17 +367,17 @@
   }
 
   function openTile(key){
-    const existing = stage.querySelector(\`.cs-tile[data-key="\${key}"]\`);
+    const existing = stage.querySelector(`.cs-tile[data-key="${key}"]`);
     if (existing){ existing.style.zIndex = ++zTop; existing.classList.add('is-focused'); return; }
 
     const el = document.createElement('section');
     el.className = 'cs-tile';
     el.dataset.key = key;
-    el.innerHTML = (TEMPLATES[key] || (()=>\`
+    el.innerHTML = (TEMPLATES[key] || (()=>`
       <header class="cs-tile-head">
-        <h4>\${key}</h4><button class="cs-close" aria-label="Close">×</button>
+        <h4>${key}</h4><button class="cs-close" aria-label="Close">×</button>
       </header>
-      <div class="cs-tile-body"><p>\${key} tile.</p></div>\`))();
+      <div class="cs-tile-body"><p>${key} tile.</p></div>`))();
 
     stage.appendChild(el);
     el.style.zIndex = ++zTop;
@@ -401,7 +401,7 @@
     }
   });
 
-  // click -> open tiles
+  // click -> open tiles (MAIN TAB BUTTONS)
   document.querySelectorAll('.cs-tab').forEach(btn=>{
     btn.addEventListener('click', ()=> openTile(btn.dataset.key));
   });
