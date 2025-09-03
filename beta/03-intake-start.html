@@ -69,11 +69,15 @@
     .alert-box{
       margin:18px auto; padding:16px 20px;
       border:2px solid #ffcc33; border-radius:14px;
-      background:linear-gradient(180deg, rgba(0,0,0,.55), rgba(0,0,0,.55)),
-             rgba(255,204,51,.08);
-      color:#ffd966; font-weight:600;
+      background:rgba(0,0,0,.55);   /* darker wash to improve contrast */
+      color:#fff; font-weight:500;
       font-size:15px; line-height:1.45;
       text-align:left;
+    }
+
+      .alert-box strong,
+      .alert-box em {
+      color:#ffd966; font-weight:600;
     }
 
     @media (max-width:480px){ .card{padding:28px 18px} }
