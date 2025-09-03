@@ -260,43 +260,35 @@
   const stage = document.getElementById('cs-tiles');
   let zTop = 10;
 
-  const forms = {
-    sec1: "https://noteforms.com/forms/beta-user-tracker-conciergesync-b4yxaf",
-    sec2: "https://noteforms.com/forms/section-2-authorized-user-card-setup-conciergesync-xnkw5k",
-    sec3: "https://noteforms.com/forms/section-3-loyalty-program-overview-40ya0y",
-    sec4: "https://noteforms.com/forms/section-4-transferable-points-programs-wp4ujy"
-  };
+  const FORM_URL = "https://noteforms.com/forms/beta-user-tracker-conciergesync-b4yxaf";
   const UID_GUID = "78ddd51d-9ccb-4fc7-a3cd-d17f7cd37ff4";
-
   function wireEditLink(scope){
     const root = scope || document;
+    const a = root.querySelector('#tool-edit-sec1');
+    if (!a) return;
+
     const uid   = localStorage.getItem('cs_uid')   || "";
     const email = localStorage.getItem('cs_email') || "";
     const first = localStorage.getItem('cs_first') || "";
     const last  = localStorage.getItem('cs_last')  || "";
 
-    Object.entries(forms).forEach(([key, baseUrl]) => {
-      const a = root.querySelector(`#tool-edit-${key}`);
-      if (!a) return;
+    if (!uid){
+      a.href = "/beta/auth.html?mode=login&next=/beta/05-section-1.html";
+      a.removeAttribute('target');
+      a.title = "Log in to edit your answers";
+      return;
+    }
+    const url = new URL(FORM_URL);
+    url.searchParams.set("uid", uid);
+    url.searchParams.set(UID_GUID, uid);
+    if (email) url.searchParams.set("email", email);
+    if (first) url.searchParams.set("first", first);
+    if (last)  url.searchParams.set("last",  last);
 
-      if (!uid){
-        a.href = "/beta/auth.html?mode=login";
-        a.removeAttribute('target');
-        a.title = "Log in to edit your answers";
-        return;
-      }
-
-      const url = new URL(baseUrl);
-      url.searchParams.set("uid", uid);
-      url.searchParams.set(UID_GUID, uid);
-      if (email) url.searchParams.set("email", email);
-      if (first) url.searchParams.set("first", first);
-      if (last)  url.searchParams.set("last",  last);
-
-      a.href = url.toString();
-      a.target = "_blank";
-      a.rel = "noopener";
-    });
+    a.href = url.toString();
+    a.target = "_blank";
+    a.rel = "noopener";
+    a.title = "Edit your Section 1 answers (opens in a new tab)";
   }
 
   const TEMPLATES = {
@@ -320,8 +312,21 @@
         <h4>User Tools</h4><button class="cs-close" aria-label="Close">×</button>
       </header>
       <div class="cs-tile-body">
-        <a id="tool-edit-sec1" class="cs-tab">✏️ Edit Section 1</a>
-        <a id="tool-update-profile" class="cs-tab">🗂️ Update Profile</a>
+        <a id="tool-edit-sec1"
+           class="cs-tab"
+           href="#"
+           target="_blank"
+           rel="noopener"
+           title="Edit your Section 1 answers (opens in a new tab)"
+           aria-label="Edit your Section 1 answers">
+          ✏️ Edit
+        </a>
+        <a id="tool-update-profile"
+           class="cs-tab"
+           href="#"
+           title="Open your profile sections (Travel Profile, Cards, Loyalty, Points) to update answers.">
+          🗂️ Update Profile
+        </a>
       </div>`,
     profile: () => `
       <header class="cs-tile-head">
@@ -329,14 +334,10 @@
       </header>
       <div class="cs-tile-body">
         <div style="display:flex;flex-direction:column;gap:10px">
-          <a id="tool-edit-sec1" class="cs-tab" target="_blank" rel="noopener"
-             title="Update your travel profile (home airport, frequency, goals)">Section 1 — Travel Profile</a>
-          <a id="tool-edit-sec2" class="cs-tab" target="_blank" rel="noopener"
-             title="Update authorized users and cards">Section 2 — Cards & Authorized Users</a>
-          <a id="tool-edit-sec3" class="cs-tab" target="_blank" rel="noopener"
-             title="Update your loyalty program activity">Section 3 — Loyalty Programs</a>
-          <a id="tool-edit-sec4" class="cs-tab" target="_blank" rel="noopener"
-             title="Update transferable points">Section 4 — Points Programs</a>
+          <button class="cs-tab" title="Update your travel profile (home airport, frequency, goals)">Section 1 — Travel Profile</button>
+          <button class="cs-tab" title="Update authorized users and cards">Section 2 — Cards & Authorized Users</button>
+          <button class="cs-tab" title="Update your loyalty program activity">Section 3 — Loyalty Programs</button>
+          <button class="cs-tab" title="Update transferable points">Section 4 — Points Programs</button>
         </div>
       </div>`
   };
@@ -363,35 +364,20 @@
     tile.addEventListener('pointerup', blur);
     tile.addEventListener('pointercancel', blur);
     tile.querySelector('.cs-close')?.addEventListener('click', (e) => { e.stopPropagation(); dismiss(tile, 1); });
-
-    // drag
-    let isDown=false, startX=0, startY=0, baseX=0, baseY=0;
-    function onDown(e){ if (e.button!==0) return;
-      isDown=true; focus();
-      startX=e.clientX; startY=e.clientY;
-      const r=tile.getBoundingClientRect(); baseX=r.left; baseY=r.top;
-      e.preventDefault(); }
-    function onMove(e){ if(!isDown) return;
-      const dx=e.clientX-startX, dy=e.clientY-startY;
-      tile.style.left=(baseX+dx)+'px'; tile.style.top=(baseY+dy)+'px'; e.preventDefault();}
-    function onUp(){ isDown=false; }
-    tile.addEventListener('pointerdown',onDown,{passive:false});
-    window.addEventListener('pointermove',onMove,{passive:false});
-    window.addEventListener('pointerup',onUp);
   }
 
   function openTile(key){
-    const existing = stage.querySelector(\`.cs-tile[data-key="\${key}"]\`);
+    const existing = stage.querySelector(`.cs-tile[data-key="${key}"]`);
     if (existing){ existing.style.zIndex = ++zTop; existing.classList.add('is-focused'); return; }
 
     const el = document.createElement('section');
     el.className = 'cs-tile';
     el.dataset.key = key;
-    el.innerHTML = (TEMPLATES[key] || (()=>\`
+    el.innerHTML = (TEMPLATES[key] || (()=>`
       <header class="cs-tile-head">
-        <h4>\${key}</h4><button class="cs-close" aria-label="Close">×</button>
+        <h4>${key}</h4><button class="cs-close" aria-label="Close">×</button>
       </header>
-      <div class="cs-tile-body"><p>\${key} tile.</p></div>\`))();
+      <div class="cs-tile-body"><p>${key} tile.</p></div>`))();
 
     stage.appendChild(el);
     el.style.zIndex = ++zTop;
@@ -404,13 +390,23 @@
     addHandlers(el);
     el.classList.add('is-focused');
 
-    if (key === 'tools' || key === 'profile') wireEditLink(el);
+    if (key === 'tools') wireEditLink(el);
   }
 
+  // Wire Update Profile button
+  document.addEventListener('click', (e)=>{
+    if (e.target && e.target.id === 'tool-update-profile'){
+      e.preventDefault();
+      openTile('profile');
+    }
+  });
+
+  // click -> open tiles (MAIN TAB BUTTONS)
   document.querySelectorAll('.cs-tab').forEach(btn=>{
     btn.addEventListener('click', ()=> openTile(btn.dataset.key));
   });
 
+  // support ?open=tools etc.
   const qs = new URLSearchParams(location.search);
   if (qs.get('open')) openTile(qs.get('open'));
 
