@@ -21,7 +21,34 @@
       display:flex; align-items:center; justify-content:center;
       padding:24px; position:relative; overflow:hidden;
     }
+    .tile {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 
+  width: min(360px, 90vw);
+  max-height: 88vh;
+
+  display: flex;
+  flex-direction: column;
+
+  border-radius: 20px;
+  background: rgba(20,20,25,.45);
+  border: 1px solid rgba(255,255,255,.25);
+  backdrop-filter: blur(14px) saturate(1.2);
+  box-shadow: 0 22px 60px rgba(0,0,0,.5);
+  padding: 22px;
+
+  /* lock outer scroll */
+  overflow: hidden;
+}
+
+.tile .tile-body {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
     .cs-bg{
       position:fixed; inset:0; z-index:-2;
       background:url('/beta/assets/CS_Logo_Premium.png') center/500px repeat;
