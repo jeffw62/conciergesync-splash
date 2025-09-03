@@ -44,8 +44,9 @@
 
 .tile-body {
   flex: 1;
-  min-height: 0;              /* 🔑 allows shrink inside flex */
-  overflow-y: auto;           /* inner scroll only */
+  min-height: 0;
+  max-height: calc(90vh - 140px);  /* tile height minus header/footer space */
+  overflow-y: auto;
   -webkit-overflow-scrolling: touch;
 }
 
