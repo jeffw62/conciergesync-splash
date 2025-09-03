@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>ConciergeSync™ — Intake Section 1</title>
+  <style>
+    :root{
+      --page-bg:#0b0f14;
+      --ink:#eaf2ff; --muted:#9fb0c8;
+      --glass-bg:rgba(255,255,255,.10);
+      --glass-brd:rgba(255,255,255,.22);
+      --glass-blur:blur(14px) saturate(1.1);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0; color:var(--ink);
+      font-family:system-ui,-apple-system,Segoe UI,Inter,Arial,sans-serif;
+      background:var(--page-bg);
+      display:flex; align-items:center; justify-content:center;
+      padding:24px; position:relative; overflow:auto;
+    }
+    .cs-bg{
+      position:fixed; inset:0; z-index:-2;
+      background:url('/beta/assets/CS_Logo_Premium.png') center/500px repeat;
+      opacity:.75; pointer-events:none;
+    }
+    body::after{
+      content:""; position:fixed; inset:0; z-index:-1; pointer-events:none;
+      background:
+        radial-gradient(120% 120% at 50% 0%, rgba(255,255,255,.04), rgba(0,0,0,.28) 60%, rgba(0,0,0,.55) 100%),
+        linear-gradient(180deg, rgba(255,255,255,.02), rgba(0,0,0,.08));
+    }
+
+    /* Card sized to viewport (consistent with Sections 3/4) */
+    .card{
+      width:min(560px, 96vw);
+      height: calc(100vh - 48px);
+      max-height: 980px;
+      border-radius:22px;
+      background:var(--glass-bg);
+      backdrop-filter:var(--glass-blur);
+      box-shadow:0 18px 48px rgba(0,0,0,.45), inset 0 0 0 1px var(--glass-brd);
+      padding:18px 18px 22px;
+      display:flex;
+      flex-direction:column;
+      overflow:hidden;
+      text-align:left;
+    }
+    header{display:flex; align-items:center; justify-content:space-between; gap:16px; margin-bottom:10px}
+    h1{font-size:clamp(18px, 2.6vw, 24px); margin:0}
+    .hint{color:var(--muted); font-size:13px}
+
+    /* The iframe flexes to fill the card */
+    #nf-embed{
+      width:100%;
+      flex:1 1 auto;
+      min-height:0;
+      border:0; border-radius:14px;
+      background:transparent !important;
+    }
+
+    @media (max-width:480px){
+      body{ padding:16px; }
+      .card{ height: calc(100vh - 32px); }
+    }
+  </style>
+</head>
+<body>
+  <div class="cs-bg"></div>
+
+  <main class="card" role="main" aria-labelledby="hdr">
+    <header>
+      <h1 id="hdr">Section 1 — Getting started</h1>
+      <div class="hint">Takes ~2 minutes</div>
+    </header>
+
+    <!-- Single iframe; src is set by the inline script below -->
+    <iframe
+      id="nf-embed"
+      data-src="https://noteforms.com/forms/beta-user-tracker-conciergesync-b4yxaf?embed=true&theme=dark"
+      allow="clipboard-write">
+    </iframe>
+
+    <div style="text-align:center;color:#a7b4c9;font-size:12px;margin-top:10px">
+      Questions? Email <a href="mailto:hello@conciergesync.ai" style="color:#dbe3f4">hello@conciergesync.ai</a>
+    </div>
+  </main>
+
+  <script>
+  (() => {
+    // Pull values from QS / localStorage
+    const qs = new URLSearchParams(location.search);
+    const email = qs.get('email') || localStorage.getItem('cs_email') || '';
+    const first = qs.get('first') || localStorage.getItem('cs_first') || '';
+    const last  = qs.get('last')  || localStorage.getItem('cs_last')  || '';
+    const uid = qs.get('uid') || localStorage.getItem('cs_uid') || '';
+    const name  = [first, last].filter(Boolean).join(' ').trim();
+
+    // Section 1 field IDs (from NoteForms prefill)
+    const NAME_ID  = 'cf891a43-1e3c-4403-886c-3a7550291a22'; // Name (First/Last)
+    const EMAIL_ID = 'aafd8404-ef8a-4b17-ab3d-15e2357e93a5'; // Client Email
+    const UID_ID = '78ddd51d-9ccb-4fc7-a3cd-d17f7cd37ff4';
+
+    // Build embed URL with prefill (field IDs are reliable regardless of mapping)
+    const iframe = document.getElementById('nf-embed');
+    const base   = iframe.dataset.src;
+    const url    = new URL(base, location.href);
+
+    if (name)  url.searchParams.set(NAME_ID,  name);
+    if (email) url.searchParams.set(EMAIL_ID, email);
+    if (uid)   url.searchParams.set(UID_ID,   uid);   // ← add this
+    if (uid)   url.searchParams.set('uid',    uid);   // optional fallback
+    url.searchParams.set('_ts', Date.now().toString()); // cache-bust
+
+    iframe.src = url.toString();
+
+    // On successful submit → Section 2 (preserve QS)
+    window.addEventListener('message', (e) => {
+      if (!String(e.origin).includes('noteforms.com')) return;
+      const d = e.data;
+      if (d?.type === 'form-submitted' && d?.form?.slug === 'beta-user-tracker-conciergesync-b4yxaf') {
+        location.href = `06-section-2.html${location.search}`;
+      }
+    });
+  })();
+  </script>
+
+</body>
+</html>
