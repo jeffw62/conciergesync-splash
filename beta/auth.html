@@ -5,82 +5,146 @@
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>Welcome • ConciergeSync™</title>
   <style>
-    /* --- Gold watermark background --- */
-    .cs-bg{
-      position:fixed; inset:0; z-index:-2;
-      background:url('/beta/assets/CS_Logo_Premium.png') center/500px repeat;
-      opacity:.75; pointer-events:none;
-    }
+  /* --- Global Reset --- */
+  *, *::before, *::after { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; overflow-x: hidden; }
 
-    :root{
-      --glass: rgba(255,255,255,.10);
-      --brd:   rgba(255,255,255,.28);
-      --ink:   #eaf2ff;
-      --muted: #9fb0c8;
-    }
-    html,body{height:100%}
-    body{
-      margin:0; color:var(--ink); background:#0b0f14;
-      font-family:system-ui,-apple-system,Segoe UI,Inter,Arial,sans-serif;
-      display:grid; place-items:center; padding:18px;
-    }
+  body {
+    background: #0b0f14;
+    color: #eaf2ff;
+    font-family: system-ui,-apple-system,Segoe UI,Inter,Arial,sans-serif;
+    display: grid;
+    place-items: center;
+    padding: 18px;
+  }
 
-    .tile{
-      width:min(450px, 92vw);
-      border-radius:18px;
-      background:var(--glass);
-      border:1px solid var(--brd);
-      backdrop-filter: blur(12px) saturate(1.2);
-      box-shadow:0 22px 60px rgba(0,0,0,.45);
-      padding: clamp(20px, 3.5vw, 30px);
-    }
-    h1{margin:0 0 8px; font-size: clamp(26px,4vw,34px); text-align:center; font-weight:800; letter-spacing:-.01em}
-    .lead{margin:6px 0 18px; text-align:center; color:var(--muted)}
-    .tabs{display:flex; gap:10px; justify-content:center; margin:8px 0 16px}
-    .tab{
-      padding:8px 12px; border-radius:999px; font-weight:700; border:1px solid rgba(255,255,255,.35);
-      background:rgba(255,255,255,.06); color:#fff; cursor:pointer; user-select:none;
-    }
-    .tab.is-active{ background:rgba(255,255,255,.14) }
+  /* --- Gold watermark background --- */
+  .cs-bg {
+    position: fixed; inset: 0; z-index: -2;
+    background: url('/beta/assets/CS_Logo_Premium.png') center/500px repeat;
+    opacity: .65; pointer-events: none;
+  }
 
-    form{margin:0}
-    .row{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:8px 0}
-    .row.single{ grid-template-columns:1fr }
-    label{font-size:13px; color:#cbd7ea; display:block; margin:6px 0}
-    input[type="text"], input[type="email"]{
-      width:100%; padding:12px 12px; border-radius:10px; border:1px solid rgba(255,255,255,.28);
-      background:rgba(0,0,0,.35); color:#fff; outline:none;
-    }
-    input[aria-invalid="true"]{ border-color:#ff6b6b; }
-    .err{ display:none; color:#ffb3b3; font-size:12px; margin-top:6px }
-    .actions{ margin-top:14px; display:flex; gap:10px; justify-content:center }
-    .btn{
-      padding:12px 18px; border-radius:999px; font-weight:800; border:1px solid rgba(255,255,255,.45);
-      background:rgba(255,255,255,.10); color:#fff; cursor:pointer;
-    }
-    .status{ opacity:0; transition:.15s; text-align:center; margin-top:8px; color:#cbd7ea; font-size:14px }
-    .status.show{ opacity:1 }
-    .foot{ margin-top:14px; color:#a7b4c9; font-size:12px; text-align:center }
+  /* --- Glass Tile --- */
+  .tile {
+    width: min(440px, 92vw);
+    border-radius: 20px;
+    background: rgba(20,20,25,.45);
+    border: 1px solid rgba(255,255,255,.25);
+    backdrop-filter: blur(14px) saturate(1.2);
+    box-shadow: 0 22px 60px rgba(0,0,0,.5);
+    padding: clamp(22px, 3.5vw, 32px);
+  }
 
-    /* Keep the card at 500px */
-    .card{ width: min(500px, calc(100vw - 32px)); margin-inline:auto; }
+  h1 {
+    margin: 0 0 8px;
+    font-size: clamp(26px,4vw,32px);
+    text-align: center;
+    font-weight: 800;
+    letter-spacing: -.01em;
+  }
 
-    /* Form spacing */
-    #gate{ padding-inline:12px; }
-    #nameRow{
-      display:grid;
-      grid-template-columns: 1fr 1fr;
-      column-gap:12px;
-    }
-    #gate input[type="text"],
-    #gate input[type="email"]{
-      width:100%;
-      box-sizing:border-box;
-    }
-    @media (max-width:520px){
-      #nameRow{ grid-template-columns: 1fr; row-gap:12px; }
-    }
-  </style>
+  .lead {
+    margin: 6px 0 22px;
+    text-align: center;
+    color: #9fb0c8;
+    font-size: 15px;
+  }
+
+  /* --- Tabs --- */
+  .tabs {
+    display: flex; gap: 12px;
+    justify-content: center;
+    margin: 10px 0 20px;
+  }
+  .tab {
+    flex: 1;
+    padding: 10px 14px;
+    border-radius: 999px;
+    border: 1px solid rgba(255,255,255,.35);
+    background: rgba(255,255,255,.08);
+    color: #fff;
+    font-weight: 600;
+    cursor: pointer;
+    text-align: center;
+    transition: all .2s ease;
+  }
+  .tab.is-active {
+    background: linear-gradient(135deg,#d4af37,#b8860b);
+    color: #111;
+    border: none;
+    box-shadow: 0 4px 12px rgba(0,0,0,.4);
+  }
+
+  /* --- Form Layout --- */
+  form { margin: 0; }
+  .row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 10px 0; }
+  .row.single { grid-template-columns: 1fr; }
+  label { font-size: 13px; color: #cbd7ea; margin-bottom: 6px; display: block; }
+
+  /* --- Inputs --- */
+  input[type="text"], input[type="email"] {
+    width: 100%;
+    padding: 12px 14px;
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,.25);
+    background: rgba(0,0,0,.35);
+    color: #fff;
+    font-size: 15px;
+    transition: border .2s ease, box-shadow .2s ease;
+  }
+  input:focus {
+    outline: none;
+    border-color: #d4af37;
+    box-shadow: 0 0 0 3px rgba(212,175,55,.35);
+  }
+  input[aria-invalid="true"] {
+    border-color: #ff6b6b;
+  }
+
+  .err {
+    display: none;
+    color: #ff9e9e;
+    font-size: 12px;
+    margin-top: 6px;
+  }
+
+  /* --- Button --- */
+  .actions { margin-top: 20px; display: flex; justify-content: center; }
+  .btn {
+    padding: 14px 20px;
+    border-radius: 999px;
+    font-weight: 700;
+    border: none;
+    background: linear-gradient(135deg,#d4af37,#b8860b);
+    color: #111;
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(0,0,0,.45);
+    transition: transform .15s ease, box-shadow .15s ease;
+  }
+  .btn:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(0,0,0,.5); }
+  .btn:active { transform: translateY(0) scale(.98); }
+
+  /* --- Status + Footer --- */
+  .status {
+    opacity: 0; transition:.15s;
+    text-align:center; margin-top:10px;
+    color:#cbd7ea; font-size:14px;
+  }
+  .status.show { opacity: 1; }
+  .foot {
+    margin-top: 18px;
+    color: #a7b4c9;
+    font-size: 12px;
+    text-align: center;
+  }
+
+  /* --- Responsive --- */
+  @media (max-width:520px){
+    .row { grid-template-columns: 1fr; }
+  }
+</style>
+
 </head>
 <body>
   <div class="cs-bg"></div>
