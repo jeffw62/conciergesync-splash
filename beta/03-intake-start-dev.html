@@ -16,40 +16,36 @@
 
     html,body{height:100%}
     body {
-  margin: 0; 
+  margin: 0;
   color: var(--ink);
   font-family: system-ui,-apple-system,Segoe UI,Inter,Arial,sans-serif;
   background: var(--page-bg);
   display: flex;
-  justify-content: center;      /* horizontal center */
-  align-items: flex-start;      /* align to top */
+  justify-content: center;    /* center horizontally */
+  align-items: flex-start;    /* tile pinned toward top */
   padding: 24px;
-  overflow: hidden;             /* stop page scroll */
+  overflow: hidden;           /* stop page bounce */
+  height: 100vh;              /* lock body height */
 }
 
-    /* Glass tile container */
-    .tile {
-  position: relative;           /* no absolute centering */
-  width: min(360px, 90vw);
-  max-height: 90vh;             /* respect viewport */
-  
+.tile {
   display: flex;
   flex-direction: column;
-
+  width: min(360px, 90vw);
+  max-height: 90vh;           /* tile never taller than screen */
   border-radius: 20px;
   background: rgba(20,20,25,.45);
   border: 1px solid rgba(255,255,255,.25);
   backdrop-filter: blur(14px) saturate(1.2);
   box-shadow: 0 22px 60px rgba(0,0,0,.5);
   padding: 22px;
-
-  overflow: hidden;             /* lock outer */
+  overflow: hidden;           /* outer locked */
 }
 
-.tile .tile-body {
+.tile-body {
   flex: 1;
-  min-height: 0;                 /* 🔑 allow flexbox to shrink */
-  overflow-y: auto;              /* enable vertical scroll */
+  min-height: 0;              /* 🔑 allows shrink inside flex */
+  overflow-y: auto;           /* inner scroll only */
   -webkit-overflow-scrolling: touch;
 }
 
@@ -127,25 +123,11 @@
   <p class="lead">This short onboarding gathers the essentials so your dashboard, recommendations, and alerts match <em>you</em>.</p>
 
   <div class="tile-body">
-    <div class="alert-box">
-      ⚠️ <strong>Important:</strong> ConciergeSync™ is a <em>“garbage in, garbage out”</em> system.  
-      The value of your console will never be better than the accuracy of the information you provide here.  
-      <br><br>
-      ➤ Enter your <strong>real travel habits, cards, loyalty programs, and goals</strong>.  
-      <br>
-      ➤ Complete each section carefully — every field matters.  
-      <br>
-      ➤ Once you finish, our engine will optimize from this foundation.
-    </div>
-
-    <ul class="bullets" aria-label="What we'll do">
-      <li>Confirm a few basics (so we talk to the right programs and cards).</li>
-      <li>Set how you earn and use points today (to tune your strategy).</li>
-      <li>Prep your starter dashboard so you can see value immediately.</li>
-    </ul>
-
-    <a class="cta" href="/beta/05-section-1.html" role="button" aria-label="Begin intake">Begin intake</a>
-    <div class="footnote">Takes about 3–5 minutes. You can pause and return anytime.</div>
+    <!-- everything else that might overflow -->
+    <div class="alert-box"> ... </div>
+    <ul class="bullets"> ... </ul>
+    <a class="cta" href="/beta/05-section-1.html">Begin intake</a>
+    <div class="footnote">Takes about 3–5 minutes...</div>
   </div>
 </main>
   
