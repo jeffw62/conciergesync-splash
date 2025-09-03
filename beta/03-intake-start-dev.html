@@ -13,6 +13,7 @@
       --glass-blur:blur(14px) saturate(1.1);
       --ring:0 0 0 3px rgba(255,255,255,.18);
     }
+
     html,body{height:100%}
     body{
       margin:0; color:var(--ink);
@@ -21,34 +22,37 @@
       display:flex; align-items:center; justify-content:center;
       padding:24px; position:relative; overflow:hidden;
     }
+
+    /* Glass tile container */
     .tile {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
 
-  width: min(360px, 90vw);
-  max-height: 88vh;
+      width: min(360px, 90vw);
+      max-height: 88vh;
 
-  display: flex;
-  flex-direction: column;
+      display: flex;
+      flex-direction: column;
 
-  border-radius: 20px;
-  background: rgba(20,20,25,.45);
-  border: 1px solid rgba(255,255,255,.25);
-  backdrop-filter: blur(14px) saturate(1.2);
-  box-shadow: 0 22px 60px rgba(0,0,0,.5);
-  padding: 22px;
+      border-radius: 20px;
+      background: rgba(20,20,25,.45);
+      border: 1px solid rgba(255,255,255,.25);
+      backdrop-filter: blur(14px) saturate(1.2);
+      box-shadow: 0 22px 60px rgba(0,0,0,.5);
+      padding: 22px;
 
-  /* lock outer scroll */
-  overflow: hidden;
-}
+      overflow: hidden; /* lock outer scroll */
+    }
 
-.tile .tile-body {
-  flex: 1;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-}
+    /* Inner scrollable area */
+    .tile .tile-body {
+      flex: 1;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
     .cs-bg{
       position:fixed; inset:0; z-index:-2;
       background:url('/beta/assets/CS_Logo_Premium.png') center/500px repeat;
@@ -62,22 +66,30 @@
         linear-gradient(180deg, rgba(255,255,255,.02), rgba(0,0,0,.08));
     }
 
-    .card{
-      width:min(500px, 92vw);
-      border-radius:22px;
-      background:var(--glass-bg);
-      backdrop-filter:var(--glass-blur);
-      box-shadow:0 18px 48px rgba(0,0,0,.45), inset 0 0 0 1px var(--glass-brd);
-      padding:36px 28px; text-align:center;
-    }
-
     h1{
       font-size:clamp(20px, 3vw, 28px);
       margin:0 0 10px; letter-spacing:.2px;
+      text-align:center;
     }
 
-    .lead{color:var(--muted); margin:6px 0 18px; line-height:1.45; font-size:clamp(15px,2.4vw,18px)}
-    ul.bullets{list-style:none; padding:0; margin:16px auto 8px; max-width:56ch; text-align:left; color:#cdd8ea; line-height:1.5; font-size:clamp(14px,2.2vw,16px)}
+    .lead{
+      color:var(--muted);
+      margin:6px 0 18px;
+      line-height:1.45;
+      font-size:clamp(15px,2.4vw,18px);
+      text-align:center;
+    }
+
+    ul.bullets{
+      list-style:none;
+      padding:0;
+      margin:16px auto 8px;
+      max-width:56ch;
+      text-align:left;
+      color:#cdd8ea;
+      line-height:1.5;
+      font-size:clamp(14px,2.2vw,16px)
+    }
     ul.bullets li{margin:10px 0; padding-left:28px; position:relative}
     ul.bullets li::before{content:"•"; position:absolute; left:8px; top:0; opacity:.6}
 
@@ -91,51 +103,50 @@
     .cta:hover{transform:translateY(-1px)}
     .cta:active{transform:translateY(0) scale(.99)}
 
-    .footnote{margin-top:14px; color:#a7b4c9; font-size:13px}
+    .footnote{margin-top:14px; color:#a7b4c9; font-size:13px; text-align:center}
 
     .alert-box{
       margin:18px auto; padding:16px 20px;
       border:2px solid #ffcc33; border-radius:14px;
-      background:rgba(0,0,0,.55);   /* darker wash to improve contrast */
+      background:rgba(0,0,0,.55);
       color:#fff; font-weight:500;
       font-size:15px; line-height:1.45;
       text-align:left;
     }
-
-      .alert-box strong,
-      .alert-box em {
+    .alert-box strong,
+    .alert-box em {
       color:#ffd966; font-weight:600;
     }
-
-    @media (max-width:480px){ .card{padding:28px 18px} }
   </style>
 </head>
 <body>
   <div class="cs-bg"></div>
 
-  <main class="card" role="main" aria-labelledby="hdr">
-    <h1 id="hdr">Welcome — let’s personalize your ConciergeSync™</h1>
-    <p class="lead">This short onboarding gathers the essentials so your dashboard, recommendations, and alerts match <em>you</em>.</p>
+  <main class="tile" role="main" aria-labelledby="hdr">
+    <div class="tile-body">
+      <h1 id="hdr">Welcome — let’s personalize your ConciergeSync™</h1>
+      <p class="lead">This short onboarding gathers the essentials so your dashboard, recommendations, and alerts match <em>you</em>.</p>
 
-    <div class="alert-box">
-      ⚠️ <strong>Important:</strong> ConciergeSync™ is a <em>“garbage in, garbage out”</em> system.  
-      The value of your console will never be better than the accuracy of the information you provide here.  
-      <br><br>
-      ➤ Enter your <strong>real travel habits, cards, loyalty programs, and goals</strong>.  
-      <br>
-      ➤ Complete each section carefully — every field matters.  
-      <br>
-      ➤ Once you finish, our engine will optimize from this foundation.
+      <div class="alert-box">
+        ⚠️ <strong>Important:</strong> ConciergeSync™ is a <em>“garbage in, garbage out”</em> system.  
+        The value of your console will never be better than the accuracy of the information you provide here.  
+        <br><br>
+        ➤ Enter your <strong>real travel habits, cards, loyalty programs, and goals</strong>.  
+        <br>
+        ➤ Complete each section carefully — every field matters.  
+        <br>
+        ➤ Once you finish, our engine will optimize from this foundation.
+      </div>
+
+      <ul class="bullets" aria-label="What we'll do">
+        <li>Confirm a few basics (so we talk to the right programs and cards).</li>
+        <li>Set how you earn and use points today (to tune your strategy).</li>
+        <li>Prep your starter dashboard so you can see value immediately.</li>
+      </ul>
+
+      <a class="cta" href="/beta/05-section-1.html" role="button" aria-label="Begin intake">Begin intake</a>
+      <div class="footnote">Takes about 3–5 minutes. You can pause and return anytime.</div>
     </div>
-
-    <ul class="bullets" aria-label="What we'll do">
-      <li>Confirm a few basics (so we talk to the right programs and cards).</li>
-      <li>Set how you earn and use points today (to tune your strategy).</li>
-      <li>Prep your starter dashboard so you can see value immediately.</li>
-    </ul>
-
-    <a class="cta" href="/beta/05-section-1.html" role="button" aria-label="Begin intake">Begin intake</a>
-    <div class="footnote">Takes about 3–5 minutes. You can pause and return anytime.</div>
   </main>
   
 <script>
