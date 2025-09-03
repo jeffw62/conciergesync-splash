@@ -76,7 +76,11 @@
     background: rgba(255,255,255,.07); color:#fff; font-weight:700; cursor:pointer;
   }
   .cs-tab:hover{ background: rgba(255,255,255,.12); }
-  a.cs-tab{text-decoration:none;}
+  a.cs-tab,
+  a.cs-tab:hover,
+  a.cs-tab:focus,
+  a.cs-tab:active,
+  a.cs-tab:visited { text-decoration: none; }
 
   /* Exit button */
   .console-exit{
@@ -89,144 +93,352 @@
   }
   .console-exit:hover{ background: rgba(20,20,20,.6); }
 
-  /* Stage */
+  /* Stage for tiles */
   #cs-tiles{ position: fixed; inset: 0; z-index: 10; pointer-events: none; }
 
   /* Tiles */
   .cs-tile{
     position:absolute;
-    width:420px;
-    min-height:320px;
-    max-height:76vh;
+    width: 420px;
+    min-height: 320px;
+    max-height: 76vh;
     display:grid; grid-template-rows:auto 1fr;
-    background:var(--glass-bg);
+    background: var(--glass-bg);
+    color:#f5f7fb;
     border:1px solid var(--glass-border);
     border-radius:18px;
     box-shadow:0 10px 30px rgba(0,0,0,.22);
-    backdrop-filter:blur(12px) saturate(1.22);
+    backdrop-filter: blur(12px) saturate(1.22);
     overflow:hidden;
     pointer-events:auto;
     user-select:none;
     touch-action: pan-y;
+    will-change: transform, opacity, left, top;
+    transition: box-shadow var(--t-fast) ease;
   }
-  .cs-tile-head{display:flex;justify-content:space-between;align-items:center;
-    padding:12px 14px;background:rgba(0,0,0,.18);border-bottom:1px solid rgba(255,255,255,.18);}
-  .cs-tile-head h4{margin:0;font-size:15px;font-weight:800;}
-  .cs-close{cursor:pointer;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);
-    border-radius:8px;width:30px;height:30px;color:#fff;text-align:center;}
-  .cs-tile-body{padding:14px;overflow:auto;}
+  .cs-tile.is-focused{
+    box-shadow:0 16px 44px rgba(0,0,0,.32), 0 0 0 1px rgba(255,255,255,.18) inset;
+  }
+  .cs-tile-head{
+    display:flex; align-items:center; justify-content:space-between;
+    padding: 12px 14px; background: rgba(0,0,0,.18);
+    border-bottom:1px solid rgba(255,255,255,.18);
+  }
+  .cs-tile-head h4{ margin:0; font-size:15px; font-weight:800; letter-spacing:.2px; }
+  .cs-close{
+    width:30px; height:30px; border-radius:8px;
+    background: rgba(255,255,255,.12);
+    border:1px solid rgba(255,255,255,.25);
+    color:#fff; font-size:18px; line-height:28px; text-align:center; cursor:pointer;
+  }
+  .cs-close:hover{ background: rgba(255,255,255,.2); }
+  .cs-tile-body{ padding:14px; overflow:auto; }
+
+  .cs-tile.dismissing{
+    transition: transform var(--t-out) var(--ease), opacity var(--t-out) var(--ease);
+    opacity:0;
+  }
+
+  /* Fullscreen CTA */
+  .fs-cta{
+    position:fixed; inset:0; display:none; place-items:center; z-index:var(--ui);
+    background: rgba(0,0,0,.45);
+  }
+  .fs-card{
+    background:#111; color:#fff; padding:18px 22px; border-radius:14px;
+    box-shadow:0 10px 30px rgba(0,0,0,.35); text-align:center; font-weight:700;
+  }
+  .fs-actions{ display:flex; gap:10px; justify-content:center; margin-top:10px; }
+  .btn{ padding:10px 14px; border-radius:12px; font-weight:800; border:1px solid rgba(255,255,255,.55); }
+  .btn.primary{ background:#fff; color:#111; border-color:#fff; }
+  .btn.ghost{ background:transparent; color:#fff; }
+  body.console-mode:not(.fs-active) .fs-cta{ display:grid; }
+
+  /* Logout confirm modal */
+  #logoutConfirm {
+    position: fixed; inset: 0; z-index: 99999;
+    display: none; place-items: center;
+    background: rgba(0,0,0,.55);
+  }
+  #logoutConfirm.show { display: grid; }
+  #logoutConfirm .card {
+    background:#111; color:#fff; border-radius:14px;
+    padding:18px 20px; box-shadow:0 10px 34px rgba(0,0,0,.45);
+    font:600 16px system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif;
+    text-align:center; min-width:320px; max-width:480px;
+  }
+  #logoutConfirm .row { display:flex; gap:10px; justify-content:center; margin-top:12px; }
+  #logoutConfirm button {
+    padding:10px 14px; border-radius:12px; cursor:pointer; font-weight:700;
+    border:1px solid rgba(255,255,255,.55); background:transparent; color:#fff;
+  }
+  #logoutConfirm .primary { background:#fff; color:#111; border-color:#fff; }
 </style>
 </head>
 <body class="console-mode">
 
-<div class="backdrop"><div class="backdrop-image" id="backdropImage"></div><div class="backdrop-overlay"></div></div>
+  <!-- Backdrop -->
+  <div class="backdrop" aria-hidden="true">
+    <div class="backdrop-image" id="backdropImage"></div>
+    <div class="backdrop-overlay"></div>
+  </div>
 
-<div class="cs-tabs">
-  <button class="cs-tab" data-key="overview">Overview</button>
-  <button class="cs-tab" data-key="itinerary">Itinerary</button>
-  <button class="cs-tab" data-key="values">Value Calc</button>
-  <button class="cs-tab" data-key="tools">User Tools</button>
-</div>
+  <!-- Tabs -->
+  <div class="cs-tabs" aria-label="Console Tabs">
+    <button class="cs-tab" data-key="overview">Overview</button>
+    <button class="cs-tab" data-key="itinerary">Itinerary</button>
+    <button class="cs-tab" data-key="values">Value Calc</button>
+    <button class="cs-tab" data-key="tools">User Tools</button>
+  </div>
 
-<button id="exitFs" class="console-exit">×</button>
-<div id="cs-tiles"></div>
+  <!-- Exit -->
+  <button id="exitFs" class="console-exit" aria-label="Exit Fullscreen">×</button>
+
+  <!-- Tiles stage -->
+  <div id="cs-tiles" aria-live="polite"></div>
+
+  <!-- Fullscreen CTA -->
+  <div id="fs-cta" class="fs-cta" role="dialog" aria-modal="true">
+    <div class="fs-card">
+      <div style="margin-bottom:8px;">Enter Fullscreen Mode</div>
+      <div class="fs-actions">
+        <button id="fs-go"   class="btn primary">Go Full Screen</button>
+        <button id="fs-skip" class="btn ghost">Skip</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Logout confirm -->
+  <div id="logoutConfirm" role="dialog" aria-modal="true" aria-labelledby="logoutTitle" hidden>
+    <div class="card">
+      <div id="logoutTitle" style="font-weight:800;margin-bottom:8px;">Do you want to log out?</div>
+      <div class="row">
+        <button id="logoutYes" class="primary">Yes, log me out</button>
+        <button id="logoutNo">No, take me back fullscreen</button>
+      </div>
+    </div>
+  </div>
 
 <script>
 (function(){
-  const BG='/beta/assets/bg/dfw-hero.jpg';
-  document.getElementById('backdropImage').style.backgroundImage=`url("${BG}")`;
+  /* ---------- Backdrop ---------- */
+  const BG = '/beta/assets/bg/dfw-hero.jpg';
+  document.getElementById('backdropImage').style.backgroundImage = `url("${BG}")`;
 
-  const stage=document.getElementById('cs-tiles');let zTop=10;
+  function setVh(){ document.documentElement.style.setProperty('--vh', window.innerHeight + 'px'); }
+  setVh(); addEventListener('resize', setVh);
 
-  const forms={
-    sec1:"https://noteforms.com/forms/beta-user-tracker-conciergesync-b4yxaf",
-    sec2:"https://noteforms.com/forms/section-2-authorized-user-card-setup-conciergesync-xnkw5k",
-    sec3:"https://noteforms.com/forms/section-3-loyalty-program-overview-40ya0y",
-    sec4:"https://noteforms.com/forms/section-4-transferable-points-programs-wp4ujy"
-  };
-  const UID_GUID="78ddd51d-9ccb-4fc7-a3cd-d17f7cd37ff4";
+  /* ---------- Fullscreen flow ---------- */
+  const root   = document.documentElement;
+  const fsGo   = document.getElementById('fs-go');
+  const fsSkip = document.getElementById('fs-skip');
+  const fsCta  = document.getElementById('fs-cta');
+  const exitFs = document.getElementById('exitFs');
 
-  function wireEditLinks(scope){
-    const root=scope||document;
-    const uid=localStorage.getItem('cs_uid')||"";
-    const email=localStorage.getItem('cs_email')||"";
-    const first=localStorage.getItem('cs_first')||"";
-    const last=localStorage.getItem('cs_last')||"";
+  function enterFS(){
+    const req = root.requestFullscreen || root.webkitRequestFullscreen || root.msRequestFullscreen || root.mozRequestFullScreen;
+    if (req) { Promise.resolve(req.call(root)).catch(()=>{}); }
+    document.body.classList.add('fs-active');
+    fsCta.style.display = 'none';
+  }
+  function leaveFS(){
+    const ex = document.exitFullscreen || document.webkitExitFullscreen || document.msExitFullscreen || document.mozCancelFullScreen;
+    if (document.fullscreenElement || document.webkitFullscreenElement) { try{ ex.call(document); }catch(e){} }
+    document.body.classList.remove('fs-active');
+  }
+  fsGo.addEventListener('click', (e)=>{ e.preventDefault(); enterFS(); });
+  fsSkip.addEventListener('click', (e)=>{ e.preventDefault(); fsCta.style.display='none'; });
+  exitFs.addEventListener('click', (e)=>{ e.preventDefault(); leaveFS(); showLogoutConfirm(); });
 
-    Object.entries(forms).forEach(([k,url])=>{
-      const a=root.querySelector(`#link-${k}`);
-      if(!a) return;
-      if(!uid){a.href="/beta/auth.html?mode=login";return;}
-      const u=new URL(url);
-      u.searchParams.set("uid",uid);
-      u.searchParams.set(UID_GUID,uid);
-      if(email)u.searchParams.set("email",email);
-      if(first)u.searchParams.set("first",first);
-      if(last)u.searchParams.set("last",last);
-      a.href=u.toString();
-      a.target="_blank";a.rel="noopener";
-    });
+  if (new URLSearchParams(location.search).get('enter') === '1'){
+    document.body.classList.add('console-mode');
+    document.body.classList.remove('fs-active');
+    fsCta.style.display = 'grid';
   }
 
-  const TEMPLATES={
-    overview:()=>`<header class="cs-tile-head"><h4>Overview</h4><div class="cs-close">×</div></header>
-      <div class="cs-tile-body"><p>Overview content</p></div>`,
-    itinerary:()=>`<header class="cs-tile-head"><h4>Itinerary</h4><div class="cs-close">×</div></header>
-      <div class="cs-tile-body"><p>Trips and dates</p></div>`,
-    values:()=>`<header class="cs-tile-head"><h4>Value Calc</h4><div class="cs-close">×</div></header>
-      <div class="cs-tile-body"><p>CPP and transfer hints</p></div>`,
-    tools:()=>`<header class="cs-tile-head"><h4>User Tools</h4><div class="cs-close">×</div></header>
+  /* ---------- Tiles ---------- */
+  const stage = document.getElementById('cs-tiles');
+  let zTop = 10;
+
+  const FORM_URL = "https://noteforms.com/forms/beta-user-tracker-conciergesync-b4yxaf";
+  const UID_GUID = "78ddd51d-9ccb-4fc7-a3cd-d17f7cd37ff4";
+  function wireEditLink(scope){
+    const root = scope || document;
+    const a = root.querySelector('#tool-edit-sec1');
+    if (!a) return;
+
+    const uid   = localStorage.getItem('cs_uid')   || "";
+    const email = localStorage.getItem('cs_email') || "";
+    const first = localStorage.getItem('cs_first') || "";
+    const last  = localStorage.getItem('cs_last')  || "";
+
+    if (!uid){
+      a.href = "/beta/auth.html?mode=login&next=/beta/05-section-1.html";
+      a.removeAttribute('target');
+      a.title = "Log in to edit your answers";
+      return;
+    }
+    const url = new URL(FORM_URL);
+    url.searchParams.set("uid", uid);
+    url.searchParams.set(UID_GUID, uid);
+    if (email) url.searchParams.set("email", email);
+    if (first) url.searchParams.set("first", first);
+    if (last)  url.searchParams.set("last",  last);
+
+    a.href = url.toString();
+    a.target = "_blank";
+    a.rel = "noopener";
+    a.title = "Edit your Section 1 answers (opens in a new tab)";
+  }
+
+  const TEMPLATES = {
+    overview: () => `
+      <header class="cs-tile-head">
+        <h4>Overview</h4><button class="cs-close" aria-label="Close">×</button>
+      </header>
+      <div class="cs-tile-body"><p>Overview content goes here.</p></div>`,
+    itinerary: () => `
+      <header class="cs-tile-head">
+        <h4>Itinerary</h4><button class="cs-close" aria-label="Close">×</button>
+      </header>
+      <div class="cs-tile-body"><p>Trip segments, dates, carriers.</p></div>`,
+    values: () => `
+      <header class="cs-tile-head">
+        <h4>Value Calc</h4><button class="cs-close" aria-label="Close">×</button>
+      </header>
+      <div class="cs-tile-body"><p>CPP, cash vs award, transfer hints.</p></div>`,
+    tools: () => `
+      <header class="cs-tile-head">
+        <h4>User Tools</h4><button class="cs-close" aria-label="Close">×</button>
+      </header>
       <div class="cs-tile-body">
-        <button id="openProfile" class="cs-tab">🗂️ Update Profile</button>
+        <a id="tool-edit-sec1"
+           class="cs-tab"
+           href="#"
+           target="_blank"
+           rel="noopener"
+           title="Edit your Section 1 answers (opens in a new tab)"
+           aria-label="Edit your Section 1 answers">
+          ✏️ Edit
+        </a>
+        <a id="tool-update-profile"
+           class="cs-tab"
+           href="#"
+           title="Open your profile sections (Travel Profile, Cards, Loyalty, Points) to update answers.">
+          🗂️ Update Profile
+        </a>
       </div>`,
-    profile:()=>`<header class="cs-tile-head"><h4>Profile Updates</h4><div class="cs-close">×</div></header>
-      <div class="cs-tile-body" style="display:flex;flex-direction:column;gap:10px">
-        <a id="link-sec1" class="cs-tab">Section 1 — Travel Profile</a>
-        <a id="link-sec2" class="cs-tab">Section 2 — Cards & Users</a>
-        <a id="link-sec3" class="cs-tab">Section 3 — Loyalty Programs</a>
-        <a id="link-sec4" class="cs-tab">Section 4 — Points Programs</a>
-        <p style="font-size:12px;color:#ccc;margin-top:8px">After submitting, just close the tab to return to Console.</p>
+    profile: () => `
+      <header class="cs-tile-head">
+        <h4>Profile Updates</h4><button class="cs-close" aria-label="Close">×</button>
+      </header>
+      <div class="cs-tile-body">
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <button class="cs-tab" title="Update your travel profile (home airport, frequency, goals)">Section 1 — Travel Profile</button>
+          <button class="cs-tab" title="Update authorized users and cards">Section 2 — Cards & Authorized Users</button>
+          <button class="cs-tab" title="Update your loyalty program activity">Section 3 — Loyalty Programs</button>
+          <button class="cs-tab" title="Update transferable points">Section 4 — Points Programs</button>
+        </div>
       </div>`
   };
 
   function centerPos(tile){
-    const r=tile.getBoundingClientRect();
-    return {x:(window.innerWidth-r.width)/2,y:Math.max(18,(window.innerHeight-r.height)/2)};
+    const r = tile.getBoundingClientRect();
+    const w = r.width, h = Math.min(r.height, window.innerHeight*0.76);
+    const x = (window.innerWidth  - w)/2;
+    const y = Math.max(18, (window.innerHeight - h)/2);
+    return { x, y };
   }
 
-  function makeDraggable(tile){
-    let isDown=false,startX=0,startY=0,baseX=0,baseY=0;
-    tile.addEventListener('pointerdown',e=>{
-      if(e.button!==0)return;
-      isDown=true;tile.style.zIndex=++zTop;
-      startX=e.clientX;startY=e.clientY;
-      const r=tile.getBoundingClientRect();baseX=r.left;baseY=r.top;
-      e.preventDefault();
-    });
-    window.addEventListener('pointermove',e=>{
-      if(!isDown)return;
-      tile.style.left=(baseX+(e.clientX-startX))+'px';
-      tile.style.top=(baseY+(e.clientY-startY))+'px';
-    });
-    window.addEventListener('pointerup',()=>isDown=false);
+  function dismiss(tile, dir){
+    const off = (window.innerWidth*0.55) * (dir||1);
+    tile.classList.add('dismissing');
+    tile.style.transform = `translate(${off}px, 0) rotate(${off*0.002}deg)`;
+    tile.addEventListener('transitionend', () => tile.remove(), {once:true});
+  }
+
+  function addHandlers(tile){
+    function focus(){ tile.style.zIndex = ++zTop; tile.classList.add('is-focused'); }
+    function blur(){ tile.classList.remove('is-focused'); }
+    tile.addEventListener('pointerdown', focus);
+    tile.addEventListener('pointerup', blur);
+    tile.addEventListener('pointercancel', blur);
+    tile.querySelector('.cs-close')?.addEventListener('click', (e) => { e.stopPropagation(); dismiss(tile, 1); });
   }
 
   function openTile(key){
-    const ex=stage.querySelector(\`.cs-tile[data-key="\${key}"]\`);
-    if(ex){ex.style.zIndex=++zTop;return;}
-    const el=document.createElement('section');
-    el.className='cs-tile';el.dataset.key=key;
-    el.innerHTML=TEMPLATES[key]?TEMPLATES[key]():'';
+    const existing = stage.querySelector(`.cs-tile[data-key="${key}"]`);
+    if (existing){ existing.style.zIndex = ++zTop; existing.classList.add('is-focused'); return; }
+
+    const el = document.createElement('section');
+    el.className = 'cs-tile';
+    el.dataset.key = key;
+    el.innerHTML = (TEMPLATES[key] || (()=>`
+      <header class="cs-tile-head">
+        <h4>${key}</h4><button class="cs-close" aria-label="Close">×</button>
+      </header>
+      <div class="cs-tile-body"><p>${key} tile.</p></div>`))();
+
     stage.appendChild(el);
-    const {x,y}=centerPos(el);el.style.left=x+'px';el.style.top=y+'px';
-    makeDraggable(el);
-    el.querySelector('.cs-close')?.addEventListener('click',()=>el.remove());
-    if(key==='profile')wireEditLinks(el);
-    if(key==='tools')el.querySelector('#openProfile').addEventListener('click',()=>openTile('profile'));
+    el.style.zIndex = ++zTop;
+
+    const {x,y} = centerPos(el);
+    const openCount = stage.querySelectorAll('.cs-tile').length - 1;
+    el.style.left = (x + openCount*24) + 'px';
+    el.style.top  = (y + openCount*18) + 'px';
+
+    addHandlers(el);
+    el.classList.add('is-focused');
+
+    if (key === 'tools') wireEditLink(el);
   }
 
-  document.querySelectorAll('.cs-tab').forEach(b=>b.addEventListener('click',()=>openTile(b.dataset.key)));
+  // Wire Update Profile button
+  document.addEventListener('click', (e)=>{
+    if (e.target && e.target.id === 'tool-update-profile'){
+      e.preventDefault();
+      openTile('profile');
+    }
+  });
+
+  // click -> open tiles (MAIN TAB BUTTONS)
+  document.querySelectorAll('.cs-tab').forEach(btn=>{
+    btn.addEventListener('click', ()=> openTile(btn.dataset.key));
+  });
+
+  // support ?open=tools etc.
+  const qs = new URLSearchParams(location.search);
+  if (qs.get('open')) openTile(qs.get('open'));
+
+  /* ---------- Logout confirm & redirect ---------- */
+  const modal  = document.getElementById('logoutConfirm');
+  const yesBtn = document.getElementById('logoutYes');
+  const noBtn  = document.getElementById('logoutNo');
+
+  function showLogoutConfirm(){ modal.hidden = false; modal.classList.add('show'); }
+  function hideLogoutConfirm(){ modal.classList.remove('show'); modal.hidden = true; }
+
+  yesBtn.addEventListener('click', () => {
+    hideLogoutConfirm();
+    try {
+      sessionStorage.removeItem('cs_authed');
+      localStorage.removeItem('cs_authed');
+      document.cookie = 'cs_auth=; Max-Age=0; path=/; SameSite=Lax';
+    } catch(_) {}
+    leaveFS();
+    location.replace('/beta/auth.html');
+  });
+
+  noBtn.addEventListener('click', () => {
+    hideLogoutConfirm();
+    enterFS();
+  });
+
+  document.addEventListener('fullscreenchange', () => {
+    if (!document.fullscreenElement) showLogoutConfirm();
+  });
 })();
 </script>
+
 </body>
 </html>
