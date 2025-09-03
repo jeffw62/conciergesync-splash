@@ -13,6 +13,7 @@
       sessionStorage.getItem('cs_authed') === '1' ||
       localStorage.getItem('cs_authed') === '1' ||
       /(?:^|;\s*)cs_auth=1(?:;|$)/.test(document.cookie);
+
     if (!isAuthed) location.replace('/beta/auth.html?mode=login');
   } catch {
     location.replace('/beta/auth.html?mode=login');
@@ -48,7 +49,7 @@
   .backdrop{ position:fixed; inset:0; z-index:0; overflow:hidden; }
   .backdrop-image{
     position:absolute; inset:0;
-    background:center/cover no-repeat;
+    background:url('/beta/assets/bg/dfw-hero.jpg') center/cover no-repeat; /* fallback */
     filter: brightness(1.12) contrast(1.05);
     transform: scale(1.03) translateZ(0);
     will-change: transform, opacity, filter;
@@ -75,7 +76,11 @@
     background: rgba(255,255,255,.07); color:#fff; font-weight:700; cursor:pointer;
   }
   .cs-tab:hover{ background: rgba(255,255,255,.12); }
-  a.cs-tab{text-decoration:none;}
+  a.cs-tab,
+  a.cs-tab:hover,
+  a.cs-tab:focus,
+  a.cs-tab:active,
+  a.cs-tab:visited { text-decoration: none; }
 
   /* Exit button */
   .console-exit{
@@ -136,7 +141,7 @@
 
   /* Fullscreen CTA */
   .fs-cta{
-    position:fixed; inset:0; display:none; place-items:center; z-index:var(--ui);
+    position:fixed; inset:0; display:grid; place-items:center; z-index:var(--ui); /* changed from none to grid */
     background: rgba(0,0,0,.45);
   }
   .fs-card{
@@ -250,204 +255,6 @@
     document.body.classList.remove('fs-active');
     fsCta.style.display = 'grid';
   }
-
-  /* ---------- Tiles ---------- */
-  const stage = document.getElementById('cs-tiles');
-  let zTop = 10;
-
-  const FORM_URL = "https://noteforms.com/forms/beta-user-tracker-conciergesync-b4yxaf";
-  const UID_GUID = "78ddd51d-9ccb-4fc7-a3cd-d17f7cd37ff4";
-  function wireEditLink(scope){
-    const root = scope || document;
-    const a = root.querySelector('#tool-edit-sec1');
-    if (!a) return;
-
-    const uid   = localStorage.getItem('cs_uid')   || "";
-    const email = localStorage.getItem('cs_email') || "";
-    const first = localStorage.getItem('cs_first') || "";
-    const last  = localStorage.getItem('cs_last')  || "";
-
-    if (!uid){
-      a.href = "/beta/auth.html?mode=login&next=/beta/05-section-1.html";
-      a.removeAttribute('target');
-      a.title = "Log in to edit your answers";
-      return;
-    }
-    const url = new URL(FORM_URL);
-    url.searchParams.set("uid", uid);
-    url.searchParams.set(UID_GUID, uid);
-    if (email) url.searchParams.set("email", email);
-    if (first) url.searchParams.set("first", first);
-    if (last)  url.searchParams.set("last",  last);
-
-    a.href = url.toString();
-    a.target = "_blank";
-    a.rel = "noopener";
-    a.title = "Edit your Section 1 answers (opens in a new tab)";
-  }
-
-  const TEMPLATES = {
-    overview: () => `
-      <header class="cs-tile-head">
-        <h4>Overview</h4><button class="cs-close" aria-label="Close">×</button>
-      </header>
-      <div class="cs-tile-body"><p>Overview content goes here.</p></div>`,
-    itinerary: () => `
-      <header class="cs-tile-head">
-        <h4>Itinerary</h4><button class="cs-close" aria-label="Close">×</button>
-      </header>
-      <div class="cs-tile-body"><p>Trip segments, dates, carriers.</p></div>`,
-    values: () => `
-      <header class="cs-tile-head">
-        <h4>Value Calc</h4><button class="cs-close" aria-label="Close">×</button>
-      </header>
-      <div class="cs-tile-body"><p>CPP, cash vs award, transfer hints.</p></div>`,
-    tools: () => `
-      <header class="cs-tile-head">
-        <h4>User Tools</h4><button class="cs-close" aria-label="Close">×</button>
-      </header>
-      <div class="cs-tile-body">
-        <a id="tool-edit-sec1"
-           class="cs-tab"
-           href="#"
-           target="_blank"
-           rel="noopener"
-           title="Edit your Section 1 answers (opens in a new tab)"
-           aria-label="Edit your Section 1 answers">
-          ✏️ Edit
-        </a>
-        <a id="tool-update-profile"
-           class="cs-tab"
-           href="#"
-           title="Open your profile sections (Travel Profile, Cards, Loyalty, Points) to update answers.">
-          🗂️ Update Profile
-        </a>
-      </div>`,
-    profile: () => `
-      <header class="cs-tile-head">
-        <h4>Profile Updates</h4><button class="cs-close" aria-label="Close">×</button>
-      </header>
-      <div class="cs-tile-body">
-        <div style="display:flex;flex-direction:column;gap:10px">
-          <a class="cs-tab" target="_blank" rel="noopener"
-             href="https://noteforms.com/forms/beta-user-tracker-conciergesync-b4yxaf"
-             title="Update your travel profile (home airport, frequency, goals)">Section 1 — Travel Profile</a>
-          <a class="cs-tab" target="_blank" rel="noopener"
-             href="https://noteforms.com/forms/section-2-authorized-user-card-setup-conciergesync-xnkw5k"
-             title="Update authorized users and cards">Section 2 — Cards & Authorized Users</a>
-          <a class="cs-tab" target="_blank" rel="noopener"
-             href="https://noteforms.com/forms/section-3-loyalty-program-overview-40ya0y"
-             title="Update your loyalty program activity">Section 3 — Loyalty Programs</a>
-          <a class="cs-tab" target="_blank" rel="noopener"
-             href="https://noteforms.com/forms/section-4-transferable-points-programs-wp4ujy"
-             title="Update transferable points">Section 4 — Points Programs</a>
-        </div>
-      </div>`
-  };
-
-  function centerPos(tile){
-    const r = tile.getBoundingClientRect();
-    const w = r.width, h = Math.min(r.height, window.innerHeight*0.76);
-    const x = (window.innerWidth  - w)/2;
-    const y = Math.max(18, (window.innerHeight - h)/2);
-    return { x, y };
-  }
-
-  function dismiss(tile, dir){
-    const off = (window.innerWidth*0.55) * (dir||1);
-    tile.classList.add('dismissing');
-    tile.style.transform = `translate(${off}px, 0) rotate(${off*0.002}deg)`;
-    tile.addEventListener('transitionend', () => tile.remove(), {once:true});
-  }
-
-  function addHandlers(tile){
-    function focus(){ tile.style.zIndex = ++zTop; tile.classList.add('is-focused'); }
-    function blur(){ tile.classList.remove('is-focused'); }
-    tile.addEventListener('pointerdown', focus);
-    tile.addEventListener('pointerup', blur);
-    tile.addEventListener('pointercancel', blur);
-    tile.querySelector('.cs-close')?.addEventListener('click', (e) => { e.stopPropagation(); dismiss(tile, 1); });
-
-    // Drag handlers
-    let isDown=false, startX=0, startY=0, baseX=0, baseY=0;
-    function onDown(e){ if(e.button!==0)return;
-      isDown=true; focus();
-      startX=e.clientX; startY=e.clientY;
-      const r=tile.getBoundingClientRect(); baseX=r.left; baseY=r.top;
-      e.preventDefault(); }
-    function onMove(e){ if(!isDown)return;
-      tile.style.left=(baseX+e.clientX-startX)+'px';
-      tile.style.top=(baseY+e.clientY-startY)+'px'; }
-    function onUp(){ isDown=false; }
-    tile.addEventListener('pointerdown', onDown);
-    window.addEventListener('pointermove', onMove);
-    window.addEventListener('pointerup', onUp);
-  }
-
-  function openTile(key){
-    const existing = stage.querySelector(\`.cs-tile[data-key="\${key}"]\`);
-    if (existing){ existing.style.zIndex = ++zTop; existing.classList.add('is-focused'); return; }
-
-    const el = document.createElement('section');
-    el.className = 'cs-tile';
-    el.dataset.key = key;
-    el.innerHTML = (TEMPLATES[key] || (()=>\`
-      <header class="cs-tile-head">
-        <h4>\${key}</h4><button class="cs-close" aria-label="Close">×</button>
-      </header>
-      <div class="cs-tile-body"><p>\${key} tile.</p></div>\`))();
-
-    stage.appendChild(el);
-    el.style.zIndex = ++zTop;
-    const {x,y} = centerPos(el);
-    el.style.left = x+'px'; el.style.top = y+'px';
-    addHandlers(el);
-    el.classList.add('is-focused');
-
-    if (key === 'tools') wireEditLink(el);
-  }
-
-  document.addEventListener('click', (e)=>{
-    if (e.target && e.target.id === 'tool-update-profile'){
-      e.preventDefault();
-      openTile('profile');
-    }
-  });
-
-  document.querySelectorAll('.cs-tab').forEach(btn=>{
-    btn.addEventListener('click', ()=> openTile(btn.dataset.key));
-  });
-
-  const qs = new URLSearchParams(location.search);
-  if (qs.get('open')) openTile(qs.get('open'));
-
-  /* ---------- Logout confirm ---------- */
-  const modal  = document.getElementById('logoutConfirm');
-  const yesBtn = document.getElementById('logoutYes');
-  const noBtn  = document.getElementById('logoutNo');
-
-  function showLogoutConfirm(){ modal.hidden = false; modal.classList.add('show'); }
-  function hideLogoutConfirm(){ modal.classList.remove('show'); modal.hidden = true; }
-
-  yesBtn.addEventListener('click', () => {
-    hideLogoutConfirm();
-    try {
-      sessionStorage.removeItem('cs_authed');
-      localStorage.removeItem('cs_authed');
-      document.cookie = 'cs_auth=; Max-Age=0; path=/; SameSite=Lax';
-    } catch(_) {}
-    leaveFS();
-    location.replace('/beta/auth.html');
-  });
-
-  noBtn.addEventListener('click', () => {
-    hideLogoutConfirm();
-    enterFS();
-  });
-
-  document.addEventListener('fullscreenchange', () => {
-    if (!document.fullscreenElement) showLogoutConfirm();
-  });
 })();
 </script>
 
