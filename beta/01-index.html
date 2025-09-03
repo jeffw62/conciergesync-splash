@@ -12,10 +12,6 @@
     --overlay-grad-bot: rgba(0,0,0,.58);
     --overlay: .30;
     --ui: 4000;
-    --t-fast: 220ms;
-    --t: 640ms;
-    --t-out: 900ms;
-    --ease: cubic-bezier(.22,1,.36,1);
   }
 
   *{box-sizing:border-box;}
@@ -28,8 +24,6 @@
     background:url('/beta/assets/bg/dfw-hero.jpg') center/cover no-repeat;
     filter:brightness(1.12) contrast(1.05);
     transform:scale(1.03);
-    will-change:transform,opacity,filter;
-    transition:opacity 600ms ease,transform 900ms ease,filter 900ms ease;
     opacity:.999;
   }
   .backdrop-overlay{
@@ -77,7 +71,7 @@
     box-shadow:0 10px 30px rgba(0,0,0,.22);
     backdrop-filter:blur(12px) saturate(1.22);
     overflow:hidden;pointer-events:auto;user-select:none;
-    transition:box-shadow var(--t-fast) ease;
+    transition:box-shadow 0.2s ease;
   }
   .cs-tile.is-focused{box-shadow:0 16px 44px rgba(0,0,0,.32),0 0 0 1px rgba(255,255,255,.18) inset;}
   .cs-tile-head{
@@ -149,6 +143,7 @@
     tile.addEventListener('pointerdown',focus);
     tile.addEventListener('pointerup',blur);
 
+    // Dragging
     let isDown=false,startX=0,startY=0,baseX=0,baseY=0;
     function onDown(e){
       if(e.button!==0)return;
@@ -167,6 +162,7 @@
     window.addEventListener('pointermove',onMove);
     window.addEventListener('pointerup',onUp);
 
+    // Close
     tile.querySelector('.cs-close').addEventListener('click',()=>tile.remove());
   }
 
