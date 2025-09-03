@@ -260,35 +260,43 @@
   const stage = document.getElementById('cs-tiles');
   let zTop = 10;
 
-  const FORM_URL = "https://noteforms.com/forms/beta-user-tracker-conciergesync-b4yxaf";
+  const forms = {
+    sec1: "https://noteforms.com/forms/beta-user-tracker-conciergesync-b4yxaf",
+    sec2: "https://noteforms.com/forms/section-2-authorized-user-card-setup-conciergesync-xnkw5k",
+    sec3: "https://noteforms.com/forms/section-3-loyalty-program-overview-40ya0y",
+    sec4: "https://noteforms.com/forms/section-4-transferable-points-programs-wp4ujy"
+  };
   const UID_GUID = "78ddd51d-9ccb-4fc7-a3cd-d17f7cd37ff4";
+
   function wireEditLink(scope){
     const root = scope || document;
-    const a = root.querySelector('#tool-edit-sec1');
-    if (!a) return;
-
     const uid   = localStorage.getItem('cs_uid')   || "";
     const email = localStorage.getItem('cs_email') || "";
     const first = localStorage.getItem('cs_first') || "";
     const last  = localStorage.getItem('cs_last')  || "";
 
-    if (!uid){
-      a.href = "/beta/auth.html?mode=login&next=/beta/05-section-1.html";
-      a.removeAttribute('target');
-      a.title = "Log in to edit your answers";
-      return;
-    }
-    const url = new URL(FORM_URL);
-    url.searchParams.set("uid", uid);
-    url.searchParams.set(UID_GUID, uid);
-    if (email) url.searchParams.set("email", email);
-    if (first) url.searchParams.set("first", first);
-    if (last)  url.searchParams.set("last",  last);
+    Object.entries(forms).forEach(([key, baseUrl]) => {
+      const a = root.querySelector(`#tool-edit-${key}`);
+      if (!a) return;
 
-    a.href = url.toString();
-    a.target = "_blank";
-    a.rel = "noopener";
-    a.title = "Edit your Section 1 answers (opens in a new tab)";
+      if (!uid){
+        a.href = "/beta/auth.html?mode=login";
+        a.removeAttribute('target');
+        a.title = "Log in to edit your answers";
+        return;
+      }
+
+      const url = new URL(baseUrl);
+      url.searchParams.set("uid", uid);
+      url.searchParams.set(UID_GUID, uid);
+      if (email) url.searchParams.set("email", email);
+      if (first) url.searchParams.set("first", first);
+      if (last)  url.searchParams.set("last",  last);
+
+      a.href = url.toString();
+      a.target = "_blank";
+      a.rel = "noopener";
+    });
   }
 
   const TEMPLATES = {
@@ -312,21 +320,8 @@
         <h4>User Tools</h4><button class="cs-close" aria-label="Close">×</button>
       </header>
       <div class="cs-tile-body">
-        <a id="tool-edit-sec1"
-           class="cs-tab"
-           href="#"
-           target="_blank"
-           rel="noopener"
-           title="Edit your Section 1 answers (opens in a new tab)"
-           aria-label="Edit your Section 1 answers">
-          ✏️ Edit
-        </a>
-        <a id="tool-update-profile"
-           class="cs-tab"
-           href="#"
-           title="Open your profile sections (Travel Profile, Cards, Loyalty, Points) to update answers.">
-          🗂️ Update Profile
-        </a>
+        <a id="tool-edit-sec1" class="cs-tab">✏️ Edit Section 1</a>
+        <a id="tool-update-profile" class="cs-tab">🗂️ Update Profile</a>
       </div>`,
     profile: () => `
       <header class="cs-tile-head">
@@ -334,10 +329,14 @@
       </header>
       <div class="cs-tile-body">
         <div style="display:flex;flex-direction:column;gap:10px">
-          <button class="cs-tab" title="Update your travel profile (home airport, frequency, goals)">Section 1 — Travel Profile</button>
-          <button class="cs-tab" title="Update authorized users and cards">Section 2 — Cards & Authorized Users</button>
-          <button class="cs-tab" title="Update your loyalty program activity">Section 3 — Loyalty Programs</button>
-          <button class="cs-tab" title="Update transferable points">Section 4 — Points Programs</button>
+          <a id="tool-edit-sec1" class="cs-tab" target="_blank" rel="noopener"
+             title="Update your travel profile (home airport, frequency, goals)">Section 1 — Travel Profile</a>
+          <a id="tool-edit-sec2" class="cs-tab" target="_blank" rel="noopener"
+             title="Update authorized users and cards">Section 2 — Cards & Authorized Users</a>
+          <a id="tool-edit-sec3" class="cs-tab" target="_blank" rel="noopener"
+             title="Update your loyalty program activity">Section 3 — Loyalty Programs</a>
+          <a id="tool-edit-sec4" class="cs-tab" target="_blank" rel="noopener"
+             title="Update transferable points">Section 4 — Points Programs</a>
         </div>
       </div>`
   };
@@ -358,93 +357,41 @@
   }
 
   function addHandlers(tile){
-  function focus(){ tile.style.zIndex = ++zTop; tile.classList.add('is-focused'); }
-  function blur(){ tile.classList.remove('is-focused'); }
-  tile.addEventListener('pointerdown', focus);
-  tile.addEventListener('pointerup', blur);
-  tile.addEventListener('pointercancel', blur);
-  tile.querySelector('.cs-close')?.addEventListener('click', (e) => { e.stopPropagation(); dismiss(tile, 1); });
+    function focus(){ tile.style.zIndex = ++zTop; tile.classList.add('is-focused'); }
+    function blur(){ tile.classList.remove('is-focused'); }
+    tile.addEventListener('pointerdown', focus);
+    tile.addEventListener('pointerup', blur);
+    tile.addEventListener('pointercancel', blur);
+    tile.querySelector('.cs-close')?.addEventListener('click', (e) => { e.stopPropagation(); dismiss(tile, 1); });
 
-  // --- drag + swipe handling ---
-  let isDown=false, startX=0, startY=0, baseX=0, baseY=0, lastX=0, trail=[];
-  const SLOP=2, ANG=60, FLICK=0.22, DISMISS_FRAC=0.12, COMMIT_FRAC=0.45, MIN=36;
-  const pxDismiss=()=>Math.max(MIN, tile.offsetWidth*DISMISS_FRAC);
-
-  function onDown(e){
-    if (e.button!==0) return;
-    if (e.target.closest('button,a,input,textarea,select')) return;
-    isDown=true; focus();
-    try{ tile.setPointerCapture?.(e.pointerId); }catch(_){}
-    startX=lastX=e.clientX; startY=e.clientY;
-    const r = tile.getBoundingClientRect(); baseX=r.left; baseY=r.top;
-    trail = [{t:performance.now(), x:lastX}];
-    e.preventDefault();
+    // drag
+    let isDown=false, startX=0, startY=0, baseX=0, baseY=0;
+    function onDown(e){ if (e.button!==0) return;
+      isDown=true; focus();
+      startX=e.clientX; startY=e.clientY;
+      const r=tile.getBoundingClientRect(); baseX=r.left; baseY=r.top;
+      e.preventDefault(); }
+    function onMove(e){ if(!isDown) return;
+      const dx=e.clientX-startX, dy=e.clientY-startY;
+      tile.style.left=(baseX+dx)+'px'; tile.style.top=(baseY+dy)+'px'; e.preventDefault();}
+    function onUp(){ isDown=false; }
+    tile.addEventListener('pointerdown',onDown,{passive:false});
+    window.addEventListener('pointermove',onMove,{passive:false});
+    window.addEventListener('pointerup',onUp);
   }
-  function onMove(e){
-    if(!isDown) return;
-    lastX = e.clientX;
-    const dx = lastX - startX, dy = e.clientY - startY;
-    const dist = Math.hypot(dx,dy);
-
-    const now = performance.now();
-    trail.push({t:now, x:lastX}); while(trail.length && now - trail[0].t > 120) trail.shift();
-
-    if (!tile._mode && dist > SLOP){
-      const angle = Math.atan2(Math.abs(dy), Math.abs(dx)) * 180/Math.PI;
-      const thr = pxDismiss();
-      tile._mode = (angle <= ANG && (Math.abs(dx) > thr*0.3)) ? 'swipe' : 'drag';
-    }
-
-    if (tile._mode === 'swipe'){
-      const thr = pxDismiss();
-      const fade = Math.min(0.7, Math.abs(dx) / (thr*0.9));
-      tile.style.transform = `translate(${dx}px,0) rotate(${dx*0.008}deg)`;
-      tile.style.opacity   = String(1 - fade);
-      e.preventDefault(); return;
-    }
-
-    tile.style.left = (baseX + dx) + 'px';
-    tile.style.top  = (baseY + dy) + 'px';
-    e.preventDefault();
-  }
-  function onUp(){
-    if(!isDown) return;
-    isDown=false;
-    const dx = lastX - startX;
-    const now = performance.now(); while(trail.length && now - trail[0].t > 120) trail.shift();
-    let vx=0; if (trail.length>=2){ const a=trail[0], b=trail[trail.length-1]; vx = Math.abs(b.x-a.x)/Math.max(1,b.t-a.t); }
-    const thr = pxDismiss();
-
-    if (tile._mode === 'swipe'){
-      if (Math.abs(dx) >= thr*COMMIT_FRAC || vx >= FLICK){ dismiss(tile, dx>=0?1:-1); }
-      else {
-        tile.style.transition = `transform var(--t) var(--ease), opacity var(--t) var(--ease)`;
-        tile.style.transform=''; tile.style.opacity='';
-        tile.addEventListener('transitionend', () => { tile.style.transition=''; }, {once:true});
-      }
-    }
-    tile._mode = null;
-  }
-
-  tile.addEventListener('pointerdown', onDown, {passive:false});
-  window.addEventListener('pointermove', onMove, {passive:false});
-  window.addEventListener('pointerup', onUp);
-  window.addEventListener('pointercancel', onUp);
-}
-
 
   function openTile(key){
-    const existing = stage.querySelector(`.cs-tile[data-key="${key}"]`);
+    const existing = stage.querySelector(\`.cs-tile[data-key="\${key}"]\`);
     if (existing){ existing.style.zIndex = ++zTop; existing.classList.add('is-focused'); return; }
 
     const el = document.createElement('section');
     el.className = 'cs-tile';
     el.dataset.key = key;
-    el.innerHTML = (TEMPLATES[key] || (()=>`
+    el.innerHTML = (TEMPLATES[key] || (()=>\`
       <header class="cs-tile-head">
-        <h4>${key}</h4><button class="cs-close" aria-label="Close">×</button>
+        <h4>\${key}</h4><button class="cs-close" aria-label="Close">×</button>
       </header>
-      <div class="cs-tile-body"><p>${key} tile.</p></div>`))();
+      <div class="cs-tile-body"><p>\${key} tile.</p></div>\`))();
 
     stage.appendChild(el);
     el.style.zIndex = ++zTop;
@@ -457,23 +404,13 @@
     addHandlers(el);
     el.classList.add('is-focused');
 
-    if (key === 'tools') wireEditLink(el);
+    if (key === 'tools' || key === 'profile') wireEditLink(el);
   }
 
-  // Wire Update Profile button
-  document.addEventListener('click', (e)=>{
-    if (e.target && e.target.id === 'tool-update-profile'){
-      e.preventDefault();
-      openTile('profile');
-    }
-  });
-
-  // click -> open tiles (MAIN TAB BUTTONS)
   document.querySelectorAll('.cs-tab').forEach(btn=>{
     btn.addEventListener('click', ()=> openTile(btn.dataset.key));
   });
 
-  // support ?open=tools etc.
   const qs = new URLSearchParams(location.search);
   if (qs.get('open')) openTile(qs.get('open'));
 
@@ -509,4 +446,3 @@
 
 </body>
 </html>
-
