@@ -5,82 +5,101 @@
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>Welcome • ConciergeSync™</title>
   <style>
-    /* --- Gold watermark background --- */
-    .cs-bg{
-      position:fixed; inset:0; z-index:-2;
-      background:url('/beta/assets/CS_Logo_Premium.png') center/500px repeat;
-      opacity:.75; pointer-events:none;
-    }
+  :root {
+    --page-bg: #0b0f14;
+    --ink: #eaf2ff;
+    --muted: #9fb0c8;
+    --glass-bg: rgba(15,15,20,.75); /* stronger dark glass for legibility */
+    --glass-brd: rgba(255,255,255,.22);
+    --glass-blur: blur(14px) saturate(1.1);
+    --ring: 0 0 0 3px rgba(255,255,255,.18);
+  }
 
-    :root{
-      --glass: rgba(255,255,255,.10);
-      --brd:   rgba(255,255,255,.28);
-      --ink:   #eaf2ff;
-      --muted: #9fb0c8;
-    }
-    html,body{height:100%}
-    body{
-      margin:0; color:var(--ink); background:#0b0f14;
-      font-family:system-ui,-apple-system,Segoe UI,Inter,Arial,sans-serif;
-      display:grid; place-items:center; padding:18px;
-    }
+  html, body {
+    height: 100%;
+  }
 
-    .tile{
-      width:min(450px, 92vw);
-      border-radius:18px;
-      background:var(--glass);
-      border:1px solid var(--brd);
-      backdrop-filter: blur(12px) saturate(1.2);
-      box-shadow:0 22px 60px rgba(0,0,0,.45);
-      padding: clamp(20px, 3.5vw, 30px);
-    }
-    h1{margin:0 0 8px; font-size: clamp(26px,4vw,34px); text-align:center; font-weight:800; letter-spacing:-.01em}
-    .lead{margin:6px 0 18px; text-align:center; color:var(--muted)}
-    .tabs{display:flex; gap:10px; justify-content:center; margin:8px 0 16px}
-    .tab{
-      padding:8px 12px; border-radius:999px; font-weight:700; border:1px solid rgba(255,255,255,.35);
-      background:rgba(255,255,255,.06); color:#fff; cursor:pointer; user-select:none;
-    }
-    .tab.is-active{ background:rgba(255,255,255,.14) }
+  body {
+    margin: 0;
+    background: var(--page-bg);
+    color: var(--ink);
+    font-family: system-ui, -apple-system, Segoe UI, Inter, Arial, sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    overflow: hidden; /* stop whole-page scrolling */
+    padding: 16px;
+    position: relative;
+  }
 
-    form{margin:0}
-    .row{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:8px 0}
-    .row.single{ grid-template-columns:1fr }
-    label{font-size:13px; color:#cbd7ea; display:block; margin:6px 0}
-    input[type="text"], input[type="email"]{
-      width:100%; padding:12px 12px; border-radius:10px; border:1px solid rgba(255,255,255,.28);
-      background:rgba(0,0,0,.35); color:#fff; outline:none;
-    }
-    input[aria-invalid="true"]{ border-color:#ff6b6b; }
-    .err{ display:none; color:#ffb3b3; font-size:12px; margin-top:6px }
-    .actions{ margin-top:14px; display:flex; gap:10px; justify-content:center }
-    .btn{
-      padding:12px 18px; border-radius:999px; font-weight:800; border:1px solid rgba(255,255,255,.45);
-      background:rgba(255,255,255,.10); color:#fff; cursor:pointer;
-    }
-    .status{ opacity:0; transition:.15s; text-align:center; margin-top:8px; color:#cbd7ea; font-size:14px }
-    .status.show{ opacity:1 }
-    .foot{ margin-top:14px; color:#a7b4c9; font-size:12px; text-align:center }
+  /* Big gold logo bg */
+  .cs-bg {
+    position: fixed; inset: 0; z-index: -2;
+    background: url('/beta/assets/CS_Logo_Premium.png') center/420px repeat;
+    opacity: .65;
+    pointer-events: none;
+  }
 
-    /* Keep the card at 500px */
-    .card{ width: min(500px, calc(100vw - 32px)); margin-inline:auto; }
+  /* Vignette overlay */
+  body::after {
+    content: "";
+    position: fixed; inset: 0; z-index: -1; pointer-events: none;
+    background:
+      radial-gradient(120% 120% at 50% 0%, rgba(255,255,255,.04), rgba(0,0,0,.28) 60%, rgba(0,0,0,.55) 100%),
+      linear-gradient(180deg, rgba(255,255,255,.02), rgba(0,0,0,.08));
+  }
 
-    /* Form spacing */
-    #gate{ padding-inline:12px; }
-    #nameRow{
-      display:grid;
-      grid-template-columns: 1fr 1fr;
-      column-gap:12px;
-    }
-    #gate input[type="text"],
-    #gate input[type="email"]{
-      width:100%;
-      box-sizing:border-box;
-    }
-    @media (max-width:520px){
-      #nameRow{ grid-template-columns: 1fr; row-gap:12px; }
-    }
-  </style>
+  /* Centered glass card */
+  .card {
+    width: min(92vw, 420px); /* keep card within viewport */
+    max-height: 90vh;        /* avoid running off screen */
+    margin: 0 auto;
+    border-radius: 22px;
+    background: var(--glass-bg);
+    backdrop-filter: var(--glass-blur);
+    box-shadow: 0 18px 48px rgba(0,0,0,.45), inset 0 0 0 1px var(--glass-brd);
+    padding: 32px 24px;
+    text-align: center;
+    overflow-y: auto;        /* scroll only inside card if needed */
+  }
+
+  h1 {
+    font-size: clamp(20px, 3vw, 28px);
+    margin: 0 0 14px;
+    letter-spacing: .2px;
+  }
+
+  p.lead {
+    color: var(--muted);
+    margin: 6px 0 18px;
+    line-height: 1.45;
+    font-size: clamp(15px, 2.4vw, 17px);
+  }
+
+  input, button {
+    width: 100%;
+    padding: 12px 14px;
+    border-radius: 10px;
+    border: 1px solid rgba(255,255,255,.25);
+    background: rgba(255,255,255,.06);
+    color: #fff;
+    font-size: 15px;
+    margin: 8px 0;
+  }
+
+  button {
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .footnote {
+    margin-top: 14px;
+    color: #a7b4c9;
+    font-size: 13px;
+  }
+</style>
+
 </head>
 <body>
   <div class="cs-bg"></div>
