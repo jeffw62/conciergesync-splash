@@ -48,7 +48,8 @@
 
 .tile .tile-body {
   flex: 1;
-  overflow-y: auto;             /* scroll inside */
+  min-height: 0;                 /* 🔑 allow flexbox to shrink */
+  overflow-y: auto;              /* enable vertical scroll */
   -webkit-overflow-scrolling: touch;
 }
 
