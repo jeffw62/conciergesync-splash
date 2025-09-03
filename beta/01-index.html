@@ -76,7 +76,6 @@
     background: rgba(255,255,255,.07); color:#fff; font-weight:700; cursor:pointer;
   }
   .cs-tab:hover{ background: rgba(255,255,255,.12); }
-  /* make links styled like buttons not show underlines */
   a.cs-tab,
   a.cs-tab:hover,
   a.cs-tab:focus,
@@ -140,7 +139,7 @@
     opacity:0;
   }
 
-  /* Fullscreen CTA (only when not fullscreen) */
+  /* Fullscreen CTA */
   .fs-cta{
     position:fixed; inset:0; display:none; place-items:center; z-index:var(--ui);
     background: rgba(0,0,0,.45);
@@ -249,7 +248,6 @@
   }
   fsGo.addEventListener('click', (e)=>{ e.preventDefault(); enterFS(); });
   fsSkip.addEventListener('click', (e)=>{ e.preventDefault(); fsCta.style.display='none'; });
-  // ONLY the top-right exit triggers logout confirm
   exitFs.addEventListener('click', (e)=>{ e.preventDefault(); leaveFS(); showLogoutConfirm(); });
 
   if (new URLSearchParams(location.search).get('enter') === '1'){
@@ -262,7 +260,6 @@
   const stage = document.getElementById('cs-tiles');
   let zTop = 10;
 
-  // Build/refresh the "Edit Section 1" link for NoteForms
   const FORM_URL = "https://noteforms.com/forms/beta-user-tracker-conciergesync-b4yxaf";
   const UID_GUID = "78ddd51d-9ccb-4fc7-a3cd-d17f7cd37ff4";
   function wireEditLink(scope){
@@ -312,36 +309,36 @@
       <div class="cs-tile-body"><p>CPP, cash vs award, transfer hints.</p></div>`,
     tools: () => `
       <header class="cs-tile-head">
-      <h4>User Tools</h4><button class="cs-close" aria-label="Close">×</button>
+        <h4>User Tools</h4><button class="cs-close" aria-label="Close">×</button>
       </header>
       <div class="cs-tile-body">
-      <a id="tool-edit-sec1"
-       class="cs-tab"
-       href="#"
-       target="_blank"
-       rel="noopener"
-       title="Edit your Section 1 answers (opens in a new tab)"
-       aria-label="Edit your Section 1 answers">
-      ✏️ Edit
-      </a>
-      <a id="tool-update-profile"
-       class="cs-tab"
-       href="#"
-       title="Open your profile sections (Travel Profile, Cards, Loyalty, Points) to update answers.">
-        🗂️ Update Profile
-      </a>
-      </div>`
+        <a id="tool-edit-sec1"
+           class="cs-tab"
+           href="#"
+           target="_blank"
+           rel="noopener"
+           title="Edit your Section 1 answers (opens in a new tab)"
+           aria-label="Edit your Section 1 answers">
+          ✏️ Edit
+        </a>
+        <a id="tool-update-profile"
+           class="cs-tab"
+           href="#"
+           title="Open your profile sections (Travel Profile, Cards, Loyalty, Points) to update answers.">
+          🗂️ Update Profile
+        </a>
+      </div>`,
     profile: () => `
       <header class="cs-tile-head">
-      <h4>Profile Updates</h4><button class="cs-close" aria-label="Close">×</button>
+        <h4>Profile Updates</h4><button class="cs-close" aria-label="Close">×</button>
       </header>
       <div class="cs-tile-body">
-      <div style="display:flex;flex-direction:column;gap:10px">
-        <button class="cs-tab" title="Update your travel profile (home airport, frequency, goals)">Section 1 — Travel Profile</button>
-        <button class="cs-tab" title="Update authorized users and cards">Section 2 — Cards & Authorized Users</button>
-        <button class="cs-tab" title="Update your loyalty program activity">Section 3 — Loyalty Programs</button>
-        <button class="cs-tab" title="Update transferable points">Section 4 — Points Programs</button>
-      </div>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <button class="cs-tab" title="Update your travel profile (home airport, frequency, goals)">Section 1 — Travel Profile</button>
+          <button class="cs-tab" title="Update authorized users and cards">Section 2 — Cards & Authorized Users</button>
+          <button class="cs-tab" title="Update your loyalty program activity">Section 3 — Loyalty Programs</button>
+          <button class="cs-tab" title="Update transferable points">Section 4 — Points Programs</button>
+        </div>
       </div>`
   };
 
@@ -366,87 +363,21 @@
     tile.addEventListener('pointerdown', focus);
     tile.addEventListener('pointerup', blur);
     tile.addEventListener('pointercancel', blur);
-    // Close ONLY dismisses this tile
     tile.querySelector('.cs-close')?.addEventListener('click', (e) => { e.stopPropagation(); dismiss(tile, 1); });
-
-    let isDown=false, startX=0, startY=0, baseX=0, baseY=0, lastX=0, trail=[];
-    const SLOP=2, ANG=60, FLICK=0.22, DISMISS_FRAC=0.12, COMMIT_FRAC=0.45, MIN=36;
-    const pxDismiss=()=>Math.max(MIN, tile.offsetWidth*DISMISS_FRAC);
-
-    function onDown(e){
-      if (e.button!==0) return;
-      if (e.target.closest('button,a,input,textarea,select')) return;
-      isDown=true; focus();
-      try{ tile.setPointerCapture?.(e.pointerId); }catch(_){}
-      startX=lastX=e.clientX; startY=e.clientY;
-      const r = tile.getBoundingClientRect(); baseX=r.left; baseY=r.top;
-      trail = [{t:performance.now(), x:lastX}];
-      e.preventDefault();
-    }
-    function onMove(e){
-      if(!isDown) return;
-      lastX = e.clientX;
-      const dx = lastX - startX, dy = e.clientY - startY;
-      const dist = Math.hypot(dx,dy);
-
-      const now = performance.now();
-      trail.push({t:now, x:lastX}); while(trail.length && now - trail[0].t > 120) trail.shift();
-
-      if (!tile._mode && dist > SLOP){
-        const angle = Math.atan2(Math.abs(dy), Math.abs(dx)) * 180/Math.PI;
-        const thr = pxDismiss();
-        tile._mode = (angle <= ANG && (Math.abs(dx) > thr*0.3)) ? 'swipe' : 'drag';
-      }
-
-      if (tile._mode === 'swipe'){
-        const thr = pxDismiss();
-        const fade = Math.min(0.7, Math.abs(dx) / (thr*0.9));
-        tile.style.transform = `translate(${dx}px,0) rotate(${dx*0.008}deg)`;
-        tile.style.opacity   = String(1 - fade);
-        e.preventDefault(); return;
-      }
-
-      tile.style.left = (baseX + dx) + 'px';
-      tile.style.top  = (baseY + dy) + 'px';
-      e.preventDefault();
-    }
-    function onUp(){
-      if(!isDown) return;
-      isDown=false;
-      const dx = lastX - startX;
-      const now = performance.now(); while(trail.length && now - trail[0].t > 120) trail.shift();
-      let vx=0; if (trail.length>=2){ const a=trail[0], b=trail[trail.length-1]; vx = Math.abs(b.x-a.x)/Math.max(1,b.t-a.t); }
-      const thr = pxDismiss();
-
-      if (tile._mode === 'swipe'){
-        if (Math.abs(dx) >= thr*COMMIT_FRAC || vx >= FLICK){ dismiss(tile, dx>=0?1:-1); }
-        else {
-          tile.style.transition = `transform var(--t) var(--ease), opacity var(--t) var(--ease)`;
-          tile.style.transform=''; tile.style.opacity='';
-          tile.addEventListener('transitionend', () => { tile.style.transition=''; }, {once:true});
-        }
-      }
-      tile._mode = null;
-    }
-
-    tile.addEventListener('pointerdown', onDown, {passive:false});
-    window.addEventListener('pointermove', onMove, {passive:false});
-    window.addEventListener('pointerup', onUp);
-    window.addEventListener('pointercancel', onUp);
   }
 
   function openTile(key){
-    const existing = stage.querySelector(`.cs-tile[data-key="${key}"]`);
+    const existing = stage.querySelector(\`.cs-tile[data-key="\${key}"]\`);
     if (existing){ existing.style.zIndex = ++zTop; existing.classList.add('is-focused'); return; }
 
     const el = document.createElement('section');
     el.className = 'cs-tile';
     el.dataset.key = key;
-    el.innerHTML = (TEMPLATES[key] || (()=>`
+    el.innerHTML = (TEMPLATES[key] || (()=>\`
       <header class="cs-tile-head">
-        <h4>${key}</h4><button class="cs-close" aria-label="Close">×</button>
+        <h4>\${key}</h4><button class="cs-close" aria-label="Close">×</button>
       </header>
-      <div class="cs-tile-body"><p>${key} tile.</p></div>`))();
+      <div class="cs-tile-body"><p>\${key} tile.</p></div>\`))();
 
     stage.appendChild(el);
     el.style.zIndex = ++zTop;
@@ -459,16 +390,17 @@
     addHandlers(el);
     el.classList.add('is-focused');
 
-    // Populate Edit link when User Tools tile is created
     if (key === 'tools') wireEditLink(el);
   }
+
   // Wire Update Profile button
   document.addEventListener('click', (e)=>{
-  if (e.target && e.target.id === 'tool-update-profile'){
-     e.preventDefault();
-     openTile('profile');
-  }
+    if (e.target && e.target.id === 'tool-update-profile'){
+      e.preventDefault();
+      openTile('profile');
+    }
   });
+
   // click -> open tiles
   document.querySelectorAll('.cs-tab').forEach(btn=>{
     btn.addEventListener('click', ()=> openTile(btn.dataset.key));
@@ -494,7 +426,7 @@
       document.cookie = 'cs_auth=; Max-Age=0; path=/; SameSite=Lax';
     } catch(_) {}
     leaveFS();
-    location.replace('/beta/auth.html'); // single gate
+    location.replace('/beta/auth.html');
   });
 
   noBtn.addEventListener('click', () => {
@@ -502,19 +434,11 @@
     enterFS();
   });
 
-  // If user hits Esc to leave FS, prompt them
   document.addEventListener('fullscreenchange', () => {
     if (!document.fullscreenElement) showLogoutConfirm();
   });
-
-  // 🔒 Removed the global “looks like exit/×” click-catcher that hijacked tile close.
 })();
 </script>
 
 </body>
 </html>
-
-
-
-
-
