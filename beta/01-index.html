@@ -364,13 +364,11 @@
     tile.addEventListener('pointerup', blur);
     tile.addEventListener('pointercancel', blur);
 
-    // --- Drag support (mouse + touch, no grab cursor) ---
     let startX=0, startY=0, origX=0, origY=0, dragging=false;
 
     tile.addEventListener('pointerdown', e=>{
       if(e.target.closest('.cs-close')) return;
       dragging = true;
-      tile.setPointerCapture(e.pointerId);
       startX = e.clientX; startY = e.clientY;
       origX  = parseInt(tile.style.left||0);
       origY  = parseInt(tile.style.top||0);
@@ -384,10 +382,8 @@
       tile.style.top  = (origY + dy) + "px";
     });
 
-    tile.addEventListener('pointerup', e=>{
-      dragging = false;
-      tile.releasePointerCapture(e.pointerId);
-    });
+    tile.addEventListener('pointerup', ()=>{ dragging=false; });
+    tile.addEventListener('pointercancel', ()=>{ dragging=false; });
 
     tile.querySelector('.cs-close')?.addEventListener('click', (e) => { 
       e.stopPropagation(); 
