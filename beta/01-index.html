@@ -112,7 +112,7 @@
     overflow:hidden;
     pointer-events:auto;
     user-select:none;
-    touch-action: none;
+    touch-action: auto; /* allow normal interactions */
     will-change: transform, opacity, left, top;
     transition: box-shadow var(--t-fast) ease;
   }
@@ -123,8 +123,9 @@
     display:flex; align-items:center; justify-content:space-between;
     padding: 12px 14px; background: rgba(0,0,0,.18);
     border-bottom:1px solid rgba(255,255,255,.18);
-    cursor: move;
+    cursor: grab;
   }
+  .cs-tile-head:active { cursor: grabbing; }
   .cs-tile-head h4{ margin:0; font-size:15px; font-weight:800; letter-spacing:.2px; }
   .cs-close{
     width:30px; height:30px; border-radius:8px;
@@ -361,36 +362,42 @@
   function addHandlers(tile){
     function focus(){ tile.style.zIndex = ++zTop; tile.classList.add('is-focused'); }
     function blur(){ tile.classList.remove('is-focused'); }
-    tile.addEventListener('pointerdown', focus);
-    tile.addEventListener('pointerup', blur);
-    tile.addEventListener('pointercancel', blur);
+    tile.addEventListener('mousedown', focus);
+    tile.addEventListener('mouseup', blur);
 
     // --- Drag support ---
     let startX=0, startY=0, origX=0, origY=0, dragging=false;
     const head = tile.querySelector('.cs-tile-head');
 
-    head.addEventListener('pointerdown', e=>{
+    head.addEventListener('mousedown', e=>{
       if(e.target.closest('.cs-close')) return;
       dragging = true;
       startX = e.clientX; startY = e.clientY;
-      origX = parseInt(tile.style.left||0);
-      origY = parseInt(tile.style.top||0);
-      tile.setPointerCapture(e.pointerId);
+      origX  = parseInt(tile.style.left||0);
+      origY  = parseInt(tile.style.top||0);
+
+      function onMove(ev){
+        if(!dragging) return;
+        const dx = ev.clientX - startX;
+        const dy = ev.clientY - startY;
+        tile.style.left = (origX + dx) + "px";
+        tile.style.top  = (origY + dy) + "px";
+      }
+
+      function onUp(){
+        dragging = false;
+        document.removeEventListener('mousemove', onMove);
+        document.removeEventListener('mouseup', onUp);
+      }
+
+      document.addEventListener('mousemove', onMove);
+      document.addEventListener('mouseup', onUp);
     });
 
-    head.addEventListener('pointermove', e=>{
-      if(!dragging) return;
-      const dx = e.clientX-startX, dy = e.clientY-startY;
-      tile.style.left = (origX+dx) + "px";
-      tile.style.top  = (origY+dy) + "px";
+    tile.querySelector('.cs-close')?.addEventListener('click', (e) => { 
+      e.stopPropagation(); 
+      dismiss(tile, 1); 
     });
-
-    head.addEventListener('pointerup', e=>{
-      dragging = false;
-      tile.releasePointerCapture(e.pointerId);
-    });
-
-    tile.querySelector('.cs-close')?.addEventListener('click', (e) => { e.stopPropagation(); dismiss(tile, 1); });
   }
 
   function openTile(key){
