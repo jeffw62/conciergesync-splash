@@ -7,7 +7,11 @@
   <style>
   /* --- Global Reset --- */
   *, *::before, *::after { box-sizing: border-box; }
-  html, body { height: 100%; margin: 0; overflow-x: hidden; }
+  html, body {
+    height: 100%;
+    margin: 0;
+    overflow: hidden; /* lock scroll + kill bounce */
+  }
 
   body {
     background: #0b0f14;
@@ -28,6 +32,8 @@
   /* --- Glass Tile --- */
   .tile {
     width: min(440px, 92vw);
+    max-height: 90vh;              /* contain inside viewport */
+    overflow-y: auto;              /* scroll inside if content too tall */
     border-radius: 20px;
     background: rgba(20,20,25,.45);
     border: 1px solid rgba(255,255,255,.25);
