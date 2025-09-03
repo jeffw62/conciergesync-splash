@@ -331,6 +331,18 @@
         🗂️ Update Profile
       </a>
       </div>`
+    profile: () => `
+      <header class="cs-tile-head">
+      <h4>Profile Updates</h4><button class="cs-close" aria-label="Close">×</button>
+      </header>
+      <div class="cs-tile-body">
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <button class="cs-tab" title="Update your travel profile (home airport, frequency, goals)">Section 1 — Travel Profile</button>
+        <button class="cs-tab" title="Update authorized users and cards">Section 2 — Cards & Authorized Users</button>
+        <button class="cs-tab" title="Update your loyalty program activity">Section 3 — Loyalty Programs</button>
+        <button class="cs-tab" title="Update transferable points">Section 4 — Points Programs</button>
+      </div>
+      </div>`
   };
 
   function centerPos(tile){
@@ -450,7 +462,12 @@
     // Populate Edit link when User Tools tile is created
     if (key === 'tools') wireEditLink(el);
   }
-
+  // Wire Update Profile button
+  document.addEventListener('click', (e)=>{
+  if (e.target && e.target.id === 'tool-update-profile'){
+     e.preventDefault();
+     openTile('profile');
+  }
   // click -> open tiles
   document.querySelectorAll('.cs-tab').forEach(btn=>{
     btn.addEventListener('click', ()=> openTile(btn.dataset.key));
@@ -495,6 +512,7 @@
 
 </body>
 </html>
+
 
 
 
