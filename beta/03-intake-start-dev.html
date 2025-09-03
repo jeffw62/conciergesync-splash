@@ -15,43 +15,42 @@
     }
 
     html,body{height:100%}
-    body{
-      margin:0; color:var(--ink);
-      font-family:system-ui,-apple-system,Segoe UI,Inter,Arial,sans-serif;
-      background:var(--page-bg);
-      display:flex; align-items:center; justify-content:center;
-      padding:24px; position:relative; overflow:hidden;
-    }
+    body {
+  margin: 0; 
+  color: var(--ink);
+  font-family: system-ui,-apple-system,Segoe UI,Inter,Arial,sans-serif;
+  background: var(--page-bg);
+  display: flex;
+  justify-content: center;      /* horizontal center */
+  align-items: flex-start;      /* align to top */
+  padding: 24px;
+  overflow: hidden;             /* stop page scroll */
+}
 
     /* Glass tile container */
     .tile {
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
+  position: relative;           /* no absolute centering */
+  width: min(360px, 90vw);
+  max-height: 90vh;             /* respect viewport */
+  
+  display: flex;
+  flex-direction: column;
 
-      width: min(360px, 90vw);
-      max-height: 88vh;
+  border-radius: 20px;
+  background: rgba(20,20,25,.45);
+  border: 1px solid rgba(255,255,255,.25);
+  backdrop-filter: blur(14px) saturate(1.2);
+  box-shadow: 0 22px 60px rgba(0,0,0,.5);
+  padding: 22px;
 
-      display: flex;
-      flex-direction: column;
+  overflow: hidden;             /* lock outer */
+}
 
-      border-radius: 20px;
-      background: rgba(20,20,25,.45);
-      border: 1px solid rgba(255,255,255,.25);
-      backdrop-filter: blur(14px) saturate(1.2);
-      box-shadow: 0 22px 60px rgba(0,0,0,.5);
-      padding: 22px;
-
-      overflow: hidden; /* lock outer scroll */
-    }
-
-    /* Inner scrollable area */
-    .tile .tile-body {
-      flex: 1;
-      overflow-y: auto;
-      -webkit-overflow-scrolling: touch;
-    }
+.tile .tile-body {
+  flex: 1;
+  overflow-y: auto;             /* scroll inside */
+  -webkit-overflow-scrolling: touch;
+}
 
     .cs-bg{
       position:fixed; inset:0; z-index:-2;
