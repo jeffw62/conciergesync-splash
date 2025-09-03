@@ -4,6 +4,23 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <title>ConciergeSync™ Console</title>
+
+<!-- Gate: require auth -->
+<script>
+(function () {
+  try {
+    const isAuthed =
+      sessionStorage.getItem('cs_authed') === '1' ||
+      localStorage.getItem('cs_authed') === '1' ||
+      /(?:^|;\s*)cs_auth=1(?:;|$)/.test(document.cookie);
+
+    if (!isAuthed) location.replace('/beta/auth.html?mode=login');
+  } catch {
+    location.replace('/beta/auth.html?mode=login');
+  }
+})();
+</script>
+
 <style>
   :root{
     --glass-bg: rgba(255,255,255,.12);
@@ -11,93 +28,163 @@
     --overlay-grad-top: rgba(0,0,0,.35);
     --overlay-grad-bot: rgba(0,0,0,.58);
     --overlay: .30;
+    --vh: 100vh;
     --ui: 4000;
+    --ease: cubic-bezier(.22,1,.36,1);
+    --t-fast: 220ms;
+    --t: 640ms;
+    --t-out: 900ms;
   }
 
-  *{box-sizing:border-box;}
-  html,body{height:100%;margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif;background:#0b0f14;color:#eef2f8;}
+  *{ box-sizing:border-box; }
+  html,body{ height:100%; }
+  body{
+    margin:0;
+    font-family: system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif;
+    color:#eef2f8;
+    background:#0b0f14;
+  }
 
   /* Backdrop */
-  .backdrop{position:fixed;inset:0;z-index:0;overflow:hidden;}
+  .backdrop{ position:fixed; inset:0; z-index:0; overflow:hidden; }
   .backdrop-image{
-    position:absolute;inset:0;
-    background:url('/beta/assets/bg/dfw-hero.jpg') center/cover no-repeat;
-    filter:brightness(1.12) contrast(1.05);
-    transform:scale(1.03);
+    position:absolute; inset:0;
+    background:center/cover no-repeat;
+    filter: brightness(1.12) contrast(1.05);
+    transform: scale(1.03) translateZ(0);
+    will-change: transform, opacity, filter;
+    transition: opacity 600ms ease, transform 900ms ease, filter 900ms ease;
     opacity:.999;
   }
   .backdrop-overlay{
-    position:absolute;inset:0;pointer-events:none;
-    background:linear-gradient(to bottom,var(--overlay-grad-top),var(--overlay-grad-bot));
-    opacity:var(--overlay);
+    position:absolute; inset:0; pointer-events:none;
+    background: linear-gradient(to bottom, var(--overlay-grad-top), var(--overlay-grad-bot));
+    opacity: var(--overlay);
   }
 
-  /* Tabs */
+  /* Tabs bar */
   .cs-tabs{
-    position:fixed;top:18px;left:50%;transform:translateX(-50%);
-    z-index:var(--ui);
-    display:flex;gap:10px;padding:10px 12px;
-    background:rgba(15,15,18,.36);
+    position: fixed; top: 18px; left: 50%; transform: translateX(-50%);
+    z-index: var(--ui);
+    display:flex; gap:10px; padding:10px 12px;
+    background: rgba(15,15,18,.36);
     border:1px solid rgba(255,255,255,.25);
-    border-radius:14px;backdrop-filter:blur(8px) saturate(1.1);
+    border-radius:14px; backdrop-filter: blur(8px) saturate(1.1);
   }
   .cs-tab{
-    padding:10px 14px;border-radius:10px;border:1px solid rgba(255,255,255,.18);
-    background:rgba(255,255,255,.07);color:#fff;font-weight:700;cursor:pointer;
+    padding:10px 14px; border-radius:10px; border:1px solid rgba(255,255,255,.18);
+    background: rgba(255,255,255,.07); color:#fff; font-weight:700; cursor:pointer;
   }
-  .cs-tab:hover{background:rgba(255,255,255,.12);}
+  .cs-tab:hover{ background: rgba(255,255,255,.12); }
+  a.cs-tab,
+  a.cs-tab:hover,
+  a.cs-tab:focus,
+  a.cs-tab:active,
+  a.cs-tab:visited { text-decoration: none; }
 
-  /* Exit */
+  /* Exit button */
   .console-exit{
-    position:fixed;top:18px;right:18px;z-index:var(--ui);
-    width:40px;height:40px;border-radius:10px;
+    position:fixed; top:18px; right:18px; z-index:var(--ui);
+    width:40px; height:40px; border-radius:10px;
     border:1px solid rgba(255,255,255,.35);
-    background:rgba(20,20,20,.45);
-    color:#fff;font-size:28px;line-height:36px;text-align:center;cursor:pointer;
-    backdrop-filter:blur(8px) saturate(1.1);
+    background: rgba(20,20,20,.45);
+    color:#fff; font-size:28px; line-height:36px; text-align:center; cursor:pointer;
+    backdrop-filter: blur(8px) saturate(1.1);
   }
+  .console-exit:hover{ background: rgba(20,20,20,.6); }
 
-  /* Stage */
-  #cs-tiles{position:fixed;inset:0;z-index:10;pointer-events:auto;}
+  /* Stage for tiles */
+  #cs-tiles{ position: fixed; inset: 0; z-index: 10; pointer-events: none; }
 
   /* Tiles */
   .cs-tile{
     position:absolute;
-    width:420px;min-height:320px;max-height:76vh;
-    display:grid;grid-template-rows:auto 1fr;
-    background:var(--glass-bg);color:#f5f7fb;
+    width: 420px;
+    min-height: 320px;
+    max-height: 76vh;
+    display:grid; grid-template-rows:auto 1fr;
+    background: var(--glass-bg);
+    color:#f5f7fb;
     border:1px solid var(--glass-border);
     border-radius:18px;
     box-shadow:0 10px 30px rgba(0,0,0,.22);
-    backdrop-filter:blur(12px) saturate(1.22);
-    overflow:hidden;pointer-events:auto;user-select:none;
-    transition:box-shadow 0.2s ease;
+    backdrop-filter: blur(12px) saturate(1.22);
+    overflow:hidden;
+    pointer-events:auto;
+    user-select:none;
+    touch-action: pan-y;
+    will-change: transform, opacity, left, top;
+    transition: box-shadow var(--t-fast) ease;
   }
-  .cs-tile.is-focused{box-shadow:0 16px 44px rgba(0,0,0,.32),0 0 0 1px rgba(255,255,255,.18) inset;}
+  .cs-tile.is-focused{
+    box-shadow:0 16px 44px rgba(0,0,0,.32), 0 0 0 1px rgba(255,255,255,.18) inset;
+  }
   .cs-tile-head{
-    display:flex;align-items:center;justify-content:space-between;
-    padding:12px 14px;background:rgba(0,0,0,.18);
+    display:flex; align-items:center; justify-content:space-between;
+    padding: 12px 14px; background: rgba(0,0,0,.18);
     border-bottom:1px solid rgba(255,255,255,.18);
   }
-  .cs-tile-head h4{margin:0;font-size:15px;font-weight:800;}
+  .cs-tile-head h4{ margin:0; font-size:15px; font-weight:800; letter-spacing:.2px; }
   .cs-close{
-    width:30px;height:30px;border-radius:8px;
-    background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);
-    color:#fff;font-size:18px;line-height:28px;text-align:center;cursor:pointer;
+    width:30px; height:30px; border-radius:8px;
+    background: rgba(255,255,255,.12);
+    border:1px solid rgba(255,255,255,.25);
+    color:#fff; font-size:18px; line-height:28px; text-align:center; cursor:pointer;
   }
-  .cs-tile-body{padding:14px;overflow:auto;}
+  .cs-close:hover{ background: rgba(255,255,255,.2); }
+  .cs-tile-body{ padding:14px; overflow:auto; }
+
+  .cs-tile.dismissing{
+    transition: transform var(--t-out) var(--ease), opacity var(--t-out) var(--ease);
+    opacity:0;
+  }
+
+  /* Fullscreen CTA */
+  .fs-cta{
+    position:fixed; inset:0; display:none; place-items:center; z-index:var(--ui);
+    background: rgba(0,0,0,.45);
+  }
+  .fs-card{
+    background:#111; color:#fff; padding:18px 22px; border-radius:14px;
+    box-shadow:0 10px 30px rgba(0,0,0,.35); text-align:center; font-weight:700;
+  }
+  .fs-actions{ display:flex; gap:10px; justify-content:center; margin-top:10px; }
+  .btn{ padding:10px 14px; border-radius:12px; font-weight:800; border:1px solid rgba(255,255,255,.55); }
+  .btn.primary{ background:#fff; color:#111; border-color:#fff; }
+  .btn.ghost{ background:transparent; color:#fff; }
+  body.console-mode:not(.fs-active) .fs-cta{ display:grid; }
+
+  /* Logout confirm modal */
+  #logoutConfirm {
+    position: fixed; inset: 0; z-index: 99999;
+    display: none; place-items: center;
+    background: rgba(0,0,0,.55);
+  }
+  #logoutConfirm.show { display: grid; }
+  #logoutConfirm .card {
+    background:#111; color:#fff; border-radius:14px;
+    padding:18px 20px; box-shadow:0 10px 34px rgba(0,0,0,.45);
+    font:600 16px system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif;
+    text-align:center; min-width:320px; max-width:480px;
+  }
+  #logoutConfirm .row { display:flex; gap:10px; justify-content:center; margin-top:12px; }
+  #logoutConfirm button {
+    padding:10px 14px; border-radius:12px; cursor:pointer; font-weight:700;
+    border:1px solid rgba(255,255,255,.55); background:transparent; color:#fff;
+  }
+  #logoutConfirm .primary { background:#fff; color:#111; border-color:#fff; }
 </style>
 </head>
 <body class="console-mode">
 
   <!-- Backdrop -->
   <div class="backdrop" aria-hidden="true">
-    <div class="backdrop-image"></div>
+    <div class="backdrop-image" id="backdropImage"></div>
     <div class="backdrop-overlay"></div>
   </div>
 
   <!-- Tabs -->
-  <div class="cs-tabs">
+  <div class="cs-tabs" aria-label="Console Tabs">
     <button class="cs-tab" data-key="overview">Overview</button>
     <button class="cs-tab" data-key="itinerary">Itinerary</button>
     <button class="cs-tab" data-key="values">Value Calc</button>
@@ -105,81 +192,254 @@
   </div>
 
   <!-- Exit -->
-  <button id="exitFs" class="console-exit">×</button>
+  <button id="exitFs" class="console-exit" aria-label="Exit Fullscreen">×</button>
 
   <!-- Tiles stage -->
-  <div id="cs-tiles"></div>
+  <div id="cs-tiles" aria-live="polite"></div>
+
+  <!-- Fullscreen CTA -->
+  <div id="fs-cta" class="fs-cta" role="dialog" aria-modal="true">
+    <div class="fs-card">
+      <div style="margin-bottom:8px;">Enter Fullscreen Mode</div>
+      <div class="fs-actions">
+        <button id="fs-go"   class="btn primary">Go Full Screen</button>
+        <button id="fs-skip" class="btn ghost">Skip</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Logout confirm -->
+  <div id="logoutConfirm" role="dialog" aria-modal="true" aria-labelledby="logoutTitle" hidden>
+    <div class="card">
+      <div id="logoutTitle" style="font-weight:800;margin-bottom:8px;">Do you want to log out?</div>
+      <div class="row">
+        <button id="logoutYes" class="primary">Yes, log me out</button>
+        <button id="logoutNo">No, take me back fullscreen</button>
+      </div>
+    </div>
+  </div>
 
 <script>
 (function(){
-  const stage=document.getElementById('cs-tiles');
-  let zTop=10;
+  /* ---------- Backdrop ---------- */
+  const BG = '/beta/assets/bg/dfw-hero.jpg';
+  document.getElementById('backdropImage').style.backgroundImage = `url("${BG}")`;
 
-  const TEMPLATES={
-    overview:()=>`
-      <header class="cs-tile-head"><h4>Overview</h4><button class="cs-close">×</button></header>
+  function setVh(){ document.documentElement.style.setProperty('--vh', window.innerHeight + 'px'); }
+  setVh(); addEventListener('resize', setVh);
+
+  /* ---------- Fullscreen flow ---------- */
+  const root   = document.documentElement;
+  const fsGo   = document.getElementById('fs-go');
+  const fsSkip = document.getElementById('fs-skip');
+  const fsCta  = document.getElementById('fs-cta');
+  const exitFs = document.getElementById('exitFs');
+
+  function enterFS(){
+    const req = root.requestFullscreen || root.webkitRequestFullscreen || root.msRequestFullscreen || root.mozRequestFullScreen;
+    if (req) { Promise.resolve(req.call(root)).catch(()=>{}); }
+    document.body.classList.add('fs-active');
+    fsCta.style.display = 'none';
+  }
+  function leaveFS(){
+    const ex = document.exitFullscreen || document.webkitExitFullscreen || document.msExitFullscreen || document.mozCancelFullScreen;
+    if (document.fullscreenElement || document.webkitFullscreenElement) { try{ ex.call(document); }catch(e){} }
+    document.body.classList.remove('fs-active');
+  }
+  fsGo.addEventListener('click', (e)=>{ e.preventDefault(); enterFS(); });
+  fsSkip.addEventListener('click', (e)=>{ e.preventDefault(); fsCta.style.display='none'; });
+  exitFs.addEventListener('click', (e)=>{ e.preventDefault(); leaveFS(); showLogoutConfirm(); });
+
+  if (new URLSearchParams(location.search).get('enter') === '1'){
+    document.body.classList.add('console-mode');
+    document.body.classList.remove('fs-active');
+    fsCta.style.display = 'grid';
+  }
+
+  /* ---------- Tiles ---------- */
+  const stage = document.getElementById('cs-tiles');
+  let zTop = 10;
+
+  const forms = {
+    sec1: "https://noteforms.com/forms/beta-user-tracker-conciergesync-b4yxaf",
+    sec2: "https://noteforms.com/forms/section-2-authorized-user-card-setup-conciergesync-xnkw5k",
+    sec3: "https://noteforms.com/forms/section-3-loyalty-program-overview-40ya0y",
+    sec4: "https://noteforms.com/forms/section-4-transferable-points-programs-wp4ujy"
+  };
+  const UID_GUID = "78ddd51d-9ccb-4fc7-a3cd-d17f7cd37ff4";
+
+  function wireEditLink(scope){
+    const root = scope || document;
+    const uid   = localStorage.getItem('cs_uid')   || "";
+    const email = localStorage.getItem('cs_email') || "";
+    const first = localStorage.getItem('cs_first') || "";
+    const last  = localStorage.getItem('cs_last')  || "";
+
+    Object.entries(forms).forEach(([key, baseUrl]) => {
+      const a = root.querySelector(`#tool-edit-${key}`);
+      if (!a) return;
+
+      if (!uid){
+        a.href = "/beta/auth.html?mode=login";
+        a.removeAttribute('target');
+        a.title = "Log in to edit your answers";
+        return;
+      }
+
+      const url = new URL(baseUrl);
+      url.searchParams.set("uid", uid);
+      url.searchParams.set(UID_GUID, uid);
+      if (email) url.searchParams.set("email", email);
+      if (first) url.searchParams.set("first", first);
+      if (last)  url.searchParams.set("last",  last);
+
+      a.href = url.toString();
+      a.target = "_blank";
+      a.rel = "noopener";
+    });
+  }
+
+  const TEMPLATES = {
+    overview: () => `
+      <header class="cs-tile-head">
+        <h4>Overview</h4><button class="cs-close" aria-label="Close">×</button>
+      </header>
       <div class="cs-tile-body"><p>Overview content goes here.</p></div>`,
-    itinerary:()=>`
-      <header class="cs-tile-head"><h4>Itinerary</h4><button class="cs-close">×</button></header>
-      <div class="cs-tile-body"><p>Itinerary content goes here.</p></div>`,
-    values:()=>`
-      <header class="cs-tile-head"><h4>Value Calc</h4><button class="cs-close">×</button></header>
-      <div class="cs-tile-body"><p>Value calculation content goes here.</p></div>`,
-    tools:()=>`
-      <header class="cs-tile-head"><h4>User Tools</h4><button class="cs-close">×</button></header>
-      <div class="cs-tile-body"><p>User tools content goes here.</p></div>`
+    itinerary: () => `
+      <header class="cs-tile-head">
+        <h4>Itinerary</h4><button class="cs-close" aria-label="Close">×</button>
+      </header>
+      <div class="cs-tile-body"><p>Trip segments, dates, carriers.</p></div>`,
+    values: () => `
+      <header class="cs-tile-head">
+        <h4>Value Calc</h4><button class="cs-close" aria-label="Close">×</button>
+      </header>
+      <div class="cs-tile-body"><p>CPP, cash vs award, transfer hints.</p></div>`,
+    tools: () => `
+      <header class="cs-tile-head">
+        <h4>User Tools</h4><button class="cs-close" aria-label="Close">×</button>
+      </header>
+      <div class="cs-tile-body">
+        <a id="tool-edit-sec1" class="cs-tab">✏️ Edit Section 1</a>
+        <a id="tool-update-profile" class="cs-tab">🗂️ Update Profile</a>
+      </div>`,
+    profile: () => `
+      <header class="cs-tile-head">
+        <h4>Profile Updates</h4><button class="cs-close" aria-label="Close">×</button>
+      </header>
+      <div class="cs-tile-body">
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <a id="tool-edit-sec1" class="cs-tab" target="_blank" rel="noopener"
+             title="Update your travel profile (home airport, frequency, goals)">Section 1 — Travel Profile</a>
+          <a id="tool-edit-sec2" class="cs-tab" target="_blank" rel="noopener"
+             title="Update authorized users and cards">Section 2 — Cards & Authorized Users</a>
+          <a id="tool-edit-sec3" class="cs-tab" target="_blank" rel="noopener"
+             title="Update your loyalty program activity">Section 3 — Loyalty Programs</a>
+          <a id="tool-edit-sec4" class="cs-tab" target="_blank" rel="noopener"
+             title="Update transferable points">Section 4 — Points Programs</a>
+        </div>
+      </div>`
   };
 
   function centerPos(tile){
-    const w=tile.offsetWidth,h=Math.min(tile.offsetHeight,window.innerHeight*0.76);
-    const x=(window.innerWidth-w)/2;
-    const y=Math.max(18,(window.innerHeight-h)/2);
-    return {x,y};
+    const r = tile.getBoundingClientRect();
+    const w = r.width, h = Math.min(r.height, window.innerHeight*0.76);
+    const x = (window.innerWidth  - w)/2;
+    const y = Math.max(18, (window.innerHeight - h)/2);
+    return { x, y };
+  }
+
+  function dismiss(tile, dir){
+    const off = (window.innerWidth*0.55) * (dir||1);
+    tile.classList.add('dismissing');
+    tile.style.transform = `translate(${off}px, 0) rotate(${off*0.002}deg)`;
+    tile.addEventListener('transitionend', () => tile.remove(), {once:true});
   }
 
   function addHandlers(tile){
-    function focus(){tile.style.zIndex=++zTop;tile.classList.add('is-focused');}
-    function blur(){tile.classList.remove('is-focused');}
-    tile.addEventListener('pointerdown',focus);
-    tile.addEventListener('pointerup',blur);
+    function focus(){ tile.style.zIndex = ++zTop; tile.classList.add('is-focused'); }
+    function blur(){ tile.classList.remove('is-focused'); }
+    tile.addEventListener('pointerdown', focus);
+    tile.addEventListener('pointerup', blur);
+    tile.addEventListener('pointercancel', blur);
+    tile.querySelector('.cs-close')?.addEventListener('click', (e) => { e.stopPropagation(); dismiss(tile, 1); });
 
-    // Dragging
-    let isDown=false,startX=0,startY=0,baseX=0,baseY=0;
-    function onDown(e){
-      if(e.button!==0)return;
-      isDown=true;focus();
-      startX=e.clientX;startY=e.clientY;
-      const r=tile.getBoundingClientRect();baseX=r.left;baseY=r.top;
-      e.preventDefault();
-    }
-    function onMove(e){
-      if(!isDown)return;
-      const dx=e.clientX-startX,dy=e.clientY-startY;
-      tile.style.left=(baseX+dx)+'px';tile.style.top=(baseY+dy)+'px';
-    }
-    function onUp(){isDown=false;}
-    tile.addEventListener('pointerdown',onDown);
-    window.addEventListener('pointermove',onMove);
+    // drag
+    let isDown=false, startX=0, startY=0, baseX=0, baseY=0;
+    function onDown(e){ if (e.button!==0) return;
+      isDown=true; focus();
+      startX=e.clientX; startY=e.clientY;
+      const r=tile.getBoundingClientRect(); baseX=r.left; baseY=r.top;
+      e.preventDefault(); }
+    function onMove(e){ if(!isDown) return;
+      const dx=e.clientX-startX, dy=e.clientY-startY;
+      tile.style.left=(baseX+dx)+'px'; tile.style.top=(baseY+dy)+'px'; e.preventDefault();}
+    function onUp(){ isDown=false; }
+    tile.addEventListener('pointerdown',onDown,{passive:false});
+    window.addEventListener('pointermove',onMove,{passive:false});
     window.addEventListener('pointerup',onUp);
-
-    // Close
-    tile.querySelector('.cs-close').addEventListener('click',()=>tile.remove());
   }
 
   function openTile(key){
-    const existing=stage.querySelector(\`.cs-tile[data-key="\${key}"]\`);
-    if(existing){existing.style.zIndex=++zTop;return;}
-    const el=document.createElement('section');
-    el.className='cs-tile';el.dataset.key=key;
-    el.innerHTML=(TEMPLATES[key]||(()=>'<p>No template</p>'))();
-    stage.appendChild(el);el.style.zIndex=++zTop;
-    const {x,y}=centerPos(el);
-    el.style.left=x+'px';el.style.top=y+'px';
+    const existing = stage.querySelector(\`.cs-tile[data-key="\${key}"]\`);
+    if (existing){ existing.style.zIndex = ++zTop; existing.classList.add('is-focused'); return; }
+
+    const el = document.createElement('section');
+    el.className = 'cs-tile';
+    el.dataset.key = key;
+    el.innerHTML = (TEMPLATES[key] || (()=>\`
+      <header class="cs-tile-head">
+        <h4>\${key}</h4><button class="cs-close" aria-label="Close">×</button>
+      </header>
+      <div class="cs-tile-body"><p>\${key} tile.</p></div>\`))();
+
+    stage.appendChild(el);
+    el.style.zIndex = ++zTop;
+
+    const {x,y} = centerPos(el);
+    const openCount = stage.querySelectorAll('.cs-tile').length - 1;
+    el.style.left = (x + openCount*24) + 'px';
+    el.style.top  = (y + openCount*18) + 'px';
+
     addHandlers(el);
+    el.classList.add('is-focused');
+
+    if (key === 'tools' || key === 'profile') wireEditLink(el);
   }
 
   document.querySelectorAll('.cs-tab').forEach(btn=>{
-    btn.addEventListener('click',()=>openTile(btn.dataset.key));
+    btn.addEventListener('click', ()=> openTile(btn.dataset.key));
+  });
+
+  const qs = new URLSearchParams(location.search);
+  if (qs.get('open')) openTile(qs.get('open'));
+
+  /* ---------- Logout confirm & redirect ---------- */
+  const modal  = document.getElementById('logoutConfirm');
+  const yesBtn = document.getElementById('logoutYes');
+  const noBtn  = document.getElementById('logoutNo');
+
+  function showLogoutConfirm(){ modal.hidden = false; modal.classList.add('show'); }
+  function hideLogoutConfirm(){ modal.classList.remove('show'); modal.hidden = true; }
+
+  yesBtn.addEventListener('click', () => {
+    hideLogoutConfirm();
+    try {
+      sessionStorage.removeItem('cs_authed');
+      localStorage.removeItem('cs_authed');
+      document.cookie = 'cs_auth=; Max-Age=0; path=/; SameSite=Lax';
+    } catch(_) {}
+    leaveFS();
+    location.replace('/beta/auth.html');
+  });
+
+  noBtn.addEventListener('click', () => {
+    hideLogoutConfirm();
+    enterFS();
+  });
+
+  document.addEventListener('fullscreenchange', () => {
+    if (!document.fullscreenElement) showLogoutConfirm();
   });
 })();
 </script>
