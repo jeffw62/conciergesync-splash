@@ -112,7 +112,7 @@
     overflow:hidden;
     pointer-events:auto;
     user-select:none;
-    touch-action: none; /* needed for finger drag */
+    touch-action: none; /* allow finger drag */
     will-change: transform, opacity, left, top;
     transition: box-shadow var(--t-fast) ease;
   }
@@ -123,9 +123,7 @@
     display:flex; align-items:center; justify-content:space-between;
     padding: 12px 14px; background: rgba(0,0,0,.18);
     border-bottom:1px solid rgba(255,255,255,.18);
-    cursor: grab;
   }
-  .cs-tile-head:active { cursor: grabbing; }
   .cs-tile-head h4{ margin:0; font-size:15px; font-weight:800; letter-spacing:.2px; }
   .cs-close{
     width:30px; height:30px; border-radius:8px;
@@ -366,21 +364,19 @@
     tile.addEventListener('pointerup', blur);
     tile.addEventListener('pointercancel', blur);
 
-    // --- Drag support (mouse + touch) ---
+    // --- Drag support (mouse + touch, no grab cursor) ---
     let startX=0, startY=0, origX=0, origY=0, dragging=false;
-    const head = tile.querySelector('.cs-tile-head');
 
-    head.addEventListener('pointerdown', e=>{
+    tile.addEventListener('pointerdown', e=>{
       if(e.target.closest('.cs-close')) return;
       dragging = true;
-      head.setPointerCapture(e.pointerId);
+      tile.setPointerCapture(e.pointerId);
       startX = e.clientX; startY = e.clientY;
       origX  = parseInt(tile.style.left||0);
       origY  = parseInt(tile.style.top||0);
-      head.style.cursor = "grabbing";
     });
 
-    head.addEventListener('pointermove', e=>{
+    tile.addEventListener('pointermove', e=>{
       if(!dragging) return;
       const dx = e.clientX - startX;
       const dy = e.clientY - startY;
@@ -388,10 +384,9 @@
       tile.style.top  = (origY + dy) + "px";
     });
 
-    head.addEventListener('pointerup', e=>{
+    tile.addEventListener('pointerup', e=>{
       dragging = false;
-      head.releasePointerCapture(e.pointerId);
-      head.style.cursor = "grab";
+      tile.releasePointerCapture(e.pointerId);
     });
 
     tile.querySelector('.cs-close')?.addEventListener('click', (e) => { 
