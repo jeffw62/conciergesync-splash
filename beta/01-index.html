@@ -261,46 +261,35 @@
   const stage = document.getElementById('cs-tiles');
   let zTop = 10;
 
-  function dismiss(tile, dir){
-    const off = (window.innerWidth*0.55) * (dir||1);
-    tile.classList.add('dismissing');
-    tile.style.transform = `translate(${off}px, 0) rotate(${off*0.002}deg)`;
-    tile.addEventListener('transitionend', () => tile.remove(), {once:true});
-  }
+  const FORM_URL = "https://noteforms.com/forms/beta-user-tracker-conciergesync-b4yxaf";
+  const UID_GUID = "78ddd51d-9ccb-4fc7-a3cd-d17f7cd37ff4";
+  function wireEditLink(scope){
+    const root = scope || document;
+    const a = root.querySelector('#tool-edit-sec1');
+    if (!a) return;
 
-  function addHandlers(tile){
-    function focus(){ tile.style.zIndex = ++zTop; tile.classList.add('is-focused'); }
-    function blur(){ tile.classList.remove('is-focused'); }
+    const uid   = localStorage.getItem('cs_uid')   || "";
+    const email = localStorage.getItem('cs_email') || "";
+    const first = localStorage.getItem('cs_first') || "";
+    const last  = localStorage.getItem('cs_last')  || "";
 
-    tile.addEventListener('pointerdown', focus);
-    tile.addEventListener('pointerup', blur);
-    tile.addEventListener('pointercancel', blur);
+    if (!uid){
+      a.href = "/beta/auth.html?mode=login&next=/beta/05-section-1.html";
+      a.removeAttribute('target');
+      a.title = "Log in to edit your answers";
+      return;
+    }
+    const url = new URL(FORM_URL);
+    url.searchParams.set("uid", uid);
+    url.searchParams.set(UID_GUID, uid);
+    if (email) url.searchParams.set("email", email);
+    if (first) url.searchParams.set("first", first);
+    if (last)  url.searchParams.set("last",  last);
 
-    // Drag support
-    let startX=0, startY=0, origX=0, origY=0, dragging=false;
-    const head = tile.querySelector('.cs-tile-head');
-
-    head.addEventListener('pointerdown', e=>{
-      if(e.target.closest('.cs-close')) return;
-      dragging=true;
-      startX=e.clientX; startY=e.clientY;
-      origX=parseInt(tile.style.left||0); origY=parseInt(tile.style.top||0);
-      tile.setPointerCapture(e.pointerId);
-    });
-
-    head.addEventListener('pointermove', e=>{
-      if(!dragging) return;
-      const dx=e.clientX-startX, dy=e.clientY-startY;
-      tile.style.left=(origX+dx)+"px";
-      tile.style.top =(origY+dy)+"px";
-    });
-
-    head.addEventListener('pointerup', e=>{
-      dragging=false;
-      tile.releasePointerCapture(e.pointerId);
-    });
-
-    tile.querySelector('.cs-close')?.addEventListener('click', (e) => { e.stopPropagation(); dismiss(tile, 1); });
+    a.href = url.toString();
+    a.target = "_blank";
+    a.rel = "noopener";
+    a.title = "Edit your Section 1 answers (opens in a new tab)";
   }
 
   const TEMPLATES = {
@@ -324,8 +313,33 @@
         <h4>User Tools</h4><button class="cs-close" aria-label="Close">×</button>
       </header>
       <div class="cs-tile-body">
-        <a id="tool-edit-sec1" class="cs-tab" href="#" target="_blank" rel="noopener">✏️ Edit</a>
-        <a id="tool-update-profile" class="cs-tab" href="#">🗂️ Update Profile</a>
+        <a id="tool-edit-sec1"
+           class="cs-tab"
+           href="#"
+           target="_blank"
+           rel="noopener"
+           title="Edit your Section 1 answers (opens in a new tab)"
+           aria-label="Edit your Section 1 answers">
+          ✏️ Edit
+        </a>
+        <a id="tool-update-profile"
+           class="cs-tab"
+           href="#"
+           title="Open your profile sections (Travel Profile, Cards, Loyalty, Points) to update answers.">
+          🗂️ Update Profile
+        </a>
+      </div>`,
+    profile: () => `
+      <header class="cs-tile-head">
+        <h4>Profile Updates</h4><button class="cs-close" aria-label="Close">×</button>
+      </header>
+      <div class="cs-tile-body">
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <button class="cs-tab" title="Update your travel profile (home airport, frequency, goals)">Section 1 — Travel Profile</button>
+          <button class="cs-tab" title="Update authorized users and cards">Section 2 — Cards & Authorized Users</button>
+          <button class="cs-tab" title="Update your loyalty program activity">Section 3 — Loyalty Programs</button>
+          <button class="cs-tab" title="Update transferable points">Section 4 — Points Programs</button>
+        </div>
       </div>`
   };
 
@@ -337,6 +351,48 @@
     return { x, y };
   }
 
+  function dismiss(tile, dir){
+    const off = (window.innerWidth*0.55) * (dir||1);
+    tile.classList.add('dismissing');
+    tile.style.transform = `translate(${off}px, 0) rotate(${off*0.002}deg)`;
+    tile.addEventListener('transitionend', () => tile.remove(), {once:true});
+  }
+
+  function addHandlers(tile){
+    function focus(){ tile.style.zIndex = ++zTop; tile.classList.add('is-focused'); }
+    function blur(){ tile.classList.remove('is-focused'); }
+    tile.addEventListener('pointerdown', focus);
+    tile.addEventListener('pointerup', blur);
+    tile.addEventListener('pointercancel', blur);
+
+    // --- Drag support ---
+    let startX=0, startY=0, origX=0, origY=0, dragging=false;
+    const head = tile.querySelector('.cs-tile-head');
+
+    head.addEventListener('pointerdown', e=>{
+      if(e.target.closest('.cs-close')) return;
+      dragging = true;
+      startX = e.clientX; startY = e.clientY;
+      origX = parseInt(tile.style.left||0);
+      origY = parseInt(tile.style.top||0);
+      tile.setPointerCapture(e.pointerId);
+    });
+
+    head.addEventListener('pointermove', e=>{
+      if(!dragging) return;
+      const dx = e.clientX-startX, dy = e.clientY-startY;
+      tile.style.left = (origX+dx) + "px";
+      tile.style.top  = (origY+dy) + "px";
+    });
+
+    head.addEventListener('pointerup', e=>{
+      dragging = false;
+      tile.releasePointerCapture(e.pointerId);
+    });
+
+    tile.querySelector('.cs-close')?.addEventListener('click', (e) => { e.stopPropagation(); dismiss(tile, 1); });
+  }
+
   function openTile(key){
     const existing = stage.querySelector(`.cs-tile[data-key="${key}"]`);
     if (existing){ existing.style.zIndex = ++zTop; existing.classList.add('is-focused'); return; }
@@ -345,7 +401,9 @@
     el.className = 'cs-tile';
     el.dataset.key = key;
     el.innerHTML = (TEMPLATES[key] || (()=>`
-      <header class="cs-tile-head"><h4>${key}</h4><button class="cs-close">×</button></header>
+      <header class="cs-tile-head">
+        <h4>${key}</h4><button class="cs-close" aria-label="Close">×</button>
+      </header>
       <div class="cs-tile-body"><p>${key} tile.</p></div>`))();
 
     stage.appendChild(el);
@@ -358,14 +416,28 @@
 
     addHandlers(el);
     el.classList.add('is-focused');
+
+    if (key === 'tools') wireEditLink(el);
   }
 
-  // click -> open tiles
+  // Wire Update Profile button
+  document.addEventListener('click', (e)=>{
+    if (e.target && e.target.id === 'tool-update-profile'){
+      e.preventDefault();
+      openTile('profile');
+    }
+  });
+
+  // click -> open tiles (MAIN TAB BUTTONS)
   document.querySelectorAll('.cs-tab').forEach(btn=>{
     btn.addEventListener('click', ()=> openTile(btn.dataset.key));
   });
 
-  /* ---------- Logout confirm ---------- */
+  // support ?open=tools etc.
+  const qs = new URLSearchParams(location.search);
+  if (qs.get('open')) openTile(qs.get('open'));
+
+  /* ---------- Logout confirm & redirect ---------- */
   const modal  = document.getElementById('logoutConfirm');
   const yesBtn = document.getElementById('logoutYes');
   const noBtn  = document.getElementById('logoutNo');
