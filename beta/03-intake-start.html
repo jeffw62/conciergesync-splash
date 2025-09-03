@@ -13,13 +13,24 @@
       --glass-blur:blur(14px) saturate(1.1);
       --ring:0 0 0 3px rgba(255,255,255,.18);
     }
-    html,body{height:100%}
-    body{
-      margin:0; color:var(--ink);
-      font-family:system-ui,-apple-system,Segoe UI,Inter,Arial,sans-serif;
-      background:var(--page-bg);
-      display:flex; align-items:center; justify-content:center;
-      padding:24px; position:relative; overflow:hidden;
+
+    html,body{
+      margin:0;
+      padding:0;
+      height:100%;
+    }
+
+    body {
+      color: var(--ink);
+      font-family: system-ui,-apple-system,Segoe UI,Inter,Arial,sans-serif;
+      background: var(--page-bg);
+      display: flex;
+      justify-content: center;        /* center horizontally */
+      align-items: flex-start;        /* start near top */
+      padding: 24px;
+      overflow-y: auto;               /* ✅ scroll allowed if needed */
+      -webkit-overflow-scrolling: touch;
+      min-height: 100vh;              /* keep body tall enough */
     }
 
     .cs-bg{
@@ -35,58 +46,91 @@
         linear-gradient(180deg, rgba(255,255,255,.02), rgba(0,0,0,.08));
     }
 
-    .card{
-      width:min(500px, 92vw);
-      border-radius:22px;
-      background:var(--glass-bg);
-      backdrop-filter:var(--glass-blur);
-      box-shadow:0 18px 48px rgba(0,0,0,.45), inset 0 0 0 1px var(--glass-brd);
-      padding:36px 28px; text-align:center;
+    .tile {
+      display: flex;
+      flex-direction: column;
+      width: min(360px, 92vw);        /* ✅ fixed, consistent width */
+      margin: auto;                   /* centers vertically if shorter than screen */
+      border-radius: 20px;
+      background: rgba(20,20,25,.45);
+      border: 1px solid rgba(255,255,255,.25);
+      backdrop-filter: blur(14px) saturate(1.2);
+      box-shadow: 0 22px 60px rgba(0,0,0,.5);
+      padding: 22px;
     }
 
     h1{
       font-size:clamp(20px, 3vw, 28px);
       margin:0 0 10px; letter-spacing:.2px;
+      text-align:center;
     }
 
-    .lead{color:var(--muted); margin:6px 0 18px; line-height:1.45; font-size:clamp(15px,2.4vw,18px)}
-    ul.bullets{list-style:none; padding:0; margin:16px auto 8px; max-width:56ch; text-align:left; color:#cdd8ea; line-height:1.5; font-size:clamp(14px,2.2vw,16px)}
+    .lead{
+      color:var(--muted);
+      margin:6px 0 18px;
+      line-height:1.45;
+      font-size:clamp(15px,2.4vw,18px);
+      text-align:center;
+    }
+
+    ul.bullets{
+      list-style:none;
+      padding:0;
+      margin:16px auto 8px;
+      max-width:56ch;
+      text-align:left;
+      color:#cdd8ea;
+      line-height:1.5;
+      font-size:clamp(14px,2.2vw,16px)
+    }
     ul.bullets li{margin:10px 0; padding-left:28px; position:relative}
     ul.bullets li::before{content:"•"; position:absolute; left:8px; top:0; opacity:.6}
 
     .cta{
-      margin-top:22px; display:inline-block; padding:14px 22px; border-radius:999px;
-      border:1px solid rgba(255,255,255,.35); color:#fff; text-decoration:none;
-      background:rgba(255,255,255,.06); backdrop-filter:blur(4px);
+      margin-top:22px;
+      display:block;                 /* ✅ centers button */
+      text-align:center;
+      padding:14px 22px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.35);
+      color:#fff;
+      text-decoration:none;
+      background:rgba(255,255,255,.06);
+      backdrop-filter:blur(4px);
       transition:transform .15s ease, box-shadow .15s ease, background .15s ease;
+      width: fit-content;
+      margin-left:auto;
+      margin-right:auto;             /* ✅ ensure horizontal center */
     }
     .cta:focus{box-shadow:var(--ring)}
     .cta:hover{transform:translateY(-1px)}
     .cta:active{transform:translateY(0) scale(.99)}
 
-    .footnote{margin-top:14px; color:#a7b4c9; font-size:13px}
+    .footnote{
+      margin-top:14px;
+      color:#a7b4c9;
+      font-size:13px;
+      text-align:center;
+    }
 
     .alert-box{
       margin:18px auto; padding:16px 20px;
       border:2px solid #ffcc33; border-radius:14px;
-      background:rgba(0,0,0,.55);   /* darker wash to improve contrast */
+      background:rgba(0,0,0,.55);
       color:#fff; font-weight:500;
       font-size:15px; line-height:1.45;
       text-align:left;
     }
-
-      .alert-box strong,
-      .alert-box em {
+    .alert-box strong,
+    .alert-box em {
       color:#ffd966; font-weight:600;
     }
-
-    @media (max-width:480px){ .card{padding:28px 18px} }
   </style>
 </head>
 <body>
   <div class="cs-bg"></div>
 
-  <main class="card" role="main" aria-labelledby="hdr">
+  <main class="tile" role="main" aria-labelledby="hdr">
     <h1 id="hdr">Welcome — let’s personalize your ConciergeSync™</h1>
     <p class="lead">This short onboarding gathers the essentials so your dashboard, recommendations, and alerts match <em>you</em>.</p>
 
