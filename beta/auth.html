@@ -52,18 +52,22 @@
 
   /* Centered glass card */
   .card {
-    width: min(92vw, 420px); /* keep card within viewport */
-    max-height: 90vh;        /* avoid running off screen */
-    margin: 0 auto;
-    border-radius: 22px;
-    background: var(--glass-bg);
-    backdrop-filter: var(--glass-blur);
-    box-shadow: 0 18px 48px rgba(0,0,0,.45), inset 0 0 0 1px var(--glass-brd);
-    padding: 32px 24px;
-    text-align: center;
-    overflow-y: auto;        /* scroll only inside card if needed */
-  }
+  width: min(92vw, 420px);
+  max-height: 90vh;
+  margin: 0 auto;
+  border-radius: 22px;
 
+  /* glass effect restored */
+  background: rgba(20,20,25,.45);   /* lighter than last attempt */
+  backdrop-filter: blur(14px) saturate(1.25);
+
+  box-shadow: 0 18px 48px rgba(0,0,0,.45),
+              inset 0 0 0 1px rgba(255,255,255,.22);
+  padding: 32px 24px;
+  text-align: center;
+
+  overflow-y: auto; /* scroll inside card if content too tall */
+}
   h1 {
     font-size: clamp(20px, 3vw, 28px);
     margin: 0 0 14px;
