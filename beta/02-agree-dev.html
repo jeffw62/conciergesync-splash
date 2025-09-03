@@ -17,25 +17,39 @@
     :root{--glass:rgba(0,0,0,.55);--brd:rgba(255,255,255,.28);--ink:#fff}
     html, body {
   height: 100%;
+  width: 100%;
   margin: 0;
-  overflow: hidden;   /* no page scrolling */
-  display: grid;
-  place-items: center; /* center tile horizontally + vertically */
+  padding: 0;
+  overflow: hidden;             /* prevent page scroll */
+  overscroll-behavior: none;    /* block bounce */
   background: #0b0f14;
   font-family: system-ui,-apple-system,Segoe UI,Inter,Arial,sans-serif;
   color: #eaf2ff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
     /* Glass tile */
     .tile {
-  width: min(460px, 92vw);
-  max-height: 90vh;         /* stay inside screen */
-  overflow-y: auto;         /* scroll only INSIDE */
+  position: fixed;              /* lock tile in place */
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%); /* perfect centering */
+  
+  width: min(420px, 92vw);      /* narrower max width */
+  max-height: 88vh;             /* keep inside viewport */
+  
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;             /* only inner content scrolls */
+  -webkit-overflow-scrolling: touch;
+  
   border-radius: 20px;
   background: rgba(20,20,25,.45);
   border: 1px solid rgba(255,255,255,.25);
   backdrop-filter: blur(14px) saturate(1.2);
   box-shadow: 0 22px 60px rgba(0,0,0,.5);
-  padding: clamp(22px, 3.5vw, 32px);
+  padding: clamp(20px, 3.5vw, 28px);
 }
 
     h1{margin:0 0 6px;font-size:clamp(22px,3.6vw,28px);font-weight:800;letter-spacing:-.01em;text-align:center}
