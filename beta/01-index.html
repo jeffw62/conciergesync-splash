@@ -112,7 +112,7 @@
     overflow:hidden;
     pointer-events:auto;
     user-select:none;
-    touch-action: none; /* allow finger drag */
+    touch-action: none;
     will-change: transform, opacity, left, top;
     transition: box-shadow var(--t-fast) ease;
   }
@@ -260,27 +260,28 @@
   const stage = document.getElementById('cs-tiles');
   let zTop = 10;
 
-  const FORM_URL = "https://noteforms.com/forms/beta-user-tracker-conciergesync-b4yxaf";
-  const UID_GUID = "78ddd51d-9ccb-4fc7-a3cd-d17f7cd37ff4";
-  function wireEditLink(scope){
-    const root = scope || document;
-    const a = root.querySelector('#tool-edit-sec1');
-    if (!a) return;
+  const NF_FORMS = {
+    sec1: { url: "https://noteforms.com/forms/beta-user-tracker-conciergesync-b4yxaf", guid: "78ddd51d-9ccb-4fc7-a3cd-d17f7cd37ff4" },
+    sec2: { url: "https://noteforms.com/forms/section-2-authorized-user-card-setup-conciergesync-xnkw5k", guid: "78ddd51d-9ccb-4fc7-a3cd-d17f7cd37ff4" },
+    sec3: { url: "https://noteforms.com/forms/section-3-loyalty-program-overview-40ya0y", guid: "78ddd51d-9ccb-4fc7-a3cd-d17f7cd37ff4" },
+    sec4: { url: "https://noteforms.com/forms/section-4-transferable-points-programs-wp4ujy", guid: "78ddd51d-9ccb-4fc7-a3cd-d17f7cd37ff4" }
+  };
 
+  function wireNFLink(a, nf){
     const uid   = localStorage.getItem('cs_uid')   || "";
     const email = localStorage.getItem('cs_email') || "";
     const first = localStorage.getItem('cs_first') || "";
     const last  = localStorage.getItem('cs_last')  || "";
 
     if (!uid){
-      a.href = "/beta/auth.html?mode=login&next=/beta/05-section-1.html";
+      a.href = "/beta/auth.html?mode=login";
       a.removeAttribute('target');
       a.title = "Log in to edit your answers";
       return;
     }
-    const url = new URL(FORM_URL);
+    const url = new URL(nf.url);
     url.searchParams.set("uid", uid);
-    url.searchParams.set(UID_GUID, uid);
+    url.searchParams.set(nf.guid, uid);
     if (email) url.searchParams.set("email", email);
     if (first) url.searchParams.set("first", first);
     if (last)  url.searchParams.set("last",  last);
@@ -288,7 +289,14 @@
     a.href = url.toString();
     a.target = "_blank";
     a.rel = "noopener";
-    a.title = "Edit your Section 1 answers (opens in a new tab)";
+  }
+
+  function wireAllLinks(scope){
+    const root = scope || document;
+    wireNFLink(root.querySelector('#tool-edit-sec1'), NF_FORMS.sec1);
+    wireNFLink(root.querySelector('#tool-edit-sec2'), NF_FORMS.sec2);
+    wireNFLink(root.querySelector('#tool-edit-sec3'), NF_FORMS.sec3);
+    wireNFLink(root.querySelector('#tool-edit-sec4'), NF_FORMS.sec4);
   }
 
   const TEMPLATES = {
@@ -312,21 +320,8 @@
         <h4>User Tools</h4><button class="cs-close" aria-label="Close">×</button>
       </header>
       <div class="cs-tile-body">
-        <a id="tool-edit-sec1"
-           class="cs-tab"
-           href="#"
-           target="_blank"
-           rel="noopener"
-           title="Edit your Section 1 answers (opens in a new tab)"
-           aria-label="Edit your Section 1 answers">
-          ✏️ Edit
-        </a>
-        <a id="tool-update-profile"
-           class="cs-tab"
-           href="#"
-           title="Open your profile sections (Travel Profile, Cards, Loyalty, Points) to update answers.">
-          🗂️ Update Profile
-        </a>
+        <a id="tool-edit-sec1" class="cs-tab" href="#">✏️ Edit Section 1</a>
+        <a id="tool-update-profile" class="cs-tab" href="#">🗂️ Update Profile</a>
       </div>`,
     profile: () => `
       <header class="cs-tile-head">
@@ -334,10 +329,10 @@
       </header>
       <div class="cs-tile-body">
         <div style="display:flex;flex-direction:column;gap:10px">
-          <button class="cs-tab" title="Update your travel profile (home airport, frequency, goals)">Section 1 — Travel Profile</button>
-          <button class="cs-tab" title="Update authorized users and cards">Section 2 — Cards & Authorized Users</button>
-          <button class="cs-tab" title="Update your loyalty program activity">Section 3 — Loyalty Programs</button>
-          <button class="cs-tab" title="Update transferable points">Section 4 — Points Programs</button>
+          <a id="tool-edit-sec1" class="cs-tab" href="#">Section 1 — Travel Profile</a>
+          <a id="tool-edit-sec2" class="cs-tab" href="#">Section 2 — Cards & Authorized Users</a>
+          <a id="tool-edit-sec3" class="cs-tab" href="#">Section 3 — Loyalty Programs</a>
+          <a id="tool-edit-sec4" class="cs-tab" href="#">Section 4 — Points Programs</a>
         </div>
       </div>`
   };
@@ -365,7 +360,6 @@
     tile.addEventListener('pointercancel', blur);
 
     let startX=0, startY=0, origX=0, origY=0, dragging=false;
-
     tile.addEventListener('pointerdown', e=>{
       if(e.target.closest('.cs-close')) return;
       dragging = true;
@@ -373,7 +367,6 @@
       origX  = parseInt(tile.style.left||0);
       origY  = parseInt(tile.style.top||0);
     });
-
     tile.addEventListener('pointermove', e=>{
       if(!dragging) return;
       const dx = e.clientX - startX;
@@ -381,13 +374,11 @@
       tile.style.left = (origX + dx) + "px";
       tile.style.top  = (origY + dy) + "px";
     });
-
     tile.addEventListener('pointerup', ()=>{ dragging=false; });
     tile.addEventListener('pointercancel', ()=>{ dragging=false; });
 
     tile.querySelector('.cs-close')?.addEventListener('click', (e) => { 
-      e.stopPropagation(); 
-      dismiss(tile, 1); 
+      e.stopPropagation(); dismiss(tile, 1); 
     });
   }
 
@@ -415,23 +406,22 @@
     addHandlers(el);
     el.classList.add('is-focused');
 
-    if (key === 'tools') wireEditLink(el);
+    if (key === 'tools' || key === 'profile') wireAllLinks(el);
   }
 
   // Wire Update Profile button
   document.addEventListener('click', (e)=>{
     if (e.target && e.target.id === 'tool-update-profile'){
-      e.preventDefault();
-      openTile('profile');
+      e.preventDefault(); openTile('profile');
     }
   });
 
-  // click -> open tiles (MAIN TAB BUTTONS)
+  // click -> open tiles
   document.querySelectorAll('.cs-tab').forEach(btn=>{
     btn.addEventListener('click', ()=> openTile(btn.dataset.key));
   });
 
-  // support ?open=tools etc.
+  // support ?open=tools
   const qs = new URLSearchParams(location.search);
   if (qs.get('open')) openTile(qs.get('open'));
 
@@ -439,10 +429,8 @@
   const modal  = document.getElementById('logoutConfirm');
   const yesBtn = document.getElementById('logoutYes');
   const noBtn  = document.getElementById('logoutNo');
-
   function showLogoutConfirm(){ modal.hidden = false; modal.classList.add('show'); }
   function hideLogoutConfirm(){ modal.classList.remove('show'); modal.hidden = true; }
-
   yesBtn.addEventListener('click', () => {
     hideLogoutConfirm();
     try {
@@ -453,12 +441,7 @@
     leaveFS();
     location.replace('/beta/auth.html');
   });
-
-  noBtn.addEventListener('click', () => {
-    hideLogoutConfirm();
-    enterFS();
-  });
-
+  noBtn.addEventListener('click', () => { hideLogoutConfirm(); enterFS(); });
   document.addEventListener('fullscreenchange', () => {
     if (!document.fullscreenElement) showLogoutConfirm();
   });
