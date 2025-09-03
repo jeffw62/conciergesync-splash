@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Welcome • ConciergeSync™</title>
+  <style>
+    /* --- Gold watermark background --- */
+    .cs-bg{
+      position:fixed; inset:0; z-index:-2;
+      background:url('/beta/assets/CS_Logo_Premium.png') center/500px repeat;
+      opacity:.75; pointer-events:none;
+    }
+
+    :root{
+      --glass: rgba(255,255,255,.10);
+      --brd:   rgba(255,255,255,.28);
+      --ink:   #eaf2ff;
+      --muted: #9fb0c8;
+    }
+    html,body{height:100%}
+    body{
+      margin:0; color:var(--ink); background:#0b0f14;
+      font-family:system-ui,-apple-system,Segoe UI,Inter,Arial,sans-serif;
+      display:grid; place-items:center; padding:18px;
+    }
+
+    .tile{
+      width:min(450px, 92vw);
+      border-radius:18px;
+      background:var(--glass);
+      border:1px solid var(--brd);
+      backdrop-filter: blur(12px) saturate(1.2);
+      box-shadow:0 22px 60px rgba(0,0,0,.45);
+      padding: clamp(20px, 3.5vw, 30px);
+    }
+    h1{margin:0 0 8px; font-size: clamp(26px,4vw,34px); text-align:center; font-weight:800; letter-spacing:-.01em}
+    .lead{margin:6px 0 18px; text-align:center; color:var(--muted)}
+    .tabs{display:flex; gap:10px; justify-content:center; margin:8px 0 16px}
+    .tab{
+      padding:8px 12px; border-radius:999px; font-weight:700; border:1px solid rgba(255,255,255,.35);
+      background:rgba(255,255,255,.06); color:#fff; cursor:pointer; user-select:none;
+    }
+    .tab.is-active{ background:rgba(255,255,255,.14) }
+
+    form{margin:0}
+    .row{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:8px 0}
+    .row.single{ grid-template-columns:1fr }
+    label{font-size:13px; color:#cbd7ea; display:block; margin:6px 0}
+    input[type="text"], input[type="email"]{
+      width:100%; padding:12px 12px; border-radius:10px; border:1px solid rgba(255,255,255,.28);
+      background:rgba(0,0,0,.35); color:#fff; outline:none;
+    }
+    input[aria-invalid="true"]{ border-color:#ff6b6b; }
+    .err{ display:none; color:#ffb3b3; font-size:12px; margin-top:6px }
+    .actions{ margin-top:14px; display:flex; gap:10px; justify-content:center }
+    .btn{
+      padding:12px 18px; border-radius:999px; font-weight:800; border:1px solid rgba(255,255,255,.45);
+      background:rgba(255,255,255,.10); color:#fff; cursor:pointer;
+    }
+    .status{ opacity:0; transition:.15s; text-align:center; margin-top:8px; color:#cbd7ea; font-size:14px }
+    .status.show{ opacity:1 }
+    .foot{ margin-top:14px; color:#a7b4c9; font-size:12px; text-align:center }
+
+    /* Keep the card at 500px */
+    .card{ width: min(500px, calc(100vw - 32px)); margin-inline:auto; }
+
+    /* Form spacing */
+    #gate{ padding-inline:12px; }
+    #nameRow{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      column-gap:12px;
+    }
+    #gate input[type="text"],
+    #gate input[type="email"]{
+      width:100%;
+      box-sizing:border-box;
+    }
+    @media (max-width:520px){
+      #nameRow{ grid-template-columns: 1fr; row-gap:12px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="cs-bg"></div>
+
+  <main class="tile" role="main" aria-labelledby="hdr">
+    <h1 id="hdr">Welcome To<br/>ConciergeSync™</h1>
+    <p class="lead">Sign in or create your account with your email.</p>
+
+    <!-- Swapped order: New User tab is now first (left side) -->
+    <div class="tabs" role="tablist" aria-label="Auth mode">
+      <button id="tabReg"   class="tab is-active" role="tab" aria-selected="true">New user? Register</button>
+      <button id="tabLogin" class="tab" role="tab" aria-selected="false">Returning user? Log in</button>
+    </div>
+
+    <form id="gate" novalidate>
+      <div id="nameRow" class="row">
+        <div>
+          <label for="first">First name</label>
+          <input id="first" type="text" autocomplete="given-name"/>
+          <div id="errFirst" class="err">First name is required.</div>
+        </div>
+        <div>
+          <label for="last">Last name</label>
+          <input id="last" type="text" autocomplete="family-name"/>
+          <div id="errLast" class="err">Last name is required.</div>
+        </div>
+      </div>
+
+      <div class="row single">
+        <div>
+          <label for="email">Email (your LoginID)</label>
+          <input id="email" type="email" inputmode="email" autocomplete="email" placeholder="you@example.com"/>
+          <div id="errEmail" class="err">Please enter a valid email address.</div>
+        </div>
+      </div>
+
+      <div id="agreeRow" class="row single" style="display:none">
+        <div>
+          <label style="display:flex;align-items:center;gap:8px">
+            <input id="agree" name="cs_agree" type="checkbox" />
+            <span>I agree to Terms &amp; Privacy.</span>
+          </label>
+          <div id="errAgree" class="err">You must agree to continue.</div>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button id="doSubmit" class="btn" type="submit">Create account</button>
+      </div>
+      <div id="status" class="status" aria-live="polite"></div>
+    </form>
+
+    <div class="foot">Protected by rate-limiting and verification. We'll never share your email.</div>
+  </main>
+
+  <!-- Firebase + auth logic -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getFirestore, doc, getDoc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCcqBQtV3e1hGRMzBa_k5trNRqL0UmlByE",
+      authDomain: "conciergesync.firebaseapp.com",
+      projectId: "conciergesync",
+      storageBucket: "conciergesync.appspot.com",
+      messagingSenderId: "882907448780",
+      appId: "1:882907448780:web:6e797ce9ad5bb84a9f8969"
+    };
+
+    let app, db;
+    try { app = initializeApp(firebaseConfig); db = getFirestore(app); }
+    catch (e) { console.warn("Firebase init error:", e); }
+
+    // ---- UID helpers ----
+    function genCsUid() {
+      const r = crypto.getRandomValues(new Uint8Array(12));
+      return 'cs_' + Array.from(r).map(b => b.toString(16).padStart(2,'0')).join('').slice(0,20);
+    }
+    async function getOrCreateUid(db, email) {
+      const key = email.toLowerCase().trim();
+      const ref = doc(db, 'beta_users', key);
+      const snap = await getDoc(ref);
+      let uid = snap.exists() && snap.data().uid;
+      if (!uid) {
+        uid = genCsUid();
+        await setDoc(ref, { uid, updatedAt: serverTimestamp() }, { merge: true });
+      }
+      try {
+        localStorage.setItem('cs_uid', uid);
+        localStorage.setItem('cs_email', key);
+      } catch (e) {}
+      return uid;
+    }
+
+    const $ = s => document.querySelector(s);
+    const mode = { value: 'register' };
+
+    const tabLogin = $('#tabLogin'), tabReg = $('#tabReg');
+    const nameRow  = $('#nameRow'), agreeRow = $('#agreeRow');
+    const first = $('#first'), last = $('#last'), email = $('#email'), agree = $('#agree');
+    const errFirst = $('#errFirst'), errLast = $('#errLast'), errEmail = $('#errEmail'), errAgree = $('#errAgree');
+    const form = $('#gate'), submitBtn = $('#doSubmit'), statusEl = $('#status');
+
+    [first,last,email].forEach(i => { try{ i.value=''; }catch{} });
+
+    function validEmail(v){ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v); }
+    function hide(el){ el && (el.style.display='none'); }
+    function show(el){ el && (el.style.display='block'); }
+    function clearErrors(){
+      [first,last,email].forEach(i=>i.setAttribute('aria-invalid','false'));
+      [errFirst,errLast,errEmail,errAgree].forEach(hide);
+      statusEl.classList.remove('show');
+    }
+    function setWorking(on){
+      submitBtn.disabled = on;
+      submitBtn.style.opacity = on ? .7 : 1;
+      statusEl.textContent = on ? 'Working…' : '';
+      statusEl.classList.toggle('show', on);
+    }
+
+    function applyRequireds(){
+      const login = mode.value === 'login';
+      email.required = true;
+      first.required = !login;
+      last.required  = !login;
+    }
+
+    function setMode(m){
+      mode.value = m;
+      const login = m === 'login';
+      tabLogin.classList.toggle('is-active', login);
+      tabReg.classList.toggle('is-active', !login);
+      tabLogin.setAttribute('aria-selected', login);
+      tabReg.setAttribute('aria-selected', !login);
+      nameRow.style.display = login ? 'none' : 'grid';
+      agreeRow.style.display = 'none';
+      submitBtn.textContent = login ? 'Log in' : 'Create account';
+      [first,last].forEach(i => i.value='');
+      clearErrors();
+      applyRequireds();
+    }
+    tabLogin.addEventListener('click', ()=> setMode('login'));
+    tabReg  .addEventListener('click', ()=> setMode('register'));
+    applyRequireds(); // init
+
+    ['input','change'].forEach(evt=>{
+      [first,last,email,agree].forEach(el => el && el.addEventListener(evt, clearErrors));
+    });
+
+    function goConsole(){
+      try{
+        localStorage.setItem('cs_authed','1');
+        sessionStorage.setItem('cs_authed','1');
+      }catch{}
+      location.replace('/beta/01-index.html?enter=1');
+    }
+
+    async function handleLogin(emailStr){
+      const key = emailStr.toLowerCase().trim();
+      if (!db){ show(errEmail); errEmail.textContent = 'Cannot reach database.'; return; }
+
+      setWorking(true);
+      try{
+        const ref = doc(db, 'beta_users', key);
+        const snap = await getDoc(ref);
+        if (snap.exists()){
+          await getOrCreateUid(db, key);
+          setWorking(false);
+          goConsole();
+        } else {
+          setWorking(false);
+          show(errEmail);
+          errEmail.textContent = 'We couldn’t find that email. Please register first.';
+          email.setAttribute('aria-invalid','true');
+          email.focus();
+        }
+      }catch(e){
+        console.warn(e);
+        setWorking(false);
+        show(errEmail);
+        errEmail.textContent = 'Login unavailable.';
+        email.setAttribute('aria-invalid','true');
+      }
+    }
+
+    async function handleRegister(firstStr, lastStr, emailStr){
+      const key = emailStr.toLowerCase().trim();
+      if (!db){ show(errEmail); errEmail.textContent = 'Cannot reach database.'; return; }
+
+      setWorking(true);
+      try{
+        const ref = doc(db, 'beta_users', key);
+        const existing = await getDoc(ref);
+
+        if (existing.exists()){
+          setWorking(false);
+          setMode('login');
+          email.value = key;
+          show(errEmail);
+          errEmail.textContent = 'This email is already registered. Please log in.';
+          email.setAttribute('aria-invalid','true');
+          try { email.focus(); } catch {}
+          return;
+        }
+
+        await setDoc(ref, {
+          first: firstStr.trim(),
+          last:  lastStr.trim(),
+          email: key,
+          createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp()
+        }, { merge: true });
+
+        const uid = await getOrCreateUid(db, key);
+        try{
+          localStorage.setItem('cs_email', key);
+          localStorage.setItem('cs_first', firstStr.trim());
+          localStorage.setItem('cs_last',  lastStr.trim());
+          localStorage.setItem('cs_uid',   uid || '');
+        }catch(_){}
+
+        setWorking(false);
+
+        const qs = new URLSearchParams({
+          email: key,
+          first: firstStr.trim(),
+          last:  lastStr.trim(),
+          uid:   uid || '',
+          return: '/beta/03-intake-start.html'
+        });
+        location.assign('/beta/02-agree.html?' + qs.toString());
+      }catch(e){
+        console.warn(e);
+        setWorking(false);
+        show(errEmail);
+        errEmail.textContent = 'Registration unavailable.';
+        email.setAttribute('aria-invalid','true');
+      }
+    }
+
+    function validate(){
+      clearErrors();
+      let ok = true, focusEl = null;
+      const e = email.value.trim();
+
+      if(!validEmail(e)){ ok=false; show(errEmail); errEmail.textContent='Please enter a valid email address.'; email.setAttribute('aria-invalid','true'); focusEl = focusEl || email; }
+
+      if(mode.value !== 'login'){
+        if(!first.value.trim()){ ok=false; show(errFirst); first.setAttribute('aria-invalid','true'); focusEl = focusEl || first; }
+        if(!last.value.trim()){  ok=false; show(errLast);  last.setAttribute('aria-invalid','true');  focusEl = focusEl || last; }
+      }
+      if(!ok && focusEl){ try{ focusEl.focus(); }catch{} }
+      return ok;
+    }
+
+    form.addEventListener('submit', async (ev) => {
+      ev.preventDefault();
+      if(!validate()) return;
+      const e = email.value.trim();
+      if (mode.value === 'login'){
+        await handleLogin(e);
+      } else {
+        await handleRegister(first.value, last.value, e);
+      }
+    });
+
+    (function defaultToLoginIfRequested(){
+      const q = new URLSearchParams(location.search);
+      if (q.get('mode') === 'login') setMode('login');
+    })();
+  </script>
+</body>
+</html>
