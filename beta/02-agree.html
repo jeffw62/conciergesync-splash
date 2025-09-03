@@ -15,15 +15,43 @@
     }
 
     :root{--glass:rgba(0,0,0,.55);--brd:rgba(255,255,255,.28);--ink:#fff}
-    html,body{height:100%}
-    body{margin:0;background:#000;color:var(--ink);
-         font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
-         display:grid;place-items:center;padding:18px}
-
+    html, body {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;             /* prevent page scroll */
+  overscroll-behavior: none;    /* block bounce */
+  background: #0b0f14;
+  font-family: system-ui,-apple-system,Segoe UI,Inter,Arial,sans-serif;
+  color: #eaf2ff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
     /* Glass tile */
-    .tile{width:min(500px,92vw);border:1px solid var(--brd);border-radius:18px;background:var(--glass);
-          backdrop-filter:blur(12px) saturate(1.2);box-shadow:0 20px 60px rgba(0,0,0,.45);
-          padding:20px 18px 16px}
+    .tile {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+
+  width: min(360px, 90vw);   /* outer width matches inner content width */
+  max-height: 88vh;
+
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+
+  display: flex;
+  flex-direction: column;
+
+  border-radius: 20px;
+  background: rgba(20,20,25,.45);
+  border: 1px solid rgba(255,255,255,.25);
+  backdrop-filter: blur(14px) saturate(1.2);
+  box-shadow: 0 22px 60px rgba(0,0,0,.5);
+  padding: 22px;             /* keep consistent breathing room */
+}
 
     h1{margin:0 0 6px;font-size:clamp(22px,3.6vw,28px);font-weight:800;letter-spacing:-.01em;text-align:center}
     .intro{margin:6px 0 12px;text-align:center;color:rgba(255,255,255,.9);font-size:14px}
