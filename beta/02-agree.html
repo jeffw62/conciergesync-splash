@@ -3,188 +3,167 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>ConciergeSync™ — Begin Your Intake</title>
+  <title>Before We Begin — ConciergeSync™ Beta Agreement</title>
   <style>
-    :root{
-      --page-bg:#0b0f14;
-      --ink:#eaf2ff; --muted:#9fb0c8;
-      --glass-bg:rgba(255,255,255,.10);
-      --glass-brd:rgba(255,255,255,.22);
-      --glass-blur:blur(14px) saturate(1.1);
-      --ring:0 0 0 3px rgba(255,255,255,.18);
+    /* Background */
+    .cs-bg {
+      position: fixed;
+      inset: 0;
+      background: url('/beta/assets/CS_Logo_Premium.png') center/500px repeat;
+      opacity: .75;  /* keeps the gold pop but tones glare */
+      pointer-events: none;
     }
 
-    html,body{
-      margin:0;
-      padding:0;
-      height:100%;
-    }
-
-    body {
-      color: var(--ink);
-      font-family: system-ui,-apple-system,Segoe UI,Inter,Arial,sans-serif;
-      background: var(--page-bg);
-      display: flex;
-      justify-content: center;        /* center horizontally */
-      align-items: flex-start;        /* start near top */
-      padding: 24px;
-      overflow-y: auto;               /* ✅ scroll allowed if needed */
-      -webkit-overflow-scrolling: touch;
-      min-height: 100vh;              /* keep body tall enough */
-    }
-
-    .cs-bg{
-      position:fixed; inset:0; z-index:-2;
-      background:url('/beta/assets/CS_Logo_Premium.png') center/500px repeat;
-      opacity:.75; pointer-events:none;
-    }
-
-    body::after{
-      content:""; position:fixed; inset:0; z-index:-1; pointer-events:none;
-      background:
-        radial-gradient(120% 120% at 50% 0%, rgba(255,255,255,.04), rgba(0,0,0,.28) 60%, rgba(0,0,0,.55) 100%),
-        linear-gradient(180deg, rgba(255,255,255,.02), rgba(0,0,0,.08));
-    }
-
+    :root{--glass:rgba(0,0,0,.55);--brd:rgba(255,255,255,.28);--ink:#fff}
+    html, body {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;             /* prevent page scroll */
+  overscroll-behavior: none;    /* block bounce */
+  background: #0b0f14;
+  font-family: system-ui,-apple-system,Segoe UI,Inter,Arial,sans-serif;
+  color: #eaf2ff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+    /* Glass tile */
     .tile {
-      display: flex;
-      flex-direction: column;
-      width: min(360px, 92vw);        /* ✅ fixed, consistent width */
-      margin: auto;                   /* centers vertically if shorter than screen */
-      border-radius: 20px;
-      background: rgba(20,20,25,.45);
-      border: 1px solid rgba(255,255,255,.25);
-      backdrop-filter: blur(14px) saturate(1.2);
-      box-shadow: 0 22px 60px rgba(0,0,0,.5);
-      padding: 22px;
-    }
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 
-    h1{
-      font-size:clamp(20px, 3vw, 28px);
-      margin:0 0 10px; letter-spacing:.2px;
-      text-align:center;
-    }
+  width: min(360px, 90vw);   /* outer width matches inner content width */
+  max-height: 88vh;
 
-    .lead{
-      color:var(--muted);
-      margin:6px 0 18px;
-      line-height:1.45;
-      font-size:clamp(15px,2.4vw,18px);
-      text-align:center;
-    }
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 
-    ul.bullets{
-      list-style:none;
-      padding:0;
-      margin:16px auto 8px;
-      max-width:56ch;
-      text-align:left;
-      color:#cdd8ea;
-      line-height:1.5;
-      font-size:clamp(14px,2.2vw,16px)
-    }
-    ul.bullets li{margin:10px 0; padding-left:28px; position:relative}
-    ul.bullets li::before{content:"•"; position:absolute; left:8px; top:0; opacity:.6}
+  display: flex;
+  flex-direction: column;
 
-    .cta{
-      margin-top:22px;
-      display:block;                 /* ✅ centers button */
-      text-align:center;
-      padding:14px 22px;
-      border-radius:999px;
-      border:1px solid rgba(255,255,255,.35);
-      color:#fff;
-      text-decoration:none;
-      background:rgba(255,255,255,.06);
-      backdrop-filter:blur(4px);
-      transition:transform .15s ease, box-shadow .15s ease, background .15s ease;
-      width: fit-content;
-      margin-left:auto;
-      margin-right:auto;             /* ✅ ensure horizontal center */
-    }
-    .cta:focus{box-shadow:var(--ring)}
-    .cta:hover{transform:translateY(-1px)}
-    .cta:active{transform:translateY(0) scale(.99)}
+  border-radius: 20px;
+  background: rgba(20,20,25,.45);
+  border: 1px solid rgba(255,255,255,.25);
+  backdrop-filter: blur(14px) saturate(1.2);
+  box-shadow: 0 22px 60px rgba(0,0,0,.5);
+  padding: 22px;             /* keep consistent breathing room */
+}
 
-    .footnote{
-      margin-top:14px;
-      color:#a7b4c9;
-      font-size:13px;
-      text-align:center;
-    }
+    h1{margin:0 0 6px;font-size:clamp(22px,3.6vw,28px);font-weight:800;letter-spacing:-.01em;text-align:center}
+    .intro{margin:6px 0 12px;text-align:center;color:rgba(255,255,255,.9);font-size:14px}
 
-    .alert-box{
-      margin:18px auto; padding:16px 20px;
-      border:2px solid #ffcc33; border-radius:14px;
-      background:rgba(0,0,0,.55);
-      color:#fff; font-weight:500;
-      font-size:15px; line-height:1.45;
-      text-align:left;
-    }
-    .alert-box strong,
-    .alert-box em {
-      color:#ffd966; font-weight:600;
-    }
+    /* Scroll box */
+    .scroll{height:44vh;min-height:320px;max-height:520px;overflow:auto;padding:14px;border-radius:12px;
+            border:1px solid rgba(255,255,255,.22);background:rgba(0,0,0,.25)}
+    .scroll h2{margin:0 0 8px;font-size:16px}
+    .scroll h3{margin:14px 0 6px;font-size:14px}
+    .scroll p,.scroll li{font-size:13px;line-height:1.6;color:#e9eef8}
+    .scroll ul{padding-left:18px}
+
+    .actions{display:flex;gap:10px;justify-content:center;margin-top:14px}
+    .btn{display:inline-flex;align-items:center;justify-content:center;padding:10px 16px;border-radius:999px;
+         font-weight:800;border:1px solid rgba(255,255,255,.45);text-decoration:none}
+    .primary{background:#fff;color:#0b0f14}
+    .ghost{background:rgba(0,0,0,.35);color:#fff}
+    .is-disabled{opacity:.45;pointer-events:none}
+    .foot{margin-top:8px;text-align:center;font-size:12px;color:rgba(255,255,255,.7)}
   </style>
 </head>
 <body>
   <div class="cs-bg"></div>
 
-  <main class="tile" role="main" aria-labelledby="hdr">
-    <h1 id="hdr">Welcome — let’s personalize your ConciergeSync™</h1>
-    <p class="lead">This short onboarding gathers the essentials so your dashboard, recommendations, and alerts match <em>you</em>.</p>
+  <main class="tile" role="main" aria-labelledby="title">
+    <h1 id="title">Before We Begin…</h1>
+    <p class="intro">Please review the Terms &amp; Privacy below. Scroll to the bottom to unlock <strong>“I agree — continue”</strong>.</p>
 
-    <div class="alert-box">
-      ⚠️ <strong>Important:</strong> ConciergeSync™ is a <em>“garbage in, garbage out”</em> system.  
-      The value of your console will never be better than the accuracy of the information you provide here.  
-      <br><br>
-      ➤ Enter your <strong>real travel habits, cards, loyalty programs, and goals</strong>.  
-      <br>
-      ➤ Complete each section carefully — every field matters.  
-      <br>
-      ➤ Once you finish, our engine will optimize from this foundation.
+    <!-- Terms/Privacy -->
+    <section id="termsBox" class="scroll" tabindex="0" aria-label="Terms and Privacy">
+      <h2>Terms &amp; Conditions — ConciergeSync™</h2>
+      <p><em>Last updated: 8/13/2025</em></p>
+      <ul>
+        <li>Beta software; features may change and bugs may exist.</li>
+        <li>No sharing access, data, or screenshots with non-authorized users.</li>
+        <li>You retain ownership of your input; we analyze anonymized usage to improve the product.</li>
+        <li>Decisions based on beta output are your responsibility.</li>
+      </ul>
+      <hr/>
+      <h2>Privacy Policy — ConciergeSync™</h2>
+      <p><em>Last updated: 8/13/2025</em></p>
+      <h3>What We Collect</h3>
+      <ul>
+        <li>Name &amp; email during onboarding</li>
+        <li>Intake/usage answers to personalize</li>
+        <li>Technical data (browser/device, IP-region)</li>
+      </ul>
+      <h3>How We Use It</h3>
+      <ul>
+        <li>Personalize and improve the beta experience</li>
+        <li>Analyze patterns to refine logic</li>
+        <li>Send essential updates (no spam)</li>
+      </ul>
+      <h3>Your Rights</h3>
+      <p>Contact <strong>privacy@conciergesync.ai</strong> to access/modify/delete your data. We do not sell your data.</p>
+      <p style="opacity:.8"><em>Scroll to the very bottom to enable “I agree — continue”.</em></p>
+    </section>
+
+    <div class="actions">
+      <a id="agreeBtn" class="btn primary is-disabled" role="button" aria-disabled="true">I agree — continue</a>
+      <a id="declineBtn" class="btn ghost" role="button">I don’t agree</a>
     </div>
-
-    <ul class="bullets" aria-label="What we'll do">
-      <li>Confirm a few basics (so we talk to the right programs and cards).</li>
-      <li>Set how you earn and use points today (to tune your strategy).</li>
-      <li>Prep your starter dashboard so you can see value immediately.</li>
-    </ul>
-
-    <a class="cta" href="/beta/05-section-1.html" role="button" aria-label="Begin intake">Begin intake</a>
-    <div class="footnote">Takes about 3–5 minutes. You can pause and return anytime.</div>
+    <div class="foot">Solving what matters — Beautifully</div>
   </main>
-  
-<script>
-(() => {
-  const qs = new URLSearchParams(location.search);
-  ['email','first','last','uid'].forEach(k => {
-    const v = qs.get(k);
-    if (v) localStorage.setItem('cs_' + k, v);
-  });
-})();
-</script>
-<script>
-(function () {
-  const qs   = location.search;
-  const NEXT = '/beta/05-section-1.html' + (qs || '');
-  const begin = document.querySelector('a.cta') || document.querySelector('a[role="button"]');
-  if (begin) begin.href = NEXT;
-  document.addEventListener('keydown', (e) => { if (e.key === 'Enter') location.assign(NEXT); });
-})();
-</script>
-<script>
-(() => {
-  const p = new URLSearchParams();
-  ['email','first','last','uid'].forEach(k => {
-    const v = localStorage.getItem('cs_' + k);
-    if (v) p.set(k, v);
-  });
-  document.querySelectorAll('a[href$="05-section-1.html"]').forEach(a => {
-    a.href = '05-section-1.html?' + p.toString();
-  });
-})();
-</script>
 
+  <script>
+  (function(){
+    const box = document.getElementById('termsBox');
+    const agree = document.getElementById('agreeBtn');
+    const decline = document.getElementById('declineBtn');
+    const qp = new URLSearchParams(location.search);
+    const dest = qp.get('return') || '/beta/03-intake-start.html';
+
+    function enableAgree(){
+      agree.classList.remove('is-disabled');
+      agree.removeAttribute('aria-disabled');
+      const suffix = qp.toString() ? ('?' + qp.toString()) : '';
+      agree.setAttribute('href', dest + suffix);
+    }
+    function disableAgree(){
+      agree.classList.add('is-disabled');
+      agree.setAttribute('aria-disabled','true');
+      agree.removeAttribute('href');
+    }
+    disableAgree();
+
+    function atBottom(){
+      return box.scrollTop + box.clientHeight >= box.scrollHeight - 2;
+    }
+    function onScroll(){
+      if (atBottom()) enableAgree();
+    }
+    box.addEventListener('scroll', onScroll);
+    window.addEventListener('load', function(){
+      if (box.scrollHeight <= box.clientHeight + 1) enableAgree();
+    });
+
+    agree.addEventListener('click', function(e){
+      if (agree.getAttribute('aria-disabled') === 'true'){ e.preventDefault(); return; }
+      try {
+        localStorage.setItem('cs_agreed','1');
+        localStorage.setItem('cs_terms_version','2025-08-28');
+      } catch(_) {}
+    });
+
+    decline.addEventListener('click', function(e){
+      e.preventDefault();
+      qp.set('declined','1');
+      const url = '/beta/TCP-Decline.html?' + qp.toString();
+      location.assign(url);
+    });
+  })();
+  </script>
 </body>
 </html>
