@@ -42,6 +42,7 @@ function getPlainText(prop) {
 
 // ---------- DB schema helpers ----------
 async function getDbSchema(dbId) {
+  console.log("DEBUG dbId being used:", dbId);
   const db = await notion.databases.retrieve({ database_id: dbId });
   console.log("Full DB response:", JSON.stringify(db, null, 2)); // 👈 log everything
   if (!db.properties) {
