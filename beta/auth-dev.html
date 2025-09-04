@@ -21,19 +21,21 @@
   /* --- Background Gradient + Wisps (replaces tiled logos) --- */
   /* --- Background Gradient + Whispy Gold Wisps --- */
 /* --- Background with defined golden sweeps --- */
+/* --- Background with defined golden streaks --- */
 .cs-bg {
   position: fixed; inset: 0; z-index: -2;
   background:
-    /* main gold sweep */
-    linear-gradient(115deg, rgba(212,175,55,0.28) 0%, rgba(212,175,55,0.08) 40%, transparent 70%),
-    /* secondary faint sweep */
-    linear-gradient(245deg, rgba(184,134,11,0.20) 0%, rgba(184,134,11,0.07) 35%, transparent 65%),
-    /* subtle corner glow */
-    radial-gradient(circle at top left, rgba(212,175,55,0.08), transparent 70%),
-    radial-gradient(circle at bottom right, rgba(184,134,11,0.08), transparent 70%),
-    /* deep dark base */
-    linear-gradient(to bottom right, #000000, #050505 40%, #0b0b0b 85%);
-  filter: saturate(1.15);
+    /* primary golden streak */
+    linear-gradient(115deg, rgba(212,175,55,0.4) 0%, rgba(212,175,55,0.15) 25%, transparent 60%),
+    /* secondary softer streak */
+    linear-gradient(250deg, rgba(184,134,11,0.25) 0%, rgba(184,134,11,0.10) 30%, transparent 65%),
+    /* subtle corner glows */
+    radial-gradient(circle at 20% 15%, rgba(212,175,55,0.12), transparent 70%),
+    radial-gradient(circle at 80% 85%, rgba(184,134,11,0.10), transparent 70%),
+    /* base */
+    linear-gradient(to bottom right, #000000, #050505 50%, #0a0a0a 100%);
+  background-blend-mode: screen;
+  filter: blur(18px) saturate(1.2);
   opacity: 0.95;
   pointer-events: none;
 }
