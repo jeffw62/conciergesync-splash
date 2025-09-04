@@ -18,20 +18,12 @@
     padding: 18px;
   }
 
-  /* --- Background Gradient + Wisps (replaces tiled logos) --- */
-  /* --- Background Gradient + Whispy Gold Wisps --- */
-/* --- Background with defined golden sweeps --- */
-/* --- Background with defined golden streaks --- */
-/* --- Dramatic Background with bold golden sweeps --- */
-/* --- Premium background with defined golden streaks --- */
-/* --- Aurora-style golden background --- */
-.cs-bg {
-  position: fixed;
-  inset: 0;
-  z-index: -2;
-  background: #000;  /* pure OLED black */
-  pointer-events: none;
-}
+  /* --- Gold watermark background --- */
+  .cs-bg {
+    position: fixed; inset: 0; z-index: -2;
+    background: url('/beta/assets/CS_Logo_Premium.png') center/500px repeat;
+    opacity: .65; pointer-events: none;
+  }
 
   /* --- Glass Tile --- */
   .tile {
@@ -158,68 +150,8 @@
   <div class="cs-bg"></div>
 
   <main class="tile" role="main" aria-labelledby="hdr">
-
-     /* Etched Glass Logo + Name */
-  .logo-etch {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin-bottom: 18px;
-  }
-
-  .logo-etch img {
-    width: 68px;
-    height: auto;
-    opacity: 0.75;
-    filter: brightness(1.1) contrast(1.2) drop-shadow(0 2px 6px rgba(0,0,0,0.6));
-    -webkit-mask-image: url('/beta/assets/CS_Logo_Premium.png');
-    -webkit-mask-repeat: no-repeat;
-    -webkit-mask-position: center;
-    -webkit-mask-size: contain;
-    background: linear-gradient(145deg, rgba(255,255,255,0.2), rgba(0,0,0,0.6));
-    background-clip: border-box;
-  }
-
-  .logo-etch span {
-    font-size: 22px;
-    font-weight: 700;
-    letter-spacing: 0.5px;
-    color: transparent;
-    background: linear-gradient(145deg, rgba(255,255,255,0.2), rgba(0,0,0,0.7));
-    -webkit-background-clip: text;
-    background-clip: text;
-    text-shadow:
-      inset 1px 1px 2px rgba(255,255,255,0.2),
-      inset -1px -1px 2px rgba(0,0,0,0.7),
-      0 2px 6px rgba(0,0,0,0.5);
-    margin-top: 6px;
-  }
-</style>
-</head>
-<body>
-  <div class="cs-bg"></div>
-
-  <main class="tile" role="main" aria-labelledby="hdr">
-
-    <!-- Etched Glass Logo + Name -->
-    <div class="logo-etch">
-      <img src="/beta/assets/CS_Logo_Premium.png" alt="ConciergeSync logo"/>
-      <span>ConciergeSync™</span>
-    </div>
-
-  <div class="cs-bg"></div>
-
-  <main class="tile" role="main" aria-labelledby="hdr">
-
-    <!-- Etched Glass Logo + Name -->
-    <div class="logo-etch">
-      <img src="/beta/assets/CS_Logo_Premium.png" alt="ConciergeSync logo"/>
-      <span>ConciergeSync™</span>
-    </div>
-
-
-  <h1 id="hdr">Welcome</h1>
-  <p class="lead">Sign in or create your account with your email.</p>
+    <h1 id="hdr">Welcome To<br/>ConciergeSync™</h1>
+    <p class="lead">Sign in or create your account with your email.</p>
 
     <!-- Swapped order: New User tab is now first (left side) -->
     <div class="tabs" role="tablist" aria-label="Auth mode">
