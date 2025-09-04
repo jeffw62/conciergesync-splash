@@ -35,14 +35,14 @@
 
   /* --- Glass Tile --- */
   .tile {
-    width: min(440px, 92vw);
-    border-radius: 20px;
-    background: rgba(20,20,25,.45);
-    border: 1px solid rgba(255,255,255,.25);
-    backdrop-filter: blur(14px) saturate(1.2);
-    box-shadow: 0 22px 60px rgba(0,0,0,.5);
-    padding: clamp(22px, 3.5vw, 32px);
-  }
+  width: min(440px, 92vw);
+  border-radius: 20px;
+  background: rgba(20,20,25,.65);  /* slightly denser glass */
+  border: none;                    /* no light outline */
+  backdrop-filter: blur(14px) saturate(1.2);
+  box-shadow: none;                /* remove glow/shadow edges */
+  padding: clamp(22px, 3.5vw, 32px);
+}
 
   h1 {
     margin: 0 0 8px;
