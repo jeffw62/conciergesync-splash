@@ -22,25 +22,34 @@
   /* --- Background Gradient + Whispy Gold Wisps --- */
 /* --- Background with defined golden sweeps --- */
 /* --- Background with defined golden streaks --- */
+/* --- Dramatic Background with bold golden sweeps --- */
 .cs-bg {
   position: fixed; inset: 0; z-index: -2;
   background:
-    /* primary golden streak */
-    linear-gradient(115deg, rgba(212,175,55,0.4) 0%, rgba(212,175,55,0.15) 25%, transparent 60%),
-    /* secondary softer streak */
-    linear-gradient(250deg, rgba(184,134,11,0.25) 0%, rgba(184,134,11,0.10) 30%, transparent 65%),
-    /* subtle corner glows */
-    radial-gradient(circle at 20% 15%, rgba(212,175,55,0.12), transparent 70%),
-    radial-gradient(circle at 80% 85%, rgba(184,134,11,0.10), transparent 70%),
-    /* base */
-    linear-gradient(to bottom right, #000000, #050505 50%, #0a0a0a 100%);
+    /* blazing primary ribbon */
+    linear-gradient(115deg,
+      rgba(255,215,0,0.85) 0%,
+      rgba(255,215,0,0.55) 10%,
+      rgba(255,215,0,0.25) 20%,
+      transparent 35%
+    ),
+    /* secondary crossing ribbon */
+    linear-gradient(245deg,
+      rgba(218,165,32,0.75) 0%,
+      rgba(218,165,32,0.45) 12%,
+      rgba(218,165,32,0.20) 22%,
+      transparent 38%
+    ),
+    /* accent glow bursts */
+    radial-gradient(circle at 25% 25%, rgba(255,215,0,0.25), transparent 60%),
+    radial-gradient(circle at 75% 80%, rgba(218,165,32,0.20), transparent 70%),
+    /* hard black base */
+    #000;
   background-blend-mode: screen;
-  filter: blur(18px) saturate(1.2);
-  opacity: 0.95;
+  filter: saturate(1.4) contrast(1.2);
+  opacity: 1;
   pointer-events: none;
 }
-
-
 
   /* --- Glass Tile --- */
   .tile {
