@@ -42,9 +42,11 @@ function getPlainText(prop) {
 
 // ---------- DB schema helpers ----------
 async function getDbSchema(dbId) {
-  const db = await notion.databases.retrieve({ database_id: dbId });
+    const db = await notion.databases.retrieve({ database_id: dbId });
+  console.log("Schema dump:", Object.keys(db.properties)); // 👈 add this line
   return db.properties || {};
 }
+
 
 /** Resolve a property name in the DB schema (case/space tolerant). Optionally enforce type. */
 function resolvePropName(props, desiredName, wantedType /* e.g., "date" or "checkbox" */) {
