@@ -7,6 +7,8 @@ import { Client } from "@notionhq/client";
 // ---------- Env ----------
 const NOTION_TOKEN = process.env.NOTION_TOKEN;
 const NOTION_DB_ID = process.env.NOTION_DB_ID;
+console.log("DEBUG — NOTION_DB_ID from env:", NOTION_DB_ID);
+
 
 if (!NOTION_TOKEN || !NOTION_DB_ID) {
   console.error("Missing NOTION_TOKEN or NOTION_DB_ID.");
