@@ -24,32 +24,24 @@
 /* --- Background with defined golden streaks --- */
 /* --- Dramatic Background with bold golden sweeps --- */
 /* --- Premium background with defined golden streaks --- */
+/* --- Aurora-style golden background --- */
 .cs-bg {
   position: fixed; inset: 0; z-index: -2;
   background:
-    /* narrow golden beam */
-    linear-gradient(120deg,
-      transparent 0%,
-      rgba(212,175,55,0.0) 35%,
-      rgba(212,175,55,0.6) 45%,
-      rgba(212,175,55,0.25) 55%,
-      transparent 65%
-    ),
-    /* softer crossing beam */
-    linear-gradient(240deg,
-      transparent 0%,
-      rgba(184,134,11,0.0) 40%,
-      rgba(184,134,11,0.4) 50%,
-      rgba(184,134,11,0.15) 60%,
-      transparent 70%
-    ),
+    /* first ribbon */
+    radial-gradient(ellipse at 30% 40%, rgba(212,175,55,0.35) 0%, transparent 60%),
+    /* second ribbon */
+    radial-gradient(ellipse at 70% 60%, rgba(212,175,55,0.25) 0%, transparent 55%),
+    /* faint crossing */
+    radial-gradient(ellipse at 50% 80%, rgba(184,134,11,0.20) 0%, transparent 50%),
     /* base */
     #000;
   background-blend-mode: screen;
-  filter: blur(12px) saturate(1.1);
+  filter: blur(24px) contrast(1.05) saturate(1.2);
   opacity: 1;
   pointer-events: none;
 }
+
 
   /* --- Glass Tile --- */
   .tile {
