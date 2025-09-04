@@ -26,22 +26,19 @@
 /* --- Premium background with defined golden streaks --- */
 /* --- Aurora-style golden background --- */
 .cs-bg {
-  position: fixed; inset: 0; z-index: -2;
+  position: fixed;
+  inset: 0;
+  z-index: -2;
   background:
-    /* first ribbon */
-    radial-gradient(ellipse at 30% 40%, rgba(212,175,55,0.35) 0%, transparent 60%),
-    /* second ribbon */
-    radial-gradient(ellipse at 70% 60%, rgba(212,175,55,0.25) 0%, transparent 55%),
-    /* faint crossing */
-    radial-gradient(ellipse at 50% 80%, rgba(184,134,11,0.20) 0%, transparent 50%),
-    /* base */
+    radial-gradient(ellipse at 30% 40%, rgba(212,175,55,0.25) 0%, transparent 60%),
+    radial-gradient(ellipse at 70% 65%, rgba(212,175,55,0.20) 0%, transparent 55%),
+    radial-gradient(ellipse at 50% 85%, rgba(212,175,55,0.15) 0%, transparent 50%),
     #000;
   background-blend-mode: screen;
-  filter: blur(24px) contrast(1.05) saturate(1.2);
+  filter: blur(32px) saturate(1.1) contrast(1.05);
   opacity: 1;
   pointer-events: none;
 }
-
 
   /* --- Glass Tile --- */
   .tile {
