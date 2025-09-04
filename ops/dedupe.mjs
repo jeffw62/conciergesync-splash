@@ -2,7 +2,7 @@
 // Deduplicate Notion DB rows by UID, stamp "Last deduped" on kept Primary.
 // Resilient to column-name casing/spacing differences and adds clear logs.
 
-import { Client } from "@notionhq/client";
+import { Client } from "@notionhq/client"; 
 
 // ---------- Env ----------
 const NOTION_TOKEN = process.env.NOTION_TOKEN;
