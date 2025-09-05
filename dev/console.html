@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ConciergeSync™ Console</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      background: #f5f7fa;
+      color: #222;
+    }
+    header {
+      background: #0b0f14;
+      color: #fff;
+      padding: 16px 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    header nav a {
+      margin-left: 24px;
+      text-decoration: none;
+      color: #fff;
+      font-weight: 500;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 30px 20px;
+    }
+
+    .card {
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 24px;
+    }
+
+    /* Row layouts */
+    .row-2, .row-3 {
+      display: flex;
+      gap: 20px;
+    }
+    .row-2 .card { flex: 1; }
+    .row-3 .card { flex: 1; }
+
+    h2 { margin-top: 0; font-size: 1.3rem; }
+    footer {
+      background: #0b0f14;
+      color: #fff;
+      text-align: center;
+      padding: 16px;
+      margin-top: 40px;
+      font-size: 0.9rem;
+    }
+
+    /* Mobile */
+    @media (max-width: 768px) {
+      .row-2, .row-3 {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">ConciergeSync™ Console</div>
+    <nav>
+      <a href="home-dev.html">Home</a>
+      <a href="#">Redemption Engine</a>
+      <a href="#">My Cards</a>
+      <a href="#">My Programs</a>
+      <a href="#">Helpful Hints</a>
+      <a href="#">Settings</a>
+    </nav>
+  </header>
+
+  <main class="container">
+    <!-- Row 1: Wide -->
+    <div class="card">
+      <h2>📊 Points Overview</h2>
+      <p>Total Points Value: <strong>823,450</strong> (~$24,703 at 3.0¢ baseline)</p>
+      <ul>
+        <li>AA: 412,000 miles (~$12,360)</li>
+        <li>Chase UR: 250,000 points (~$7,500)</li>
+        <li>AmEx MR: 161,450 points (~$4,843)</li>
+      </ul>
+    </div>
+
+    <!-- Row 2: Two-up -->
+    <div class="row-2">
+      <div class="card">
+        <h2>💳 My Cards</h2>
+        <p>Capital One Venture X — $332 balance — Due Oct 10</p>
+        <p>AmEx Gold — $0 balance — Due Sep 25</p>
+        <p>Chase Sapphire Preferred — $0 balance — Due Sep 21</p>
+      </div>
+      <div class="card">
+        <h2>🎯 Redemption Engine Highlights</h2>
+        <ul>
+          <li>DFW → LHR — 13.8¢ per mile (AA miles)</li>
+          <li>CUN → DFW — 4.5¢ per mile (Avios)</li>
+          <li>LAS → JFK — 3.9¢ per mile (JetBlue points)</li>
+        </ul>
+        <button>View Full Engine</button>
+      </div>
+    </div>
+
+    <!-- Row 3: Three-up -->
+    <div class="row-3">
+      <div class="card">
+        <h2>💡 Helpful Hint</h2>
+        <p>Pairing Sapphire Preferred with Freedom Flex unlocks 5x quarterly categories with 1:1 UR transfers.</p>
+      </div>
+      <div class="card">
+        <h2>🚀 Transfer Bonus Alerts</h2>
+        <p>30% bonus → Chase UR → Avios (Ends Sep 15)</p>
+        <p>20% bonus → AmEx MR → Virgin (Ends Sep 30)</p>
+      </div>
+      <div class="card">
+        <h2>🤝 The ConciergeSync™ Creed</h2>
+        <p>Clarity eliminates confusion. Cleanliness eliminates clutter. Trust is our foundation.</p>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    Solving What Matters… <em>Beautifully</em> • © 2025 ConciergeSync™
+  </footer>
+</body>
+</html>
