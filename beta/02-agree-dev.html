@@ -1,169 +1,145 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>Before We Begin — ConciergeSync™ Beta Agreement</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ConciergeSync™ – Solving What Matters…Beautifully</title>
   <style>
-    /* Background */
-    .cs-bg {
-      position: fixed;
-      inset: 0;
-      background: url('/beta/assets/CS_Logo_Premium.png') center/500px repeat;
-      opacity: .75;  /* keeps the gold pop but tones glare */
-      pointer-events: none;
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      background: #fff;
+      color: #222;
     }
-
-    :root{--glass:rgba(0,0,0,.55);--brd:rgba(255,255,255,.28);--ink:#fff}
-    html, body {
-  height: 100%;
-  width: 100%;
-  margin: 0;
-  padding: 0;
-  overflow: hidden;             /* prevent page scroll */
-  overscroll-behavior: none;    /* block bounce */
-  background: #0b0f14;
-  font-family: system-ui,-apple-system,Segoe UI,Inter,Arial,sans-serif;
-  color: #eaf2ff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-    /* Glass tile */
-    .tile {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-
-  width: min(360px, 90vw);   /* outer width matches inner content width */
-  max-height: 88vh;
-
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-
-  display: flex;
-  flex-direction: column;
-
-  border-radius: 20px;
-  background: rgba(20,20,25,.45);
-  border: 1px solid rgba(255,255,255,.25);
-  backdrop-filter: blur(14px) saturate(1.2);
-  box-shadow: 0 22px 60px rgba(0,0,0,.5);
-  padding: 22px;             /* keep consistent breathing room */
-}
-
-    h1{margin:0 0 6px;font-size:clamp(22px,3.6vw,28px);font-weight:800;letter-spacing:-.01em;text-align:center}
-    .intro{margin:6px 0 12px;text-align:center;color:rgba(255,255,255,.9);font-size:14px}
-
-    /* Scroll box */
-    .scroll{height:44vh;min-height:320px;max-height:520px;overflow:auto;padding:14px;border-radius:12px;
-            border:1px solid rgba(255,255,255,.22);background:rgba(0,0,0,.25)}
-    .scroll h2{margin:0 0 8px;font-size:16px}
-    .scroll h3{margin:14px 0 6px;font-size:14px}
-    .scroll p,.scroll li{font-size:13px;line-height:1.6;color:#e9eef8}
-    .scroll ul{padding-left:18px}
-
-    .actions{display:flex;gap:10px;justify-content:center;margin-top:14px}
-    .btn{display:inline-flex;align-items:center;justify-content:center;padding:10px 16px;border-radius:999px;
-         font-weight:800;border:1px solid rgba(255,255,255,.45);text-decoration:none}
-    .primary{background:#fff;color:#0b0f14}
-    .ghost{background:rgba(0,0,0,.35);color:#fff}
-    .is-disabled{opacity:.45;pointer-events:none}
-    .foot{margin-top:8px;text-align:center;font-size:12px;color:rgba(255,255,255,.7)}
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 40px;
+      border-bottom: 1px solid #e0e0e0;
+    }
+    header nav a {
+      margin-left: 24px;
+      text-decoration: none;
+      color: #222;
+      font-weight: 500;
+    }
+    .hero {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #f5f7fa;
+      padding: 60px 40px;
+    }
+    .hero h1 {
+      font-size: 2.2rem;
+      margin-bottom: 12px;
+    }
+    .hero p {
+      font-size: 1.1rem;
+      margin-bottom: 20px;
+      color: #444;
+    }
+    .btn {
+      background: #bfa14a; /* CS gold */
+      color: #fff;
+      padding: 12px 20px;
+      border: none;
+      border-radius: 4px;
+      text-decoration: none;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .login-box {
+      background: #fff;
+      padding: 20px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      width: 280px;
+    }
+    .login-box input {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    .sections {
+      display: flex;
+      justify-content: space-around;
+      padding: 40px;
+      text-align: center;
+    }
+    .sections div {
+      flex: 1;
+    }
+    .sections div p {
+      margin-top: 10px;
+      font-weight: 500;
+    }
+    footer {
+      background: #0b0f14;
+      color: #fff;
+      text-align: center;
+      padding: 20px;
+      font-size: 0.9rem;
+    }
   </style>
 </head>
 <body>
-  <div class="cs-bg"></div>
+  <header>
+    <div class="logo">ConciergeSync™</div>
+    <nav>
+      <a href="#">About</a>
+      <a href="#">Beta Program</a>
+      <a href="#">Helpful Hints</a>
+      <a href="#">Contact</a>
+    </nav>
+  </header>
 
-  <main class="tile" role="main" aria-labelledby="title">
-    <h1 id="title">Before We Begin…</h1>
-    <p class="intro">Please review the Terms &amp; Privacy below. Scroll to the bottom to unlock <strong>“I agree — continue”</strong>.</p>
-
-    <!-- Terms/Privacy -->
-    <section id="termsBox" class="scroll" tabindex="0" aria-label="Terms and Privacy">
-      <h2>Terms &amp; Conditions — ConciergeSync™</h2>
-      <p><em>Last updated: 8/13/2025</em></p>
-      <ul>
-        <li>Beta software; features may change and bugs may exist.</li>
-        <li>No sharing access, data, or screenshots with non-authorized users.</li>
-        <li>You retain ownership of your input; we analyze anonymized usage to improve the product.</li>
-        <li>Decisions based on beta output are your responsibility.</li>
-      </ul>
-      <hr/>
-      <h2>Privacy Policy — ConciergeSync™</h2>
-      <p><em>Last updated: 8/13/2025</em></p>
-      <h3>What We Collect</h3>
-      <ul>
-        <li>Name &amp; email during onboarding</li>
-        <li>Intake/usage answers to personalize</li>
-        <li>Technical data (browser/device, IP-region)</li>
-      </ul>
-      <h3>How We Use It</h3>
-      <ul>
-        <li>Personalize and improve the beta experience</li>
-        <li>Analyze patterns to refine logic</li>
-        <li>Send essential updates (no spam)</li>
-      </ul>
-      <h3>Your Rights</h3>
-      <p>Contact <strong>privacy@conciergesync.ai</strong> to access/modify/delete your data. We do not sell your data.</p>
-      <p style="opacity:.8"><em>Scroll to the very bottom to enable “I agree — continue”.</em></p>
-    </section>
-
-    <div class="actions">
-      <a id="agreeBtn" class="btn primary is-disabled" role="button" aria-disabled="true">I agree — continue</a>
-      <a id="declineBtn" class="btn ghost" role="button">I don’t agree</a>
+  <section class="hero">
+    <div>
+      <h1>Turn Your Points Into Real Money Value</h1>
+      <p>ConciergeSync™ helps you optimize cards, miles, and redemptions with accuracy and clarity.</p>
+      <a href="#" class="btn">Not a Client? Enroll Here</a>
     </div>
-    <div class="foot">Solving what matters — Beautifully</div>
-  </main>
+    <div class="login-box">
+      <h3>Welcome Back</h3>
+      <input type="text" placeholder="Email or Username" />
+      <input type="password" placeholder="Password" />
+      <button class="btn" style="width:100%;">Sign In</button>
+    </div>
+  </section>
 
-  <script>
-  (function(){
-    const box = document.getElementById('termsBox');
-    const agree = document.getElementById('agreeBtn');
-    const decline = document.getElementById('declineBtn');
-    const qp = new URLSearchParams(location.search);
-    const dest = qp.get('return') || '/beta/03-intake-start.html';
+  <section class="sections">
+    <div>
+      <div>📊</div>
+      <p>Dashboard</p>
+    </div>
+    <div>
+      <div>🎯</div>
+      <p>Redemption Engine</p>
+    </div>
+    <div>
+      <div>💳</div>
+      <p>My Cards</p>
+    </div>
+    <div>
+      <div>✈️</div>
+      <p>My Programs</p>
+    </div>
+    <div>
+      <div>💡</div>
+      <p>Helpful Hints</p>
+    </div>
+    <div>
+      <div>⚙️</div>
+      <p>Settings</p>
+    </div>
+  </section>
 
-    function enableAgree(){
-      agree.classList.remove('is-disabled');
-      agree.removeAttribute('aria-disabled');
-      const suffix = qp.toString() ? ('?' + qp.toString()) : '';
-      agree.setAttribute('href', dest + suffix);
-    }
-    function disableAgree(){
-      agree.classList.add('is-disabled');
-      agree.setAttribute('aria-disabled','true');
-      agree.removeAttribute('href');
-    }
-    disableAgree();
-
-    function atBottom(){
-      return box.scrollTop + box.clientHeight >= box.scrollHeight - 2;
-    }
-    function onScroll(){
-      if (atBottom()) enableAgree();
-    }
-    box.addEventListener('scroll', onScroll);
-    window.addEventListener('load', function(){
-      if (box.scrollHeight <= box.clientHeight + 1) enableAgree();
-    });
-
-    agree.addEventListener('click', function(e){
-      if (agree.getAttribute('aria-disabled') === 'true'){ e.preventDefault(); return; }
-      try {
-        localStorage.setItem('cs_agreed','1');
-        localStorage.setItem('cs_terms_version','2025-08-28');
-      } catch(_) {}
-    });
-
-    decline.addEventListener('click', function(e){
-      e.preventDefault();
-      qp.set('declined','1');
-      const url = '/beta/TCP-Decline.html?' + qp.toString();
-      location.assign(url);
-    });
-  })();
-  </script>
+  <footer>
+    Solving What Matters… <em>Beautifully</em> • © 2025 ConciergeSync™
+  </footer>
 </body>
 </html>
