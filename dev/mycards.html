@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ConciergeSync™ My Cards</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      background: #f5f7fa;
+      color: #222;
+    }
+    header {
+      background: #0b0f14;
+      color: #fff;
+      padding: 16px 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    header nav a {
+      margin-left: 24px;
+      text-decoration: none;
+      color: #fff;
+      font-weight: 500;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 30px 20px;
+    }
+    h1 { margin-bottom: 20px; }
+
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
+    }
+    .ccard {
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 20px;
+    }
+    .ccard h2 {
+      margin-top: 0;
+      font-size: 1.2rem;
+    }
+    .ccard ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .ccard li {
+      margin: 6px 0;
+    }
+    .highlight {
+      background: #fff8e1;
+    }
+    footer {
+      background: #0b0f14;
+      color: #fff;
+      text-align: center;
+      padding: 16px;
+      margin-top: 40px;
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">ConciergeSync™ My Cards</div>
+    <nav>
+      <a href="console.html">Console</a>
+      <a href="redemption.html">Redemption Engine</a>
+      <a href="myprograms.html">My Programs</a>
+      <a href="helpful.html">Helpful Hints</a>
+      <a href="settings.html">Settings</a>
+    </nav>
+  </header>
+
+  <main class="container">
+    <h1>My Cards</h1>
+    <p>Track balances, due dates, rewards, and bonus categories across all your cards.</p>
+
+    <div class="card-grid">
+      <div class="ccard highlight">
+        <h2>Capital One Venture X</h2>
+        <ul>
+          <li><strong>Balance:</strong> $332 / $20,000 limit</li>
+          <li><strong>Due Date:</strong> Oct 10, 2025</li>
+          <li><strong>Rewards:</strong> 2x everywhere, 10x hotels, 5x flights</li>
+          <li><strong>Status:</strong> On autopay</li>
+        </ul>
+      </div>
+
+      <div class="ccard">
+        <h2>AmEx Gold</h2>
+        <ul>
+          <li><strong>Balance:</strong> $0 / $25,000 limit</li>
+          <li><strong>Due Date:</strong> Sep 25, 2025</li>
+          <li><strong>Rewards:</strong> 4x dining & groceries, 3x flights</li>
+          <li><strong>Status:</strong> Manual payment</li>
+        </ul>
+      </div>
+
+      <div class="ccard">
+        <h2>Chase Sapphire Preferred</h2>
+        <ul>
+          <li><strong>Balance:</strong> $0 / $16,000 limit</li>
+          <li><strong>Due Date:</strong> Sep 21, 2025</li>
+          <li><strong>Rewards:</strong> 2x travel, 3x dining, 25% uplift in portal</li>
+          <li><strong>Status:</strong> On autopay</li>
+        </ul>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    Solving What Matters… <em>Beautifully</em> • © 2025 ConciergeSync™
+  </footer>
+</body>
+</html>
