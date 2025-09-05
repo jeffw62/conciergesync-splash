@@ -146,38 +146,38 @@
     .row { grid-template-columns: 1fr; }
   }
     /* --- Etched Glass Logo + Name --- */
+/* --- Etched Glass Logo + Name --- */
 .logo-etch {
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-bottom: 22px;
+  margin-bottom: 20px;
 }
 
-.cs-logo {
-  width: 120px;
+.logo-etch img {
+  width: 90px; /* make it larger */
   height: auto;
-  display: block;
-
-  /* Etched glass gradient */
-  fill: url(#glassGradient);
-  filter:
-    drop-shadow(0 4px 8px rgba(0,0,0,0.6))
-    drop-shadow(0 -2px 6px rgba(255,255,255,0.15));
+  opacity: 0.85;
+  filter: brightness(1.15) contrast(1.1)
+          drop-shadow(0 3px 8px rgba(0,0,0,0.7))
+          drop-shadow(0 -2px 6px rgba(255,255,255,0.08));
+  margin-bottom: 12px;
 }
 
 .logo-etch span {
-  margin-top: 10px;
   font-size: 26px;
   font-weight: 700;
+  letter-spacing: 0.6px;
   color: transparent;
-  background: linear-gradient(180deg, rgba(255,255,255,0.3), rgba(0,0,0,0.85));
+  background: linear-gradient(180deg, rgba(255,255,255,0.35), rgba(0,0,0,0.85));
   -webkit-background-clip: text;
   background-clip: text;
   text-shadow:
-    inset 1px 1px 2px rgba(255,255,255,0.2),
+    inset 1px 1px 2px rgba(255,255,255,0.25),
     inset -1px -1px 2px rgba(0,0,0,0.8),
-    0 3px 10px rgba(0,0,0,0.6);
+    0 3px 8px rgba(0,0,0,0.6);
 }
+
 </style>
 
 </head>
