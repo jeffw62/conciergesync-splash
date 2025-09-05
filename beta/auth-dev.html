@@ -150,38 +150,37 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-bottom: 18px;
+  margin-bottom: 24px;
 }
 
-.logo-etch img {
-  width: 140px;       /* make logo big enough to feel premium */
-  height: auto;
-  opacity: 0.85;
-
-  /* give logo a chiseled/etched feel */
-  filter: drop-shadow(0 3px 6px rgba(0,0,0,0.7))
-          drop-shadow(0 -1px 2px rgba(255,255,255,0.2));
-}
-
-.logo-etch span {
-  font-size: 28px;
-  font-weight: 700;
-  letter-spacing: 1px;
+.cs-logo {
+  font-size: 72px;        /* BIG logo size */
+  font-weight: 900;
+  letter-spacing: -2px;
   color: transparent;
-
-  /* Make it look carved/etched */
-  background: linear-gradient(180deg, rgba(255,255,255,0.15), rgba(0,0,0,0.8));
+  background: linear-gradient(180deg, rgba(255,255,255,0.25), rgba(0,0,0,0.9));
   -webkit-background-clip: text;
   background-clip: text;
 
-  /* Inner + outer shadows to simulate engraving */
   text-shadow:
     inset 2px 2px 4px rgba(255,255,255,0.2),
-    inset -2px -2px 4px rgba(0,0,0,0.7),
-    0 2px 6px rgba(0,0,0,0.8);
+    inset -2px -2px 4px rgba(0,0,0,0.8),
+    0 4px 12px rgba(0,0,0,0.7);
+}
 
-  margin-top: 12px;
-  display: inline-block;
+.logo-etch span {
+  margin-top: 10px;
+  font-size: 26px;
+  font-weight: 700;
+  color: transparent;
+  background: linear-gradient(180deg, rgba(255,255,255,0.25), rgba(0,0,0,0.85));
+  -webkit-background-clip: text;
+  background-clip: text;
+
+  text-shadow:
+    inset 1px 1px 3px rgba(255,255,255,0.15),
+    inset -1px -1px 3px rgba(0,0,0,0.7),
+    0 3px 8px rgba(0,0,0,0.6);
 }
 
 
@@ -194,7 +193,7 @@
   <main class="tile" role="main" aria-labelledby="hdr">
     <!-- Etched Glass Logo + Name -->
     <div class="logo-etch">
-    <img src="/beta/assets/CS_Logo_Premium.png" alt="ConciergeSync logo"/>
+    <div class="cs-logo">⌂∞</div> <!-- placeholder until we SVG it -->
     <span>ConciergeSync™</span>
     </div>
 
