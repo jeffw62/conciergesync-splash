@@ -5,6 +5,28 @@
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <title>ConciergeSync™ Console</title>
 
+  <script>
+(function () {
+  // Skip redirects on dev pages
+  if (location.pathname.includes('-dev.html')) return;
+
+  try {
+    const isAuthed =
+      sessionStorage.getItem('cs_authed') === '1' ||
+      localStorage.getItem('cs_authed') === '1' ||
+      /(?:^|;\s*)cs_auth=1(?:;|$)/.test(document.cookie);
+
+    if (!isAuthed) {
+      location.replace('/beta/auth.html?mode=login');
+    } else {
+      location.replace('/beta/console.html');
+    }
+  } catch {
+    location.replace('/beta/auth.html?mode=login');
+  }
+})();
+</script>
+
 <style>
   :root{
     --glass-bg: rgba(255,255,255,.12);
