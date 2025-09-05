@@ -5,22 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <title>ConciergeSync™ Console</title>
 
-<!-- Gate: require auth -->
-<script>
-(function () {
-  try {
-    const isAuthed =
-      sessionStorage.getItem('cs_authed') === '1' ||
-      localStorage.getItem('cs_authed') === '1' ||
-      /(?:^|;\s*)cs_auth=1(?:;|$)/.test(document.cookie);
-
-    if (!isAuthed) location.replace('/beta/auth.html?mode=login');
-  } catch {
-    location.replace('/beta/auth.html?mode=login');
-  }
-})();
-</script>
-
 <style>
   :root{
     --glass-bg: rgba(255,255,255,.12);
