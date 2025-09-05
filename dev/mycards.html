@@ -30,8 +30,29 @@
       margin: 0 auto;
       padding: 30px 20px;
     }
-    h1 { margin-bottom: 20px; }
+    h1 { margin-bottom: 10px; }
 
+    /* Summary bar */
+    .summary {
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 30px;
+      display: flex;
+      justify-content: space-around;
+      text-align: center;
+    }
+    .summary div {
+      flex: 1;
+    }
+    .summary strong {
+      display: block;
+      font-size: 1.2rem;
+      margin-top: 4px;
+    }
+
+    /* Card grid */
     .card-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -82,25 +103,46 @@
 
   <main class="container">
     <h1>My Cards</h1>
-    <p>Track balances, due dates, rewards, and bonus categories across all your cards.</p>
+    <p>Track balances, limits, utilization, rewards, and due dates across all your cards.</p>
 
+    <!-- Summary -->
+    <div class="summary">
+      <div>
+        Total Credit Limit
+        <strong>$61,000</strong>
+      </div>
+      <div>
+        Total Balance
+        <strong>$1,194</strong>
+      </div>
+      <div>
+        Utilization
+        <strong>1.95%</strong>
+      </div>
+    </div>
+
+    <!-- Cards -->
     <div class="card-grid">
       <div class="ccard highlight">
         <h2>Capital One Venture X</h2>
         <ul>
-          <li><strong>Balance:</strong> $332 / $20,000 limit</li>
+          <li><strong>Credit Limit:</strong> $20,000</li>
+          <li><strong>Balance:</strong> $332</li>
+          <li><strong>Utilization:</strong> 1.6%</li>
+          <li><strong>Rewards Balance:</strong> 82,500 miles (~$1,650)</li>
           <li><strong>Due Date:</strong> Oct 10, 2025</li>
-          <li><strong>Rewards:</strong> 2x everywhere, 10x hotels, 5x flights</li>
-          <li><strong>Status:</strong> On autopay</li>
+          <li><strong>Status:</strong> Autopay</li>
         </ul>
       </div>
 
       <div class="ccard">
         <h2>AmEx Gold</h2>
         <ul>
-          <li><strong>Balance:</strong> $0 / $25,000 limit</li>
+          <li><strong>Credit Limit:</strong> $25,000</li>
+          <li><strong>Balance:</strong> $0</li>
+          <li><strong>Utilization:</strong> 0%</li>
+          <li><strong>Rewards Balance:</strong> 65,000 MR (~$1,300)</li>
           <li><strong>Due Date:</strong> Sep 25, 2025</li>
-          <li><strong>Rewards:</strong> 4x dining & groceries, 3x flights</li>
           <li><strong>Status:</strong> Manual payment</li>
         </ul>
       </div>
@@ -108,10 +150,12 @@
       <div class="ccard">
         <h2>Chase Sapphire Preferred</h2>
         <ul>
-          <li><strong>Balance:</strong> $0 / $16,000 limit</li>
+          <li><strong>Credit Limit:</strong> $16,000</li>
+          <li><strong>Balance:</strong> $0</li>
+          <li><strong>Utilization:</strong> 0%</li>
+          <li><strong>Rewards Balance:</strong> 92,000 UR (~$1,150)</li>
           <li><strong>Due Date:</strong> Sep 21, 2025</li>
-          <li><strong>Rewards:</strong> 2x travel, 3x dining, 25% uplift in portal</li>
-          <li><strong>Status:</strong> On autopay</li>
+          <li><strong>Status:</strong> Autopay</li>
         </ul>
       </div>
     </div>
