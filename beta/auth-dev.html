@@ -154,45 +154,30 @@
 }
 
 .cs-logo {
-  width: 90px; 
+  width: 120px;
   height: auto;
+  display: block;
+
+  /* Etched glass gradient */
+  fill: url(#glassGradient);
+  filter:
+    drop-shadow(0 4px 8px rgba(0,0,0,0.6))
+    drop-shadow(0 -2px 6px rgba(255,255,255,0.15));
+}
+
+.logo-etch span {
+  margin-top: 10px;
+  font-size: 26px;
+  font-weight: 700;
   color: transparent;
   background: linear-gradient(180deg, rgba(255,255,255,0.3), rgba(0,0,0,0.85));
   -webkit-background-clip: text;
   background-clip: text;
-  filter: drop-shadow(0 4px 10px rgba(0,0,0,0.7));
-}
-
-.logo-etch span {
-  margin-top: 10px;
-  font-size: 26px;
-  font-weight: 700;
-  color: transparent;
-  background: linear-gradient(180deg, rgba(255,255,255,0.25), rgba(0,0,0,0.85));
-  -webkit-background-clip: text;
-  background-clip: text;
   text-shadow:
-    inset 2px 2px 4px rgba(255,255,255,0.2),
-    inset -2px -2px 4px rgba(0,0,0,0.8),
+    inset 1px 1px 2px rgba(255,255,255,0.2),
+    inset -1px -1px 2px rgba(0,0,0,0.8),
     0 3px 10px rgba(0,0,0,0.6);
 }
-
-.logo-etch span {
-  margin-top: 10px;
-  font-size: 26px;
-  font-weight: 700;
-  color: transparent;
-  background: linear-gradient(180deg, rgba(255,255,255,0.25), rgba(0,0,0,0.85));
-  -webkit-background-clip: text;
-  background-clip: text;
-
-  text-shadow:
-    inset 1px 1px 3px rgba(255,255,255,0.15),
-    inset -1px -1px 3px rgba(0,0,0,0.7),
-    0 3px 8px rgba(0,0,0,0.6);
-}
-
-
 </style>
 
 </head>
@@ -204,6 +189,13 @@
     <!-- Etched Glass Logo + Name -->
 <div class="logo-etch">
   <svg class="cs-logo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+    <defs>
+  <linearGradient id="glassGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+    <stop offset="0%" stop-color="rgba(255,255,255,0.35)" />
+    <stop offset="100%" stop-color="rgba(0,0,0,0.8)" />
+  </linearGradient>
+</defs>
+
     <!-- Bell -->
     <path d="M100 30c-25 0-45 20-45 45v25c0 10-5 20-15 25v10h120v-10c-10-5-15-15-15-25V75c0-25-20-45-45-45z"
           fill="currentColor"/>
