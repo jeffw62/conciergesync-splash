@@ -4,15 +4,6 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>ConciergeSync™ – Dev Home</title>
-
-  <!-- Favicons -->
-  <link rel="shortcut icon" href="/dev/asset/favicon.ico">
-  <link rel="icon" type="image/x-icon" href="/dev/asset/favicon.ico">
-  <link rel="icon" type="image/png" sizes="32x32" href="/dev/asset/favicon-32.png">
-  <link rel="icon" type="image/png" sizes="16x16" href="/dev/asset/favicon-16.png">
-  <link rel="apple-touch-icon" href="/dev/asset/apple-touch-icon.png">
-  <link rel="manifest" href="/dev/asset/site.webmanifest">
-
   <style>
     body {
       margin: 0;
@@ -27,27 +18,22 @@
       justify-content: space-between;
       align-items: center;
       padding: 16px 40px;
-      background: #0a1a33; /* Deep navy */
+      background: #0a1a33;
       color: #fff;
     }
-
-    .logo-container {
+    .logo {
       display: flex;
       align-items: center;
     }
-
-    .logo-container img {
-      width: 160px;   /* consistent logo size */
+    .logo img {
+      width: 150px; /* clean size */
       height: auto;
       margin-right: 12px;
     }
-
-    .logo-container span {
-      font-size: 1.8rem;
+    .logo span {
       font-weight: bold;
-      line-height: 1;
+      font-size: 1.2rem;
     }
-
     header nav a {
       margin-left: 24px;
       text-decoration: none;
@@ -64,11 +50,10 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      background: #0a1a33; /* Deep navy */
+      background: #0a1a33;
       padding: 60px 40px;
-      flex-wrap: wrap;
       color: #fff;
-      position: relative;
+      min-height: 400px; /* ensures it's tall enough */
     }
     .hero::after {
       content: "";
@@ -77,7 +62,7 @@
       right: 0;
       bottom: 0;
       height: 6px;
-      background: #bfa14a; /* Thin gold accent line */
+      background: #bfa14a;
     }
     .hero h1 {
       font-size: 2.4rem;
@@ -91,7 +76,7 @@
       max-width: 500px;
     }
     .btn {
-      background: #bfa14a; /* CS gold */
+      background: #bfa14a;
       color: #fff;
       padding: 14px 24px;
       border: none;
@@ -160,16 +145,6 @@
 
     /* --- Mobile Responsive --- */
     @media (max-width: 768px) {
-      header {
-        flex-direction: column;
-        text-align: center;
-      }
-      .logo-container {
-        flex-direction: column;
-      }
-      .logo-container img {
-        margin: 0 0 8px 0;
-      }
       .hero {
         flex-direction: column;
         text-align: center;
@@ -189,7 +164,7 @@
 </head>
 <body>
   <header>
-    <div class="logo-container">
+    <div class="logo">
       <img src="/dev/asset/CS_Logo_Premium_2x.png" alt="ConciergeSync Logo">
       <span>ConciergeSync™</span>
     </div>
@@ -217,12 +192,30 @@
   </section>
 
   <section class="sections">
-    <div><div>📊</div><p>Dashboard</p></div>
-    <div><div>🎯</div><p>Redemption Engine</p></div>
-    <div><div>💳</div><p>My Cards</p></div>
-    <div><div>✈️</div><p>My Programs</p></div>
-    <div><div>💡</div><p>Helpful Hints</p></div>
-    <div><div>⚙️</div><p>Settings</p></div>
+    <div>
+      <div>📊</div>
+      <p>Dashboard</p>
+    </div>
+    <div>
+      <div>🎯</div>
+      <p>Redemption Engine</p>
+    </div>
+    <div>
+      <div>💳</div>
+      <p>My Cards</p>
+    </div>
+    <div>
+      <div>✈️</div>
+      <p>My Programs</p>
+    </div>
+    <div>
+      <div>💡</div>
+      <p>Helpful Hints</p>
+    </div>
+    <div>
+      <div>⚙️</div>
+      <p>Settings</p>
+    </div>
   </section>
 
   <footer>
