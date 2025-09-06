@@ -120,25 +120,36 @@
   cursor: pointer;
 }
     /* --- Sections --- */
+/* --- Sections --- */
 .sections {
   display: flex;
-  justify-content: space-around;  /* spread evenly across */
-  align-items: flex-start;
+  justify-content: space-around;
+  align-items: center;
   flex-wrap: wrap;
-  padding: 40px;
+  padding: 60px 80px;   /* generous breathing room */
   text-align: center;
-  gap: 40px;                      /* consistent spacing */
+  gap: 40px;
 }
 
 .sections div {
-  flex: 1 1 150px;                /* flexible, min 150px */
-  max-width: 200px;               /* keeps them from stretching too wide */
-  margin: 10px;
+  flex: 1 1 150px;
+  max-width: 200px;
+  margin: 20px;
 }
+
+.sections div div {
+  font-size: 2rem;      /* bigger icon size */
+  filter: grayscale(100%) brightness(0); /* black & white effect */
+  margin-bottom: 10px;
+}
+
 .sections div p {
-  margin-top: 10px;
-  font-weight: 500;
+  margin: 0;
+  font-weight: 600;
+  font-size: 1rem;
+  color: #000;          /* solid black text */
 }
+
 
     footer {
       background: #0b0f14;
