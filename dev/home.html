@@ -102,11 +102,12 @@
     }
 
     /* --- Login Box --- */
-    .login-box {
+   .login-box {
   background: #fff;
-  padding: 20px;                /* tighten padding */
+  padding: 20px;                /* tighter padding */
   border-radius: 8px;
   width: 200px;                 /* hard-set width */
+  flex: 0 0 200px;              /* lock flex width */
   height: auto;                 /* shrink to fit content */
   box-shadow: 0 4px 12px rgba(0,0,0,0.15);
   color: #222;
@@ -114,7 +115,7 @@
 }
 
 .login-box h3 {
-  margin: 0 0 12px;             /* small gap below heading */
+  margin: 0 0 12px;
   font-size: 1.1rem;
 }
 
@@ -122,7 +123,7 @@
   width: 100%;
   max-width: 100%;
   box-sizing: border-box;
-  padding: 8px 10px;            /* reduce height */
+  padding: 8px 10px;
   margin: 8px 0;
   border: 1px solid #ccc;
   border-radius: 4px;
@@ -131,7 +132,7 @@
 .login-box button {
   width: 100%;
   max-width: 100%;
-  padding: 10px;                /* reduce button height */
+  padding: 10px;
   margin-top: 10px;
   background: #bfa14a;
   color: #fff;
@@ -140,6 +141,7 @@
   font-weight: bold;
   cursor: pointer;
 }
+
 
     /* --- Sections --- */
     .sections {
