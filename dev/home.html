@@ -21,17 +21,22 @@
       background: #0a1a33; /* Deep navy */
       color: #fff;
     }
-    header .logo {
+    .logo {
+      display: flex;
+      align-items: center;
       font-weight: 700;
       font-size: 1.2rem;
     }
-    header nav a {
-      margin-left: 24px;
-      text-decoration: none;
-      color: #fff;
-      font-weight: 500;
-      transition: opacity 0.2s ease;
+    .logo img {
+      margin-right: 10px; /* spacing between logo and text */
     }
+      header nav a {
+        margin-left: 24px;
+        text-decoration: none;
+        color: #fff;
+        font-weight: 500;
+        transition: opacity 0.2s ease;
+     }
     header nav a:hover {
       opacity: 0.75;
     }
@@ -156,14 +161,17 @@
 </head>
 <body>
   <header>
-    <div class="logo">ConciergeSync™</div>
-    <nav>
-      <a href="#">About</a>
-      <a href="#">Beta Program</a>
-      <a href="#">Helpful Hints</a>
-      <a href="#">Contact</a>
-    </nav>
-  </header>
+  <div class="logo">
+    <img src="/dev/asset/CS_Logo_v1.svg" alt="ConciergeSync Logo" height="36" />
+    <span>ConciergeSync™</span>
+  </div>
+  <nav>
+    <a href="#">About</a>
+    <a href="#">Beta Program</a>
+    <a href="#">Helpful Hints</a>
+    <a href="#">Contact</a>
+  </nav>
+</header>
 
   <section class="hero">
     <div>
