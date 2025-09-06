@@ -103,14 +103,15 @@
 
     /* --- Login Box --- */
     .login-box {
-  background: #fff;
-  padding: 24px 20px 24px 24px; /* tighter right padding */
-  border-radius: 8px;
-  width: 320px;                 /* lock to a nice clean width */
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-  color: #222;
-  flex-shrink: 0;               /* prevents it from stretching */
-}
+      background: #fff;
+      padding: 24px;                 /* even, clean padding all around */
+      border-radius: 8px;
+      max-width: 320px;              /* maximum width cap */
+      min-width: 280px;              /* prevents collapse */
+      flex: 0 0 320px;               /* lock at 320px in flex layouts */
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      color: #222;
+  }
 .login-box h3 {
   margin-top: 0;
   margin-bottom: 16px;
