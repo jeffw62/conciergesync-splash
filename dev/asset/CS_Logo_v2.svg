@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <defs>
+    <linearGradient id="csGold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f9e17a"/>
+      <stop offset="40%" stop-color="#d4af37"/>
+      <stop offset="70%" stop-color="#b8860b"/>
+      <stop offset="100%" stop-color="#7a5c00"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Bell dome -->
+  <path d="M100 20
+           C70 20, 40 50, 40 90
+           L160 90
+           C160 50, 130 20, 100 20 Z"
+        fill="url(#csGold)" />
+
+  <!-- Bell knob -->
+  <circle cx="100" cy="15" r="6" fill="url(#csGold)" />
+
+  <!-- Bell base -->
+  <rect x="45" y="90" width="110" height="12" rx="6" ry="6" fill="url(#csGold)" />
+
+  <!-- Infinity loop -->
+  <path d="M60 150
+           C60 120, 100 120, 100 150
+           C100 180, 140 180, 140 150
+           C140 120, 100 120, 100 90
+           C100 120, 60 120, 60 150 Z"
+        fill="url(#csGold)" />
+</svg>
