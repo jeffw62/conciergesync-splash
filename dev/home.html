@@ -119,14 +119,27 @@
   font-weight: bold;
   cursor: pointer;
 }
-    .sections div {
-      flex: 1 1 150px;
-      margin: 20px;
-    }
-    .sections div p {
-      margin-top: 10px;
-      font-weight: 500;
-    }
+    /* --- Sections --- */
+.sections {
+  display: flex;
+  justify-content: space-around;  /* spread evenly across */
+  align-items: flex-start;
+  flex-wrap: wrap;
+  padding: 40px;
+  text-align: center;
+  gap: 40px;                      /* consistent spacing */
+}
+
+.sections div {
+  flex: 1 1 150px;                /* flexible, min 150px */
+  max-width: 200px;               /* keeps them from stretching too wide */
+  margin: 10px;
+}
+.sections div p {
+  margin-top: 10px;
+  font-weight: 500;
+}
+
     footer {
       background: #0b0f14;
       color: #fff;
