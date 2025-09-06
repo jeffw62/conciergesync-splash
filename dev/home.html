@@ -44,15 +44,21 @@
 
     /* --- Hero Banner --- */
     .hero {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background: #0a1a33; /* deep navy background */
-      color: #fff;
-      padding: 80px 60px;
-      flex-wrap: wrap;
-      position: relative;
-    }
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start; /* align from the top */
+  background: #0a1a33;
+  padding: 80px 40px;
+  flex-wrap: wrap;
+  color: #fff;
+  gap: 40px; /* add spacing between left and right blocks */
+}
+
+.hero > div {
+  flex: 1 1 400px; /* allow both sections to shrink/grow properly */
+  max-width: 600px;
+}
+
     .hero::after {
       content: "";
       position: absolute;
