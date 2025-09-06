@@ -106,13 +106,15 @@
   background: #fff;
   padding: 20px;
   border-radius: 8px;
-  width: 280px;           /* fixed width */
-  max-width: 280px;       /* prevent stretching */
-  flex: 0 0 280px;        /* lock flex width */
-  height: auto;
+  width: 300px;        /* fixed width */
+  min-width: 300px;    /* can’t shrink */
+  max-width: 300px;    /* can’t grow */
+  height: auto;        /* only as tall as needed */
   box-shadow: 0 4px 12px rgba(0,0,0,0.15);
   color: #222;
   box-sizing: border-box;
+  flex: none !important;   /* don’t let flexbox resize it */
+  align-self: flex-start;  /* keep it aligned top, not stretched */
 }
 
 .login-box h3 {
