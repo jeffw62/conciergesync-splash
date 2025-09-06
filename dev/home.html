@@ -18,7 +18,7 @@
       justify-content: space-between;
       align-items: center;
       padding: 16px 40px;
-      background: #0a1a33; /* Deep navy blue */
+      background: #0a1a33; /* Deep navy */
       color: #fff;
     }
     header .logo {
@@ -28,7 +28,7 @@
     header nav a {
       margin-left: 24px;
       text-decoration: none;
-      color: #fff; /* white links */
+      color: #fff;
       font-weight: 500;
       transition: opacity 0.2s ease;
     }
@@ -36,42 +36,51 @@
       opacity: 0.75;
     }
 
+    /* --- Hero Banner --- */
     .hero {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      background: #f5f7fa;
+      background: #0a1a33; /* Deep navy */
       padding: 60px 40px;
       flex-wrap: wrap;
+      color: #fff;
     }
     .hero h1 {
-      font-size: 2.2rem;
+      font-size: 2.4rem;
       margin-bottom: 12px;
+      color: #fff;
     }
     .hero p {
-      font-size: 1.1rem;
-      margin-bottom: 20px;
-      color: #444;
+      font-size: 1.2rem;
+      margin-bottom: 24px;
+      color: #e0e6f0;
+      max-width: 500px;
     }
     .btn {
       background: #bfa14a; /* CS gold */
       color: #fff;
-      padding: 12px 20px;
+      padding: 14px 24px;
       border: none;
       border-radius: 4px;
       text-decoration: none;
       font-weight: bold;
       cursor: pointer;
     }
+
+    /* --- Login Box --- */
     .login-box {
       background: #fff;
-      padding: 20px;
-      border: 1px solid #ccc;
+      padding: 24px;
       border-radius: 8px;
-      width: 280px;
+      width: 300px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+      color: #222;
     }
     .login-box h3 {
       margin-top: 0;
+      margin-bottom: 16px;
+      color: #0a1a33;
     }
     .login-box input {
       width: 100%;
@@ -80,6 +89,18 @@
       border: 1px solid #ccc;
       border-radius: 4px;
     }
+    .login-box button {
+      width: 100%;
+      background: #bfa14a;
+      color: #fff;
+      padding: 12px;
+      border: none;
+      border-radius: 4px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    /* --- Sections --- */
     .sections {
       display: flex;
       justify-content: space-around;
@@ -95,6 +116,7 @@
       margin-top: 10px;
       font-weight: 500;
     }
+
     footer {
       background: #0b0f14;
       color: #fff;
@@ -111,7 +133,7 @@
       }
       .login-box {
         width: 100%;
-        margin-top: 20px;
+        margin-top: 30px;
       }
       .sections {
         flex-direction: column;
@@ -136,14 +158,15 @@
   <section class="hero">
     <div>
       <h1>Turn Your Points Into Real Money Value</h1>
-      <p>ConciergeSync™ helps you optimize cards, miles, and redemptions with accuracy and clarity.</p>
+      <p>ConciergeSync™ helps you optimize cards, miles, and redemptions with accuracy and clarity. 
+         Join our beta program and be part of shaping the future of travel finance.</p>
       <a href="#" class="btn">Not a Client? Enroll Here</a>
     </div>
     <div class="login-box">
       <h3>Welcome Back</h3>
       <input type="text" placeholder="Email or Username" />
       <input type="password" placeholder="Password" />
-      <button class="btn" style="width:100%;">Sign In</button>
+      <button>Sign In</button>
     </div>
   </section>
 
