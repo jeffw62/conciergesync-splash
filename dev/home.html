@@ -99,24 +99,27 @@
 
   display: inline-block; 
   margin-top: 20px; /* breathing room below paragraph */
-}
+    }
 
     /* --- Login Box --- */
     .login-box {
       background: #fff;
-      padding: 24px;                 /* even, clean padding all around */
+      padding: 24px;
       border-radius: 8px;
-      max-width: 320px;              /* maximum width cap */
-      min-width: 280px;              /* prevents collapse */
-      flex: 0 0 320px;               /* lock at 320px in flex layouts */
+      max-width: 340px;        /* hard cap */
+      flex: 0 0 340px;         /* flex item locks width */
       box-shadow: 0 4px 12px rgba(0,0,0,0.15);
       color: #222;
-  }
-.login-box h3 {
-  margin-top: 0;
-  margin-bottom: 16px;
-  color: #0a1a33;
-}
+      box-sizing: border-box;  /* include padding in width calc */
+    }
+
+    .login-box input,
+    .login-box button {
+      width: 100%;             /* stay inside the card */
+      max-width: 100%;         /* don’t spill past */
+      box-sizing: border-box;  /* prevent overflow from padding */
+    }
+
 .login-box input {
   width: 100%;
   padding: 10px;
