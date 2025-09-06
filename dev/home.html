@@ -18,23 +18,17 @@
       justify-content: space-between;
       align-items: center;
       padding: 16px 40px;
-      background: #0a1a33; /* Deep navy blue */
+      background: #0a1a33; /* Deep navy */
       color: #fff;
     }
-    .logo {
-      display: flex;
-      align-items: center;
+    header .logo {
       font-weight: 700;
       font-size: 1.2rem;
-    }
-    .logo img {
-      height: 40px;   /* adjust as needed */
-      margin-right: 10px;
     }
     header nav a {
       margin-left: 24px;
       text-decoration: none;
-      color: #fff; /* white links */
+      color: #fff;
       font-weight: 500;
       transition: opacity 0.2s ease;
     }
@@ -42,114 +36,101 @@
       opacity: 0.75;
     }
 
+    /* --- Hero Banner --- */
     .hero {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: #0a1a33;  /* same deep navy as header */
-  padding: 80px 40px;
-  flex-wrap: wrap;
-  color: #fff;          /* text white */
-  position: relative;
-}
-
-.hero h1 {
-  font-size: 2.8rem;
-  margin-bottom: 16px;
-  color: #fff;          /* white text */
-}
-
-.hero p {
-  font-size: 1.3rem;
-  margin-bottom: 24px;
-  color: #e0e6f0;       /* soft white/gray for paragraph */
-  line-height: 1.5;
-}
-.hero::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: 6px;              /* thickness of the line */
-  background: #bfa14a;      /* CS gold */
-}
-
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      background: #0a1a33; /* Deep navy */
+      padding: 60px 40px;
+      flex-wrap: wrap;
+      color: #fff;
+      position: relative;
+    }
+    .hero::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 6px;
+      background: #bfa14a; /* Thin gold accent line */
+    }
+    .hero h1 {
+      font-size: 2.4rem;
+      margin-bottom: 12px;
+      color: #fff;
+    }
+    .hero p {
+      font-size: 1.2rem;
+      margin-bottom: 24px;
+      color: #e0e6f0;
+      max-width: 500px;
+    }
     .btn {
       background: #bfa14a; /* CS gold */
       color: #fff;
-      padding: 12px 20px;
+      padding: 14px 24px;
       border: none;
       border-radius: 4px;
       text-decoration: none;
       font-weight: bold;
       cursor: pointer;
     }
-   .login-box {
-  background: #fff;
-  padding: 20px;             /* even padding all around */
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-  color: #222;
-  box-sizing: border-box;
-}
 
-.login-box h3 {
-  margin: 0 0 12px;
-  font-size: 1.1rem;
-}
+    /* --- Hero Columns --- */
+    .hero > div:first-child {
+      flex: 1 1 60%;
+      max-width: 600px;
+    }
+    .login-box {
+      background: #fff;
+      padding: 24px;
+      border-radius: 8px;
+      width: 200px; /* reduced from 300px */
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      color: #222;
+      flex: 0 0 200px; /* keep it from stretching */
+    }
+    .login-box h3 {
+      margin-top: 0;
+      margin-bottom: 16px;
+      color: #0a1a33;
+    }
+    .login-box input {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    .login-box button {
+      width: 100%;
+      background: #bfa14a;
+      color: #fff;
+      padding: 12px;
+      border: none;
+      border-radius: 4px;
+      font-weight: bold;
+      cursor: pointer;
+    }
 
-.login-box input {
-  width: 100%;
-  padding: 10px;
-  margin: 10px 0;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  box-sizing: border-box;
-}
-
-.login-box button {
-  width: 100%;
-  padding: 12px;
-  margin-top: 10px;
-  background: #bfa14a;
-  color: #fff;
-  border: none;
-  border-radius: 4px;
-  font-weight: bold;
-  cursor: pointer;
-}
     /* --- Sections --- */
-/* --- Sections --- */
-.sections {
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
-  flex-wrap: wrap;
-  padding: 60px 80px;   /* generous breathing room */
-  text-align: center;
-  gap: 40px;
-}
-
-.sections div {
-  flex: 1 1 150px;
-  max-width: 200px;
-  margin: 20px;
-}
-
-.sections div div {
-  font-size: 2rem;      /* bigger icon size */
-  filter: grayscale(100%) brightness(0); /* black & white effect */
-  margin-bottom: 10px;
-}
-
-.sections div p {
-  margin: 0;
-  font-weight: 600;
-  font-size: 1rem;
-  color: #000;          /* solid black text */
-}
-
+    .sections {
+      display: flex;
+      justify-content: space-around;
+      flex-wrap: wrap;
+      padding: 40px;
+      text-align: center;
+    }
+    .sections div {
+      flex: 1 1 150px;
+      margin: 20px;
+    }
+    .sections div p {
+      margin-top: 10px;
+      font-weight: 500;
+    }
 
     footer {
       background: #0b0f14;
@@ -159,37 +140,25 @@
       font-size: 0.9rem;
     }
 
-    /* --- Mobile Responsive --- */
-    @media (max-width: 768px) {
+    /* --- Responsive Fixes --- */
+    @media (max-width: 1000px) {
       .hero {
         flex-direction: column;
+        align-items: center;
         text-align: center;
       }
+      .hero > div:first-child {
+        max-width: 100%;
+      }
       .login-box {
-        width: 100%;
-        margin-top: 20px;
+        margin-top: 30px;
       }
-      .sections {
-        flex-direction: column;
-      }
-      .sections div {
-        margin-bottom: 20px;
-      }
-      .sections div div i {
-        font-size: 3.5rem;       /* big icons */
-        color: #000;             /* black outline look */
-      }
-
     }
   </style>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
   <header>
-    <div class="logo">
-      <img src="/dev/asset/CS_Logo_Premium_2x.png" alt="ConciergeSync Logo">
-      ConciergeSync™
-    </div>
+    <div class="logo">ConciergeSync™</div>
     <nav>
       <a href="#">About</a>
       <a href="#">Beta Program</a>
@@ -201,44 +170,26 @@
   <section class="hero">
     <div>
       <h1>Turn Your Points Into Real Money Value</h1>
-      <p>ConciergeSync™ helps you optimize cards, miles, and redemptions with accuracy and clarity.</p>
+      <p>ConciergeSync™ helps you optimize cards, miles, and redemptions with accuracy and clarity. 
+         Join our beta program and be part of shaping the future of travel finance.</p>
       <a href="#" class="btn">Not a Client? Enroll Here</a>
     </div>
     <div class="login-box">
       <h3>Welcome Back</h3>
       <input type="text" placeholder="Email or Username" />
       <input type="password" placeholder="Password" />
-      <button class="btn" style="width:100%;">Sign In</button>
+      <button>Sign In</button>
     </div>
   </section>
 
- <section class="sections">
-  <div>
-    <div><i class="fa-regular fa-chart-bar"></i></div>
-    <p>Dashboard</p>
-  </div>
-  <div>
-    <div><i class="fa-regular fa-bullseye"></i></div>
-    <p>Redemption Engine</p>
-  </div>
-  <div>
-    <div><i class="fa-regular fa-credit-card"></i></div>
-    <p>My Cards</p>
-  </div>
-  <div>
-    <div><i class="fa-regular fa-plane"></i></div>
-    <p>My Programs</p>
-  </div>
-  <div>
-    <div><i class="fa-regular fa-lightbulb"></i></div>
-    <p>Helpful Hints</p>
-  </div>
-  <div>
-    <div><i class="fa-regular fa-gear"></i></div>
-    <p>Settings</p>
-  </div>
-</section>
-
+  <section class="sections">
+    <div><div>📊</div><p>Dashboard</p></div>
+    <div><div>🎯</div><p>Redemption Engine</p></div>
+    <div><div>💳</div><p>My Cards</p></div>
+    <div><div>✈️</div><p>My Programs</p></div>
+    <div><div>💡</div><p>Helpful Hints</p></div>
+    <div><div>⚙️</div><p>Settings</p></div>
+  </section>
 
   <footer>
     Solving What Matters… <em>Beautifully</em> • © 2025 ConciergeSync™
