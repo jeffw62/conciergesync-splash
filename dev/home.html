@@ -1,18 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ConciergeSync™ – Dev Home</title>
-
-  <!-- Favicons -->
   <link rel="shortcut icon" href="/dev/asset/favicon.ico">
   <link rel="icon" type="image/x-icon" href="/dev/asset/favicon.ico">
   <link rel="icon" type="image/png" sizes="32x32" href="/dev/asset/favicon-32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="/dev/asset/favicon-16.png">
   <link rel="apple-touch-icon" href="/dev/asset/apple-touch-icon.png">
   <link rel="manifest" href="/dev/asset/site.webmanifest">
-
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ConciergeSync™ – Dev Home</title>
   <style>
     body {
       margin: 0;
@@ -30,19 +27,24 @@
       background: #0a1a33; /* Deep navy */
       color: #fff;
     }
+
     .logo-container {
       display: flex;
       align-items: center;
     }
+
     .logo-container img {
-      width: 160px; /* logo size */
+      width: 120px;      /* balanced logo size */
       height: auto;
       margin-right: 10px;
     }
+
     .logo-container span {
-      font-size: 1.2rem;
+      font-size: 1.6rem; /* upscale text */
       font-weight: bold;
+      line-height: 1;
     }
+
     header nav a {
       margin-left: 24px;
       text-decoration: none;
@@ -169,6 +171,14 @@
       .sections div {
         margin-bottom: 20px;
       }
+      .logo-container {
+        flex-direction: column;
+        text-align: center;
+      }
+      .logo-container img {
+        margin-right: 0;
+        margin-bottom: 8px;
+      }
     }
   </style>
 </head>
@@ -197,17 +207,35 @@
       <h3>Welcome Back</h3>
       <input type="text" placeholder="Email or Username" />
       <input type="password" placeholder="Password" />
-      <button type="submit">Sign In</button>
+      <button>Sign In</button>
     </div>
   </section>
 
   <section class="sections">
-    <div><div>📊</div><p>Dashboard</p></div>
-    <div><div>🎯</div><p>Redemption Engine</p></div>
-    <div><div>💳</div><p>My Cards</p></div>
-    <div><div>✈️</div><p>My Programs</p></div>
-    <div><div>💡</div><p>Helpful Hints</p></div>
-    <div><div>⚙️</div><p>Settings</p></div>
+    <div>
+      <div>📊</div>
+      <p>Dashboard</p>
+    </div>
+    <div>
+      <div>🎯</div>
+      <p>Redemption Engine</p>
+    </div>
+    <div>
+      <div>💳</div>
+      <p>My Cards</p>
+    </div>
+    <div>
+      <div>✈️</div>
+      <p>My Programs</p>
+    </div>
+    <div>
+      <div>💡</div>
+      <p>Helpful Hints</p>
+    </div>
+    <div>
+      <div>⚙️</div>
+      <p>Settings</p>
+    </div>
   </section>
 
   <footer>
