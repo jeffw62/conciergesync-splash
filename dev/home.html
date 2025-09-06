@@ -18,17 +18,23 @@
       justify-content: space-between;
       align-items: center;
       padding: 16px 40px;
-      background: #0a1a33; /* Deep navy */
+      background: #0a1a33; /* Deep navy blue */
       color: #fff;
     }
-    header .logo {
+    .logo {
+      display: flex;
+      align-items: center;
       font-weight: 700;
       font-size: 1.2rem;
+    }
+    .logo img {
+      height: 40px;   /* adjust as needed */
+      margin-right: 10px;
     }
     header nav a {
       margin-left: 24px;
       text-decoration: none;
-      color: #fff;
+      color: #fff; /* white links */
       font-weight: 500;
       transition: opacity 0.2s ease;
     }
@@ -36,61 +42,42 @@
       opacity: 0.75;
     }
 
-    /* --- Hero Banner --- */
     .hero {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      background: #0a1a33; /* Deep navy */
+      background: #f5f7fa;
       padding: 60px 40px;
       flex-wrap: wrap;
-      color: #fff;
-      position: relative;
-    }
-    .hero::after {
-      content: "";
-      position: absolute;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      height: 6px;
-      background: #bfa14a; /* Thin gold accent line */
     }
     .hero h1 {
-      font-size: 2.4rem;
+      font-size: 2.2rem;
       margin-bottom: 12px;
-      color: #fff;
     }
     .hero p {
-      font-size: 1.2rem;
-      margin-bottom: 24px;
-      color: #e0e6f0;
-      max-width: 500px;
+      font-size: 1.1rem;
+      margin-bottom: 20px;
+      color: #444;
     }
     .btn {
       background: #bfa14a; /* CS gold */
       color: #fff;
-      padding: 14px 24px;
+      padding: 12px 20px;
       border: none;
       border-radius: 4px;
       text-decoration: none;
       font-weight: bold;
       cursor: pointer;
     }
-
-    /* --- Login Box --- */
     .login-box {
       background: #fff;
-      padding: 24px;
+      padding: 20px;
+      border: 1px solid #ccc;
       border-radius: 8px;
-      width: 300px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.2); /* bump for floating look */
-      color: #222;
+      width: 280px;
     }
     .login-box h3 {
       margin-top: 0;
-      margin-bottom: 16px;
-      color: #0a1a33;
     }
     .login-box input {
       width: 100%;
@@ -99,18 +86,6 @@
       border: 1px solid #ccc;
       border-radius: 4px;
     }
-    .login-box button {
-      width: 100%;
-      background: #bfa14a;
-      color: #fff;
-      padding: 12px;
-      border: none;
-      border-radius: 4px;
-      font-weight: bold;
-      cursor: pointer;
-    }
-
-    /* --- Sections --- */
     .sections {
       display: flex;
       justify-content: space-around;
@@ -126,7 +101,6 @@
       margin-top: 10px;
       font-weight: 500;
     }
-
     footer {
       background: #0b0f14;
       color: #fff;
@@ -143,7 +117,7 @@
       }
       .login-box {
         width: 100%;
-        margin-top: 30px;
+        margin-top: 20px;
       }
       .sections {
         flex-direction: column;
@@ -156,7 +130,10 @@
 </head>
 <body>
   <header>
-    <div class="logo">ConciergeSync™</div>
+    <div class="logo">
+      <img src="/dev/asset/CS_Logo_Premium_2x.png" alt="ConciergeSync Logo">
+      ConciergeSync™
+    </div>
     <nav>
       <a href="#">About</a>
       <a href="#">Beta Program</a>
@@ -168,15 +145,14 @@
   <section class="hero">
     <div>
       <h1>Turn Your Points Into Real Money Value</h1>
-      <p>ConciergeSync™ helps you optimize cards, miles, and redemptions with accuracy and clarity. 
-         Join our beta program and be part of shaping the future of travel finance.</p>
+      <p>ConciergeSync™ helps you optimize cards, miles, and redemptions with accuracy and clarity.</p>
       <a href="#" class="btn">Not a Client? Enroll Here</a>
     </div>
     <div class="login-box">
       <h3>Welcome Back</h3>
       <input type="text" placeholder="Email or Username" />
       <input type="password" placeholder="Password" />
-      <button>Sign In</button>
+      <button class="btn" style="width:100%;">Sign In</button>
     </div>
   </section>
 
