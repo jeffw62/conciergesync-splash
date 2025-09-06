@@ -42,51 +42,52 @@
       opacity: 0.75;
     }
 
-    /* --- Hero Banner --- */
-    .hero {
+ /* --- Hero Banner --- */
+.hero {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start; /* align from the top */
+  align-items: flex-start;
   background: #0a1a33;
   padding: 80px 40px;
   flex-wrap: wrap;
   color: #fff;
-  gap: 40px; /* add spacing between left and right blocks */
+  gap: 40px;
+  position: relative; /* required for the ::after accent line */
 }
 
-.hero > div {
-  flex: 1 1 400px; /* allow both sections to shrink/grow properly */
+.hero::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 6px;
+  background: #bfa14a; /* thin gold line */
+}
+
+.hero .hero-left {
   max-width: 600px;
 }
 
-    .hero::after {
-      content: "";
-      position: absolute;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      height: 6px;
-      background: #bfa14a; /* thin gold line */
-    }
-    .hero .hero-left {
-      max-width: 600px;
-    }
-    .hero .hero-left img {
-      height: 100px; /* big logo */
-      margin-bottom: 20px;
-    }
-    .hero h1 {
-      font-size: 2.8rem;
-      margin-bottom: 16px;
-      color: #fff;
-    }
-    .hero p {
-      font-size: 1.3rem;
-      margin-bottom: 24px;
-      color: #e0e6f0;
-      line-height: 1.5;
-    }
-    .btn {
+.hero .hero-left img {
+  height: 100px; /* big logo */
+  margin-bottom: 20px;
+}
+
+.hero h1 {
+  font-size: 2.8rem;
+  margin-bottom: 16px;
+  color: #fff;
+}
+
+.hero p {
+  font-size: 1.3rem;
+  margin-bottom: 24px;
+  color: #e0e6f0;
+  line-height: 1.5;
+}
+
+.btn {
   background: #bfa14a; /* CS gold */
   color: #fff;
   padding: 14px 28px;
@@ -96,19 +97,19 @@
   font-weight: bold;
   cursor: pointer;
   font-size: 1rem;
+  display: inline-block;
+  margin-top: 20px;
+}
 
-  display: inline-block; 
-  margin-top: 20px; /* breathing room below paragraph */
-    }
-
-    /* --- Login Box --- */
-   .login-box {
+/* --- Login Box --- */
+.login-box {
   background: #fff;
-  padding: 20px;                /* tighter padding */
+  padding: 20px;
   border-radius: 8px;
-  width: 200px;                 /* hard-set width */
-  flex: 0 0 200px;              /* lock flex width */
-  height: auto;                 /* shrink to fit content */
+  width: 280px;           /* fixed width */
+  max-width: 280px;       /* prevent stretching */
+  flex: 0 0 280px;        /* lock flex width */
+  height: auto;
   box-shadow: 0 4px 12px rgba(0,0,0,0.15);
   color: #222;
   box-sizing: border-box;
@@ -121,7 +122,6 @@
 
 .login-box input {
   width: 100%;
-  max-width: 100%;
   box-sizing: border-box;
   padding: 8px 10px;
   margin: 8px 0;
@@ -131,7 +131,6 @@
 
 .login-box button {
   width: 100%;
-  max-width: 100%;
   padding: 10px;
   margin-top: 10px;
   background: #bfa14a;
