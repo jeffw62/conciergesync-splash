@@ -132,11 +132,11 @@
     /* --- Registration Box --- */
     .registration-box {
       background: #fff;
-      padding: 24px;
+      padding: 30px;        /* increased inner padding */
       border-radius: 8px;
       box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-      flex: 1;
-      max-width: 380px;
+      max-width: 360px;
+      margin: 0 auto;
     }
     .registration-box h3 {
       margin-top: 0;
@@ -150,23 +150,24 @@
       color: #0a1a33;
     }
     .registration-box input {
-      width: 100%;
-      padding: 10px;
-      margin-bottom: 16px;
+      margin-bottom: 15px;
+      padding: 12px;
       border: 1px solid #ccc;
       border-radius: 4px;
       font-size: 1rem;
+      width: 100%;
+      box-sizing: border-box;
     }
     .registration-box button {
+      width: 100%;
+      padding: 14px;
+      font-size: 1rem;
+      font-weight: bold;
       background: #bfa14a;
       color: #fff;
-      padding: 12px;
       border: none;
       border-radius: 4px;
-      font-weight: bold;
-      font-size: 1rem;
       cursor: pointer;
-      width: 100%;
     }
     .registration-box button:hover {
       opacity: 0.9;
