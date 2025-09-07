@@ -33,8 +33,10 @@
     header .logo img {
       height: 32px;
     }
+
+    /* nav hidden by default */
     header nav {
-      display: flex;
+      display: none;
       gap: 24px;
     }
     header nav a {
@@ -45,6 +47,16 @@
     }
     header nav a:hover {
       opacity: 0.75;
+    }
+
+    /* desktop: show nav always */
+    @media (min-width: 769px) {
+      header nav {
+        display: flex;
+      }
+      .menu-toggle {
+        display: none !important;
+      }
     }
 
     /* --- Hamburger --- */
@@ -175,7 +187,6 @@
     /* --- Mobile Responsive --- */
     @media (max-width: 768px) {
       header nav {
-        display: none;
         flex-direction: column;
         background: #0a1a33;
         position: absolute;
@@ -275,7 +286,6 @@
 
       if (toggle && nav) {
         toggle.addEventListener("click", () => {
-          alert("hamburger clicked"); // for debug
           nav.classList.toggle("active");
         });
       }
