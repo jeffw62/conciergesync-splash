@@ -14,7 +14,7 @@
       line-height: 1.5;
     }
 
-    /* --- Header Bar --- */
+    /* --- Header --- */
     header {
       display: flex;
       justify-content: space-between;
@@ -35,8 +35,6 @@
     header .logo img {
       height: 32px;
     }
-
-    /* nav hidden by default */
     header nav {
       display: none;
       gap: 24px;
@@ -45,13 +43,12 @@
       text-decoration: none;
       color: #fff;
       font-weight: 500;
-      transition: opacity 0.2s ease;
     }
     header nav a:hover {
       opacity: 0.75;
     }
 
-    /* desktop: show nav always */
+    /* desktop nav */
     @media (min-width: 769px) {
       header nav {
         display: flex;
@@ -79,12 +76,12 @@
       border-radius: 2px;
     }
 
-    /* --- Hero Section --- */
+    /* --- Hero --- */
     .hero {
       background: #0a1a33;
       color: #fff;
       text-align: center;
-      padding: 60px 20px;
+      padding: 80px 20px;
       position: relative;
     }
     .hero::after {
@@ -98,95 +95,96 @@
     }
     .hero h1 {
       font-size: 2.2rem;
-      margin-bottom: 12px;
+      margin-bottom: 16px;
     }
     .hero p {
       font-size: 1.1rem;
       max-width: 600px;
-      margin: 0 auto;
+      margin: 0 auto 24px auto;
       color: #e0e6f0;
     }
 
-    /* --- Content Section --- */
-    .content {
+    /* --- CTA --- */
+    .cta {
+      text-align: center;
+      padding: 60px 20px;
+    }
+    .btn {
+      background: #bfa14a;
+      color: #fff;
+      padding: 14px 28px;
+      border: none;
+      border-radius: 4px;
+      text-decoration: none;
+      font-weight: bold;
+      cursor: pointer;
+      font-size: 1rem;
+    }
+    .btn:hover {
+      opacity: 0.9;
+    }
+    .registration {
       display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      gap: 40px;
-      max-width: 1100px;
-      margin: 60px auto;
-      padding: 0 20px;
-    }
-    .content-left {
-      flex: 1;
-    }
-    .content-left h2 {
-      color: #0a1a33;
-      margin-top: 0;
-      font-size: 1.3rem;
-    }
-    .content-left p {
-      margin-bottom: 20px;
+      justify-content: center;
+      padding: 40px 20px;
     }
 
-    /* --- Registration Box --- */
     .registration-box {
       background: #fff;
-      padding: 24px;
+      padding: 24px;          /* smaller padding */
       border-radius: 8px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-      flex: 1;
-      max-width: 380px;
+      width: 320px;           /* slightly narrower */
+      max-width: 90%;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+      box-sizing: border-box;
+      text-align: left;
     }
+
     .registration-box h3 {
       margin-top: 0;
-      margin-bottom: 16px;
+      margin-bottom: 16px;    /* tighter spacing */
+      font-size: 1.1rem;
       color: #0a1a33;
     }
+
     .registration-box label {
       display: block;
       margin-bottom: 6px;
       font-weight: 600;
       color: #0a1a33;
     }
+
     .registration-box input {
+      display: block;
       width: 100%;
-      padding: 10px;
-      margin-bottom: 16px;
-      border: 1px solid #ccc;
+      margin-bottom: 12px;    /* reduce spacing */
+      padding: 10px;          /* smaller field height */
       border-radius: 4px;
-      font-size: 1rem;
+      border: 1px solid #ccc;
+      font-size: 0.95rem;
+      box-sizing: border-box;
     }
-    .registration-box button {
+
+    .registration-box button.btn {
+      width: 100%;
       background: #bfa14a;
       color: #fff;
-      padding: 12px;
+      padding: 12px;          /* smaller button height */
       border: none;
       border-radius: 4px;
       font-weight: bold;
-      font-size: 1rem;
+      font-size: 0.95rem;
       cursor: pointer;
-      width: 100%;
     }
-    .registration-box button:hover {
+
+    .registration-box button.btn:hover {
       opacity: 0.9;
     }
 
-    /* --- Footer --- */
-    .site-footer {
-      background: #0b0f14;
-      color: #fff;
-      text-align: center;
-      padding: 20px;
-      font-size: 0.9rem;
-    }
-    .site-footer p {
-      margin: 4px 0;
-    }
-
-    /* --- Responsive --- */
+    /* --- Mobile Responsive --- */
     @media (max-width: 768px) {
       header nav {
+        display: flex;
         flex-direction: column;
         background: #0a1a33;
         position: absolute;
@@ -196,6 +194,7 @@
         border-radius: 0 0 6px 6px;
         box-shadow: 0 4px 8px rgba(0,0,0,0.3);
         z-index: 9999;
+
         max-height: 0;
         overflow: hidden;
         opacity: 0;
@@ -210,11 +209,8 @@
       .menu-toggle {
         display: flex;
       }
-      .content {
-        flex-direction: column;
-      }
-      .registration-box {
-        max-width: 100%;
+      .hero h1 {
+        font-size: 1.8rem;
       }
     }
   </style>
@@ -239,52 +235,55 @@
   </header>
 
   <section class="hero">
-    <h1>Welcome to ConciergeSync™ Beta</h1>
-    <p>You’re just a few steps away from beginning your journey. Complete the intake process so we can personalize your experience.</p>
-  </section>
+  <h1>Welcome to ConciergeSync™ Beta</h1>
+  <p>You’re just a few steps away from beginning your journey. Complete the intake process so we can personalize your experience.</p>
+  
+  <div class="onboarding-info">
+    <h2>Registration</h2>
+    <p>This establishes your account inside ConciergeSync™.</p>
 
-  <section class="content">
-    <!-- Left: Explanatory Text -->
-    <div class="content-left">
-      <h2>Registration</h2>
-      <p>This establishes your account inside ConciergeSync™.</p>
+    <h2>What is Onboarding?</h2>
+    <p>Onboarding is the setup process that personalizes ConciergeSync™ for you. Think of it like your flight check-in — we confirm a few details, then you’re cleared for takeoff.</p>
+    <p>By completing onboarding, we’ll know which cards and loyalty programs you use, so we can show you the most valuable redemption options that are best for you.</p>
 
-      <h2>What is Onboarding?</h2>
-      <p>Onboarding is the setup process that personalizes ConciergeSync™ for you. 
-      Think of it like your flight check-in — we confirm a few details, then you’re cleared for takeoff.</p>
-      <p>By completing onboarding, we’ll know which cards and loyalty programs you use, 
-      so we can show you the most valuable redemption options that are best for you.</p>
+    <h2>Why It’s Necessary</h2>
+    <p>Without onboarding, ConciergeSync™ would just be a blank console. With it, the platform becomes your personalized co-pilot — guiding you toward smarter decisions, better redemptions, and maximum travel value.</p>
+    <p>This step ensures you don’t see generic advice — everything is tailored to your profile, your cards, and your goals.</p>
+  </div>
+</section>
 
-      <h2>Why It’s Necessary</h2>
-      <p>Without onboarding, ConciergeSync™ would just be a blank console. 
-      With it, the platform becomes your personalized co-pilot — guiding you toward smarter decisions, 
-      better redemptions, and maximum travel value.</p>
-      <p>This step ensures you don’t see generic advice — everything is tailored to your profile, your cards, and your goals.</p>
-    </div>
+<section class="registration">
+  <div class="registration-box">
+    <h3>Create Your Account</h3>
+    <form>
+      <label for="first">First Name</label>
+      <input type="text" id="first" name="first" required>
 
-    <!-- Right: Registration Form -->
-    <div class="registration-box">
-      <h3>Create Your Account</h3>
-      <form>
-        <label for="first-name">First Name</label>
-        <input type="text" id="first-name" name="first-name" required>
+      <label for="last">Last Name</label>
+      <input type="text" id="last" name="last" required>
 
-        <label for="last-name">Last Name</label>
-        <input type="text" id="last-name" name="last-name" required>
+      <label for="email">Email Address</label>
+      <input type="email" id="email" name="email" required>
 
-        <label for="email">Email Address</label>
-        <input type="email" id="email" name="email" required>
+      <button type="submit" class="btn">Create Account</button>
+    </form>
+  </div>
+</section>
 
-        <button type="submit">Create Account</button>
-      </form>
-    </div>
-  </section>
 
-  <footer class="site-footer">
-    Solving What Matters… <em>Beautifully</em> • © 2025 ConciergeSync™
-  </footer>
+  <!-- Universal Footer -->
+  <div id="footer"></div>
 
   <script>
+    // Load universal footer
+    fetch("/dev/footer.html")
+      .then(response => response.text())
+      .then(html => {
+        document.getElementById("footer").innerHTML = html;
+      })
+      .catch(err => console.error("Footer failed to load:", err));
+
+    // Hamburger toggle
     document.addEventListener("DOMContentLoaded", () => {
       const toggle = document.querySelector(".menu-toggle");
       const nav = document.querySelector("header nav");
