@@ -208,6 +208,18 @@
       font-size: 1.1rem;
     }
 
+    .sections i {
+      width: 32px;
+      height: 32px;
+      stroke: #0a1a33;   /* default navy outline */
+      stroke-width: 2;
+      margin-bottom: 8px;
+    }
+    
+    .sections div:hover i {
+      stroke: #bfa14a;   /* gold on hover */
+    }
+
     /* --- Mobile Responsive --- */
     @media (max-width: 768px) {
       header nav {
@@ -307,13 +319,31 @@
       </div>
   </section>
 
-  <section class="sections">
-    <div><div>📊</div><p>Dashboard</p></div>
-    <div><div>🎯</div><p>Redemption Engine</p></div>
-    <div><div>💳</div><p>My Cards</p></div>
-    <div><div>✈️</div><p>My Programs</p></div>
-    <div><div>💡</div><p>Helpful Hints</p></div>
-    <div><div>⚙️</div><p>Settings</p></div>
+   <section class="sections">
+    <div>
+      <i data-lucide="bar-chart-3"></i>
+      <p>Dashboard</p>
+    </div>
+    <div>
+      <i data-lucide="target"></i>
+      <p>Redemption Engine</p>
+    </div>
+    <div>
+      <i data-lucide="credit-card"></i>
+      <p>My Cards</p>
+    </div>
+    <div>
+      <i data-lucide="plane"></i>
+      <p>My Programs</p>
+    </div>
+    <div>
+      <i data-lucide="lightbulb"></i>
+      <p>Helpful Hints</p>
+    </div>
+    <div>
+      <i data-lucide="settings"></i>
+      <p>Settings</p>
+    </div>
   </section>
 
   <!-- Universal Footer will be injected here -->
@@ -339,6 +369,10 @@
         });
       }
     });
+  </script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+      <script>
+        lucide.createIcons();
   </script>
 </body>
 </html>
