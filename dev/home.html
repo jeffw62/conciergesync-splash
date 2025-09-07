@@ -187,26 +187,19 @@
     /* --- Mobile Responsive --- */
     @media (max-width: 768px) {
       header nav {
-        display: block; /* keep in flow for animation */
-        max-height: 0;
-        opacity: 0;
-        overflow: hidden;
         flex-direction: column;
         background: #0a1a33;
         position: absolute;
         top: 100%;
         right: 0;
         left: 0;
-        padding: 0 20px;
+        padding: 20px;
         border-radius: 0 0 6px 6px;
         box-shadow: 0 4px 8px rgba(0,0,0,0.3);
         z-index: 9999;
-        transition: max-height 0.4s ease, opacity 0.4s ease, padding 0.3s ease;
       }
       header nav.active {
-        max-height: 500px; /* enough for all links */
-        opacity: 1;
-        padding: 20px;
+        display: flex;
       }
       .menu-toggle {
         display: flex;
@@ -252,7 +245,7 @@
     </div>
     <nav>
       <a href="#">About</a>
-      <a href="#">Beta Program</a>
+      <a href="/dev/betap.html">Beta Program</a>
       <a href="#">Helpful Hints</a>
       <a href="#">Contact</a>
     </nav>
@@ -263,7 +256,7 @@
       <h1>Turn Your Points Into Real Money Value</h1>
       <p>ConciergeSync™ helps you optimize cards, miles, and redemptions with accuracy and clarity. 
          Join our beta program and be part of shaping the future of travel finance.</p>
-      <a href="#" class="btn">Not a Client? Enroll Here</a>
+      <a href="/dev/betap.html" class="btn">Not a Client? Enroll Here</a>
     </div>
     <div class="login-box">
       <h3>Welcome Back</h3>
