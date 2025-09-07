@@ -124,61 +124,62 @@
       opacity: 0.9;
     }
     .registration {
-  display: flex;
-  justify-content: center;
-  padding: 40px 20px;
-}
+      display: flex;
+      justify-content: center;
+      padding: 40px 20px;
+    }
 
-.registration-box {
-  background: #fff;
-  padding: 32px;
-  border-radius: 8px;
-  width: 360px;
-  max-width: 90%;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-  box-sizing: border-box;
-  text-align: left;
-}
+    .registration-box {
+      background: #fff;
+      padding: 24px;          /* smaller padding */
+      border-radius: 8px;
+      width: 320px;           /* slightly narrower */
+      max-width: 90%;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+      box-sizing: border-box;
+      text-align: left;
+    }
 
-.registration-box h3 {
-  margin-top: 0;
-  margin-bottom: 20px;
-  color: #0a1a33;
-}
+    .registration-box h3 {
+      margin-top: 0;
+      margin-bottom: 16px;    /* tighter spacing */
+      font-size: 1.1rem;
+      color: #0a1a33;
+    }
 
-.registration-box label {
-  display: block;
-  margin-bottom: 6px;
-  font-weight: 600;
-  color: #0a1a33;
-}
+    .registration-box label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: 600;
+      color: #0a1a33;
+    }
 
-.registration-box input {
-  display: block;
-  width: 100%;
-  margin-bottom: 16px;
-  padding: 12px;
-  border-radius: 4px;
-  border: 1px solid #ccc;
-  font-size: 1rem;
-  box-sizing: border-box;
-}
+    .registration-box input {
+      display: block;
+      width: 100%;
+      margin-bottom: 12px;    /* reduce spacing */
+      padding: 10px;          /* smaller field height */
+      border-radius: 4px;
+      border: 1px solid #ccc;
+      font-size: 0.95rem;
+      box-sizing: border-box;
+    }
 
-.registration-box button.btn {
-  width: 100%;
-  background: #bfa14a;
-  color: #fff;
-  padding: 14px;
-  border: none;
-  border-radius: 4px;
-  font-weight: bold;
-  font-size: 1rem;
-  cursor: pointer;
-}
+    .registration-box button.btn {
+      width: 100%;
+      background: #bfa14a;
+      color: #fff;
+      padding: 12px;          /* smaller button height */
+      border: none;
+      border-radius: 4px;
+      font-weight: bold;
+      font-size: 0.95rem;
+      cursor: pointer;
+    }
 
-.registration-box button.btn:hover {
-  opacity: 0.9;
-}
+    .registration-box button.btn:hover {
+      opacity: 0.9;
+    }
 
     /* --- Mobile Responsive --- */
     @media (max-width: 768px) {
@@ -269,11 +270,6 @@
   </div>
 </section>
 
-
-
-  <section class="cta">
-    <a href="#" class="btn">Start Intake</a>
-  </section>
 
   <!-- Universal Footer -->
   <div id="footer"></div>
