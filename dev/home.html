@@ -21,6 +21,7 @@
       background: #0a1a33; /* Deep navy */
       color: #fff;
       position: relative;
+      z-index: 1000; /* make sure header stays on top */
     }
     header .logo {
       font-weight: 700;
@@ -181,6 +182,7 @@
         padding: 20px;
         border-radius: 0 0 6px 6px;
         box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        z-index: 9999; /* keep nav on top of everything */
       }
 
       header nav.active {
@@ -272,23 +274,14 @@
   </footer>
 
   <script>
-    console.log("script loaded"); // confirm the script itself is running
-
     const toggle = document.querySelector(".menu-toggle");
     const nav = document.querySelector("header nav");
 
-    console.log("toggle element:", toggle);
-    console.log("nav element:", nav);
-
     if (toggle && nav) {
       toggle.addEventListener("click", () => {
-        console.log("hamburger clicked");
         nav.classList.toggle("active");
       });
-    } else {
-      console.error("Menu toggle or nav not found");
     }
   </script>
-
 </body>
 </html>
