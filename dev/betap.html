@@ -110,6 +110,7 @@
       font-size: 1.1rem;
       max-width: 600px;
       margin: 0 auto 24px auto;
+      margin: 0 auto 36px auto;  /* more breathing room below the paragraph */
       color: #e0e6f0;
     }
     .btn {
@@ -127,7 +128,8 @@
       opacity: 0.9;
     }
     .hero .btn {
-      margin-top: 28px; /* creates breathing room after the paragraph */
+      display: inline-block;    /* ensures margin works properly */
+      margin-top: 0;            /* keep clean override */
     }
 
     /* --- Two Column Layout --- */
