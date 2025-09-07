@@ -253,5 +253,16 @@
   <footer>
     Solving What Matters… <em>Beautifully</em> • © 2025 ConciergeSync™
   </footer>
+  <script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const toggle = document.querySelector(".menu-toggle");
+    const nav = document.querySelector("header nav");
+
+    toggle.addEventListener("click", () => {
+      nav.classList.toggle("active");
+    });
+  });
+</script>
+
 </body>
 </html>
