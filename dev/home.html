@@ -187,13 +187,23 @@
         top: 100%;
         right: 0;
         left: 0;
-        padding: 20px;
         border-radius: 0 0 6px 6px;
         box-shadow: 0 4px 8px rgba(0,0,0,0.3);
         z-index: 9999;
+
+    /* animation state */
+        max-height: 0;
+        overflow: hidden;
+        opacity: 0;
+        padding: 0 20px; 
+        transition: all 0.3s ease;
       }
+
       header nav.active {
         display: flex; /* SHOW when toggled */
+        max-height: 400px; /* adjust for link count */
+        opacity: 1;
+        padding: 20px;
       }
       .menu-toggle {
         display: flex;
