@@ -187,19 +187,26 @@
     /* --- Mobile Responsive --- */
     @media (max-width: 768px) {
       header nav {
+        display: block; /* keep in flow for animation */
+        max-height: 0;
+        opacity: 0;
+        overflow: hidden;
         flex-direction: column;
         background: #0a1a33;
         position: absolute;
         top: 100%;
         right: 0;
         left: 0;
-        padding: 20px;
+        padding: 0 20px;
         border-radius: 0 0 6px 6px;
         box-shadow: 0 4px 8px rgba(0,0,0,0.3);
         z-index: 9999;
+        transition: max-height 0.4s ease, opacity 0.4s ease, padding 0.3s ease;
       }
       header nav.active {
-        display: flex;
+        max-height: 500px; /* enough for all links */
+        opacity: 1;
+        padding: 20px;
       }
       .menu-toggle {
         display: flex;
