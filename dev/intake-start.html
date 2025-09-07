@@ -320,9 +320,16 @@
     </div>
   </section>
 
-  <footer class="site-footer">
-    Solving What Matters… <em>Beautifully</em> • © 2025 ConciergeSync™
-  </footer>
+  <div id="footer"></div>
+    <script>
+      fetch("/dev/footer.html")
+        .then(response => response.text())
+        .then(html => {
+          document.getElementById("footer").innerHTML = html;
+        })
+        .catch(err => console.error("Footer failed to load:", err));
+    </script>
+
 
   <script>
     document.addEventListener("DOMContentLoaded", () => {
