@@ -122,25 +122,15 @@
       font-size: 1.2rem;
     }
 
-    /* ---  CTA --- */
-    .cta- {
+    /* --- Footer CTA --- */
+    .cta-footer {
       text-align: center;
       padding: 60px 20px;
       background: #0a1a33;
       color: #fff;
     }
-    .cta- h2 {
+    .cta-footer h2 {
       margin-bottom: 20px;
-    }
-    .site-footer {
-      background: #0b0f14;
-      color: #fff;
-      text-align: center;
-      padding: 20px;
-      font-size: 0.9rem;
-    }
-    .site-footer p {
-      margin: 4px 0;
     }
 
     /* --- Responsive --- */
@@ -220,13 +210,8 @@
     <a href="#" class="btn">Begin Your ConciergeSync™ Journey</a>
   </section>
 
-  <div id="footer"></div>
-    <script>
-      fetch("/footer.html")
-        .then(response => response.text())
-        .then(html => {
-          document.getElementById("footer").innerHTML = html;
-        });
-    </script>
+  <footer class="site-footer">
+    Solving What Matters… <em>Beautifully</em> • © 2025 ConciergeSync™
+  </footer>
 </body>
 </html>
