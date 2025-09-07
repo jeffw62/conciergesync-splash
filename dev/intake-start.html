@@ -184,9 +184,10 @@
       margin: 4px 0;
     }
 
-    /* --- Responsive --- */
+    /* --- Mobile Responsive --- */
     @media (max-width: 768px) {
       header nav {
+        display: flex;               /* keep it in the DOM */
         flex-direction: column;
         background: #0a1a33;
         position: absolute;
@@ -196,6 +197,8 @@
         border-radius: 0 0 6px 6px;
         box-shadow: 0 4px 8px rgba(0,0,0,0.3);
         z-index: 9999;
+
+    /* hidden state */
         max-height: 0;
         overflow: hidden;
         opacity: 0;
@@ -209,6 +212,16 @@
       }
       .menu-toggle {
         display: flex;
+      }
+      header nav a {
+        color: #fff;
+        font-size: 1rem;
+        text-decoration: none;
+        padding: 8px 0;
+        display: block;
+      }
+      header nav a:hover {
+        opacity: 0.75;
       }
       .content {
         flex-direction: column;
