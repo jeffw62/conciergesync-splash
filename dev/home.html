@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>ConciergeSync™ – Dev Home</title>
+  <link rel="stylesheet" href="/dev/style.css">
   <style>
     body {
       margin: 0;
@@ -176,37 +177,26 @@
       font-size: 1.1rem;
     }
 
-    footer {
-      background: #0b0f14;
-      color: #fff;
-      text-align: center;
-      padding: 20px;
-      font-size: 0.9rem;
-    }
-
     /* --- Mobile Responsive --- */
     @media (max-width: 768px) {
-  header nav {
-    display: none;              /* hide by default on mobile */
-    flex-direction: column;
-    background: #0a1a33;
-    position: absolute;
-    top: 100%;
-    right: 0;
-    left: 0;
-    padding: 20px;
-    border-radius: 0 0 6px 6px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-    z-index: 9999;
-  }
-
-  header nav.active {
-    display: flex;              /* show when toggled */
-  }
-
-  .menu-toggle {
-    display: flex;
-  }
+      header nav {
+        flex-direction: column;
+        background: #0a1a33;
+        position: absolute;
+        top: 100%;
+        right: 0;
+        left: 0;
+        padding: 20px;
+        border-radius: 0 0 6px 6px;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        z-index: 9999;
+      }
+      header nav.active {
+        display: flex;
+      }
+      .menu-toggle {
+        display: flex;
+      }
       header nav a {
         color: #fff;
         font-size: 1rem;
@@ -248,7 +238,7 @@
     </div>
     <nav>
       <a href="#">About</a>
-      <a href="#">Beta Program</a>
+      <a href="/dev/betap.html">Beta Program</a>
       <a href="#">Helpful Hints</a>
       <a href="#">Contact</a>
     </nav>
@@ -259,7 +249,7 @@
       <h1>Turn Your Points Into Real Money Value</h1>
       <p>ConciergeSync™ helps you optimize cards, miles, and redemptions with accuracy and clarity. 
          Join our beta program and be part of shaping the future of travel finance.</p>
-      <a href="#" class="btn">Not a Client? Enroll Here</a>
+      <a href="/dev/betap.html" class="btn">What is ConciergeSync?</a>
     </div>
     <div class="login-box">
       <h3>Welcome Back</h3>
@@ -278,7 +268,7 @@
     <div><div>⚙️</div><p>Settings</p></div>
   </section>
 
-  <footer>
+  <footer class="site-footer">
     Solving What Matters… <em>Beautifully</em> • © 2025 ConciergeSync™
   </footer>
 
@@ -294,6 +284,5 @@
       }
     });
   </script>
-
 </body>
 </html>
