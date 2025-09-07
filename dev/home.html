@@ -279,6 +279,15 @@
     <div><div>⚙️</div><p>Settings</p></div>
   </section>
 
+   <div id="footer"></div>
+    <script>
+      fetch("/footer.html")
+        .then(response => response.text())
+        .then(html => {
+          document.getElementById("footer").innerHTML = html;
+        });
+    </script>
+
   <script>
     document.addEventListener("DOMContentLoaded", () => {
       const toggle = document.querySelector(".menu-toggle");
@@ -291,5 +300,6 @@
       }
     });
   </script>
-</body>
+  
+ </body>
 </html>
