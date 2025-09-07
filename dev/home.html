@@ -180,7 +180,7 @@
     /* --- Mobile Responsive --- */
     @media (max-width: 768px) {
       header nav {
-        display: none; /* HIDE by default on mobile */
+        display: flex;               /* keep it in the tree */
         flex-direction: column;
         background: #0a1a33;
         position: absolute;
@@ -196,12 +196,11 @@
         overflow: hidden;
         opacity: 0;
         padding: 0 20px; 
-        transition: all 0.3s ease;
+        transition: max-height 0.3s ease, opacity 0.3s ease, padding 0.3s ease;
       }
 
       header nav.active {
-        display: flex; /* SHOW when toggled */
-        max-height: 400px; /* adjust for link count */
+        max-height: 400px; /* adjust as needed */
         opacity: 1;
         padding: 20px;
       }
