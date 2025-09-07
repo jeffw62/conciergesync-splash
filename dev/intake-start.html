@@ -25,17 +25,18 @@
       position: relative;
       z-index: 1000;
     }
-    header .logo {
+    header .logo a {
       display: flex;
       align-items: center;
       gap: 8px;
       font-weight: 700;
       font-size: 1.2rem;
-      color: #fff;               /* keep text white */
-      text-decoration: none;     /* remove underline */
+      color: #fff;              /* force white */
+      text-decoration: none;    /* kill underline */
     }
-    header .logo img {
-      height: 32px;
+    
+    header .logo a:hover {
+      opacity: 0.85;            /* subtle hover */
     }
 
     /* nav hidden by default */
@@ -264,10 +265,12 @@
 </head>
 <body>
   <header>
-    <a href="/dev/home.html" class="logo">
-      <img src="/dev/asset/CS_Logo_Premium_2x.png" alt="ConciergeSync Logo">
-      ConciergeSync™
-    </a>
+    <div class="logo">
+      <a href="/dev/home.html">
+        <img src="/dev/asset/CS_Logo_Premium_2x.png" alt="ConciergeSync Logo">
+        ConciergeSync™
+      </a>
+    </div>
     <div class="menu-toggle">
       <span></span>
       <span></span>
