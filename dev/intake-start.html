@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ConciergeSync™ – Intake Start</title>
+  <link rel="stylesheet" href="/dev/style.css">
+  <style>
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      background: #fff;
+      color: #222;
+      line-height: 1.5;
+    }
+
+    /* Hero */
+    .hero {
+      background: #0a1a33;
+      color: #fff;
+      text-align: center;
+      padding: 80px 20px;
+      position: relative;
+    }
+    .hero::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 6px;
+      background: #bfa14a;
+    }
+    .hero h1 {
+      font-size: 2.2rem;
+      margin-bottom: 16px;
+    }
+    .hero p {
+      font-size: 1.1rem;
+      max-width: 600px;
+      margin: 0 auto 24px auto;
+      color: #e0e6f0;
+    }
+
+    /* CTA */
+    .cta {
+      text-align: center;
+      padding: 60px 20px;
+    }
+    .btn {
+      background: #bfa14a;
+      color: #fff;
+      padding: 14px 28px;
+      border: none;
+      border-radius: 4px;
+      text-decoration: none;
+      font-weight: bold;
+      cursor: pointer;
+      font-size: 1rem;
+    }
+    .btn:hover {
+      opacity: 0.9;
+    }
+
+    @media (max-width: 768px) {
+      .hero h1 {
+        font-size: 1.8rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">
+      <img src="/dev/asset/CS_Logo_Premium_2x.png" alt="ConciergeSync Logo">
+      ConciergeSync™
+    </div>
+    <div class="menu-toggle">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+    <nav>
+      <a href="/dev/index.html">About</a>
+      <a href="/dev/betap.html">Beta Program</a>
+      <a href="#">Helpful Hints</a>
+      <a href="#">Contact</a>
+    </nav>
+  </header>
+
+  <section class="hero">
+    <h1>Welcome to ConciergeSync™ Beta</h1>
+    <p>You’re just a few steps away from beginning your journey. Complete the intake process so we can personalize your experience.</p>
+  </section>
+
+  <section class="cta">
+    <a href="#" class="btn">Start Intake</a>
+  </section>
+
+  <!-- Universal Footer -->
+  <div id="footer"></div>
+
+  <script>
+    // Load universal footer
+    fetch("/dev/footer.html")
+      .then(response => response.text())
+      .then(html => {
+        document.getElementById("footer").innerHTML = html;
+      })
+      .catch(err => console.error("Footer failed to load:", err));
+
+    // Hamburger toggle
+    document.addEventListener("DOMContentLoaded", () => {
+      const toggle = document.querySelector(".menu-toggle");
+      const nav = document.querySelector("header nav");
+
+      if (toggle && nav) {
+        toggle.addEventListener("click", () => {
+          nav.classList.toggle("active");
+        });
+      }
+    });
+  </script>
+</body>
+</html>
