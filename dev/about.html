@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ConciergeSync™ – Master Build</title>
+  <link rel="stylesheet" href="/dev/style.css">
+  <style>
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      background: #fff;
+      color: #222;
+    }
+
+    /* --- Header --- */
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 20px;
+      background: #0a1a33;
+      color: #fff;
+      position: relative;
+      z-index: 1000;
+    }
+
+    header .logo a {
+      font-weight: 700;
+      font-size: 1.2rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: inherit;        /* stay white */
+      text-decoration: none; /* no underline */
+    }
+
+    header .logo img {
+      height: 32px;
+    }
+
+    header nav {
+      display: none;
+      gap: 24px;
+    }
+
+    header nav a {
+      text-decoration: none;
+      color: #fff;
+      font-weight: 500;
+      transition: opacity 0.2s ease;
+    }
+    header nav a:hover {
+      opacity: 0.75;
+    }
+
+    /* desktop nav always visible */
+    @media (min-width: 769px) {
+      header nav {
+        display: flex;
+      }
+      .menu-toggle {
+        display: none !important;
+      }
+    }
+
+    /* --- Hamburger --- */
+    .menu-toggle {
+      display: none;
+      flex-direction: column;
+      cursor: pointer;
+      gap: 4px;
+      padding: 10px;
+      margin-left: auto;
+      user-select: none;
+    }
+
+    .menu-toggle span {
+      display: block;
+      width: 24px;
+      height: 3px;
+      background: #fff;
+      border-radius: 2px;
+    }
+
+    /* --- Mobile Menu Animation --- */
+    @media (max-width: 768px) {
+      header nav {
+        display: flex;
+        flex-direction: column;
+        background: #0a1a33;
+        position: absolute;
+        top: 100%;
+        right: 0;
+        left: 0;
+        border-radius: 0 0 6px 6px;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        z-index: 9999;
+
+        /* animation states */
+        max-height: 0;
+        overflow: hidden;
+        opacity: 0;
+        padding: 0 20px;
+        transition: max-height 0.3s ease, opacity 0.3s ease, padding 0.3s ease;
+      }
+
+      header nav.active {
+        max-height: 400px;
+        opacity: 1;
+        padding: 20px;
+      }
+
+      .menu-toggle {
+        display: flex;
+      }
+
+      header nav a {
+        font-size: 1rem;
+        padding: 8px 0;
+        display: block;
+      }
+    }
+
+    /* --- Placeholder Hero (replace per page) --- */
+    .hero {
+      background: #0a1a33;
+      color: #fff;
+      text-align: center;
+      padding: 80px 20px;
+      position: relative;
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 6px;
+      background: #bfa14a;
+    }
+
+    /* --- Footer --- */
+    .site-footer {
+      background: #0a1a33;
+      color: #fff;
+      text-align: center;
+      padding: 20px;
+      font-size: 0.9rem;
+    }
+
+    .site-footer p {
+      margin: 4px 0;
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header>
+    <div class="logo">
+      <a href="/dev/home.html">
+        <img src="/dev/asset/CS_Logo_Premium_2x.png" alt="ConciergeSync Logo">
+        ConciergeSync™
+      </a>
+    </div>
+    <div class="menu-toggle">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+    <nav>
+      <a href="/dev/index.html">About</a>
+      <a href="/dev/betap.html">Beta Program</a>
+      <a href="#">Helpful Hints</a>
+      <a href="#">Contact</a>
+    </nav>
+  </header>
+
+  <!-- Hero placeholder -->
+  <section class="hero">
+    <h1>Page Title Goes Here</h1>
+    <p>This hero section is just a placeholder. Replace with per-page content.</p>
+  </section>
+
+  <!-- Page-specific content goes here -->
+
+  <!-- Footer injection -->
+  <div id="footer"></div>
+
+  <script>
+    // Footer loader
+    fetch("/dev/footer.html")
+      .then(response => response.text())
+      .then(html => {
+        document.getElementById("footer").innerHTML = html;
+      })
+      .catch(err => console.error("Footer failed to load:", err));
+
+    // Hamburger toggle
+    document.addEventListener("DOMContentLoaded", () => {
+      const toggle = document.querySelector(".menu-toggle");
+      const nav = document.querySelector("header nav");
+
+      if (toggle && nav) {
+        toggle.addEventListener("click", () => {
+          nav.classList.toggle("active");
+        });
+      }
+    });
+  </script>
+</body>
+</html>
