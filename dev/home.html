@@ -254,20 +254,22 @@
   </footer>
 
   <script>
-  // runs after page is fully loaded
-  document.addEventListener("DOMContentLoaded", function () {
-    const toggle = document.querySelector(".menu-toggle");
-    const nav = document.querySelector("nav");
+  console.log("script loaded"); // confirm the script itself is running
 
-    if (toggle && nav) {
-      toggle.addEventListener("click", function () {
-        console.log("hamburger clicked"); // debug line
-        nav.classList.toggle("active");
-      });
-    } else {
-      console.error("Menu toggle or nav not found");
-    }
-  });
+  const toggle = document.querySelector(".menu-toggle");
+  const nav = document.querySelector("header nav");
+
+  console.log("toggle element:", toggle);
+  console.log("nav element:", nav);
+
+  if (toggle && nav) {
+    toggle.addEventListener("click", () => {
+      console.log("hamburger clicked");
+      nav.classList.toggle("active");
+    });
+  } else {
+    console.error("Menu toggle or nav not found");
+  }
 </script>
 
 </body>
