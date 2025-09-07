@@ -17,45 +17,48 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 16px 40px;
+      padding: 16px 20px;
       background: #0a1a33; /* Deep navy */
       color: #fff;
       position: relative;
     }
-
     header .logo {
-      display: flex;
-      align-items: center;
       font-weight: 700;
       font-size: 1.2rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
     header .logo img {
       height: 32px;
-      margin-right: 10px;
     }
-
-    nav {
+    header nav {
       display: flex;
       gap: 24px;
     }
-    nav a {
+    header nav a {
       text-decoration: none;
       color: #fff;
       font-weight: 500;
       transition: opacity 0.2s ease;
     }
-    nav a:hover {
+    header nav a:hover {
       opacity: 0.75;
     }
 
-    /* Hamburger button (hidden on desktop) */
+    /* --- Hamburger --- */
     .menu-toggle {
       display: none;
-      font-size: 1.8rem;
-      background: none;
-      border: none;
-      color: #fff;
+      flex-direction: column;
       cursor: pointer;
+      gap: 4px;
+    }
+    .menu-toggle span {
+      display: block;
+      width: 24px;
+      height: 3px;
+      background: #fff;
+      border-radius: 2px;
     }
 
     /* --- Hero Banner --- */
@@ -102,31 +105,35 @@
     /* --- Login Box --- */
     .login-box {
       background: #fff;
-      padding: 24px;
+      padding: 32px;
       border-radius: 8px;
-      width: 300px;
+      width: 360px;
+      max-width: 90%;
       box-shadow: 0 4px 12px rgba(0,0,0,0.2);
       color: #222;
+      box-sizing: border-box;
     }
     .login-box h3 {
       margin-top: 0;
-      margin-bottom: 16px;
+      margin-bottom: 20px;
       color: #0a1a33;
+      text-align: left;
     }
-    .login-box input {
+    .login-box input,
+    .login-box button {
+      display: block;
       width: 100%;
-      padding: 10px;
-      margin: 10px 0;
-      border: 1px solid #ccc;
+      margin: 12px 0;
+      padding: 12px;
       border-radius: 4px;
+      border: 1px solid #ccc;
+      font-size: 1rem;
+      box-sizing: border-box;
     }
     .login-box button {
-      width: 100%;
       background: #bfa14a;
       color: #fff;
-      padding: 12px;
       border: none;
-      border-radius: 4px;
       font-weight: bold;
       cursor: pointer;
     }
@@ -143,9 +150,14 @@
       flex: 1 1 150px;
       margin: 20px;
     }
+    .sections div div {
+      font-size: 2rem;
+      margin-bottom: 8px;
+    }
     .sections div p {
       margin-top: 10px;
-      font-weight: 500;
+      font-weight: 600;
+      font-size: 1.1rem;
     }
 
     footer {
@@ -158,23 +170,24 @@
 
     /* --- Mobile Responsive --- */
     @media (max-width: 768px) {
-      nav {
+      header nav {
         display: none;
         flex-direction: column;
-        gap: 12px;
         background: #0a1a33;
         position: absolute;
-        top: 64px;
+        top: 60px;
         right: 20px;
-        padding: 16px;
-        border-radius: 8px;
+        padding: 20px;
+        border-radius: 6px;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.3);
       }
-      nav.active {
+      header nav.active {
         display: flex;
       }
       .menu-toggle {
-        display: block;
+        display: flex;
       }
+
       .hero {
         flex-direction: column;
         text-align: center;
@@ -199,7 +212,11 @@
       <img src="/dev/asset/CS_Logo_Premium_2x.png" alt="ConciergeSync Logo">
       ConciergeSync™
     </div>
-    <button class="menu-toggle" onclick="document.querySelector('nav').classList.toggle('active')">☰</button>
+    <div class="menu-toggle">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
     <nav>
       <a href="#">About</a>
       <a href="#">Beta Program</a>
@@ -224,45 +241,27 @@
   </section>
 
   <section class="sections">
-    <div>
-      <div>📊</div>
-      <p>Dashboard</p>
-    </div>
-    <div>
-      <div>🎯</div>
-      <p>Redemption Engine</p>
-    </div>
-    <div>
-      <div>💳</div>
-      <p>My Cards</p>
-    </div>
-    <div>
-      <div>✈️</div>
-      <p>My Programs</p>
-    </div>
-    <div>
-      <div>💡</div>
-      <p>Helpful Hints</p>
-    </div>
-    <div>
-      <div>⚙️</div>
-      <p>Settings</p>
-    </div>
+    <div><div>📊</div><p>Dashboard</p></div>
+    <div><div>🎯</div><p>Redemption Engine</p></div>
+    <div><div>💳</div><p>My Cards</p></div>
+    <div><div>✈️</div><p>My Programs</p></div>
+    <div><div>💡</div><p>Helpful Hints</p></div>
+    <div><div>⚙️</div><p>Settings</p></div>
   </section>
 
   <footer>
     Solving What Matters… <em>Beautifully</em> • © 2025 ConciergeSync™
   </footer>
+
   <script>
-  document.addEventListener("DOMContentLoaded", function () {
-    const toggle = document.querySelector(".menu-toggle");
-    const nav = document.querySelector("header nav");
+    document.addEventListener("DOMContentLoaded", function () {
+      const toggle = document.querySelector(".menu-toggle");
+      const nav = document.querySelector("header nav");
 
-    toggle.addEventListener("click", () => {
-      nav.classList.toggle("active");
+      toggle.addEventListener("click", () => {
+        nav.classList.toggle("active");
+      });
     });
-  });
-</script>
-
+  </script>
 </body>
 </html>
