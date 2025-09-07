@@ -186,24 +186,27 @@
 
     /* --- Mobile Responsive --- */
     @media (max-width: 768px) {
-      header nav {
-        flex-direction: column;
-        background: #0a1a33;
-        position: absolute;
-        top: 100%;
-        right: 0;
-        left: 0;
-        padding: 20px;
-        border-radius: 0 0 6px 6px;
-        box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-        z-index: 9999;
-      }
-      header nav.active {
-        display: flex;
-      }
-      .menu-toggle {
-        display: flex;
-      }
+  header nav {
+    display: none;              /* hide by default on mobile */
+    flex-direction: column;
+    background: #0a1a33;
+    position: absolute;
+    top: 100%;
+    right: 0;
+    left: 0;
+    padding: 20px;
+    border-radius: 0 0 6px 6px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+    z-index: 9999;
+  }
+
+  header nav.active {
+    display: flex;              /* show when toggled */
+  }
+
+  .menu-toggle {
+    display: flex;
+  }
       header nav a {
         color: #fff;
         font-size: 1rem;
@@ -291,5 +294,6 @@
       }
     });
   </script>
+
 </body>
 </html>
