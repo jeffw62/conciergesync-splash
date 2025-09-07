@@ -165,22 +165,23 @@
       cursor: pointer;
     }
     .signup-link {
-      margin-top: 6px;
-      font-size: 0.7rem;        /* smaller font */
-      text-align: left;
-      width: 66%;               /* about 2/3 width of button */
-      color: #555;              /* medium gray for legibility */
-      line-height: 1.2;
+      margin-top: 8px;
+      display: flex;
+      align-items: center;
+      width: 66%;              /* 2/3 width of the button above */
+      font-size: 0.8rem;       /* smaller text */
+      color: #444;             /* darker gray, more legible */
     }
     
     .signup-link a {
-      color: #bfa14a;           /* gold highlight */
-      text-decoration: none;    /* no underline */
+      color: #bfa14a;
       font-weight: 600;
+      margin-left: 4px;        /* little breathing space after "Not Registered?" */
+      text-decoration: none;   /* no underline */
     }
     
     .signup-link a:hover {
-      opacity: 0.85;            /* subtle hover fade */
+      opacity: 0.85;           /* subtle hover feedback */
     }
 
     /* --- Sections --- */
@@ -298,9 +299,10 @@
         <input type="password" placeholder="Password" required />
         <button type="submit" class="btn">Sign In</button>
       </form>
-      <p class="signup-link">
-        Not Registered? <a href="/dev/intake-start.html">Sign up now &raquo;</a>
-      </p>
+      <div class="signup-link">
+        <span>Not Registered?</span>
+        <a href="/dev/intake-start.html">Sign up now »</a>
+      </div>
   </section>
 
   <section class="sections">
