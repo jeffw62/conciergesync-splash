@@ -36,15 +36,14 @@
       height: 32px;
     }
     header .logo a {
-      color: inherit;          /* matches the header text color */
-      text-decoration: none;   /* removes underline */
+      color: inherit;
+      text-decoration: none;
       display: flex;
       align-items: center;
       gap: 8px;
     }
-    
     header .logo a:hover {
-      opacity: 0.85;           /* subtle hover fade */
+      opacity: 0.85;
     }
     header nav {
       display: none;
@@ -59,7 +58,6 @@
       opacity: 0.75;
     }
 
-    /* desktop nav */
     @media (min-width: 769px) {
       header nav {
         display: flex;
@@ -129,25 +127,33 @@
       opacity: 0.9;
     }
 
-    /* --- Content Sections --- */
-    .section {
-      max-width: 900px;
+    /* --- Two Column Layout --- */
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 40px;
+      max-width: 1100px;
       margin: 60px auto;
       padding: 0 20px;
     }
-    .section h2 {
+    .two-col h2 {
       color: #0a1a33;
       margin-bottom: 16px;
       font-size: 1.6rem;
     }
-    .section p {
+    .two-col p {
       margin-bottom: 20px;
       font-size: 1.05rem;
     }
+
+    /* --- Benefits Section --- */
     .benefits {
       display: flex;
       flex-wrap: wrap;
       gap: 20px;
+      max-width: 1100px;
+      margin: 60px auto;
+      padding: 0 20px;
     }
     .benefit {
       flex: 1 1 250px;
@@ -175,6 +181,9 @@
 
     /* --- Mobile Responsive --- */
     @media (max-width: 768px) {
+      .two-col {
+        grid-template-columns: 1fr;
+      }
       header nav {
         display: flex;
         flex-direction: column;
@@ -237,27 +246,26 @@
     <a href="#" class="btn">Apply to Become a Beta User</a>
   </section>
 
-  <section class="section">
-    <h2>What is ConciergeSync™?</h2>
-    <p>ConciergeSync™ is your personal co-pilot for points and miles. It brings all your cards, loyalty programs, and redemption options into one place — and shows you, with precision, how to get the most real-world value out of every point.</p>
-    <p>We call this <strong>travel finance</strong> — treating your points and miles like money, not freebies. Just like a financial portfolio, ConciergeSync™ helps you measure cost, track returns, and make smarter decisions that turn everyday spending into extraordinary travel.</p>
-  </section>
+  <!-- Two-column layout -->
+  <section class="two-col">
+    <div>
+      <h2>What is ConciergeSync™?</h2>
+      <p>ConciergeSync™ is your personal co-pilot for points and miles. It brings all your cards, loyalty programs, and redemption options into one place — and shows you, with precision, how to get the most real-world value out of every point.</p>
+      <p>We call this <strong>travel finance</strong> — treating your points and miles like money, not freebies. Just like a financial portfolio, ConciergeSync™ helps you measure cost, track returns, and make smarter decisions that turn everyday spending into extraordinary travel.</p>
 
-  <section class="section">
-    <h2>Why Travel Finance Matters</h2>
-    <p>Banks want you to believe points and miles are free perks. They’re not. You paid for them every time you swiped your card — they’re baked into interest rates, merchant fees, and annual fees.</p>
-    <p>The truth is, banks already see points as money. They track them as liabilities on their balance sheets and use them to lock in your loyalty. It’s time you saw them the same way.</p>
-    <p>When you start treating points and miles as a <strong>financial asset</strong>, you flip the script. You stop leaving value on the table and start making strategic decisions: which card to use, when to transfer, when to redeem. That’s the shift from “free rewards” to travel finance.</p>
-  </section>
+      <h2>What is a Beta User?</h2>
+      <p>A Beta User is more than a tester — you’re a partner. You’ll get early access to ConciergeSync™, explore its features, and share your feedback so we can refine the experience before public launch.</p>
+    </div>
 
-  <section class="section">
-    <h2>What is a Beta User?</h2>
-    <p>A Beta User is more than a tester — you’re a partner. You’ll get early access to ConciergeSync™, explore its features, and share your feedback so we can refine the experience before public launch.</p>
-  </section>
+    <div>
+      <h2>Why Travel Finance Matters</h2>
+      <p>Banks want you to believe points and miles are free perks. They’re not. You paid for them every time you swiped your card — they’re baked into interest rates, merchant fees, and annual fees.</p>
+      <p>The truth is, banks already see points as money. They track them as liabilities on their balance sheets and use them to lock in your loyalty. It’s time you saw them the same way.</p>
+      <p>When you start treating points and miles as a <strong>financial asset</strong>, you flip the script. You stop leaving value on the table and start making strategic decisions: which card to use, when to transfer, when to redeem. That’s the shift from “free rewards” to travel finance.</p>
 
-  <section class="section">
-    <h2>Why We Need You</h2>
-    <p>ConciergeSync™ is designed to be more than software — it’s your personal co-pilot for maximizing points, miles, and travel value. To make it truly powerful, we need real users like you to guide us with feedback, insights, and ideas.</p>
+      <h2>Why We Need You</h2>
+      <p>ConciergeSync™ is designed to be more than software — it’s your personal co-pilot for maximizing points, miles, and travel value. To make it truly powerful, we need real users like you to guide us with feedback, insights, and ideas.</p>
+    </div>
   </section>
 
   <section class="section">
