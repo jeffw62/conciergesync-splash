@@ -35,6 +35,17 @@
     header .logo img {
       height: 32px;
     }
+    header .logo a {
+      color: inherit;          /* matches the header text color */
+      text-decoration: none;   /* removes underline */
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    header .logo a:hover {
+      opacity: 0.85;           /* subtle hover fade */
+    }
     header nav {
       display: none;
       gap: 24px;
@@ -202,8 +213,10 @@
 <body>
   <header>
     <div class="logo">
-      <img src="/dev/asset/CS_Logo_Premium_2x.png" alt="ConciergeSync Logo">
-      ConciergeSync™
+      <a href="/dev/home.html">
+        <img src="/dev/asset/CS_Logo_Premium_2x.png" alt="ConciergeSync Logo">
+        ConciergeSync™
+      </a>
     </div>
     <div class="menu-toggle">
       <span></span>
