@@ -169,71 +169,58 @@
     }
 
     /* --- Mobile Responsive --- */
-   @media (max-width: 768px) {
-  header nav {
-    display: none;
-    flex-direction: column;
-    background: #0a1a33;
-    position: absolute;
-    top: 60px;
-    right: 20px;
-    padding: 20px;
-    border-radius: 6px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-  }
+    @media (max-width: 768px) {
+      header nav {
+        display: none;
+        flex-direction: column;
+        background: #0a1a33;
+        position: absolute;
+        top: 100%;
+        right: 0;
+        left: 0;
+        padding: 20px;
+        border-radius: 0 0 6px 6px;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+      }
 
-  header nav.active {
-    display: flex;
-  }
+      header nav.active {
+        display: flex;
+      }
 
-  .menu-toggle {
-    display: flex;
-  }
+      .menu-toggle {
+        display: flex;
+      }
 
-  header nav a {
-    color: #fff;
-    font-size: 1rem;
-    text-decoration: none;
-    padding: 8px 0;
-  }
+      header nav a {
+        color: #fff;
+        font-size: 1rem;
+        text-decoration: none;
+        padding: 8px 0;
+        display: block;
+      }
 
-  header nav a:hover {
-    opacity: 0.75;
-  }
+      header nav a:hover {
+        opacity: 0.75;
+      }
 
-  .hero {
-    flex-direction: column;
-    text-align: center;
-  }
+      .hero {
+        flex-direction: column;
+        text-align: center;
+      }
 
-  .login-box {
-    width: 100%;
-    max-width: 320px;
-    margin-top: 30px;
-  }
+      .login-box {
+        width: 100%;
+        max-width: 320px;
+        margin-top: 30px;
+      }
 
-  .sections {
-    flex-direction: column;
-  }
+      .sections {
+        flex-direction: column;
+      }
 
-  .sections div {
-    margin-bottom: 20px;
-  }
-
-    header nav a {
-    color: #fff;
-    text-decoration: none;
-    font-weight: 500;
-    padding: 10px 0;
-    display: block;
-  }
-
-  header nav a:hover {
-    opacity: 0.75;
-  }
-
-} /* <-- keep this final closing brace */
-
+      .sections div {
+        margin-bottom: 20px;
+      }
     }
   </style>
 </head>
@@ -285,23 +272,23 @@
   </footer>
 
   <script>
-  console.log("script loaded"); // confirm the script itself is running
+    console.log("script loaded"); // confirm the script itself is running
 
-  const toggle = document.querySelector(".menu-toggle");
-  const nav = document.querySelector("header nav");
+    const toggle = document.querySelector(".menu-toggle");
+    const nav = document.querySelector("header nav");
 
-  console.log("toggle element:", toggle);
-  console.log("nav element:", nav);
+    console.log("toggle element:", toggle);
+    console.log("nav element:", nav);
 
-  if (toggle && nav) {
-    toggle.addEventListener("click", () => {
-      console.log("hamburger clicked");
-      nav.classList.toggle("active");
-    });
-  } else {
-    console.error("Menu toggle or nav not found");
-  }
-</script>
+    if (toggle && nav) {
+      toggle.addEventListener("click", () => {
+        console.log("hamburger clicked");
+        nav.classList.toggle("active");
+      });
+    } else {
+      console.error("Menu toggle or nav not found");
+    }
+  </script>
 
 </body>
 </html>
