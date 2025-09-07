@@ -24,15 +24,6 @@
       color: #fff;
       position: relative;
     }
-    header::after {
-      content: "";
-      position: absolute;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      height: 6px;
-      background: #bfa14a; /* Gold bar */
-    }
     header .logo {
       font-weight: 700;
       font-size: 1.2rem;
@@ -62,6 +53,16 @@
       color: #fff;
       text-align: center;
       padding: 80px 20px;
+      position: relative;
+    }
+    .hero::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 6px;
+      background: #bfa14a; /* Gold bar */
     }
     .hero h1 {
       font-size: 2.2rem;
