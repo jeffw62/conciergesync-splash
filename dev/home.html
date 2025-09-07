@@ -18,7 +18,7 @@
       justify-content: space-between;
       align-items: center;
       padding: 16px 20px;
-      background: #0a1a33; /* Deep navy */
+      background: #0a1a33;
       color: #fff;
       position: relative;
       z-index: 1000;
@@ -53,7 +53,7 @@
       flex-direction: column;
       cursor: pointer;
       gap: 4px;
-      padding: 10px;       /* bigger tap target */
+      padding: 10px;
       margin-left: auto;
       user-select: none;
     }
@@ -275,7 +275,7 @@
 
       if (toggle && nav) {
         toggle.addEventListener("click", () => {
-          alert("hamburger clicked");
+          alert("hamburger clicked"); // for debug
           nav.classList.toggle("active");
         });
       }
