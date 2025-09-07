@@ -180,6 +180,7 @@
     /* --- Mobile Responsive --- */
     @media (max-width: 768px) {
       header nav {
+        display: none; /* HIDE by default on mobile */
         flex-direction: column;
         background: #0a1a33;
         position: absolute;
@@ -192,7 +193,7 @@
         z-index: 9999;
       }
       header nav.active {
-        display: flex;
+        display: flex; /* SHOW when toggled */
       }
       .menu-toggle {
         display: flex;
@@ -268,11 +269,19 @@
     <div><div>⚙️</div><p>Settings</p></div>
   </section>
 
-  <footer class="site-footer">
-    Solving What Matters… <em>Beautifully</em> • © 2025 ConciergeSync™
-  </footer>
+  <!-- Universal Footer will be injected here -->
+  <div id="footer"></div>
 
   <script>
+    // Load universal footer
+    fetch("/dev/footer.html")
+      .then(response => response.text())
+      .then(html => {
+        document.getElementById("footer").innerHTML = html;
+      })
+      .catch(err => console.error("Footer failed to load:", err));
+
+    // Hamburger toggle
     document.addEventListener("DOMContentLoaded", () => {
       const toggle = document.querySelector(".menu-toggle");
       const nav = document.querySelector("header nav");
