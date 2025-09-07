@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>ConciergeSync™ – Dev Home</title>
   <link rel="stylesheet" href="/dev/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;600&display=swap" rel="stylesheet">
+
   <style>
     body {
       margin: 0;
@@ -220,26 +222,20 @@
       stroke: #bfa14a;   /* gold on hover */
     }
 
-    .creed-hero {
-      max-width: 380px;
+   .creed-hero {
+      font-family: "Dancing Script", cursive;  /* or "Great Vibes", or another clean script */
+      font-size: 1.1rem;
+      line-height: 1.6;
+      color: rgba(255, 255, 255, 0.85);  /* softer white */
+      font-style: italic;
+      transform: rotate(-2deg);           /* slight left-to-right slope */
       margin-right: 40px;
-      font-size: 0.9rem;
-      line-height: 1.5;
-      color: #dcdcdc;             /* softer, muted text */
-      font-style: italic;         /* handwritten / note vibe */
-      background: rgba(255,255,255,0.05); /* faint translucent backdrop */
-      padding: 16px 20px;
-      border-left: 3px solid #bfa14a;    /* subtle gold line */
-      border-radius: 6px;
+      max-width: 320px;
     }
-    
-    .creed-hero p:first-child {
-      font-weight: 500;
-      font-style: normal;         /* keep title straight, not italic */
-      margin-bottom: 10px;
-      color: #f5f5f5;             /* a bit brighter than body text */
+    .creed-hero strong {
+      font-style: normal;
+      font-weight: 600;
     }
-
 
     /* --- Mobile Responsive --- */
     @media (max-width: 768px) {
@@ -329,11 +325,11 @@
     </div>
 
     <div class="creed-hero">
-      <h3>The ConciergeSync™ Creed</h3>
-      <p>It's not just about how we build our product.</p>
-      <p>It’s how we make decisions.</p>
-      <p>It’s how we treat clients, partners, and each other.</p>
-      <p>It’s how we carry ourselves every day.</p>
+      <p><strong>The ConciergeSync™ Creed</strong></p>
+      <p>It’s not just about how we build our product.<br>
+         It’s how we make decisions.<br>
+         It’s how we treat clients, partners, and each other.<br>
+         It’s how we carry ourselves every day.</p>
     </div>
     
     <div class="login-box">
