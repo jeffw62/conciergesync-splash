@@ -5,3 +5,24 @@
   padding: 20px;
   font-size: 0.9rem;
 }
+
+.creed {
+  text-align: center;
+  max-width: 700px;
+  margin: 0 auto;
+  padding: 40px 20px;
+  color: #e0e6f0;
+}
+
+.creed h2 {
+  font-size: 1.4rem;
+  font-weight: 600;
+  margin-bottom: 12px;
+  color: #fff;
+}
+
+.creed p {
+  font-size: 1rem;
+  font-style: italic;
+  line-height: 1.6;
+}
