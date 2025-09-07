@@ -11,9 +11,10 @@
       font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
       background: #fff;
       color: #222;
+      line-height: 1.5;
     }
 
-    /* --- Header Bar --- */
+    /* --- Header --- */
     header {
       display: flex;
       justify-content: space-between;
@@ -22,7 +23,6 @@
       background: #0a1a33;
       color: #fff;
       position: relative;
-      z-index: 1000;
     }
     header .logo {
       font-weight: 700;
@@ -34,60 +34,26 @@
     header .logo img {
       height: 32px;
     }
-
-    /* nav hidden by default */
     header nav {
-      display: none;
+      display: flex;
       gap: 24px;
     }
     header nav a {
       text-decoration: none;
       color: #fff;
       font-weight: 500;
-      transition: opacity 0.2s ease;
     }
     header nav a:hover {
       opacity: 0.75;
     }
 
-    /* desktop: show nav always */
-    @media (min-width: 769px) {
-      header nav {
-        display: flex;
-      }
-      .menu-toggle {
-        display: none !important;
-      }
-    }
-
-    /* --- Hamburger --- */
-    .menu-toggle {
-      display: none;
-      flex-direction: column;
-      cursor: pointer;
-      gap: 4px;
-      padding: 10px;
-      margin-left: auto;
-      user-select: none;
-    }
-    .menu-toggle span {
-      display: block;
-      width: 24px;
-      height: 3px;
-      background: #fff;
-      border-radius: 2px;
-    }
-
-    /* --- Hero Banner --- */
+    /* --- Hero Section --- */
     .hero {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
       background: #0a1a33;
-      padding: 60px 40px;
-      flex-wrap: wrap;
       color: #fff;
-      position: relative;
+      text-align: center;
+      padding: 80px 20px;
+      position: relative; /* ensures ::after anchors here */
     }
     .hero::after {
       content: "";
@@ -96,140 +62,84 @@
       right: 0;
       bottom: 0;
       height: 6px;
-      background: #bfa14a;
+      background: #bfa14a; /* Gold bar */
     }
     .hero h1 {
-      font-size: 2.4rem;
-      margin-bottom: 12px;
+      font-size: 2.2rem;
+      margin-bottom: 16px;
     }
     .hero p {
-      font-size: 1.2rem;
-      margin-bottom: 24px;
+      font-size: 1.1rem;
+      max-width: 600px;
+      margin: 0 auto 24px auto;
       color: #e0e6f0;
-      max-width: 500px;
     }
     .btn {
       background: #bfa14a;
       color: #fff;
-      padding: 14px 24px;
+      padding: 14px 28px;
       border: none;
       border-radius: 4px;
       text-decoration: none;
       font-weight: bold;
       cursor: pointer;
-    }
-
-    /* --- Login Box --- */
-    .login-box {
-      background: #fff;
-      padding: 32px;
-      border-radius: 8px;
-      width: 360px;
-      max-width: 90%;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-      color: #222;
-      box-sizing: border-box;
-    }
-    .login-box h3 {
-      margin-top: 0;
-      margin-bottom: 20px;
-      color: #0a1a33;
-      text-align: left;
-    }
-    .login-box input,
-    .login-box button {
-      display: block;
-      width: 100%;
-      margin: 12px 0;
-      padding: 12px;
-      border-radius: 4px;
-      border: 1px solid #ccc;
       font-size: 1rem;
-      box-sizing: border-box;
     }
-    .login-box button {
-      background: #bfa14a;
-      color: #fff;
-      border: none;
-      font-weight: bold;
-      cursor: pointer;
+    .btn:hover {
+      opacity: 0.9;
     }
 
-    /* --- Sections --- */
-    .sections {
+    /* --- Content Sections --- */
+    .section {
+      max-width: 900px;
+      margin: 60px auto;
+      padding: 0 20px;
+    }
+    .section h2 {
+      color: #0a1a33;
+      margin-bottom: 16px;
+      font-size: 1.6rem;
+    }
+    .section p {
+      margin-bottom: 20px;
+      font-size: 1.05rem;
+    }
+    .benefits {
       display: flex;
-      justify-content: space-around;
       flex-wrap: wrap;
-      padding: 40px;
+      gap: 20px;
+    }
+    .benefit {
+      flex: 1 1 250px;
+      background: #f8f9fb;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    }
+    .benefit h3 {
+      color: #bfa14a;
+      margin-top: 0;
+      font-size: 1.2rem;
+    }
+
+    /* --- Footer CTA --- */
+    .cta-footer {
       text-align: center;
+      padding: 60px 20px;
+      background: #0a1a33;
+      color: #fff;
     }
-    .sections div {
-      flex: 1 1 150px;
-      margin: 20px;
-    }
-    .sections div div {
-      font-size: 2rem;
-      margin-bottom: 8px;
-    }
-    .sections div p {
-      margin-top: 10px;
-      font-weight: 600;
-      font-size: 1.1rem;
+    .cta-footer h2 {
+      margin-bottom: 20px;
     }
 
-    /* --- Mobile Responsive --- */
+    /* --- Responsive --- */
     @media (max-width: 768px) {
-      header nav {
-        display: flex;               /* keep in tree */
+      .hero h1 {
+        font-size: 1.8rem;
+      }
+      .benefits {
         flex-direction: column;
-        background: #0a1a33;
-        position: absolute;
-        top: 100%;
-        right: 0;
-        left: 0;
-        border-radius: 0 0 6px 6px;
-        box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-        z-index: 9999;
-
-        /* animation state */
-        max-height: 0;
-        overflow: hidden;
-        opacity: 0;
-        padding: 0 20px; 
-        transition: max-height 0.3s ease, opacity 0.3s ease, padding 0.3s ease;
-      }
-      header nav.active {
-        max-height: 400px; /* adjust as needed */
-        opacity: 1;
-        padding: 20px;
-      }
-      .menu-toggle {
-        display: flex;
-      }
-      header nav a {
-        color: #fff;
-        font-size: 1rem;
-        text-decoration: none;
-        padding: 8px 0;
-        display: block;
-      }
-      header nav a:hover {
-        opacity: 0.75;
-      }
-      .hero {
-        flex-direction: column;
-        text-align: center;
-      }
-      .login-box {
-        width: 100%;
-        max-width: 320px;
-        margin-top: 30px;
-      }
-      .sections {
-        flex-direction: column;
-      }
-      .sections div {
-        margin-bottom: 20px;
       }
     }
   </style>
@@ -240,13 +150,8 @@
       <img src="/dev/asset/CS_Logo_Premium_2x.png" alt="ConciergeSync Logo">
       ConciergeSync™
     </div>
-    <div class="menu-toggle">
-      <span></span>
-      <span></span>
-      <span></span>
-    </div>
     <nav>
-      <a href="#">About</a>
+      <a href="/dev/index.html">About</a>
       <a href="/dev/betap.html">Beta Program</a>
       <a href="#">Helpful Hints</a>
       <a href="#">Contact</a>
@@ -254,52 +159,59 @@
   </header>
 
   <section class="hero">
-    <div>
-      <h1>Turn Your Points Into Real Money Value</h1>
-      <p>ConciergeSync™ helps you optimize cards, miles, and redemptions with accuracy and clarity. 
-         Join our beta program and be part of shaping the future of travel finance.</p>
-      <a href="/dev/betap.html" class="btn">What is ConciergeSync?</a>
-    </div>
-    <div class="login-box">
-      <h3>Welcome Back</h3>
-      <input type="text" placeholder="Email or Username" />
-      <input type="password" placeholder="Password" />
-      <button>Sign In</button>
+    <h1>Join the ConciergeSync™ Beta Program</h1>
+    <p>Help shape the future of <strong>travel finance</strong> — and unlock lifetime rewards for being among our very first users.</p>
+    <a href="#" class="btn">Apply to Become a Beta User</a>
+  </section>
+
+  <section class="section">
+    <h2>What is ConciergeSync™?</h2>
+    <p>ConciergeSync™ is your personal co-pilot for points and miles. It brings all your cards, loyalty programs, and redemption options into one place — and shows you, with precision, how to get the most real-world value out of every point.</p>
+    <p>We call this <strong>travel finance</strong> — treating your points and miles like money, not freebies. Just like a financial portfolio, ConciergeSync™ helps you measure cost, track returns, and make smarter decisions that turn everyday spending into extraordinary travel.</p>
+  </section>
+
+  <section class="section">
+    <h2>Why Travel Finance Matters</h2>
+    <p>Banks want you to believe points and miles are free perks. They’re not. You paid for them every time you swiped your card — they’re baked into interest rates, merchant fees, and annual fees.</p>
+    <p>The truth is, banks already see points as money. They track them as liabilities on their balance sheets and use them to lock in your loyalty. It’s time you saw them the same way.</p>
+    <p>When you start treating points and miles as a <strong>financial asset</strong>, you flip the script. You stop leaving value on the table and start making strategic decisions: which card to use, when to transfer, when to redeem. That’s the shift from “free rewards” to travel finance.</p>
+  </section>
+
+  <section class="section">
+    <h2>What is a Beta User?</h2>
+    <p>A Beta User is more than a tester — you’re a partner. You’ll get early access to ConciergeSync™, explore its features, and share your feedback so we can refine the experience before public launch.</p>
+  </section>
+
+  <section class="section">
+    <h2>Why We Need You</h2>
+    <p>ConciergeSync™ is designed to be more than software — it’s your personal co-pilot for maximizing points, miles, and travel value. To make it truly powerful, we need real users like you to guide us with feedback, insights, and ideas.</p>
+  </section>
+
+  <section class="section">
+    <h2>What’s in it for You?</h2>
+    <div class="benefits">
+      <div class="benefit">
+        <h3>Lifetime Access</h3>
+        <p>Enjoy free access to every ConciergeSync™ upgrade, premium feature, and partner integration — forever.</p>
+      </div>
+      <div class="benefit">
+        <h3>Direct Influence</h3>
+        <p>Your feedback directly shapes the product roadmap. You’ll help decide what features we build next.</p>
+      </div>
+      <div class="benefit">
+        <h3>Recognition</h3>
+        <p>Be part of an exclusive group of early adopters recognized as founding Beta User Clients of ConciergeSync™.</p>
+      </div>
     </div>
   </section>
 
-  <section class="sections">
-    <div><div>📊</div><p>Dashboard</p></div>
-    <div><div>🎯</div><p>Redemption Engine</p></div>
-    <div><div>💳</div><p>My Cards</p></div>
-    <div><div>✈️</div><p>My Programs</p></div>
-    <div><div>💡</div><p>Helpful Hints</p></div>
-    <div><div>⚙️</div><p>Settings</p></div>
+  <section class="cta-footer">
+    <h2>Ready to Shape the Future?</h2>
+    <a href="#" class="btn">Begin Your ConciergeSync™ Journey</a>
   </section>
 
-  <!-- Universal Footer -->
-  <div id="footer"></div>
-
-  <script>
-    // Load universal footer
-    fetch("/dev/footer.html")
-      .then(response => response.text())
-      .then(html => {
-        document.getElementById("footer").innerHTML = html;
-      })
-      .catch(err => console.error("Footer failed to load:", err));
-
-    // Hamburger toggle
-    document.addEventListener("DOMContentLoaded", () => {
-      const toggle = document.querySelector(".menu-toggle");
-      const nav = document.querySelector("header nav");
-
-      if (toggle && nav) {
-        toggle.addEventListener("click", () => {
-          nav.classList.toggle("active");
-        });
-      }
-    });
-  </script>
+  <footer class="site-footer">
+    Solving What Matters… <em>Beautifully</em> • © 2025 ConciergeSync™
+  </footer>
 </body>
 </html>
