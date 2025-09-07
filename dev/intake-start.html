@@ -25,19 +25,28 @@
       position: relative;
       z-index: 1000;
     }
-    header .logo a {
+    header .logo {
+      font-weight: 700;
+      font-size: 1.2rem;
       display: flex;
       align-items: center;
       gap: 8px;
-      font-weight: 700;
-      font-size: 1.2rem;
-      color: #fff;              /* white text */
-      text-decoration: none;    /* no underline */
+    }
+    header .logo img {
+      height: 32px;
+    }
+    header .logo a {
+      color: inherit;          /* matches the header text color */
+      text-decoration: none;   /* removes underline */
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
     
     header .logo a:hover {
-      opacity: 0.85;            /* subtle hover effect */
+      opacity: 0.85;           /* subtle hover fade */
     }
+
 
     /* nav hidden by default */
     header nav {
