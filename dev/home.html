@@ -169,40 +169,58 @@
     }
 
     /* --- Mobile Responsive --- */
-    @media (max-width: 768px) {
-      header nav {
-        display: none;
-        flex-direction: column;
-        background: #0a1a33;
-        position: absolute;
-        top: 60px;
-        right: 20px;
-        padding: 20px;
-        border-radius: 6px;
-        box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-      }
-      header nav.active {
-        display: flex;
-      }
-      .menu-toggle {
-        display: flex;
-      }
+   @media (max-width: 768px) {
+  header nav {
+    display: none;
+    flex-direction: column;
+    background: #0a1a33;
+    position: absolute;
+    top: 60px;
+    right: 20px;
+    padding: 20px;
+    border-radius: 6px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+  }
 
-      .hero {
-        flex-direction: column;
-        text-align: center;
-      }
-      .login-box {
-        width: 100%;
-        max-width: 320px;
-        margin-top: 30px;
-      }
-      .sections {
-        flex-direction: column;
-      }
-      .sections div {
-        margin-bottom: 20px;
-      }
+  header nav.active {
+    display: flex;
+  }
+
+  .menu-toggle {
+    display: flex;
+  }
+
+  header nav a {
+    color: #fff;
+    font-size: 1rem;
+    text-decoration: none;
+    padding: 8px 0;
+  }
+
+  header nav a:hover {
+    opacity: 0.75;
+  }
+
+  .hero {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .login-box {
+    width: 100%;
+    max-width: 320px;
+    margin-top: 30px;
+  }
+
+  .sections {
+    flex-direction: column;
+  }
+
+  .sections div {
+    margin-bottom: 20px;
+  }
+} /* <-- keep this final closing brace */
+
     }
   </style>
 </head>
