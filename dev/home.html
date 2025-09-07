@@ -281,7 +281,7 @@
 
    <div id="footer"></div>
     <script>
-      fetch("/footer.html")
+      fetch("/dev/footer.html")   <!-- adjust if footer.html is in same folder -->
         .then(response => response.text())
         .then(html => {
           document.getElementById("footer").innerHTML = html;
