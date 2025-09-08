@@ -163,14 +163,14 @@
   </footer>
 
   <script>
-    // Example dataset (later replace with live API feed)
+    // Example dataset (later replace with live feed)
     const redemptions = [
       { route: "DFW → LHR", program: "AA", alliance: "oneworld", points: 57500, cashFare: 7950, fees: 737 },
       { route: "CUN → DFW", program: "Avios", alliance: "oneworld", points: 12000, cashFare: 540, fees: 90 },
       { route: "LAS → JFK", program: "JetBlue", alliance: "independent", points: 15000, cashFare: 585, fees: 30 }
     ];
 
-    // Compute CPM for each redemption
+    // Compute CPM
     redemptions.forEach(r => {
       r.cpm = ((r.cashFare - r.fees) / r.points).toFixed(2);
     });
@@ -193,7 +193,7 @@
         tbody.appendChild(tr);
       });
 
-      // Highlight best (highest CPM)
+      // Highlight best by CPM
       if (data.length > 0) {
         const best = data.reduce((a, b) => (parseFloat(a.cpm) > parseFloat(b.cpm) ? a : b));
         [...tbody.rows].forEach(row => {
