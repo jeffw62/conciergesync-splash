@@ -3,39 +3,144 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ConciergeSync™ Redemption Engine</title>
+  <title>ConciergeSync™ – Redemption Engine</title>
   <link rel="stylesheet" href="/dev/style.css">
   <style>
     body {
       margin: 0;
       font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
-      background: #f5f7fa;
+      background: #fff;
       color: #222;
     }
+
+    /* --- Header --- */
     header {
-      background: #0b0f14;
-      color: #fff;
-      padding: 16px 40px;
       display: flex;
       justify-content: space-between;
       align-items: center;
+      padding: 16px 20px;
+      background: #0a1a33;
+      color: #fff;
+      position: relative;
+      z-index: 1000;
     }
+
+    header .logo a {
+      font-weight: 700;
+      font-size: 1.2rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: inherit;
+      text-decoration: none;
+    }
+
+    header .logo img {
+      height: 32px;
+    }
+
+    header nav {
+      display: none;
+      gap: 24px;
+    }
+
     header nav a {
-      margin-left: 24px;
       text-decoration: none;
       color: #fff;
       font-weight: 500;
+      transition: opacity 0.2s ease;
     }
+    header nav a:hover {
+      opacity: 0.75;
+    }
+
+    @media (min-width: 769px) {
+      header nav {
+        display: flex;
+      }
+      .menu-toggle {
+        display: none !important;
+      }
+    }
+
+    /* --- Hamburger --- */
+    .menu-toggle {
+      display: none;
+      flex-direction: column;
+      cursor: pointer;
+      gap: 4px;
+      padding: 10px;
+      margin-left: auto;
+      user-select: none;
+    }
+    .menu-toggle span {
+      display: block;
+      width: 24px;
+      height: 3px;
+      background: #fff;
+      border-radius: 2px;
+    }
+
+    @media (max-width: 768px) {
+      header nav {
+        display: flex;
+        flex-direction: column;
+        background: #0a1a33;
+        position: absolute;
+        top: 100%;
+        right: 0;
+        left: 0;
+        border-radius: 0 0 6px 6px;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        z-index: 9999;
+        max-height: 0;
+        overflow: hidden;
+        opacity: 0;
+        padding: 0 20px;
+        transition: max-height 0.3s ease, opacity 0.3s ease, padding 0.3s ease;
+      }
+      header nav.active {
+        max-height: 400px;
+        opacity: 1;
+        padding: 20px;
+      }
+      .menu-toggle {
+        display: flex;
+      }
+      header nav a {
+        font-size: 1rem;
+        padding: 8px 0;
+        display: block;
+      }
+    }
+
+    /* --- Hero --- */
+    .hero {
+      background: #0a1a33;
+      color: #fff;
+      text-align: center;
+      padding: 80px 20px;
+      position: relative;
+    }
+    .hero::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 6px;
+      background: #bfa14a;
+    }
+
+    /* --- Redemption Engine Section --- */
     .container {
       max-width: 1200px;
       margin: 0 auto;
-      padding: 30px 20px;
+      padding: 40px 20px;
     }
-    h1 {
+    h2 {
       margin-bottom: 20px;
     }
-
-    /* Filters */
     .filters {
       display: flex;
       gap: 20px;
@@ -47,8 +152,6 @@
       border: 1px solid #ccc;
       border-radius: 4px;
     }
-
-    /* Table */
     table {
       width: 100%;
       border-collapse: collapse;
@@ -76,45 +179,38 @@
       padding: 8px 14px;
       border: none;
       border-radius: 4px;
-      text-decoration: none;
       cursor: pointer;
-    }
-
-    footer {
-      background: #0b0f14;
-      color: #fff;
-      text-align: center;
-      padding: 16px;
-      margin-top: 40px;
-      font-size: 0.9rem;
-    }
-
-    @media (max-width: 768px) {
-      .filters {
-        flex-direction: column;
-      }
-      table {
-        font-size: 0.9rem;
-      }
     }
   </style>
 </head>
 <body>
+  <!-- Header -->
   <header>
-    <div class="logo">ConciergeSync™ Redemption Engine</div>
+    <div class="logo">
+      <a href="/dev/home.html">
+        <img src="/dev/asset/CS_Logo_Premium_2x.png" alt="ConciergeSync Logo">
+        ConciergeSync™
+      </a>
+    </div>
+    <div class="menu-toggle">
+      <span></span><span></span><span></span>
+    </div>
     <nav>
-      <a href="console.html">Console</a>
-      <a href="mycards-dev.html">My Cards</a>
-      <a href="myprograms-dev.html">My Programs</a>
-      <a href="helpful-dev.html">Helpful Hints</a>
-      <a href="settings-dev.html">Settings</a>
+      <a href="/dev/index.html">About</a>
+      <a href="/dev/betap.html">Beta Program</a>
+      <a href="#">Helpful Hints</a>
+      <a href="#">Contact</a>
     </nav>
   </header>
 
-  <main class="container">
+  <!-- Hero -->
+  <section class="hero">
     <h1>Redemption Engine</h1>
     <p>Scan and compare the best redemption opportunities across your programs. Sort, filter, and act with confidence.</p>
+  </section>
 
+  <!-- Redemption Engine Section -->
+  <main class="container">
     <!-- Filters -->
     <div class="filters">
       <select id="programFilter">
@@ -153,17 +249,31 @@
         </tr>
       </thead>
       <tbody id="resultsBody">
-        <!-- Dynamic rows will be injected here -->
+        <!-- Injected rows -->
       </tbody>
     </table>
   </main>
 
-  <footer>
-    Solving What Matters… <em>Beautifully</em> • © 2025 ConciergeSync™
-  </footer>
+  <!-- Footer injection -->
+  <div id="footer"></div>
 
   <script>
-    // Example dataset (later replace with API calls)
+    // Footer loader
+    fetch("/dev/footer.html")
+      .then(res => res.text())
+      .then(html => { document.getElementById("footer").innerHTML = html; })
+      .catch(err => console.error("Footer failed to load:", err));
+
+    // Hamburger toggle
+    document.addEventListener("DOMContentLoaded", () => {
+      const toggle = document.querySelector(".menu-toggle");
+      const nav = document.querySelector("header nav");
+      if (toggle && nav) {
+        toggle.addEventListener("click", () => nav.classList.toggle("active"));
+      }
+    });
+
+    // Redemption Engine sample dataset
     const redemptions = [
       { route: "DFW → LHR", program: "AA", alliance: "oneworld", points: 57500, cashFare: 7950, fees: 737 },
       { route: "CUN → DFW", program: "Avios", alliance: "oneworld", points: 12000, cashFare: 540, fees: 90 },
@@ -178,7 +288,6 @@
     function renderTable(data) {
       const tbody = document.getElementById("resultsBody");
       tbody.innerHTML = "";
-
       data.forEach(r => {
         const tr = document.createElement("tr");
         tr.innerHTML = `
@@ -192,19 +301,14 @@
         `;
         tbody.appendChild(tr);
       });
-
-      // Highlight best by CPM
+      // Highlight best CPM
       if (data.length > 0) {
-        const best = data.reduce((a, b) => (parseFloat(a.cpm) > parseFloat(b.cpm) ? a : b));
+        const best = data.reduce((a, b) => parseFloat(a.cpm) > parseFloat(b.cpm) ? a : b);
         [...tbody.rows].forEach(row => {
-          if (row.cells[0].innerText === best.route) {
-            row.classList.add("highlight");
-          }
+          if (row.cells[0].innerText === best.route) row.classList.add("highlight");
         });
       }
     }
-
-    // Initial render
     renderTable(redemptions);
   </script>
 </body>
