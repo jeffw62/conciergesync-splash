@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ConciergeSync™ – About</title>
+  <title>About ConciergeSync™</title>
   <link rel="stylesheet" href="/dev/style.css">
   <style>
     body {
@@ -54,10 +54,10 @@
       header nav {
         display: flex;
       }
-      .menu-toggle { display: none !important; }
+      .menu-toggle {
+        display: none !important;
+      }
     }
-
-    /* --- Hamburger --- */
     .menu-toggle {
       display: none;
       flex-direction: column;
@@ -97,7 +97,9 @@
         opacity: 1;
         padding: 20px;
       }
-      .menu-toggle { display: flex; }
+      .menu-toggle {
+        display: flex;
+      }
       header nav a {
         font-size: 1rem;
         padding: 8px 0;
@@ -123,45 +125,35 @@
       background: #bfa14a;
     }
     .hero h1 {
-      font-size: 2.2rem;
-      margin-bottom: 16px;
-    }
-    .hero p {
-      font-size: 1.15rem;
-      max-width: 700px;
-      margin: 0 auto;
-      color: #e0e6f0;
+      margin-bottom: 12px;
     }
 
-    /* --- Content Sections --- */
-    .section {
+    /* --- Page Content --- */
+    .page-content {
       max-width: 900px;
       margin: 60px auto;
       padding: 0 20px;
     }
-    .section h2 {
+    .page-content h2 {
       color: #0a1a33;
-      margin-bottom: 16px;
+      margin-top: 40px;
+      margin-bottom: 12px;
       font-size: 1.6rem;
-    }
-    .section p {
-      margin-bottom: 20px;
-      font-size: 1.05rem;
     }
 
     /* --- Creed Block --- */
     .creed {
-      background: #f8f9fb;
-      padding: 40px 24px;
+      background: #f9f9fb;
       border-left: 6px solid #bfa14a;
+      padding: 24px;
+      margin: 40px 0;
       border-radius: 6px;
       font-style: italic;
-      color: #333;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
     }
     .creed h3 {
-      font-style: normal;
       margin-top: 0;
+      margin-bottom: 16px;
+      font-style: normal;
       color: #0a1a33;
     }
 
@@ -173,7 +165,9 @@
       padding: 20px;
       font-size: 0.9rem;
     }
-    .site-footer p { margin: 4px 0; }
+    .site-footer p {
+      margin: 4px 0;
+    }
   </style>
 </head>
 <body>
@@ -186,7 +180,9 @@
       </a>
     </div>
     <div class="menu-toggle">
-      <span></span><span></span><span></span>
+      <span></span>
+      <span></span>
+      <span></span>
     </div>
     <nav>
       <a href="/dev/about.html">About</a>
@@ -202,41 +198,42 @@
     <p>ConciergeSync™ gives you back your time for the things in life that matter to you.</p>
   </section>
 
-  <!-- Mission -->
-  <section class="section">
-    <h2>Our Mission</h2>
-    <p>We exist to simplify travel finance. No more wasted points. No more wasted time. With ConciergeSync™, clarity, consistency, and trust are built in from the start.</p>
-  </section>
+  <!-- Page Content -->
+  <div class="page-content">
+    <section>
+      <h2>Our Mission</h2>
+      <p>We exist to simplify travel finance. No more wasted points. No more wasted time. With ConciergeSync™, clarity, consistency, and trust are built in from the start.</p>
+    </section>
 
-  <!-- Story -->
-  <section class="section">
-    <h2>Our Story</h2>
-    <p>ConciergeSync™ was born from frustration. Too many hours — even days — were lost to complicated systems, endless spreadsheets, and scattered blogs. We wanted a better way. A way to make travel finance as simple as checking your balance, and as powerful as managing an investment portfolio.</p>
-  </section>
+    <section>
+      <h2>Our Story</h2>
+      <p>ConciergeSync™ was born from frustration. Too many hours — even days — were lost to complicated systems, endless spreadsheets, and scattered blogs. We wanted a better way. A way to make travel finance as simple as checking your balance, and as powerful as managing an investment portfolio.</p>
+    </section>
 
-  <!-- Creed -->
-  <section class="section creed">
-    <h3>The ConciergeSync™ Creed</h3>
-    <p>This is not just how we build our product. It’s how we make decisions. It’s how we treat clients, partners, and each other. It’s how we carry ourselves every day.</p>
-    <p>Clarity eliminates confusion ~ Cleanliness eliminates clutter. And trust is the foundation of every relationship — personal or professional.</p>
-    <p>This creed ensures that: we protect our energy and focus, deliver consistency in everything we touch, and preserve trust above all else.</p>
-    <p>This is our filter for life and work. This is the ecosystem of ConciergeSync™.</p>
-  </section>
+    <section class="creed">
+      <h3>The ConciergeSync™ Creed</h3>
+      <p>This is not just how we build our product. It’s how we make decisions. It’s how we treat clients, partners, and each other. It’s how we carry ourselves every day.</p>
+      <p>Clarity eliminates confusion ~ Cleanliness eliminates clutter. And trust is the foundation of every relationship — personal or professional.</p>
+      <p>This creed ensures that: we protect our energy and focus, deliver consistency in everything we touch, and preserve trust above all else.</p>
+      <p>This is our filter for life and work. This is the ecosystem of ConciergeSync™.</p>
+    </section>
 
-  <!-- Looking Ahead -->
-  <section class="section">
-    <h2>Looking Ahead</h2>
-    <p>ConciergeSync™ is built to grow with you. Every feature, every update, and every partnership is guided by the same filter: does it give you back time and maximize value?</p>
-  </section>
+    <section>
+      <h2>Looking Ahead</h2>
+      <p>ConciergeSync™ is built to grow with you. Every feature, every update, and every partnership is guided by the same filter: does it give you back time and maximize value?</p>
+    </section>
+  </div>
 
-  <!-- Footer -->
+  <!-- Footer injection -->
   <div id="footer"></div>
 
   <script>
     // Footer loader
     fetch("/dev/footer.html")
       .then(response => response.text())
-      .then(html => { document.getElementById("footer").innerHTML = html; })
+      .then(html => {
+        document.getElementById("footer").innerHTML = html;
+      })
       .catch(err => console.error("Footer failed to load:", err));
 
     // Hamburger toggle
