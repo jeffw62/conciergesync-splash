@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>About ConciergeSync™</title>
+  <title>About • ConciergeSync™</title>
   <link rel="stylesheet" href="/dev/style.css">
   <style>
     body {
@@ -11,7 +11,6 @@
       font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
       background: #fff;
       color: #222;
-      line-height: 1.6;
     }
 
     /* --- Header --- */
@@ -25,6 +24,7 @@
       position: relative;
       z-index: 1000;
     }
+
     header .logo a {
       font-weight: 700;
       font-size: 1.2rem;
@@ -34,13 +34,16 @@
       color: inherit;
       text-decoration: none;
     }
+
     header .logo img {
       height: 32px;
     }
+
     header nav {
       display: none;
       gap: 24px;
     }
+
     header nav a {
       text-decoration: none;
       color: #fff;
@@ -50,14 +53,13 @@
     header nav a:hover {
       opacity: 0.75;
     }
+
     @media (min-width: 769px) {
-      header nav {
-        display: flex;
-      }
-      .menu-toggle {
-        display: none !important;
-      }
+      header nav { display: flex; }
+      .menu-toggle { display: none !important; }
     }
+
+    /* --- Hamburger --- */
     .menu-toggle {
       display: none;
       flex-direction: column;
@@ -74,6 +76,8 @@
       background: #fff;
       border-radius: 2px;
     }
+
+    /* Mobile nav */
     @media (max-width: 768px) {
       header nav {
         display: flex;
@@ -86,6 +90,7 @@
         border-radius: 0 0 6px 6px;
         box-shadow: 0 4px 8px rgba(0,0,0,0.3);
         z-index: 9999;
+
         max-height: 0;
         overflow: hidden;
         opacity: 0;
@@ -97,9 +102,7 @@
         opacity: 1;
         padding: 20px;
       }
-      .menu-toggle {
-        display: flex;
-      }
+      .menu-toggle { display: flex; }
       header nav a {
         font-size: 1rem;
         padding: 8px 0;
@@ -112,49 +115,57 @@
       background: #0a1a33;
       color: #fff;
       text-align: center;
-      padding: 80px 20px;
+      padding: 100px 20px;
       position: relative;
     }
     .hero::after {
       content: "";
       position: absolute;
-      left: 0;
-      right: 0;
-      bottom: 0;
+      left: 0; right: 0; bottom: 0;
       height: 6px;
       background: #bfa14a;
     }
     .hero h1 {
-      margin-bottom: 12px;
+      margin: 0 0 12px;
+      font-size: 2.4rem;
+    }
+    .hero p {
+      font-size: 1.2rem;
+      color: #e0e6f0;
     }
 
-    /* --- Page Content --- */
-    .page-content {
+    /* --- Content Sections --- */
+    .content {
       max-width: 900px;
       margin: 60px auto;
       padding: 0 20px;
     }
-    .page-content h2 {
-      color: #0a1a33;
+    .content h2 {
       margin-top: 40px;
-      margin-bottom: 12px;
       font-size: 1.6rem;
+      color: #0a1a33;
+    }
+    .content p {
+      line-height: 1.6;
+      margin: 12px 0;
     }
 
-    /* --- Creed Block --- */
-    .creed {
+    /* --- Creed Box --- */
+    .creed-box {
       background: #f9f9fb;
       border-left: 6px solid #bfa14a;
+      border-radius: 6px;
       padding: 24px;
       margin: 40px 0;
-      border-radius: 6px;
       font-style: italic;
+      color: #222;
     }
-    .creed h3 {
-      margin-top: 0;
-      margin-bottom: 16px;
+    .creed-box h3 {
       font-style: normal;
-      color: #0a1a33;
+      font-weight: 600;
+      margin-bottom: 16px;
+      text-align: center;
+      color: #111;
     }
 
     /* --- Footer --- */
@@ -165,9 +176,7 @@
       padding: 20px;
       font-size: 0.9rem;
     }
-    .site-footer p {
-      margin: 4px 0;
-    }
+    .site-footer p { margin: 4px 0; }
   </style>
 </head>
 <body>
@@ -180,9 +189,7 @@
       </a>
     </div>
     <div class="menu-toggle">
-      <span></span>
-      <span></span>
-      <span></span>
+      <span></span><span></span><span></span>
     </div>
     <nav>
       <a href="/dev/about.html">About</a>
@@ -198,42 +205,33 @@
     <p>ConciergeSync™ gives you back your time for the things in life that matter to you.</p>
   </section>
 
-  <!-- Page Content -->
-  <div class="page-content">
-    <section>
-      <h2>Our Mission</h2>
-      <p>We exist to simplify travel finance. No more wasted points. No more wasted time. With ConciergeSync™, clarity, consistency, and trust are built in from the start.</p>
-    </section>
+  <!-- Main Content -->
+  <div class="content">
+    <h2>Our Mission</h2>
+    <p>We exist to simplify travel finance. No more wasted points. No more wasted time. With ConciergeSync™, clarity, consistency, and trust are built in from the start.</p>
 
-    <section>
-      <h2>Our Story</h2>
-      <p>ConciergeSync™ was born from frustration. Too many hours — even days — were lost to complicated systems, endless spreadsheets, and scattered blogs. We wanted a better way. A way to make travel finance as simple as checking your balance, and as powerful as managing an investment portfolio.</p>
-    </section>
+    <h2>Our Story</h2>
+    <p>ConciergeSync™ was born from frustration. Too many hours — even days — were lost to complicated systems, endless spreadsheets, and scattered blogs. We wanted a better way. A way to make travel finance as simple as checking your balance, and as powerful as managing an investment portfolio.</p>
 
-    <section class="creed">
+    <div class="creed-box">
       <h3>The ConciergeSync™ Creed</h3>
       <p>This is not just how we build our product. It’s how we make decisions. It’s how we treat clients, partners, and each other. It’s how we carry ourselves every day.</p>
       <p>Clarity eliminates confusion ~ Cleanliness eliminates clutter. And trust is the foundation of every relationship — personal or professional.</p>
       <p>This creed ensures that: we protect our energy and focus, deliver consistency in everything we touch, and preserve trust above all else.</p>
       <p>This is our filter for life and work. This is the ecosystem of ConciergeSync™.</p>
-    </section>
+    </div>
 
-    <section>
-      <h2>Looking Ahead</h2>
-      <p>ConciergeSync™ is built to grow with you. Every feature, every update, and every partnership is guided by the same filter: does it give you back time and maximize value?</p>
-    </section>
+    <h2>Looking Ahead</h2>
+    <p>ConciergeSync™ is built to grow with you. Every feature, every update, and every partnership is guided by the same filter: does it give you back time and maximize value?</p>
   </div>
 
-  <!-- Footer injection -->
+  <!-- Footer -->
   <div id="footer"></div>
-
   <script>
-    // Footer loader
+    // Load universal footer
     fetch("/dev/footer.html")
-      .then(response => response.text())
-      .then(html => {
-        document.getElementById("footer").innerHTML = html;
-      })
+      .then(r => r.text())
+      .then(html => { document.getElementById("footer").innerHTML = html; })
       .catch(err => console.error("Footer failed to load:", err));
 
     // Hamburger toggle
@@ -241,9 +239,7 @@
       const toggle = document.querySelector(".menu-toggle");
       const nav = document.querySelector("header nav");
       if (toggle && nav) {
-        toggle.addEventListener("click", () => {
-          nav.classList.toggle("active");
-        });
+        toggle.addEventListener("click", () => nav.classList.toggle("active"));
       }
     });
   </script>
