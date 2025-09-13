@@ -91,15 +91,27 @@
     padding: 220px 20px 160px;   /* a bit taller to fit the panel */
     position: relative;
   }
-  .hero::after {
+  /* ✨ New overlay layer */
+  .hero::before {
     content: "";
     position: absolute;
-    left: 0; right: 0; bottom: 0;
-    height: 6px;
-    background: #bfa14a;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.45);  /* adjust darkness */
+    z-index: 0;
   }
-  .hero h1 { margin: 0 0 10px; }
-  .hero p { margin: 0 0 40px; }
+  
+  /* Keep your existing hero::after stripe */
+  .hero::after {
+    /* your gold stripe code */
+    z-index: 1; /* keep it above ::before if needed */
+  }
+  
+  /* Ensure text stays on top */
+  .hero h1,
+  .hero p {
+    position: relative;
+    z-index: 2;
+  }
 
   /* ---------- Guided Search Panel ---------- */
   .search-panel {
