@@ -92,21 +92,34 @@
     position: relative;
   }
   /* ✨ New overlay layer */
+  .hero {
+  background: url('/dev/asset/hero-bg.png') center/cover no-repeat;
+  color: #fff;
+  text-align: center;
+  padding: 160px 20px 100px;   /* taller to showcase the image */
+  position: relative;          /* required for ::before and ::after layers */
+}
+
+/* Dark overlay for better text contrast */
   .hero::before {
     content: "";
     position: absolute;
     top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(0,0,0,0.45);  /* adjust darkness */
+    background: rgba(0, 0, 0, 0.45);  /* adjust opacity as needed */
     z-index: 0;
   }
   
-  /* Keep your existing hero::after stripe */
+  /* Gold accent stripe at the bottom of hero */
   .hero::after {
-    /* your gold stripe code */
-    z-index: 1; /* keep it above ::before if needed */
+    content: "";
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    height: 6px;
+    background: #bfa14a;
+    z-index: 1;
   }
   
-  /* Ensure text stays on top */
+  /* Ensure hero text is always above overlays */
   .hero h1,
   .hero p {
     position: relative;
