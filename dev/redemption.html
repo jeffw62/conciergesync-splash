@@ -187,7 +187,28 @@
     display: flex;
     align-items: center;
     gap: 12px;
+    flex-wrap: wrap;           /* allow hint to wrap neatly */
   }
+  
+  .exact-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 500;
+    cursor: pointer;
+  }
+  
+  .exact-toggle input {
+    width: 16px;
+    height: 16px;
+  }
+  
+  .date-row .hint {
+    font-size: 0.85rem;
+    color: #555;
+    margin-left: 4px;
+  }
+
   .flexdays {
     display: inline-flex;
     align-items: center;
@@ -209,12 +230,7 @@
     border-color: #bfa14a;
   }
   /* STEP 2: tidy the date row and the ±14 days toggle */
-  .date-row {
-    display: flex;
-    align-items: center;
-    gap: 12px;          /* space between date input and the pill */
-  }
-  
+    
   /* pill label behaves like a button */
   .flexdays {
     display: inline-flex;
@@ -377,16 +393,17 @@
     <label for="destination">Destination</label>
     <input type="text" id="destination" placeholder="e.g. LHR">
 
-    <label for="departDate">Departure Date</label>
-    <div class="date-row">
-      <input type="date" id="departDate" />
-      <label class="flexdays">
-        <input type="checkbox" id="exactDate" />
-        <span>Exact date only</span>
-      </label>
-      <small class="flexnote">If unchecked, we’ll search ±3 days around your date.</small>
+    <div class="date-wrap">
+      <label for="departDate">Departure Date</label>
+      <div class="date-row">
+        <input type="date" id="departDate" />
+        <label class="exact-toggle">
+          <input type="checkbox" id="exactDate" />
+          <span>Exact date only</span>
+        </label>
+        <small class="hint">If unchecked, we’ll search ±3 days around your date.</small>
+      </div>
     </div>
-  </div>
 
   <div class="step">
     <h3>2&nbsp;Routing Preferences</h3>
