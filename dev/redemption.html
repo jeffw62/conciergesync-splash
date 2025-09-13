@@ -151,6 +151,9 @@
     padding: 8px;
     border: 1px solid #ccc;
     border-radius: 4px;
+    font-family: inherit;
+    font-size: 1rem;
+    color: #333;
   }
   .toggle-group {
     display: flex;
@@ -182,14 +185,13 @@
     margin-top: 20px;
   }
 
-  /* Date + +/- 14 days layout */
+  /* ---------- Date + Exact Toggle ---------- */
   .date-row {
     display: flex;
     align-items: center;
     gap: 12px;
-    flex-wrap: wrap;           /* allow hint to wrap neatly */
+    flex-wrap: wrap;
   }
-  
   .exact-toggle {
     display: inline-flex;
     align-items: center;
@@ -197,68 +199,13 @@
     font-weight: 500;
     cursor: pointer;
   }
-  
   .exact-toggle input {
     width: 16px;
     height: 16px;
   }
-  
   .date-row .hint {
     font-size: 0.85rem;
     color: #555;
-    margin-left: 4px;
-  }
-
-  .flexdays {
-    display: inline-flex;
-    align-items: center;
-    cursor: pointer;
-  }
-  .flexdays input[type="checkbox"] { display: none; }
-  .flexdays span {
-    padding: 6px 12px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    background: #f7f7f7;
-    color: #333;
-    font-size: 0.9rem;
-    transition: all 0.2s ease;
-  }
-  .flexdays input[type="checkbox"]:checked + span {
-    background: #bfa14a;
-    color: #fff;
-    border-color: #bfa14a;
-  }
-  /* STEP 2: tidy the date row and the ±14 days toggle */
-    
-  /* pill label behaves like a button */
-  .flexdays {
-    display: inline-flex;
-    align-items: center;
-    cursor: pointer;
-    user-select: none;
-    margin-left: 4px;
-  }
-  
-  /* hide native checkbox */
-  .flexdays input[type="checkbox"] { display: none; }
-  
-  /* the visible pill */
-  .flexdays span {
-    padding: 6px 12px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    background: #f7f7f7;
-    color: #333;
-    font-size: 0.9rem;
-    transition: all 0.2s ease;
-  }
-  
-  /* active state */
-  .flexdays input[type="checkbox"]:checked + span {
-    background: #bfa14a;
-    border-color: #bfa14a;
-    color: #fff;
   }
 
   /* ---------- Compact (Power) Search ---------- */
@@ -308,53 +255,13 @@
     border-radius: 4px;
     cursor: pointer;
   }
-    /* STEP 1: normalize <input type="date"> so it matches other inputs */
-  .search-panel input[type="date"] {
-    font-family: inherit;
-    font-size: 1rem;
-    color: #333;
-    padding: 8px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-  }
-  
-  /* Optional polish (Chrome/Edge/Safari only): make the grey "mm/dd/yyyy" text lighter */
-  .search-panel input[type="date"]::-webkit-datetime-edit {
-    color: #888;
-  }
-  /* tighten ±14 days pill so +14 and 'days' stay together */
-  .flexdays span {
-    display: inline-block;      /* fixes the two-line wrap */
-    white-space: nowrap;        /* keep text on one line */
-    padding: 6px 12px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    background: #f7f7f7;
-    color: #333;
-    font-size: 0.9rem;
-    transition: all 0.2s ease;
-  }
-  /* style the numeric flex-day input inline */
-    .flexdays {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 0.9rem;
-      cursor: pointer;
-    }
-    
-    .flexdays input[type="checkbox"] {
-      width: 16px;
-      height: 16px;
-    }
-    
-    .flexnote {
-      display: block;
-      font-size: 0.8rem;
-      color: #555;
-      margin-top: 4px;
-    }
 
+  /* ---------- Footer ---------- */
+  #footer {
+    position: relative;
+    z-index: 0;
+    margin-top: 60px;
+  }
 </style>
 </head>
 <body>
@@ -404,6 +311,7 @@
         <small class="hint">If unchecked, we’ll search ±3 days around your date.</small>
       </div>
     </div>
+  </div>
 
   <div class="step">
     <h3>2&nbsp;Routing Preferences</h3>
@@ -493,8 +401,11 @@
     compactBar.style.display = spVisible ? "flex" : "none";
   });
 
-  const isExact = document.getElementById('exactDate').checked;
-  const flexRange = isExact ? 0 : 3;   // 0 days if exact, else ±3 by default
+  // Example: reading the exact-date preference
+  function getFlexRange() {
+    const isExact = document.getElementById('exactDate').checked;
+    return isExact ? 0 : 3; // 0 days if exact, else ±3 default
+  }
 
   // Sample redemption data
   const redemptions = [
