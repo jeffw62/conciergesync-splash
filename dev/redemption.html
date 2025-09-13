@@ -322,17 +322,21 @@
     .flexdays {
       display: flex;
       align-items: center;
-      gap: 4px;
+      gap: 6px;
       font-size: 0.9rem;
+      cursor: pointer;
     }
     
-    .flexdays .flex-input {
-      width: 3.5em;
-      padding: 4px;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-      text-align: center;
-      font-size: 0.9rem;
+    .flexdays input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+    }
+    
+    .flexnote {
+      display: block;
+      font-size: 0.8rem;
+      color: #555;
+      margin-top: 4px;
     }
 
 </style>
@@ -377,11 +381,10 @@
     <div class="date-row">
       <input type="date" id="departDate" />
       <label class="flexdays">
-        ±
-        <input type="number" id="flexDays"
-               min="0" max="14" value="0"
-               class="flex-input"> days
+        <input type="checkbox" id="exactDate" />
+        <span>Exact date only</span>
       </label>
+      <small class="flexnote">If unchecked, we’ll search ±3 days around your date.</small>
     </div>
   </div>
 
@@ -472,6 +475,9 @@
     searchPanel.style.display = spVisible ? "none" : "grid";
     compactBar.style.display = spVisible ? "flex" : "none";
   });
+
+  const isExact = document.getElementById('exactDate').checked;
+  const flexRange = isExact ? 0 : 3;   // 0 days if exact, else ±3 by default
 
   // Sample redemption data
   const redemptions = [
