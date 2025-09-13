@@ -262,6 +262,19 @@
     z-index: 0;
     margin-top: 60px;
   }
+  .flexrange {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.9rem;
+  }
+  .flexrange input[type="number"] {
+    width: 60px;
+    padding: 4px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+
 </style>
 </head>
 <body>
@@ -304,12 +317,21 @@
       <label for="departDate">Departure Date</label>
       <div class="date-row">
         <input type="date" id="departDate" />
+    
         <label class="exact-toggle">
           <input type="checkbox" id="exactDate" />
           <span>Exact date only</span>
         </label>
-        <small class="hint">If unchecked, we’ll search ±3 days around your date.</small>
+    
+        <div class="flexrange" id="flexContainer">
+          ± <input type="number" id="flexDays"
+                   value="3" min="1" max="14"> days
+        </div>
       </div>
+      <small class="hint">
+        If “Exact date only” is unchecked you can choose a ±-day window (1–14).  
+        Default is ±3 days.
+      </small>
     </div>
   </div>
 
@@ -401,6 +423,18 @@
     compactBar.style.display = spVisible ? "flex" : "none";
   });
 
+  const flexDaysInput = document.getElementById('flexDays');
+  document.getElementById('exactDate').addEventListener('change', e => {
+    document.getElementById('flexContainer').style.display =
+        e.target.checked ? 'none' : 'inline-flex';
+  });
+  
+  // Later, when you need the value:
+  function getFlexRange() {
+    const exact = document.getElementById('exactDate').checked;
+    return exact ? 0 : parseInt(flexDaysInput.value || 3, 10);
+  }
+
   // Example: reading the exact-date preference
   function getFlexRange() {
     const isExact = document.getElementById('exactDate').checked;
@@ -439,6 +473,7 @@
     }
   }
   renderTable(redemptions);
+  
 </script>
 </body>
 </html>
