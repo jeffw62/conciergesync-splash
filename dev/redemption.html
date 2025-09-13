@@ -109,22 +109,21 @@
       z-index: 0;
     }
     
-    /* Gold accent stripe at the bottom of hero */
+  /* Gold accent stripe at the bottom of hero */
     .hero::after {
       content: "";
       position: absolute;
-      left: 0;
-      right: 0;
-      bottom: -12px; /* push it 12px lower than the hero bottom */
+      left: 0; right: 0; bottom: 0;
       height: 6px;
       background: #bfa14a;
       z-index: 1;
     }
-  
-  /* Ensure hero text is always above overlays */
+    
+    /* Ensure hero text is always above overlays */
     .hero h1,
     .hero p {
-      text-shadow: 0 2px 6px rgba(0,0,0,0.6);
+      position: relative;
+      z-index: 2;
     }
 
   /* ---------- Guided Search Panel ---------- */
