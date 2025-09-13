@@ -1,315 +1,376 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ConciergeSync™ – Redemption Engine</title>
-  <link rel="stylesheet" href="/dev/style.css">
-  <style>
-    body {
-      margin: 0;
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
-      background: #fff;
-      color: #222;
-    }
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ConciergeSync™ – Redemption Engine</title>
+<link rel="stylesheet" href="/dev/style.css">
+<style>
+  body {
+    margin: 0;
+    font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+    background: #fff;
+    color: #222;
+  }
 
-    /* --- Header --- */
-    header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 16px 20px;
-      background: #0a1a33;
-      color: #fff;
-      position: relative;
-      z-index: 1000;
-    }
+  /* ---------- Header ---------- */
+  header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px;
+    background: #0a1a33;
+    color: #fff;
+    position: relative;
+    z-index: 1000;
+  }
+  header .logo a {
+    font-weight: 700;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: inherit;
+    text-decoration: none;
+  }
+  header .logo img { height: 32px; }
+  header nav { display: none; gap: 24px; }
+  header nav a {
+    text-decoration: none;
+    color: #fff;
+    font-weight: 500;
+    transition: opacity 0.2s ease;
+  }
+  header nav a:hover { opacity: 0.75; }
+  @media (min-width: 769px) {
+    header nav { display: flex; }
+    .menu-toggle { display: none !important; }
+  }
 
-    header .logo a {
-      font-weight: 700;
-      font-size: 1.2rem;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      color: inherit;
-      text-decoration: none;
-    }
-
-    header .logo img {
-      height: 32px;
-    }
-
+  /* ---------- Hamburger ---------- */
+  .menu-toggle {
+    display: none;
+    flex-direction: column;
+    cursor: pointer;
+    gap: 4px;
+    padding: 10px;
+    margin-left: auto;
+    user-select: none;
+  }
+  .menu-toggle span {
+    display: block;
+    width: 24px;
+    height: 3px;
+    background: #fff;
+    border-radius: 2px;
+  }
+  @media (max-width: 768px) {
     header nav {
-      display: none;
-      gap: 24px;
-    }
-
-    header nav a {
-      text-decoration: none;
-      color: #fff;
-      font-weight: 500;
-      transition: opacity 0.2s ease;
-    }
-    header nav a:hover {
-      opacity: 0.75;
-    }
-
-    @media (min-width: 769px) {
-      header nav {
-        display: flex;
-      }
-      .menu-toggle {
-        display: none !important;
-      }
-    }
-
-    /* --- Hamburger --- */
-    .menu-toggle {
-      display: none;
-      flex-direction: column;
-      cursor: pointer;
-      gap: 4px;
-      padding: 10px;
-      margin-left: auto;
-      user-select: none;
-    }
-    .menu-toggle span {
-      display: block;
-      width: 24px;
-      height: 3px;
-      background: #fff;
-      border-radius: 2px;
-    }
-
-    @media (max-width: 768px) {
-      header nav {
-        display: flex;
-        flex-direction: column;
-        background: #0a1a33;
-        position: absolute;
-        top: 100%;
-        right: 0;
-        left: 0;
-        border-radius: 0 0 6px 6px;
-        box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-        z-index: 9999;
-        max-height: 0;
-        overflow: hidden;
-        opacity: 0;
-        padding: 0 20px;
-        transition: max-height 0.3s ease, opacity 0.3s ease, padding 0.3s ease;
-      }
-      header nav.active {
-        max-height: 400px;
-        opacity: 1;
-        padding: 20px;
-      }
-      .menu-toggle {
-        display: flex;
-      }
-      header nav a {
-        font-size: 1rem;
-        padding: 8px 0;
-        display: block;
-      }
-    }
-
-    /* --- Hero --- */
-    .hero {
-      background: #0a1a33;
-      color: #fff;
-      text-align: center;
-      padding: 80px 20px;
-      position: relative;
-    }
-    .hero::after {
-      content: "";
-      position: absolute;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      height: 6px;
-      background: #bfa14a;
-    }
-
-    /* --- Redemption Engine Section --- */
-    .container {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 40px 20px;
-    }
-    h2 {
-      margin-bottom: 20px;
-    }
-    .filters {
       display: flex;
-      gap: 20px;
-      margin-bottom: 20px;
-      flex-wrap: wrap;
+      flex-direction: column;
+      background: #0a1a33;
+      position: absolute;
+      top: 100%;
+      right: 0; left: 0;
+      border-radius: 0 0 6px 6px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+      max-height: 0; overflow: hidden; opacity: 0;
+      padding: 0 20px;
+      transition: max-height .3s ease, opacity .3s ease, padding .3s ease;
     }
-    .filters select, .filters input {
-      padding: 8px;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      background: #fff;
-      border: 1px solid #ddd;
-    }
-    th, td {
-      padding: 12px;
-      text-align: left;
-      border-bottom: 1px solid #eee;
-    }
-    th {
-      background: #f0f0f0;
-      cursor: pointer;
-    }
-    tr:hover {
-      background: #fafafa;
-    }
-    .highlight {
-      background: #fff8e1;
-    }
-    .btn {
-      background: #bfa14a;
-      color: #fff;
-      padding: 8px 14px;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-  </style>
+    header nav.active { max-height: 400px; opacity: 1; padding: 20px; }
+    .menu-toggle { display: flex; }
+    header nav a { font-size: 1rem; padding: 8px 0; display: block; }
+  }
+
+  /* ---------- Hero ---------- */
+  .hero {
+    background: url('/dev/asset/hero-bg.jpg') center/cover no-repeat, #0a1a33;
+    color: #fff;
+    text-align: center;
+    padding: 80px 20px 40px;
+    position: relative;
+  }
+  .hero::after {
+    content: "";
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    height: 6px;
+    background: #bfa14a;
+  }
+  .hero h1 { margin: 0 0 10px; }
+  .hero p { margin: 0 0 40px; }
+
+  /* ---------- Guided Search Panel ---------- */
+  .search-panel {
+    max-width: 1100px;
+    margin: -20px auto 40px;
+    background: rgba(255,255,255,0.95);
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    padding: 30px 20px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit,minmax(260px,1fr));
+    gap: 20px;
+    position: relative;
+  }
+  .power-toggle {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    font-size: 0.9rem;
+    color: #0a1a33;
+    cursor: pointer;
+    text-decoration: underline;
+  }
+  .step h3 {
+    margin-top: 0;
+    color: #0a1a33;
+    font-size: 1.1rem;
+  }
+  .step label {
+    display: block;
+    margin: 8px 0 4px;
+    font-weight: 500;
+  }
+  .step input, .step select {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+  .toggle-group {
+    display: flex;
+    gap: 10px;
+    margin-top: 6px;
+  }
+  .toggle-group button {
+    flex: 1;
+    padding: 6px 0;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background: #f7f7f7;
+    cursor: pointer;
+  }
+  .toggle-group button.active {
+    background: #bfa14a;
+    color: #fff;
+    border-color: #bfa14a;
+  }
+  .search-btn {
+    width: 100%;
+    background: #bfa14a;
+    color: #fff;
+    padding: 12px;
+    border: none;
+    border-radius: 6px;
+    font-size: 1rem;
+    cursor: pointer;
+    margin-top: 20px;
+  }
+
+  /* ---------- Compact (Power) Search Bar ---------- */
+  .compact-bar {
+    display: none;
+    max-width: 1100px;
+    margin: -20px auto 40px;
+    background: rgba(255,255,255,0.95);
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    padding: 20px;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .compact-bar input, .compact-bar select {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    margin: 5px;
+  }
+
+  /* ---------- Table ---------- */
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 40px 20px;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+    border: 1px solid #ddd;
+  }
+  th, td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #eee;
+  }
+  th { background: #f0f0f0; cursor: pointer; }
+  tr:hover { background: #fafafa; }
+  .highlight { background: #fff8e1; }
+  .btn {
+    background: #bfa14a;
+    color: #fff;
+    padding: 8px 14px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+</style>
 </head>
 <body>
-  <!-- Header -->
-  <header>
-    <div class="logo">
-      <a href="/dev/home.html">
-        <img src="/dev/asset/CS_Logo_Premium_2x.png" alt="ConciergeSync Logo">
-        ConciergeSync™
-      </a>
+<header>
+  <div class="logo">
+    <a href="/dev/home.html">
+      <img src="/dev/asset/CS_Logo_Premium_2x.png" alt="ConciergeSync Logo">
+      ConciergeSync™
+    </a>
+  </div>
+  <div class="menu-toggle"><span></span><span></span><span></span></div>
+  <nav>
+    <a href="/dev/index.html">About</a>
+    <a href="/dev/betap.html">Beta Program</a>
+    <a href="#">Helpful Hints</a>
+    <a href="#">Contact</a>
+  </nav>
+</header>
+
+<section class="hero">
+  <h1>Redemption Engine</h1>
+  <p>Scan and compare the best redemption opportunities across your programs. Sort, filter, and act with confidence.</p>
+</section>
+
+<!-- Guided Panel (default) -->
+<div class="search-panel" id="searchPanel">
+  <span class="power-toggle" id="powerToggle">Power Search</span>
+
+  <div class="step">
+    <h3>1&nbsp;Enter Origin & Destination</h3>
+    <label>Origin</label>
+    <input type="text" placeholder="e.g. DFW" id="originFilter">
+    <label>Destination</label>
+    <input type="text" placeholder="e.g. LHR" id="destinationFilter">
+  </div>
+
+  <div class="step">
+    <h3>2&nbsp;Routing Preferences</h3>
+    <label>Multiple Connections</label>
+    <div class="toggle-group" id="multiConn">
+      <button data-val="no">No</button>
+      <button data-val="yes">Yes</button>
     </div>
-    <div class="menu-toggle">
-      <span></span><span></span><span></span>
+    <label>Direct Non-stop</label>
+    <div class="toggle-group" id="directStop">
+      <button data-val="no">No</button>
+      <button data-val="yes">Yes</button>
     </div>
-    <nav>
-      <a href="/dev/index.html">About</a>
-      <a href="/dev/betap.html">Beta Program</a>
-      <a href="#">Helpful Hints</a>
-      <a href="#">Contact</a>
-    </nav>
-  </header>
-
-  <!-- Hero -->
-  <section class="hero">
-    <h1>Redemption Engine</h1>
-    <p>Scan and compare the best redemption opportunities across your programs. Sort, filter, and act with confidence.</p>
-  </section>
-
-  <!-- Redemption Engine Section -->
-  <main class="container">
-    <!-- Filters -->
-    <div class="filters">
-      <select id="programFilter">
-        <option value="all">All Programs</option>
-        <option value="AA">AA</option>
-        <option value="Chase UR">Chase UR</option>
-        <option value="AmEx MR">AmEx MR</option>
-      </select>
-      <select id="allianceFilter">
-        <option value="all">All Alliances</option>
-        <option value="oneworld">oneworld</option>
-        <option value="Star Alliance">Star Alliance</option>
-        <option value="SkyTeam">SkyTeam</option>
-      </select>
-      <input type="text" id="originFilter" placeholder="Origin (e.g. DFW)" />
-      <input type="text" id="destinationFilter" placeholder="Destination (e.g. LHR)" />
-      <select id="valueFilter">
-        <option value="any">Any Value</option>
-        <option value="3">>= 3¢ per mile</option>
-        <option value="5">>= 5¢ per mile</option>
-        <option value="10">>= 10¢ per mile</option>
-      </select>
+    <label>Positioning Flight Allowed</label>
+    <div class="toggle-group" id="posFlight">
+      <button data-val="no">No</button>
+      <button data-val="yes">Yes</button>
     </div>
+  </div>
 
-    <!-- Results Table -->
-    <table>
-      <thead>
-        <tr>
-          <th>Route</th>
-          <th>Program</th>
-          <th>Points Needed</th>
-          <th>Cash Price</th>
-          <th>Fees</th>
-          <th>Value (¢/mile)</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody id="resultsBody">
-        <!-- Injected rows -->
-      </tbody>
-    </table>
-  </main>
+  <div class="step">
+    <h3>3&nbsp;Search</h3>
+    <button class="search-btn">Search</button>
+  </div>
+</div>
 
-  <!-- Footer injection -->
-  <div id="footer"></div>
+<!-- Compact Power Search (hidden until toggled) -->
+<div class="compact-bar" id="compactBar">
+  <input type="text" placeholder="Origin (e.g. DFW)" id="cOrigin">
+  <input type="text" placeholder="Destination (e.g. LHR)" id="cDest">
+  <select id="mcToggle">
+    <option>Multiple Connections: Any</option>
+    <option>No</option>
+    <option>Yes</option>
+  </select>
+  <select id="dnsToggle">
+    <option>Direct Non-stop: Any</option>
+    <option>No</option>
+    <option>Yes</option>
+  </select>
+  <select id="pfToggle">
+    <option>Positioning Flight: Any</option>
+    <option>No</option>
+    <option>Yes</option>
+  </select>
+  <button class="search-btn">Search</button>
+</div>
 
-  <script>
-    // Footer loader
-    fetch("/dev/footer.html")
-      .then(res => res.text())
-      .then(html => { document.getElementById("footer").innerHTML = html; })
-      .catch(err => console.error("Footer failed to load:", err));
+<main class="container">
+  <table>
+    <thead>
+      <tr>
+        <th>Route</th>
+        <th>Program</th>
+        <th>Points Needed</th>
+        <th>Cash Price</th>
+        <th>Fees</th>
+        <th>Value (¢/mile)</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody id="resultsBody"></tbody>
+  </table>
+</main>
 
-    // Hamburger toggle
-    document.addEventListener("DOMContentLoaded", () => {
-      const toggle = document.querySelector(".menu-toggle");
-      const nav = document.querySelector("header nav");
-      if (toggle && nav) {
-        toggle.addEventListener("click", () => nav.classList.toggle("active"));
-      }
+<div id="footer"></div>
+
+<script>
+  // Footer loader
+  fetch("/dev/footer.html")
+    .then(res => res.text())
+    .then(html => { document.getElementById("footer").innerHTML = html; })
+    .catch(err => console.error("Footer failed to load:", err));
+
+  // Hamburger toggle
+  const toggleBtn = document.querySelector(".menu-toggle");
+  const nav = document.querySelector("header nav");
+  toggleBtn.addEventListener("click", () => nav.classList.toggle("active"));
+
+  // Power Search toggle
+  const powerToggle = document.getElementById("powerToggle");
+  const searchPanel = document.getElementById("searchPanel");
+  const compactBar = document.getElementById("compactBar");
+  powerToggle.addEventListener("click", () => {
+    searchPanel.style.display = searchPanel.style.display === "none" ? "grid" : "none";
+    compactBar.style.display = compactBar.style.display === "flex" ? "none" : "flex";
+  });
+
+  // Sample redemption data
+  const redemptions = [
+    { route: "DFW → LHR", program: "AA", points: 57500, cashFare: 7950, fees: 737 },
+    { route: "CUN → DFW", program: "Avios", points: 12000, cashFare: 540, fees: 90 },
+    { route: "LAS → JFK", program: "JetBlue", points: 15000, cashFare: 585, fees: 30 }
+  ];
+  redemptions.forEach(r => { r.cpm = ((r.cashFare - r.fees) / r.points).toFixed(2); });
+
+  function renderTable(data) {
+    const tbody = document.getElementById("resultsBody");
+    tbody.innerHTML = "";
+    data.forEach(r => {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${r.route}</td>
+        <td>${r.program}</td>
+        <td>${r.points.toLocaleString()}</td>
+        <td>$${r.cashFare.toLocaleString()}</td>
+        <td>$${r.fees.toLocaleString()}</td>
+        <td><strong>${r.cpm}¢</strong></td>
+        <td><button class="btn">Book</button></td>
+      `;
+      tbody.appendChild(tr);
     });
-
-    // Redemption Engine sample dataset
-    const redemptions = [
-      { route: "DFW → LHR", program: "AA", alliance: "oneworld", points: 57500, cashFare: 7950, fees: 737 },
-      { route: "CUN → DFW", program: "Avios", alliance: "oneworld", points: 12000, cashFare: 540, fees: 90 },
-      { route: "LAS → JFK", program: "JetBlue", alliance: "independent", points: 15000, cashFare: 585, fees: 30 }
-    ];
-
-    // Compute CPM
-    redemptions.forEach(r => {
-      r.cpm = ((r.cashFare - r.fees) / r.points).toFixed(2);
-    });
-
-    function renderTable(data) {
-      const tbody = document.getElementById("resultsBody");
-      tbody.innerHTML = "";
-      data.forEach(r => {
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-          <td>${r.route}</td>
-          <td>${r.program}</td>
-          <td>${r.points.toLocaleString()}</td>
-          <td>$${r.cashFare.toLocaleString()}</td>
-          <td>$${r.fees.toLocaleString()}</td>
-          <td><strong>${r.cpm}¢</strong></td>
-          <td><button class="btn">Book</button></td>
-        `;
-        tbody.appendChild(tr);
+    if (data.length > 0) {
+      const best = data.reduce((a,b)=>parseFloat(a.cpm)>parseFloat(b.cpm)?a:b);
+      [...tbody.rows].forEach(row=>{
+        if(row.cells[0].innerText===best.route) row.classList.add("highlight");
       });
-      // Highlight best CPM
-      if (data.length > 0) {
-        const best = data.reduce((a, b) => parseFloat(a.cpm) > parseFloat(b.cpm) ? a : b);
-        [...tbody.rows].forEach(row => {
-          if (row.cells[0].innerText === best.route) row.classList.add("highlight");
-        });
-      }
     }
-    renderTable(redemptions);
-  </script>
+  }
+  renderTable(redemptions);
+</script>
 </body>
 </html>
