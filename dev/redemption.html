@@ -189,6 +189,32 @@
     cursor: pointer;
     margin-top: 20px;
   }
+  /* === Additions for Date + Flex-days === */
+.step .date-flex {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 12px;
+}
+
+.step .date-flex label {
+  margin: 0;              /* override default margin for tight layout */
+  font-weight: 500;
+}
+
+.step .date-flex input[type="date"] {
+  flex: 1;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.step .date-flex .flexdays {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
 
   /* ---------- Compact (Power) Search Bar ---------- */
   .compact-bar {
@@ -266,12 +292,25 @@
   <span class="power-toggle" id="powerToggle">Power Search</span>
 
   <div class="step">
-    <h3>1&nbsp;Enter Origin & Destination</h3>
-    <label>Origin</label>
-    <input type="text" placeholder="e.g. DFW" id="originFilter">
-    <label>Destination</label>
-    <input type="text" placeholder="e.g. LHR" id="destinationFilter">
+  <h3>1 Enter Origin & Destination</h3>
+
+  <label for="origin">Origin</label>
+  <input type="text" id="origin" placeholder="e.g. DFW">
+
+  <label for="destination">Destination</label>
+  <input type="text" id="destination" placeholder="e.g. LHR">
+
+  <!-- NEW date + flex days -->
+  <div class="date-flex">
+    <label for="departDate">Departure Date
+      <input type="date" id="departDate">
+    </label>
+    <label class="flexdays">
+      <input type="checkbox" id="flex14">
+      ± 14 days
+    </label>
   </div>
+</div>
 
   <div class="step">
     <h3>2&nbsp;Routing Preferences</h3>
