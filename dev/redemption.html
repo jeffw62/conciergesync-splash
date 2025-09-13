@@ -114,17 +114,33 @@
   }
 
   /* ---------- Guided Search Panel ---------- */
-  /* Make all text inputs match the date input's padding & font */
+ /* --- Guided Search Panel --- */
+  .search-panel {
+      max-width: 1100px;
+      margin: -80px auto 40px;
+      background: rgba(255,255,255,0.95);
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      padding: 30px 20px;
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;  /* 3 equal columns again */
+      gap: 20px;
+      position: relative;
+      z-index: 3;
+  }
+  
+  /* Make all text/date inputs share the same padding and font */
   .search-panel input[type="text"],
   .search-panel input[type="date"] {
       font-family: inherit;
       font-size: 1rem;
       color: #333;
-      padding: 8px;             /* matches the date field */
+      padding: 8px;             /* match date field */
       border: 1px solid #ccc;
       border-radius: 4px;
-      box-sizing: border-box;   /* keeps width consistent */
+      box-sizing: border-box;
   }
+
   .power-toggle {
     position: absolute;
     top: 15px;
