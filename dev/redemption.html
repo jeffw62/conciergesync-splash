@@ -306,6 +306,18 @@
   .search-panel input[type="date"]::-webkit-datetime-edit {
     color: #888;
   }
+  /* tighten ±14 days pill so +14 and 'days' stay together */
+  .flexdays span {
+    display: inline-block;      /* fixes the two-line wrap */
+    white-space: nowrap;        /* keep text on one line */
+    padding: 6px 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background: #f7f7f7;
+    color: #333;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+  }
 </style>
 </head>
 <body>
