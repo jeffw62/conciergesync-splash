@@ -84,46 +84,39 @@
   }
 
   /* ---------- Hero ---------- */
-  /* ✨ New overlay layer */
   .hero {
     background: url('/dev/asset/hero-bg.png') center/cover no-repeat;
     color: #fff;
     text-align: center;
-    padding: 200px 20px 120px;   /* taller to showcase the image */
-    position: relative;   /* must be here */
-    overflow: hidden;     /* optional but helps keep pseudo-elements inside */
+    padding: 200px 20px 120px;
+    position: relative;
+    overflow: hidden;
   }
-  
-  /* Dark overlay for better text contrast */
-    .hero::before {
-      content: "";
-      position: absolute;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0,0,0,0.65);  /* adjust opacity as needed */
-      z-index: 0;
-    }
-    
-  /* Gold accent stripe at the bottom of hero */
-    .hero::after {
-      content: "";
-      position: absolute;
-      left: 0; right: 0; bottom: 0;
-      height: 6px;
-      background: #bfa14a;
-      z-index: 1;
-    }
-    
-    /* Ensure hero text is always above overlays */
-    .hero h1,
-    .hero p {
-      position: relative;
-      z-index: 2;
-    }
+  .hero::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.65);
+    z-index: 0;
+  }
+  .hero::after {
+    content: "";
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    height: 6px;
+    background: #bfa14a;
+    z-index: 1;
+  }
+  .hero h1,
+  .hero p {
+    position: relative;
+    z-index: 2;
+  }
 
   /* ---------- Guided Search Panel ---------- */
   .search-panel {
     max-width: 1100px;
-    margin: -20px auto 40px;
+    margin: -80px auto 40px;
     background: rgba(255,255,255,0.95);
     border-radius: 12px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.15);
@@ -132,8 +125,7 @@
     grid-template-columns: repeat(auto-fit,minmax(260px,1fr));
     gap: 20px;
     position: relative;
-    z-index: 3;   /* higher than the hero ::after stripe (which is 1) */
-    margin-top: -80px;  /* move it upward – tweak the number to taste */
+    z-index: 3;
   }
   .power-toggle {
     position: absolute;
@@ -189,73 +181,35 @@
     cursor: pointer;
     margin-top: 20px;
   }
+
   /* Date + +/- 14 days layout */
-.date-wrap {
-  margin-top: 8px;
-}
+  .date-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .flexdays {
+    display: inline-flex;
+    align-items: center;
+    cursor: pointer;
+  }
+  .flexdays input[type="checkbox"] { display: none; }
+  .flexdays span {
+    padding: 6px 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background: #f7f7f7;
+    color: #333;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+  }
+  .flexdays input[type="checkbox"]:checked + span {
+    background: #bfa14a;
+    color: #fff;
+    border-color: #bfa14a;
+  }
 
-.date-row {
-  display: flex;
-  align-items: center;
-  gap: 12px;              /* space between date input and toggle */
-}
-
-/* toggle pill */
-.flexdays {
-  display: inline-flex;
-  align-items: center;
-  cursor: pointer;
-}
-
-.flexdays input[type="checkbox"] {
-  display: none;          /* hide default box */
-}
-
-.flexdays span {
-  padding: 6px 12px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  background: #f7f7f7;
-  color: #333;
-  font-size: 0.9rem;
-  transition: all 0.2s ease;
-}
-
-/* highlight when checked */
-.flexdays input[type="checkbox"]:checked + span {
-  background: #bfa14a;
-  color: #fff;
-  border-color: #bfa14a;
-}
-
-  /* === Additions for Date + Flex-days === */
-.step .date-flex {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  margin-top: 12px;
-}
-
-.step .date-flex label {
-  margin: 0;              /* override default margin for tight layout */
-  font-weight: 500;
-}
-
-.step .date-flex input[type="date"] {
-  flex: 1;
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-}
-
-.step .date-flex .flexdays {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  white-space: nowrap;
-}
-
-  /* ---------- Compact (Power) Search Bar ---------- */
+  /* ---------- Compact (Power) Search ---------- */
   .compact-bar {
     display: none;
     max-width: 1100px;
@@ -305,6 +259,7 @@
 </style>
 </head>
 <body>
+
 <header>
   <div class="logo">
     <a href="/dev/home.html">
@@ -326,21 +281,19 @@
   <p>Scan and compare the best redemption opportunities across your programs. Sort, filter, and act with confidence.</p>
 </section>
 
-<!-- Guided Panel (default) -->
+<!-- Guided Search Panel -->
 <div class="search-panel" id="searchPanel">
   <span class="power-toggle" id="powerToggle">Power Search</span>
 
   <div class="step">
-  <h3>1 Enter Origin & Destination</h3>
+    <h3>1&nbsp;Enter Origin & Destination</h3>
 
-  <label for="origin">Origin</label>
-  <input type="text" id="origin" placeholder="e.g. DFW">
+    <label for="origin">Origin</label>
+    <input type="text" id="origin" placeholder="e.g. DFW">
 
-  <label for="destination">Destination</label>
-  <input type="text" id="destination" placeholder="e.g. LHR">
+    <label for="destination">Destination</label>
+    <input type="text" id="destination" placeholder="e.g. LHR">
 
-  <!-- NEW date + flex days -->
-  <div class="date-wrap">
     <label for="departDate">Departure Date</label>
     <div class="date-row">
       <input type="date" id="departDate" />
@@ -350,7 +303,7 @@
       </label>
     </div>
   </div>
-    
+
   <div class="step">
     <h3>2&nbsp;Routing Preferences</h3>
     <label>Multiple Connections</label>
@@ -434,8 +387,9 @@
   const searchPanel = document.getElementById("searchPanel");
   const compactBar = document.getElementById("compactBar");
   powerToggle.addEventListener("click", () => {
-    searchPanel.style.display = searchPanel.style.display === "none" ? "grid" : "none";
-    compactBar.style.display = compactBar.style.display === "flex" ? "none" : "flex";
+    const spVisible = searchPanel.style.display !== "none";
+    searchPanel.style.display = spVisible ? "none" : "grid";
+    compactBar.style.display = spVisible ? "flex" : "none";
   });
 
   // Sample redemption data
