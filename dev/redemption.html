@@ -318,6 +318,23 @@
     font-size: 0.9rem;
     transition: all 0.2s ease;
   }
+  /* style the numeric flex-day input inline */
+    .flexdays {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 0.9rem;
+    }
+    
+    .flexdays .flex-input {
+      width: 3.5em;
+      padding: 4px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      text-align: center;
+      font-size: 0.9rem;
+    }
+
 </style>
 </head>
 <body>
@@ -360,8 +377,10 @@
     <div class="date-row">
       <input type="date" id="departDate" />
       <label class="flexdays">
-        <input type="checkbox" id="flex14" />
-        <span>± 14 days</span>
+        ±
+        <input type="number" id="flexDays"
+               min="0" max="14" value="0"
+               class="flex-input"> days
       </label>
     </div>
   </div>
