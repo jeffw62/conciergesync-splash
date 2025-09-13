@@ -138,6 +138,7 @@
     grid-template-columns: repeat(auto-fit,minmax(260px,1fr));
     gap: 20px;
     position: relative;
+    z-index: 3;   /* higher than the hero ::after stripe (which is 1) */
   }
   .power-toggle {
     position: absolute;
