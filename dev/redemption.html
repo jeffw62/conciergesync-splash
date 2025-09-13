@@ -93,38 +93,39 @@
   }
   /* ✨ New overlay layer */
   .hero {
-  background: url('/dev/asset/hero-bg.png') center/cover no-repeat;
-  color: #fff;
-  text-align: center;
-  padding: 160px 20px 100px;   /* taller to showcase the image */
-  position: relative;          /* required for ::before and ::after layers */
-}
-
-/* Dark overlay for better text contrast */
-  .hero::before {
-    content: "";
-    position: absolute;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(0, 0, 0, 0.45);  /* adjust opacity as needed */
-    z-index: 0;
+    background: url('/dev/asset/hero-bg.png') center/cover no-repeat;
+    color: #fff;
+    text-align: center;
+    padding: 200px 20px 120px;   /* taller to showcase the image */
+    position: relative;          /* required for ::before and ::after layers */
   }
   
-  /* Gold accent stripe at the bottom of hero */
-  .hero::after {
-    content: "";
-    position: absolute;
-    left: 0; right: 0; bottom: 0;
-    height: 6px;
-    background: #bfa14a;
-    z-index: 1;
-  }
+  /* Dark overlay for better text contrast */
+    .hero::before {
+      content: "";
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.55);  /* adjust opacity as needed */
+      z-index: 0;
+    }
+    
+    /* Gold accent stripe at the bottom of hero */
+    .hero::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: -12px; /* push it 12px lower than the hero bottom */
+      height: 6px;
+      background: #bfa14a;
+      z-index: 1;
+    }
   
   /* Ensure hero text is always above overlays */
-  .hero h1,
-  .hero p {
-    position: relative;
-    z-index: 2;
-  }
+    .hero h1,
+    .hero p {
+      text-shadow: 0 2px 6px rgba(0,0,0,0.6);
+    }
 
   /* ---------- Guided Search Panel ---------- */
   .search-panel {
