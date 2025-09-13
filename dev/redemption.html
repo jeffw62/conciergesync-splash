@@ -114,18 +114,16 @@
   }
 
   /* ---------- Guided Search Panel ---------- */
-  .search-panel {
-    max-width: 1100px;
-    margin: -80px auto 40px;
-    background: rgba(255,255,255,0.95);
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    padding: 30px 20px;
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-    gap: 20px;
-    position: relative;
-    z-index: 3;
+  /* Make all text inputs match the date input's padding & font */
+  .search-panel input[type="text"],
+  .search-panel input[type="date"] {
+      font-family: inherit;
+      font-size: 1rem;
+      color: #333;
+      padding: 8px;             /* matches the date field */
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-sizing: border-box;   /* keeps width consistent */
   }
   .power-toggle {
     position: absolute;
