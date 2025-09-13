@@ -189,6 +189,45 @@
     cursor: pointer;
     margin-top: 20px;
   }
+  /* Date + +/- 14 days layout */
+.date-wrap {
+  margin-top: 8px;
+}
+
+.date-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;              /* space between date input and toggle */
+}
+
+/* toggle pill */
+.flexdays {
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.flexdays input[type="checkbox"] {
+  display: none;          /* hide default box */
+}
+
+.flexdays span {
+  padding: 6px 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background: #f7f7f7;
+  color: #333;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+}
+
+/* highlight when checked */
+.flexdays input[type="checkbox"]:checked + span {
+  background: #bfa14a;
+  color: #fff;
+  border-color: #bfa14a;
+}
+
   /* === Additions for Date + Flex-days === */
 .step .date-flex {
   display: flex;
@@ -301,17 +340,17 @@
   <input type="text" id="destination" placeholder="e.g. LHR">
 
   <!-- NEW date + flex days -->
-  <div class="date-flex">
-    <label for="departDate">Departure Date
-      <input type="date" id="departDate">
-    </label>
-    <label class="flexdays">
-      <input type="checkbox" id="flex14">
-      ± 14 days
-    </label>
+  <div class="date-wrap">
+    <label for="departDate">Departure Date</label>
+    <div class="date-row">
+      <input type="date" id="departDate" />
+      <label class="flexdays">
+        <input type="checkbox" id="flex14" />
+        <span>± 14 days</span>
+      </label>
+    </div>
   </div>
-</div>
-
+    
   <div class="step">
     <h3>2&nbsp;Routing Preferences</h3>
     <label>Multiple Connections</label>
