@@ -307,42 +307,51 @@
     border-radius: 4px;
     box-sizing: border-box;
   }
-  /* --- Fix exact-date row wrapping & alignments --- */
-  /* keep the row on one line */
-  .date-row {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    flex-wrap: nowrap;
-  }
-  
-  /* override the generic .step label rule just for this label */
-  .step label.exact-toggle {
-    display: inline-flex !important;   /* beat .step label */
-    align-items: center;
-    gap: 6px;
-    margin: 0;                         /* no extra block margin */
-    white-space: nowrap;               /* keep "Exact date only" on one line */
-  }
-  
-  /* keep the ±days control inline with the label */
-  #flexContainer {
-    display: inline-flex !important;
-    align-items: center;
-    gap: 6px;
-    white-space: nowrap;
-  }
-  
-  /* make the number input visually match other inputs */
-  #flexContainer input[type="number"] {
-    width: 60px;
-    padding: 8px;
-    font-family: inherit;
-    font-size: 1rem;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    box-sizing: border-box;
-  }
+  /* --- Fix date row so everything stays on one line --- */
+.search-panel .date-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: nowrap;              /* keep in one row on wide screens */
+}
+
+/* override the generic .step input width for the date picker */
+.search-panel .date-row > input[type="date"] {
+  width: auto;                    /* stop stretching to 100% */
+  flex: 0 0 220px;                /* pick a nice width; tweak as you like */
+}
+
+/* keep the "Exact date only" label inline */
+.search-panel .date-row label.exact-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  white-space: nowrap;
+}
+
+/* keep the ±days control inline and sized nicely */
+.search-panel .date-row #flexContainer {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+.search-panel .date-row #flexContainer input[type="number"] {
+  width: 60px !important;         /* override the generic 100% input width */
+  padding: 8px;
+  font-family: inherit;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+/* allow wrapping gracefully on small screens */
+@media (max-width: 640px) {
+  .search-panel .date-row { flex-wrap: wrap; }
+  .search-panel .date-row > input[type="date"] { flex: 1 1 100%; }
+}
 
 </style>
 </head>
