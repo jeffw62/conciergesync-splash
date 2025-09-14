@@ -115,7 +115,7 @@
 
   /* ---------- Guided Search Panel ---------- */
   .search-panel {
-    max-width: 900px; /* narrower card */
+    max-width: 900px;
     margin: -80px auto 40px;
     background: rgba(255,255,255,0.95);
     border-radius: 12px;
@@ -157,7 +157,7 @@
     font-size: 0.95rem;
   }
   .step input, .step select {
-    width: 75%;  /* reduced field width */
+    width: 75%;
     padding: 8px;
     border: 1px solid #ccc;
     border-radius: 4px;
@@ -170,7 +170,7 @@
   /* --- Toggle buttons --- */
   .toggle-group {
     display: flex;
-    justify-content: flex-start; /* left align toggles */
+    justify-content: flex-start;
     gap: 8px;
     margin-top: 2px;
   }
@@ -190,8 +190,8 @@
   }
 
   .search-btn {
-    width: 75%;   /* match field width */
-    margin: 12px auto 0; /* center horizontally + spacing */
+    width: 75%;
+    margin-top: 12px;
     background: #bfa14a;
     color: #fff;
     padding: 12px;
@@ -199,7 +199,7 @@
     border-radius: 6px;
     font-size: 1rem;
     cursor: pointer;
-    display: block;
+    text-align: left; /* left align */
   }
 
   /* ---------- Date + Exact Toggle ---------- */
@@ -245,6 +245,7 @@
   .date-wrap .hint {
     font-size: 0.85rem;
     color: #555;
+    margin-top: 4px; /* ensure it’s clearly separated under line 2 */
   }
 
   /* ---------- Compact (Power) Search ---------- */
