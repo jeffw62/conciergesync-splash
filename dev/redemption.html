@@ -411,13 +411,16 @@
 <!-- Compact Power Search -->
 <div class="compact-bar" id="compactBar">
   <span class="guided-toggle" id="guidedToggle">Guided Search</span>
+
+  <!-- Row 1: Origin + Destination -->
   <div class="compact-row">
     <input type="text" placeholder="Origin (e.g. DFW)" id="cOrigin">
     <input type="text" placeholder="Destination (e.g. LHR)" id="cDest">
-    <input type="date" id="cDepartDate" />
   </div>
 
+  <!-- Row 2: Date + Exact toggle -->
   <div class="compact-date-row">
+    <input type="date" id="cDepartDate" />
     <label class="exact-toggle">
       <input type="checkbox" id="cExactDate"> Exact date only
     </label>
@@ -426,10 +429,12 @@
     </div>
   </div>
 
+  <!-- Instruction -->
   <div class="compact-hint">
     If “Exact date only” is unchecked you can choose a ±-day window (1–14). Default is ±3 days.
   </div>
 
+  <!-- Row 3: Dropdowns -->
   <div class="compact-row">
     <select id="dnsToggle">
       <option>Direct Non-stop: Any</option>
@@ -448,6 +453,7 @@
     </select>
   </div>
 
+  <!-- Search button -->
   <button class="search-btn">Search</button>
 </div>
 
