@@ -307,52 +307,7 @@
     border-radius: 4px;
     box-sizing: border-box;
   }
-  /* --- Fix date row so everything stays on one line --- */
-.search-panel .date-row {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  flex-wrap: nowrap;              /* keep in one row on wide screens */
-}
-
-/* override the generic .step input width for the date picker */
-.search-panel .date-row > input[type="date"] {
-  width: auto;                    /* stop stretching to 100% */
-  flex: 0 0 220px;                /* pick a nice width; tweak as you like */
-}
-
-/* keep the "Exact date only" label inline */
-.search-panel .date-row label.exact-toggle {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  margin: 0;
-  white-space: nowrap;
-}
-
-/* keep the ±days control inline and sized nicely */
-.search-panel .date-row #flexContainer {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  white-space: nowrap;
-}
-.search-panel .date-row #flexContainer input[type="number"] {
-  width: 60px !important;         /* override the generic 100% input width */
-  padding: 8px;
-  font-family: inherit;
-  font-size: 1rem;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  box-sizing: border-box;
-}
-
-/* allow wrapping gracefully on small screens */
-@media (max-width: 640px) {
-  .search-panel .date-row { flex-wrap: wrap; }
-  .search-panel .date-row > input[type="date"] { flex: 1 1 100%; }
-}
-
+  
 </style>
 </head>
 <body>
