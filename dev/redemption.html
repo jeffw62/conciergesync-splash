@@ -192,15 +192,17 @@
     margin-left: 20px;
   }
   .search-btn {
-    width: 75%;
+    width: auto;
+    min-width: 180px;
     background: #bfa14a;
     color: #fff;
-    padding: 12px;
+    padding: 12px 20px;
     border: none;
     border-radius: 6px;
     font-size: 1rem;
     cursor: pointer;
     display: block;
+    margin-top: 10px;
   }
 
   /* ---------- Date + Exact Toggle ---------- */
@@ -209,14 +211,14 @@
     color: #555;
     display: block;
     width: 75%;
-    margin-left: 0;
-    margin-top: 4px;
+    margin-top: 4px; /* pulled closer */
     line-height: 1.4;
   }
   .sub-row {
     display: flex;
     align-items: center;
-    gap: 14px;
+    gap: 12px; /* more breathing room */
+    margin-top: 6px;
   }
   .exact-toggle {
     display: flex;
@@ -261,9 +263,12 @@
     top: 15px;
     right: 20px;
     font-size: 0.9rem;
-    color: #0a1a33;
+    color: #555;
     cursor: pointer;
     text-decoration: underline;
+  }
+  .compact-bar .guided-toggle:hover {
+    color: #0a1a33;
   }
   .compact-row {
     display: flex;
@@ -279,13 +284,13 @@
   .compact-date-row {
     display: flex;
     align-items: center;
-    gap: 14px;
-    margin-bottom: 6px;
+    gap: 12px; /* added spacing between date + checkbox */
+    margin-bottom: 4px;
   }
   .compact-hint {
     font-size: 0.85rem;
     color: #555;
-    margin: 0 0 12px 0;
+    margin: 0 0 12px 0; /* closer to checkbox */
   }
   .compact-bar .search-btn {
     width: auto;
@@ -331,7 +336,6 @@
 </style>
 </head>
 <body>
-
 <header>
   <div class="logo">
     <a href="/dev/home.html">
@@ -356,17 +360,13 @@
 <!-- Guided Search Panel -->
 <div class="search-panel" id="searchPanel">
   <span class="power-toggle" id="powerToggle">Power Search</span>
-
   <!-- Step 1 -->
   <div class="step">
     <h3>1&nbsp;Enter Origin & Destination</h3>
-
     <label for="origin">Origin</label>
     <input type="text" id="origin" placeholder="e.g. DFW">
-
     <label for="destination">Destination</label>
     <input type="text" id="destination" placeholder="e.g. LHR">
-
     <div class="date-wrap">
       <label for="departDate">Departure Date</label>
       <input type="date" id="departDate" />
@@ -383,8 +383,7 @@
       </small>
     </div>
   </div>
-
-  <!-- Step 2 + Step 3 stacked -->
+  <!-- Step 2 + Step 3 -->
   <div class="step routing">
     <h3>2&nbsp;Routing Preferences</h3>
     <label>Direct Non-stop</label>
@@ -402,7 +401,6 @@
       <button data-val="yes">Yes</button>
       <button data-val="no">No</button>
     </div>
-
     <h3 style="margin-top:20px;">3&nbsp;Search</h3>
     <button class="search-btn">Search</button>
   </div>
@@ -411,14 +409,10 @@
 <!-- Compact Power Search -->
 <div class="compact-bar" id="compactBar">
   <span class="guided-toggle" id="guidedToggle">Guided Search</span>
-
-  <!-- Row 1: Origin + Destination -->
   <div class="compact-row">
     <input type="text" placeholder="Origin (e.g. DFW)" id="cOrigin">
     <input type="text" placeholder="Destination (e.g. LHR)" id="cDest">
   </div>
-
-  <!-- Row 2: Date + Exact toggle -->
   <div class="compact-date-row">
     <input type="date" id="cDepartDate" />
     <label class="exact-toggle">
@@ -428,13 +422,9 @@
       ± <input type="number" id="cFlexDays" min="1" max="14" value="3"> days
     </div>
   </div>
-
-  <!-- Instruction -->
   <div class="compact-hint">
     If “Exact date only” is unchecked you can choose a ±-day window (1–14). Default is ±3 days.
   </div>
-
-  <!-- Row 3: Dropdowns -->
   <div class="compact-row">
     <select id="dnsToggle">
       <option>Direct Non-stop: Any</option>
@@ -452,8 +442,6 @@
       <option>Yes</option>
     </select>
   </div>
-
-  <!-- Search button -->
   <button class="search-btn">Search</button>
 </div>
 
