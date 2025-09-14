@@ -130,6 +130,7 @@
   @media (max-width: 980px) {
     .search-panel { grid-template-columns: 1fr; }
   }
+
   .power-toggle {
     position: absolute;
     top: 15px;
@@ -139,6 +140,7 @@
     cursor: pointer;
     text-decoration: underline;
   }
+
   .step {
     display: flex;
     flex-direction: column;
@@ -149,19 +151,45 @@
     color: #0a1a33;
     font-size: 1.1rem;
   }
-  .date-row {
+  .step label {
+    margin: 2px 0;
+    font-weight: 500;
+    font-size: 0.95rem;
+  }
+  .step input, .step select {
+    width: 75%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-family: inherit;
+    font-size: 1rem;
+    color: #333;
+    box-sizing: border-box;
+  }
+
+  /* --- Toggle buttons --- */
+  .toggle-group {
     display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-top: 6px;
+    justify-content: flex-start;
+    gap: 8px;
+    margin-top: 2px;
   }
-  .date-row input[type="number"] {
-    width: 60px;
+  .toggle-group button {
+    flex: 0 0 auto;
+    padding: 6px 14px;
+    min-width: 60px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background: #f7f7f7;
+    cursor: pointer;
   }
-  .date-wrap .hint {
-    font-size: 0.85rem;
-    color: #555;
-    margin-top: 4px;
+  .toggle-group button.active {
+    background: #bfa14a;
+    color: #fff;
+    border-color: #bfa14a;
+  }
+  .toggle-group button[data-val="no"] {
+    margin-left: 20px;
   }
   .search-btn {
     width: 75%;
@@ -173,10 +201,48 @@
     font-size: 1rem;
     cursor: pointer;
     display: block;
-    text-align: center;
   }
 
-  /* ---------- Power Search ---------- */
+  /* ---------- Date + Exact Toggle ---------- */
+  .date-wrap .hint {
+    font-size: 0.85rem;
+    color: #555;
+    display: block;
+    width: 75%;
+    margin-left: 0;
+    margin-top: 4px;
+    line-height: 1.4;
+  }
+  .sub-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .exact-toggle {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+  .exact-toggle input { margin: 0; }
+  #flexContainer {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+  }
+  #flexContainer input[type="number"] {
+    width: 60px;
+    padding: 6px 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-family: inherit;
+    font-size: 1rem;
+    box-sizing: border-box;
+  }
+
+  /* ---------- Compact (Power) Search ---------- */
   .compact-bar {
     display: none;
     max-width: 900px;
@@ -185,49 +251,29 @@
     border-radius: 12px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.15);
     padding: 20px;
+    gap: 10px;
+    flex-direction: column;
     position: relative;
     z-index: 3;
-  }
-  .compact-bar .guided-toggle {
-    position: absolute;
-    top: 15px;
-    right: 20px;
-    font-size: 0.9rem;
-    color: #0a1a33;
-    cursor: pointer;
-    text-decoration: underline;
   }
   .compact-row {
     display: flex;
     gap: 10px;
+    flex-wrap: wrap;
     margin-bottom: 10px;
-    flex-wrap: wrap;
   }
-  .compact-date {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    flex-wrap: wrap;
-    margin-top: 8px;
+  .compact-bar input, .compact-bar select {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
   }
-  .compact-date .hint {
+  .compact-hint {
     font-size: 0.85rem;
     color: #555;
-    margin-top: 4px;
-    margin-bottom: 10px;
-    display: block;
-    width: 100%;
+    margin: -5px 0 10px 0;
   }
-  .compact-search-btn {
-    width: 75%;
-    background: #bfa14a;
-    color: #fff;
-    padding: 12px;
-    border: none;
-    border-radius: 6px;
-    font-size: 1rem;
-    cursor: pointer;
-    text-align: center;
+  .compact-bar .search-btn {
+    width: 100%;
   }
 
   /* ---------- Table ---------- */
@@ -259,10 +305,16 @@
     cursor: pointer;
   }
 
-  #footer { margin-top: 60px; }
+  /* ---------- Footer ---------- */
+  #footer {
+    position: relative;
+    z-index: 0;
+    margin-top: 60px;
+  }
 </style>
 </head>
 <body>
+
 <header>
   <div class="logo">
     <a href="/dev/home.html">
@@ -284,65 +336,114 @@
   <p>Scan and compare the best redemption opportunities across your programs. Sort, filter, and act with confidence.</p>
 </section>
 
-<!-- Guided Search -->
+<!-- Guided Search Panel -->
 <div class="search-panel" id="searchPanel">
   <span class="power-toggle" id="powerToggle">Power Search</span>
+
+  <!-- Step 1 -->
   <div class="step">
-    <h3>1 Enter Origin & Destination</h3>
+    <h3>1&nbsp;Enter Origin & Destination</h3>
+
     <label for="origin">Origin</label>
     <input type="text" id="origin" placeholder="e.g. DFW">
+
     <label for="destination">Destination</label>
     <input type="text" id="destination" placeholder="e.g. LHR">
+
     <div class="date-wrap">
       <label for="departDate">Departure Date</label>
-      <input type="date" id="departDate">
-      <div class="date-row">
-        <label><input type="checkbox" id="exactDate"> Exact date only</label>
-        <span>± <input type="number" id="flexDays" min="1" max="14" value="3"> days</span>
+      <input type="date" id="departDate" />
+      <div class="sub-row">
+        <label class="exact-toggle">
+          <input type="checkbox" id="exactDate" /> Exact date only
+        </label>
+        <div class="flexrange" id="flexContainer">
+          ± <input type="number" id="flexDays" min="1" max="14" value="3"> days
+        </div>
       </div>
-      <small class="hint">If “Exact date only” is unchecked you can choose a ±-day window (1–14). Default is ±3 days.</small>
+      <small class="hint">
+        If “Exact date only” is unchecked you can choose a ±-day window (1–14). Default is ±3 days.
+      </small>
     </div>
   </div>
-  <div class="step">
-    <h3>2 Routing Preferences</h3>
+
+  <!-- Step 2 + Step 3 stacked -->
+  <div class="step routing">
+    <h3>2&nbsp;Routing Preferences</h3>
     <label>Direct Non-stop</label>
-    <div class="toggle-group"><button>Yes</button><button>No</button></div>
+    <div class="toggle-group" id="directStop">
+      <button data-val="yes">Yes</button>
+      <button data-val="no">No</button>
+    </div>
     <label>Multiple Connections</label>
-    <div class="toggle-group"><button>Yes</button><button>No</button></div>
+    <div class="toggle-group" id="multiConn">
+      <button data-val="yes">Yes</button>
+      <button data-val="no">No</button>
+    </div>
     <label>Positioning Flight Allowed</label>
-    <div class="toggle-group"><button>Yes</button><button>No</button></div>
-    <h3>3 Search</h3>
+    <div class="toggle-group" id="posFlight">
+      <button data-val="yes">Yes</button>
+      <button data-val="no">No</button>
+    </div>
+
+    <h3 style="margin-top:20px;">3&nbsp;Search</h3>
     <button class="search-btn">Search</button>
   </div>
 </div>
 
-<!-- Power Search -->
+<!-- Compact Power Search -->
 <div class="compact-bar" id="compactBar">
-  <span class="guided-toggle" id="guidedToggle">Guided Search</span>
   <div class="compact-row">
-    <input type="text" placeholder="Origin (e.g. DFW)">
-    <input type="text" placeholder="Destination (e.g. LHR)">
-    <input type="date" id="cDepartDate">
+    <input type="text" placeholder="Origin (e.g. DFW)" id="cOrigin">
+    <input type="text" placeholder="Destination (e.g. LHR)" id="cDest">
+    <input type="date" id="cDepartDate" />
   </div>
-  <div class="compact-date">
-    <label><input type="checkbox" id="cExactDate"> Exact date only</label>
-    <span>± <input type="number" id="cFlexDays" min="1" max="14" value="3"> days</span>
-    <small class="hint">If “Exact date only” is unchecked you can choose a ±-day window (1–14). Default is ±3 days.</small>
-  </div>
+
   <div class="compact-row">
-    <select><option>Direct Non-stop: Any</option><option>No</option><option>Yes</option></select>
-    <select><option>Positioning Flight: Any</option><option>No</option><option>Yes</option></select>
-    <select><option>Multiple Connections: Any</option><option>No</option><option>Yes</option></select>
+    <label class="exact-toggle">
+      <input type="checkbox" id="cExactDate"> Exact date only
+    </label>
+    <div class="flexrange" id="cFlexContainer">
+      ± <input type="number" id="cFlexDays" min="1" max="14" value="3"> days
+    </div>
   </div>
-  <button class="compact-search-btn">Search</button>
+
+  <div class="compact-hint">
+    If “Exact date only” is unchecked you can choose a ±-day window (1–14). Default is ±3 days.
+  </div>
+
+  <div class="compact-row">
+    <select id="dnsToggle">
+      <option>Direct Non-stop: Any</option>
+      <option>No</option>
+      <option>Yes</option>
+    </select>
+    <select id="pfToggle">
+      <option>Positioning Flight: Any</option>
+      <option>No</option>
+      <option>Yes</option>
+    </select>
+    <select id="mcToggle">
+      <option>Multiple Connections: Any</option>
+      <option>No</option>
+      <option>Yes</option>
+    </select>
+  </div>
+
+  <button class="search-btn">Search</button>
 </div>
 
 <main class="container">
   <table>
     <thead>
       <tr>
-        <th>Route</th><th>Program</th><th>Points Needed</th>
-        <th>Cash Price</th><th>Fees</th><th>Value (¢/mile)</th><th></th>
+        <th>Route</th>
+        <th>Program</th>
+        <th>Points Needed</th>
+        <th>Cash Price</th>
+        <th>Fees</th>
+        <th>Value (¢/mile)</th>
+        <th></th>
       </tr>
     </thead>
     <tbody id="resultsBody"></tbody>
@@ -352,59 +453,75 @@
 <div id="footer"></div>
 
 <script>
-  fetch("/dev/footer.html").then(res=>res.text()).then(html=>{
-    document.getElementById("footer").innerHTML=html;
+  // Footer loader
+  fetch("/dev/footer.html")
+    .then(res => res.text())
+    .then(html => { document.getElementById("footer").innerHTML = html; })
+    .catch(err => console.error("Footer failed to load:", err));
+
+  // Hamburger toggle
+  const toggleBtn = document.querySelector(".menu-toggle");
+  const nav = document.querySelector("header nav");
+  toggleBtn.addEventListener("click", () => nav.classList.toggle("active"));
+
+  // Power Search toggle
+  const powerToggle = document.getElementById("powerToggle");
+  const searchPanel = document.getElementById("searchPanel");
+  const compactBar = document.getElementById("compactBar");
+  powerToggle.addEventListener("click", () => {
+    const spVisible = searchPanel.style.display !== "none";
+    searchPanel.style.display = spVisible ? "none" : "grid";
+    compactBar.style.display = spVisible ? "flex" : "none";
   });
 
-  const toggleBtn=document.querySelector(".menu-toggle");
-  const nav=document.querySelector("header nav");
-  toggleBtn.addEventListener("click",()=>nav.classList.toggle("active"));
+  // Guided Search Exact date
+  const exactBox = document.getElementById('exactDate');
+  const flexContainer = document.getElementById('flexContainer');
+  const flexDaysInput = document.getElementById('flexDays');
+  function updateFlexVisibility() {
+    const exact = exactBox.checked;
+    flexContainer.style.display = exact ? 'none' : 'flex';
+    flexDaysInput.disabled = exact;
+  }
+  exactBox.addEventListener('change', updateFlexVisibility);
+  document.addEventListener('DOMContentLoaded', updateFlexVisibility);
 
-  const powerToggle=document.getElementById("powerToggle");
-  const guidedToggle=document.getElementById("guidedToggle");
-  const searchPanel=document.getElementById("searchPanel");
-  const compactBar=document.getElementById("compactBar");
-  powerToggle.addEventListener("click",()=>{
-    searchPanel.style.display="none"; compactBar.style.display="block";
-  });
-  guidedToggle.addEventListener("click",()=>{
-    compactBar.style.display="none"; searchPanel.style.display="grid";
-  });
+  // Power Search Exact date
+  const cExactBox = document.getElementById('cExactDate');
+  const cFlexContainer = document.getElementById('cFlexContainer');
+  const cFlexDaysInput = document.getElementById('cFlexDays');
+  function updateCompactFlexVisibility() {
+    const exact = cExactBox.checked;
+    cFlexContainer.style.display = exact ? 'none' : 'flex';
+    cFlexDaysInput.disabled = exact;
+  }
+  cExactBox.addEventListener('change', updateCompactFlexVisibility);
+  document.addEventListener('DOMContentLoaded', updateCompactFlexVisibility);
 
-  const exactBox=document.getElementById("exactDate");
-  const flexDays=document.getElementById("flexDays");
-  exactBox.addEventListener("change",()=>{
-    flexDays.disabled=exactBox.checked;
-  });
-  const cExact=document.getElementById("cExactDate");
-  const cFlex=document.getElementById("cFlexDays");
-  cExact.addEventListener("change",()=>{
-    cFlex.disabled=cExact.checked;
-  });
-
-  const redemptions=[
-    {route:"DFW → LHR",program:"AA",points:57500,cashFare:7950,fees:737},
-    {route:"CUN → DFW",program:"Avios",points:12000,cashFare:540,fees:90},
-    {route:"LAS → JFK",program:"JetBlue",points:15000,cashFare:585,fees:30}
+  // Sample redemption data
+  const redemptions = [
+    { route: "DFW → LHR", program: "AA", points: 57500, cashFare: 7950, fees: 737 },
+    { route: "CUN → DFW", program: "Avios", points: 12000, cashFare: 540, fees: 90 },
+    { route: "LAS → JFK", program: "JetBlue", points: 15000, cashFare: 585, fees: 30 }
   ];
-  redemptions.forEach(r=>{r.cpm=((r.cashFare-r.fees)/r.points).toFixed(2);});
-  function renderTable(data){
-    const tbody=document.getElementById("resultsBody");
-    tbody.innerHTML="";
-    data.forEach(r=>{
-      const tr=document.createElement("tr");
-      tr.innerHTML=`<td>${r.route}</td><td>${r.program}</td>
-        <td>${r.points.toLocaleString()}</td><td>$${r.cashFare}</td>
-        <td>$${r.fees}</td><td><strong>${r.cpm}¢</strong></td>
-        <td><button class="btn">Book</button></td>`;
+  redemptions.forEach(r => { r.cpm = ((r.cashFare - r.fees) / r.points).toFixed(2); });
+
+  function renderTable(data) {
+    const tbody = document.getElementById("resultsBody");
+    tbody.innerHTML = "";
+    data.forEach(r => {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${r.route}</td>
+        <td>${r.program}</td>
+        <td>${r.points.toLocaleString()}</td>
+        <td>$${r.cashFare.toLocaleString()}</td>
+        <td>$${r.fees.toLocaleString()}</td>
+        <td><strong>${r.cpm}</strong></td>
+        <td><button class="btn">Book</button></td>
+      `;
       tbody.appendChild(tr);
     });
-    if(data.length>0){
-      const best=data.reduce((a,b)=>parseFloat(a.cpm)>parseFloat(b.cpm)?a:b);
-      [...tbody.rows].forEach(row=>{
-        if(row.cells[0].innerText===best.route) row.classList.add("highlight");
-      });
-    }
   }
   renderTable(redemptions);
 </script>
