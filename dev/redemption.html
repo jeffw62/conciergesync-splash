@@ -120,9 +120,9 @@
     background: rgba(255,255,255,0.95);
     border-radius: 12px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    padding: 30px 20px;
+    padding: 24px 20px; /* slightly tighter */
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr;  /* three equal columns */
+    grid-template-columns: 1fr 1fr 1fr;
     gap: 20px;
     position: relative;
     z-index: 3;
@@ -140,20 +140,26 @@
     cursor: pointer;
     text-decoration: underline;
   }
-  .step { display: flex; flex-direction: column; gap: 10px; }
+
+  .step {
+    display: flex;
+    flex-direction: column;
+    gap: 6px; /* tighter */
+  }
   .step h3 {
-    margin: 0 0 6px 0;
+    margin: 0 0 4px 0;
     color: #0a1a33;
     font-size: 1.1rem;
   }
   .step label {
     display: block;
-    margin: 4px 0;
+    margin: 2px 0;
     font-weight: 500;
+    font-size: 0.95rem;
   }
   .step input, .step select {
     width: 100%;
-    padding: 8px;                 /* unified padding for text/date */
+    padding: 8px;
     border: 1px solid #ccc;
     border-radius: 4px;
     font-family: inherit;
@@ -162,14 +168,16 @@
     box-sizing: border-box;
   }
 
+  /* --- Toggle buttons --- */
   .toggle-group {
     display: flex;
-    gap: 10px;
+    gap: 8px;
     margin-top: 2px;
   }
   .toggle-group button {
-    flex: 1;
-    padding: 6px 0;
+    flex: 0 0 auto; /* natural width */
+    padding: 6px 14px;
+    min-width: 60px;
     border: 1px solid #ccc;
     border-radius: 4px;
     background: #f7f7f7;
@@ -190,44 +198,51 @@
     border-radius: 6px;
     font-size: 1rem;
     cursor: pointer;
-    margin-top: auto; /* keeps button near bottom of column */
   }
 
   /* ---------- Date + Exact Toggle ---------- */
+  .date-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
   .date-row {
     display: flex;
+    flex-direction: column; /* stack main field over sub-row */
+    gap: 6px;
+    width: 100%;
+  }
+  .sub-row {
+    display: flex;
     align-items: center;
-    gap: 12px;
-    flex-wrap: wrap;
+    gap: 14px;
   }
   .exact-toggle {
-    display: inline-flex;
+    display: flex;
     align-items: center;
     gap: 6px;
     font-weight: 500;
-    cursor: pointer;
+    white-space: nowrap;
   }
-  .exact-toggle input {
-    width: 16px;
-    height: 16px;
-  }
-  .date-row .hint,
-  .date-wrap .hint {
-    font-size: 0.85rem;
-    color: #555;
-  }
-
-  .flexrange {
-    display: inline-flex;
+  .exact-toggle input { margin: 0; }
+  #flexContainer {
+    display: flex;
     align-items: center;
     gap: 6px;
-    font-size: 0.95rem;
+    white-space: nowrap;
   }
-  .flexrange input[type="number"] {
-    width: 64px;
+  #flexContainer input[type="number"] {
+    width: 60px;
     padding: 6px 8px;
     border: 1px solid #ccc;
     border-radius: 4px;
+    font-family: inherit;
+    font-size: 1rem;
+    box-sizing: border-box;
+  }
+  .date-wrap .hint {
+    font-size: 0.85rem;
+    color: #555;
   }
 
   /* ---------- Compact (Power) Search ---------- */
@@ -284,30 +299,6 @@
     z-index: 0;
     margin-top: 60px;
   }
-  /* --- Fix ±days alignment --- */
-  .date-row {
-    display: flex;
-    align-items: center;
-    flex-wrap: nowrap;       /* keep everything on one line */
-    gap: 10px;
-  }
-  
-  #flexContainer {
-    display: inline-flex !important;  /* ensure it's inline with the checkbox */
-    align-items: center;
-    gap: 6px;
-  }
-  
-  #flexContainer input[type="number"] {
-    width: 60px;
-    padding: 8px;            /* match other inputs */
-    font-family: inherit;
-    font-size: 1rem;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    box-sizing: border-box;
-  }
-  
 </style>
 </head>
 <body>
@@ -337,6 +328,7 @@
 <div class="search-panel" id="searchPanel">
   <span class="power-toggle" id="powerToggle">Power Search</span>
 
+  <!-- Step 1 -->
   <div class="step">
     <h3>1&nbsp;Enter Origin & Destination</h3>
 
@@ -350,14 +342,14 @@
       <label for="departDate">Departure Date</label>
       <div class="date-row">
         <input type="date" id="departDate" />
-
-        <label class="exact-toggle" title="Only search the exact date selected">
-          <input type="checkbox" id="exactDate" />
-          <span>Exact date only</span>
-        </label>
-
-        <div class="flexrange" id="flexContainer">
-          ± <input type="number" id="flexDays" min="1" max="14" value="3"> days
+        <div class="sub-row">
+          <label class="exact-toggle">
+            <input type="checkbox" id="exactDate" />
+            Exact date only
+          </label>
+          <div class="flexrange" id="flexContainer">
+            ± <input type="number" id="flexDays" min="1" max="14" value="3"> days
+          </div>
         </div>
       </div>
       <small class="hint">
@@ -366,6 +358,7 @@
     </div>
   </div>
 
+  <!-- Step 2 -->
   <div class="step">
     <h3>2&nbsp;Routing Preferences</h3>
     <label>Multiple Connections</label>
@@ -385,13 +378,16 @@
     </div>
   </div>
 
+  <!-- Step 3 -->
   <div class="step">
     <h3>3&nbsp;Search</h3>
-    <button class="search-btn">Search</button>
+    <div class="actions">
+      <button class="search-btn">Search</button>
+    </div>
   </div>
 </div>
 
-<!-- Compact Power Search (hidden until toggled) -->
+<!-- Compact Power Search -->
 <div class="compact-bar" id="compactBar">
   <input type="text" placeholder="Origin (e.g. DFW)" id="cOrigin">
   <input type="text" placeholder="Destination (e.g. LHR)" id="cDest">
@@ -461,11 +457,10 @@
 
   function updateFlexVisibility() {
     const exact = exactBox.checked;
-    flexContainer.style.display = exact ? 'none' : 'inline-flex';
+    flexContainer.style.display = exact ? 'none' : 'flex';
     flexDaysInput.disabled = exact;
   }
 
-  // clamp and read
   function getFlexRange() {
     if (exactBox.checked) return 0;
     const n = parseInt(flexDaysInput.value || '3', 10);
