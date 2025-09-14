@@ -115,7 +115,7 @@
 
   /* ---------- Guided Search Panel ---------- */
   .search-panel {
-    max-width: 900px;
+    max-width: 720px; /* reduced card width */
     margin: -80px auto 40px;
     background: rgba(255,255,255,0.95);
     border-radius: 12px;
@@ -157,7 +157,7 @@
     font-size: 0.95rem;
   }
   .step input, .step select {
-    width: 100%;
+    width: 75%; /* narrowed */
     padding: 8px;
     border: 1px solid #ccc;
     border-radius: 4px;
@@ -190,7 +190,7 @@
   }
 
   .search-btn {
-    width: 100%;
+    width: 75%; /* match input width */
     background: #bfa14a;
     color: #fff;
     padding: 12px;
@@ -198,6 +198,8 @@
     border-radius: 6px;
     font-size: 1rem;
     cursor: pointer;
+    margin: 20px auto 0; /* spacing + center */
+    display: block;
   }
 
   /* ---------- Date + Exact Toggle ---------- */
@@ -210,7 +212,7 @@
     display: flex;
     flex-direction: column;
     gap: 6px;
-    width: 100%;
+    width: 75%; /* match inputs */
   }
   .sub-row {
     display: flex;
@@ -243,12 +245,13 @@
   .date-wrap .hint {
     font-size: 0.85rem;
     color: #555;
+    width: 75%;
   }
 
   /* ---------- Compact (Power) Search ---------- */
   .compact-bar {
     display: none;
-    max-width: 900px;
+    max-width: 720px;
     margin: -20px auto 40px;
     background: rgba(255,255,255,0.95);
     border-radius: 12px;
@@ -331,7 +334,6 @@
   <!-- Step 1 -->
   <div class="step">
     <h3>1&nbsp;Enter Origin & Destination</h3>
-
     <label for="origin">Origin</label>
     <input type="text" id="origin" placeholder="e.g. DFW">
 
@@ -358,29 +360,26 @@
     </div>
   </div>
 
-  <!-- Step 2 + 3 combined -->
+  <!-- Step 2 + Step 3 stacked -->
   <div class="step" style="text-align:center;">
     <h3>2&nbsp;Routing Preferences</h3>
-
     <label>Direct Non-stop</label>
     <div class="toggle-group" id="directStop">
       <button data-val="yes">Yes</button>
       <button data-val="no">No</button>
     </div>
-
     <label>Multiple Connections</label>
     <div class="toggle-group" id="multiConn">
       <button data-val="yes">Yes</button>
       <button data-val="no">No</button>
     </div>
-
     <label>Positioning Flight Allowed</label>
     <div class="toggle-group" id="posFlight">
       <button data-val="yes">Yes</button>
       <button data-val="no">No</button>
     </div>
 
-    <h3>3&nbsp;Search</h3>
+    <h3 style="margin-top:20px;">3&nbsp;Search</h3>
     <button class="search-btn">Search</button>
   </div>
 </div>
@@ -389,20 +388,20 @@
 <div class="compact-bar" id="compactBar">
   <input type="text" placeholder="Origin (e.g. DFW)" id="cOrigin">
   <input type="text" placeholder="Destination (e.g. LHR)" id="cDest">
-  <select id="dnsToggle">
-    <option>Direct Non-stop: Any</option>
-    <option>Yes</option>
-    <option>No</option>
-  </select>
   <select id="mcToggle">
     <option>Multiple Connections: Any</option>
-    <option>Yes</option>
     <option>No</option>
+    <option>Yes</option>
+  </select>
+  <select id="dnsToggle">
+    <option>Direct Non-stop: Any</option>
+    <option>No</option>
+    <option>Yes</option>
   </select>
   <select id="pfToggle">
     <option>Positioning Flight: Any</option>
-    <option>Yes</option>
     <option>No</option>
+    <option>Yes</option>
   </select>
   <button class="search-btn">Search</button>
 </div>
