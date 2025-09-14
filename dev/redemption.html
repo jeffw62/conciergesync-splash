@@ -256,6 +256,15 @@
     position: relative;
     z-index: 3;
   }
+  .compact-bar .guided-toggle {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    font-size: 0.9rem;
+    color: #0a1a33;
+    cursor: pointer;
+    text-decoration: underline;
+  }
   .compact-row {
     display: flex;
     gap: 10px;
@@ -267,13 +276,21 @@
     border: 1px solid #ccc;
     border-radius: 4px;
   }
+  .compact-date-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 6px;
+  }
   .compact-hint {
     font-size: 0.85rem;
     color: #555;
-    margin: -5px 0 10px 0;
+    margin: 0 0 12px 0;
   }
   .compact-bar .search-btn {
-    width: 100%;
+    width: auto;
+    min-width: 180px;
+    align-self: flex-start;
   }
 
   /* ---------- Table ---------- */
@@ -393,13 +410,14 @@
 
 <!-- Compact Power Search -->
 <div class="compact-bar" id="compactBar">
+  <span class="guided-toggle" id="guidedToggle">Guided Search</span>
   <div class="compact-row">
     <input type="text" placeholder="Origin (e.g. DFW)" id="cOrigin">
     <input type="text" placeholder="Destination (e.g. LHR)" id="cDest">
     <input type="date" id="cDepartDate" />
   </div>
 
-  <div class="compact-row">
+  <div class="compact-date-row">
     <label class="exact-toggle">
       <input type="checkbox" id="cExactDate"> Exact date only
     </label>
@@ -466,12 +484,17 @@
 
   // Power Search toggle
   const powerToggle = document.getElementById("powerToggle");
+  const guidedToggle = document.getElementById("guidedToggle");
   const searchPanel = document.getElementById("searchPanel");
   const compactBar = document.getElementById("compactBar");
+
   powerToggle.addEventListener("click", () => {
-    const spVisible = searchPanel.style.display !== "none";
-    searchPanel.style.display = spVisible ? "none" : "grid";
-    compactBar.style.display = spVisible ? "flex" : "none";
+    searchPanel.style.display = "none";
+    compactBar.style.display = "flex";
+  });
+  guidedToggle.addEventListener("click", () => {
+    compactBar.style.display = "none";
+    searchPanel.style.display = "grid";
   });
 
   // Guided Search Exact date
@@ -522,6 +545,16 @@
       `;
       tbody.appendChild(tr);
     });
+
+    // Highlight best CPM
+    if (data.length > 0) {
+      const best = data.reduce((a, b) => parseFloat(a.cpm) > parseFloat(b.cpm) ? a : b);
+      [...tbody.rows].forEach(row => {
+        if (row.cells[0].innerText === best.route) {
+          row.classList.add("highlight");
+        }
+      });
+    }
   }
   renderTable(redemptions);
 </script>
