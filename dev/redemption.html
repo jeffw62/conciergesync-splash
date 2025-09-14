@@ -120,7 +120,7 @@
     background: rgba(255,255,255,0.95);
     border-radius: 12px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    padding: 24px 20px; /* slightly tighter */
+    padding: 24px 20px;
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
     gap: 20px;
@@ -144,7 +144,7 @@
   .step {
     display: flex;
     flex-direction: column;
-    gap: 6px; /* tighter */
+    gap: 6px;
   }
   .step h3 {
     margin: 0 0 4px 0;
@@ -152,7 +152,6 @@
     font-size: 1.1rem;
   }
   .step label {
-    display: block;
     margin: 2px 0;
     font-weight: 500;
     font-size: 0.95rem;
@@ -171,11 +170,12 @@
   /* --- Toggle buttons --- */
   .toggle-group {
     display: flex;
+    justify-content: center; /* center align toggles */
     gap: 8px;
     margin-top: 2px;
   }
   .toggle-group button {
-    flex: 0 0 auto; /* natural width */
+    flex: 0 0 auto;
     padding: 6px 14px;
     min-width: 60px;
     border: 1px solid #ccc;
@@ -208,7 +208,7 @@
   }
   .date-row {
     display: flex;
-    flex-direction: column; /* stack main field over sub-row */
+    flex-direction: column;
     gap: 6px;
     width: 100%;
   }
@@ -359,7 +359,7 @@
   </div>
 
   <!-- Step 2 -->
-  <div class="step">
+  <div class="step" style="text-align:center;">
     <h3>2&nbsp;Routing Preferences</h3>
     <label>Multiple Connections</label>
     <div class="toggle-group" id="multiConn">
@@ -381,9 +381,7 @@
   <!-- Step 3 -->
   <div class="step">
     <h3>3&nbsp;Search</h3>
-    <div class="actions">
-      <button class="search-btn">Search</button>
-    </div>
+    <button class="search-btn">Search</button>
   </div>
 </div>
 
