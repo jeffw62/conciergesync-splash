@@ -115,7 +115,7 @@
 
   /* ---------- Guided Search Panel ---------- */
   .search-panel {
-    max-width: 720px; /* smaller card */
+    max-width: 900px;
     margin: -80px auto 40px;
     background: rgba(255,255,255,0.95);
     border-radius: 12px;
@@ -157,7 +157,7 @@
     font-size: 0.95rem;
   }
   .step input, .step select {
-    width: 75%; /* narrower width */
+    width: 100%;
     padding: 8px;
     border: 1px solid #ccc;
     border-radius: 4px;
@@ -190,7 +190,7 @@
   }
 
   .search-btn {
-    width: 75%; /* match input width */
+    width: 100%;
     background: #bfa14a;
     color: #fff;
     padding: 12px;
@@ -198,8 +198,6 @@
     border-radius: 6px;
     font-size: 1rem;
     cursor: pointer;
-    margin: 20px auto 0; /* spacing + center */
-    display: block; /* center align */
   }
 
   /* ---------- Date + Exact Toggle ---------- */
@@ -212,7 +210,7 @@
     display: flex;
     flex-direction: column;
     gap: 6px;
-    width: 75%; /* match inputs */
+    width: 100%;
   }
   .sub-row {
     display: flex;
@@ -245,13 +243,12 @@
   .date-wrap .hint {
     font-size: 0.85rem;
     color: #555;
-    width: 75%;
   }
 
   /* ---------- Compact (Power) Search ---------- */
   .compact-bar {
     display: none;
-    max-width: 720px;
+    max-width: 900px;
     margin: -20px auto 40px;
     background: rgba(255,255,255,0.95);
     border-radius: 12px;
@@ -305,6 +302,204 @@
 </style>
 </head>
 <body>
-<!-- same body as before (header, hero, search-panel, etc.) -->
+
+<header>
+  <div class="logo">
+    <a href="/dev/home.html">
+      <img src="/dev/asset/CS_Logo_Premium_2x.png" alt="ConciergeSync Logo">
+      ConciergeSync™
+    </a>
+  </div>
+  <div class="menu-toggle"><span></span><span></span><span></span></div>
+  <nav>
+    <a href="/dev/index.html">About</a>
+    <a href="/dev/betap.html">Beta Program</a>
+    <a href="#">Helpful Hints</a>
+    <a href="#">Contact</a>
+  </nav>
+</header>
+
+<section class="hero">
+  <h1>Redemption Engine</h1>
+  <p>Scan and compare the best redemption opportunities across your programs. Sort, filter, and act with confidence.</p>
+</section>
+
+<!-- Guided Search Panel -->
+<div class="search-panel" id="searchPanel">
+  <span class="power-toggle" id="powerToggle">Power Search</span>
+
+  <!-- Step 1 -->
+  <div class="step">
+    <h3>1&nbsp;Enter Origin & Destination</h3>
+
+    <label for="origin">Origin</label>
+    <input type="text" id="origin" placeholder="e.g. DFW">
+
+    <label for="destination">Destination</label>
+    <input type="text" id="destination" placeholder="e.g. LHR">
+
+    <div class="date-wrap">
+      <label for="departDate">Departure Date</label>
+      <div class="date-row">
+        <input type="date" id="departDate" />
+        <div class="sub-row">
+          <label class="exact-toggle">
+            <input type="checkbox" id="exactDate" />
+            Exact date only
+          </label>
+          <div class="flexrange" id="flexContainer">
+            ± <input type="number" id="flexDays" min="1" max="14" value="3"> days
+          </div>
+        </div>
+      </div>
+      <small class="hint">
+        If “Exact date only” is unchecked you can choose a ±-day window (1–14). Default is ±3 days.
+      </small>
+    </div>
+  </div>
+
+  <!-- Step 2 + 3 combined -->
+  <div class="step" style="text-align:center;">
+    <h3>2&nbsp;Routing Preferences</h3>
+
+    <label>Direct Non-stop</label>
+    <div class="toggle-group" id="directStop">
+      <button data-val="yes">Yes</button>
+      <button data-val="no">No</button>
+    </div>
+
+    <label>Multiple Connections</label>
+    <div class="toggle-group" id="multiConn">
+      <button data-val="yes">Yes</button>
+      <button data-val="no">No</button>
+    </div>
+
+    <label>Positioning Flight Allowed</label>
+    <div class="toggle-group" id="posFlight">
+      <button data-val="yes">Yes</button>
+      <button data-val="no">No</button>
+    </div>
+
+    <h3>3&nbsp;Search</h3>
+    <button class="search-btn">Search</button>
+  </div>
+</div>
+
+<!-- Compact Power Search -->
+<div class="compact-bar" id="compactBar">
+  <input type="text" placeholder="Origin (e.g. DFW)" id="cOrigin">
+  <input type="text" placeholder="Destination (e.g. LHR)" id="cDest">
+  <select id="dnsToggle">
+    <option>Direct Non-stop: Any</option>
+    <option>Yes</option>
+    <option>No</option>
+  </select>
+  <select id="mcToggle">
+    <option>Multiple Connections: Any</option>
+    <option>Yes</option>
+    <option>No</option>
+  </select>
+  <select id="pfToggle">
+    <option>Positioning Flight: Any</option>
+    <option>Yes</option>
+    <option>No</option>
+  </select>
+  <button class="search-btn">Search</button>
+</div>
+
+<main class="container">
+  <table>
+    <thead>
+      <tr>
+        <th>Route</th>
+        <th>Program</th>
+        <th>Points Needed</th>
+        <th>Cash Price</th>
+        <th>Fees</th>
+        <th>Value (¢/mile)</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody id="resultsBody"></tbody>
+  </table>
+</main>
+
+<div id="footer"></div>
+
+<script>
+  // Footer loader
+  fetch("/dev/footer.html")
+    .then(res => res.text())
+    .then(html => { document.getElementById("footer").innerHTML = html; })
+    .catch(err => console.error("Footer failed to load:", err));
+
+  // Hamburger toggle
+  const toggleBtn = document.querySelector(".menu-toggle");
+  const nav = document.querySelector("header nav");
+  toggleBtn.addEventListener("click", () => nav.classList.toggle("active"));
+
+  // Power Search toggle
+  const powerToggle = document.getElementById("powerToggle");
+  const searchPanel = document.getElementById("searchPanel");
+  const compactBar = document.getElementById("compactBar");
+  powerToggle.addEventListener("click", () => {
+    const spVisible = searchPanel.style.display !== "none";
+    searchPanel.style.display = spVisible ? "none" : "grid";
+    compactBar.style.display = spVisible ? "flex" : "none";
+  });
+
+  // Exact date / flex days behavior
+  const exactBox = document.getElementById('exactDate');
+  const flexContainer = document.getElementById('flexContainer');
+  const flexDaysInput = document.getElementById('flexDays');
+
+  function updateFlexVisibility() {
+    const exact = exactBox.checked;
+    flexContainer.style.display = exact ? 'none' : 'flex';
+    flexDaysInput.disabled = exact;
+  }
+
+  function getFlexRange() {
+    if (exactBox.checked) return 0;
+    const n = parseInt(flexDaysInput.value || '3', 10);
+    return Math.max(1, Math.min(14, isNaN(n) ? 3 : n));
+  }
+
+  exactBox.addEventListener('change', updateFlexVisibility);
+  document.addEventListener('DOMContentLoaded', updateFlexVisibility);
+
+  // Sample redemption data
+  const redemptions = [
+    { route: "DFW → LHR", program: "AA", points: 57500, cashFare: 7950, fees: 737 },
+    { route: "CUN → DFW", program: "Avios", points: 12000, cashFare: 540, fees: 90 },
+    { route: "LAS → JFK", program: "JetBlue", points: 15000, cashFare: 585, fees: 30 }
+  ];
+  redemptions.forEach(r => { r.cpm = ((r.cashFare - r.fees) / r.points).toFixed(2); });
+
+  function renderTable(data) {
+    const tbody = document.getElementById("resultsBody");
+    tbody.innerHTML = "";
+    data.forEach(r => {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${r.route}</td>
+        <td>${r.program}</td>
+        <td>${r.points.toLocaleString()}</td>
+        <td>$${r.cashFare.toLocaleString()}</td>
+        <td>$${r.fees.toLocaleString()}</td>
+        <td><strong>${r.cpm}¢</strong></td>
+        <td><button class="btn">Book</button></td>
+      `;
+      tbody.appendChild(tr);
+    });
+    if (data.length > 0) {
+      const best = data.reduce((a,b)=>parseFloat(a.cpm)>parseFloat(b.cpm)?a:b);
+      [...tbody.rows].forEach(row=>{
+        if(row.cells[0].innerText===best.route) row.classList.add("highlight");
+      });
+    }
+  }
+  renderTable(redemptions);
+</script>
 </body>
 </html>
