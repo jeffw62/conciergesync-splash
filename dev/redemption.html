@@ -267,23 +267,38 @@
   }
   .compact-row {
     display: flex;
-    flex-wrap: wrap;
     gap: 10px;
+    flex-wrap: wrap;
     margin-bottom: 10px;
   }
   .compact-bar input, .compact-bar select {
     padding: 8px;
     border: 1px solid #ccc;
     border-radius: 4px;
-    flex: 1;
-    min-width: 140px;
   }
   .compact-date-row {
     display: flex;
-    flex-wrap: wrap;
     align-items: center;
-    gap: 10px;
+    gap: 16px;    /* NEW spacing between date, checkbox, flex days */
     margin-bottom: 6px;
+    flex-wrap: wrap;
+  }
+  .compact-date-row input[type="date"] {
+    padding: 6px 10px;
+    font-size: 1rem;
+  }
+  .compact-date-row .exact-toggle {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+  .compact-date-row .flexrange {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
   }
   .compact-hint {
     font-size: 0.85rem;
@@ -294,25 +309,6 @@
     width: auto;
     min-width: 180px;
     align-self: flex-start;
-  }
-
-  /* ---------- Mobile Fixes ---------- */
-  @media (max-width: 480px) {
-    .compact-row {
-      flex-direction: column;
-      align-items: stretch;
-    }
-    .compact-date-row {
-      flex-direction: column;
-      align-items: flex-start;
-    }
-    .compact-bar select {
-      width: 100%;
-    }
-    .compact-bar .search-btn {
-      width: 100%;
-      align-self: stretch;
-    }
   }
 
   /* ---------- Table ---------- */
@@ -382,10 +378,13 @@
   <!-- Step 1 -->
   <div class="step">
     <h3>1&nbsp;Enter Origin & Destination</h3>
+
     <label for="origin">Origin</label>
     <input type="text" id="origin" placeholder="e.g. DFW">
+
     <label for="destination">Destination</label>
     <input type="text" id="destination" placeholder="e.g. LHR">
+
     <div class="date-wrap">
       <label for="departDate">Departure Date</label>
       <input type="date" id="departDate" />
@@ -421,6 +420,7 @@
       <button data-val="yes">Yes</button>
       <button data-val="no">No</button>
     </div>
+
     <h3 style="margin-top:20px;">3&nbsp;Search</h3>
     <button class="search-btn">Search</button>
   </div>
@@ -433,6 +433,8 @@
     <input type="text" placeholder="Origin (e.g. DFW)" id="cOrigin">
     <input type="text" placeholder="Destination (e.g. LHR)" id="cDest">
   </div>
+
+  <!-- Row 2: Date + Exact toggle + flex days (inline, spaced) -->
   <div class="compact-date-row">
     <input type="date" id="cDepartDate" />
     <label class="exact-toggle">
@@ -442,9 +444,11 @@
       ± <input type="number" id="cFlexDays" min="1" max="14" value="3"> days
     </div>
   </div>
+
   <div class="compact-hint">
     If “Exact date only” is unchecked you can choose a ±-day window (1–14). Default is ±3 days.
   </div>
+
   <div class="compact-row">
     <select id="dnsToggle">
       <option>Direct Non-stop: Any</option>
@@ -462,6 +466,7 @@
       <option>Yes</option>
     </select>
   </div>
+
   <button class="search-btn">Search</button>
 </div>
 
@@ -501,6 +506,7 @@
   const guidedToggle = document.getElementById("guidedToggle");
   const searchPanel = document.getElementById("searchPanel");
   const compactBar = document.getElementById("compactBar");
+
   powerToggle.addEventListener("click", () => {
     searchPanel.style.display = "none";
     compactBar.style.display = "flex";
@@ -533,7 +539,43 @@
   }
   cExactBox.addEventListener('change', updateCompactFlexVisibility);
   document.addEventListener('DOMContentLoaded', updateCompactFlexVisibility);
-</script>
 
+  // Sample redemption data
+  const redemptions = [
+    { route: "DFW → LHR", program: "AA", points: 57500, cashFare: 7950, fees: 737 },
+    { route: "CUN → DFW", program: "Avios", points: 12000, cashFare: 540, fees: 90 },
+    { route: "LAS → JFK", program: "JetBlue", points: 15000, cashFare: 585, fees: 30 }
+  ];
+  redemptions.forEach(r => { r.cpm = ((r.cashFare - r.fees) / r.points).toFixed(2); });
+
+  function renderTable(data) {
+    const tbody = document.getElementById("resultsBody");
+    tbody.innerHTML = "";
+    data.forEach(r => {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${r.route}</td>
+        <td>${r.program}</td>
+        <td>${r.points.toLocaleString()}</td>
+        <td>$${r.cashFare.toLocaleString()}</td>
+        <td>$${r.fees.toLocaleString()}</td>
+        <td><strong>${r.cpm}</strong></td>
+        <td><button class="btn">Book</button></td>
+      `;
+      tbody.appendChild(tr);
+    });
+
+    // Highlight best CPM
+    if (data.length > 0) {
+      const best = data.reduce((a, b) => parseFloat(a.cpm) > parseFloat(b.cpm) ? a : b);
+      [...tbody.rows].forEach(row => {
+        if (row.cells[0].innerText === best.route) {
+          row.classList.add("highlight");
+        }
+      });
+    }
+  }
+  renderTable(redemptions);
+</script>
 </body>
 </html>
