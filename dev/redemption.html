@@ -237,6 +237,28 @@
   .compact-date input[type="number"] {
     width: 50px;
   }
+    .compact-date {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: nowrap;  /* keep inline */
+  }
+  
+  .compact-date label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin: 0;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+  
+  .compact-date input[type="number"] {
+    width: 50px;
+    padding: 4px 6px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
 
   /* ---------- Table ---------- */
   .container {
@@ -358,33 +380,44 @@
   <div class="compact-row">
     <input type="text" placeholder="Origin (e.g. DFW)" id="cOrigin">
     <input type="text" placeholder="Destination (e.g. LHR)" id="cDest">
+
+    <!-- Date Selection -->
     <input type="date" id="cDepartDate" />
-    <label class="exact-toggle">
-      <input type="checkbox" id="cExactDate"> Exact date only
-    </label>
-    <div class="flexrange" id="cFlexContainer">
-      ± <input type="number" id="cFlexDays" min="1" max="14" value="3"> days
+      <div class="compact-date">
+        <label class="exact-toggle">
+          <input type="checkbox" id="cExactDate"> Exact date only
+        </label>
+        <div class="flexrange" id="cFlexContainer">
+          ± <input type="number" id="cFlexDays" min="1" max="14" value="3"> days
+        </div>
+      </div>
     </div>
+  
+    <!-- Hint -->
+    <small class="hint" style="flex-basis: 100%; margin-left:5px;">
+      If “Exact date only” is unchecked you can choose a ±-day window (1–14). Default is ±3 days.
+    </small>
+  
+    <div class="compact-row">
+      <select id="dnsToggle">
+        <option>Direct Non-stop: Any</option>
+        <option>No</option>
+        <option>Yes</option>
+      </select>
+      <select id="pfToggle">
+        <option>Positioning Flight: Any</option>
+        <option>No</option>
+        <option>Yes</option>
+      </select>
+      <select id="mcToggle">
+        <option>Multiple Connections: Any</option>
+        <option>No</option>
+        <option>Yes</option>
+      </select>
+    </div>
+  
+    <button class="search-btn">Search</button>
   </div>
-  <div class="compact-row">
-    <select id="dnsToggle">
-      <option>Direct Non-stop: Any</option>
-      <option>No</option>
-      <option>Yes</option>
-    </select>
-    <select id="pfToggle">
-      <option>Positioning Flight: Any</option>
-      <option>No</option>
-      <option>Yes</option>
-    </select>
-    <select id="mcToggle">
-      <option>Multiple Connections: Any</option>
-      <option>No</option>
-      <option>Yes</option>
-    </select>
-  </div>
-  <button class="search-btn">Search</button>
-</div>
 
 <main class="container">
   <table>
