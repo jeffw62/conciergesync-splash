@@ -189,10 +189,10 @@
     border-color: #bfa14a;
   }
   .toggle-group button[data-val="no"] {
-    margin-left: 20px;   /* push No button further right */
+    margin-left: 20px;
   }
   .search-btn {
-    width: 75%;       /* match input field width */
+    width: 75%;
     background: #bfa14a;
     color: #fff;
     padding: 12px;
@@ -203,83 +203,30 @@
     display: block;
   }
 
-  /* ---------- Date + Exact Toggle ---------- */
-  .date-wrap .hint {
-    font-size: 0.85rem;
-    color: #555;
-    display: block;
-    width: 75%;       /* force match input width */
-    margin-left: 0;   /* keep it aligned with inputs */
-    margin-top: 4px;
-    line-height: 1.4;
-  }
-  .date-row {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    width: 100%;
-  }
-  .date-wrap .hint {
-    font-size: 0.85rem;
-    color: #555;
-    display: block;
-    max-width: 100%;   /* let it span full width */
-    margin-top: 4px;   /* give a little breathing room */
-  }
-
-  .sub-row {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-  }
-  .exact-toggle {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-weight: 500;
-    white-space: nowrap;
-  }
-  .exact-toggle input { margin: 0; }
-  #flexContainer {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    white-space: nowrap;
-  }
-  #flexContainer input[type="number"] {
-    width: 60px;
-    padding: 6px 8px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    font-family: inherit;
-    font-size: 1rem;
-    box-sizing: border-box;
-  }
-  .date-wrap .hint {
-    font-size: 0.85rem;
-    color: #555;
-    margin-top: 4px; /* ensure it’s clearly separated under line 2 */
-  }
-
   /* ---------- Compact (Power) Search ---------- */
   .compact-bar {
     display: none;
     max-width: 1100px;
-    margin: -80px auto 40px;   /* match main search card */
+    margin: -80px auto 40px;
     background: rgba(255,255,255,0.95);
     border-radius: 12px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.15);
     padding: 20px;
+    flex-direction: column;
+    gap: 10px;
+    position: relative;
+    z-index: 3;
+  }
+  .compact-row {
+    display: flex;
     gap: 10px;
     flex-wrap: wrap;
-    position: relative;
-    z-index: 3;               /* ensure it sits above hero */
+    margin-bottom: 10px;
   }
   .compact-bar input, .compact-bar select {
     padding: 8px;
     border: 1px solid #ccc;
     border-radius: 4px;
-    margin: 5px;
   }
   .compact-date {
     display: flex;
@@ -287,28 +234,8 @@
     gap: 10px;
     flex-wrap: wrap;
   }
-  .compact-date input[type="date"] {
-    padding: 6px 8px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-  }
-  .compact-date .flexrange {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    font-size: 0.9rem;
-  }
   .compact-date input[type="number"] {
     width: 50px;
-    padding: 4px 6px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-  }
-    .compact-row {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-    margin-bottom: 10px;
   }
 
   /* ---------- Table ---------- */
@@ -378,13 +305,10 @@
   <!-- Step 1 -->
   <div class="step">
     <h3>1&nbsp;Enter Origin & Destination</h3>
-
     <label for="origin">Origin</label>
     <input type="text" id="origin" placeholder="e.g. DFW">
-
     <label for="destination">Destination</label>
     <input type="text" id="destination" placeholder="e.g. LHR">
-
     <div class="date-wrap">
       <label for="departDate">Departure Date</label>
       <div class="date-row">
@@ -405,7 +329,7 @@
     </div>
   </div>
 
-  <!-- Step 2 + Step 3 stacked -->
+  <!-- Step 2 + Step 3 -->
   <div class="step routing">
     <h3>2&nbsp;Routing Preferences</h3>
     <label>Direct Non-stop</label>
@@ -431,45 +355,36 @@
 
 <!-- Compact Power Search -->
 <div class="compact-bar" id="compactBar">
-  <input type="text" placeholder="Origin (e.g. DFW)" id="cOrigin">
-  <input type="text" placeholder="Destination (e.g. LHR)" id="cDest">
-
-  <!-- Date Selection -->
- <div class="compact-bar" id="compactBar">
   <div class="compact-row">
     <input type="text" placeholder="Origin (e.g. DFW)" id="cOrigin">
     <input type="text" placeholder="Destination (e.g. LHR)" id="cDest">
-
-    <!-- Date Selection -->
     <input type="date" id="cDepartDate" />
     <label class="exact-toggle">
       <input type="checkbox" id="cExactDate"> Exact date only
     </label>
-      <div class="flexrange" id="cFlexContainer">
-        ± <input type="number" id="cFlexDays" min="1" max="14" value="3"> days
-      </div>
+    <div class="flexrange" id="cFlexContainer">
+      ± <input type="number" id="cFlexDays" min="1" max="14" value="3"> days
     </div>
-  
-    <div class="compact-row">
-      <select id="dnsToggle">
-        <option>Direct Non-stop: Any</option>
-        <option>No</option>
-        <option>Yes</option>
-      </select>
-      <select id="pfToggle">
-        <option>Positioning Flight: Any</option>
-        <option>No</option>
-        <option>Yes</option>
-      </select>
-      <select id="mcToggle">
-        <option>Multiple Connections: Any</option>
-        <option>No</option>
-        <option>Yes</option>
-      </select>
-    </div>
-  
-    <button class="search-btn">Search</button>
   </div>
+  <div class="compact-row">
+    <select id="dnsToggle">
+      <option>Direct Non-stop: Any</option>
+      <option>No</option>
+      <option>Yes</option>
+    </select>
+    <select id="pfToggle">
+      <option>Positioning Flight: Any</option>
+      <option>No</option>
+      <option>Yes</option>
+    </select>
+    <select id="mcToggle">
+      <option>Multiple Connections: Any</option>
+      <option>No</option>
+      <option>Yes</option>
+    </select>
+  </div>
+  <button class="search-btn">Search</button>
+</div>
 
 <main class="container">
   <table>
@@ -511,40 +426,30 @@
     searchPanel.style.display = spVisible ? "none" : "grid";
     compactBar.style.display = spVisible ? "flex" : "none";
   });
-  
-  // Power Search Exact date / flex days
-  const cExactBox = document.getElementById('cExactDate');
-  const cFlexContainer = document.getElementById('cFlexContainer');
-  const cFlexDaysInput = document.getElementById('cFlexDays');
-  
-  function updateCompactFlexVisibility() {
-    const exact = cExactBox.checked;
-    cFlexContainer.style.display = exact ? 'none' : 'flex';
-    cFlexDaysInput.disabled = exact;
-  }
-  
-  cExactBox.addEventListener('change', updateCompactFlexVisibility);
-  document.addEventListener('DOMContentLoaded', updateCompactFlexVisibility);
-  
-  // Exact date / flex days behavior
+
+  // Guided Exact date toggle
   const exactBox = document.getElementById('exactDate');
   const flexContainer = document.getElementById('flexContainer');
   const flexDaysInput = document.getElementById('flexDays');
-
   function updateFlexVisibility() {
     const exact = exactBox.checked;
     flexContainer.style.display = exact ? 'none' : 'flex';
     flexDaysInput.disabled = exact;
   }
-
-  function getFlexRange() {
-    if (exactBox.checked) return 0;
-    const n = parseInt(flexDaysInput.value || '3', 10);
-    return Math.max(1, Math.min(14, isNaN(n) ? 3 : n));
-  }
-
   exactBox.addEventListener('change', updateFlexVisibility);
   document.addEventListener('DOMContentLoaded', updateFlexVisibility);
+
+  // Compact Exact date toggle
+  const cExactBox = document.getElementById('cExactDate');
+  const cFlexContainer = document.getElementById('cFlexContainer');
+  const cFlexDaysInput = document.getElementById('cFlexDays');
+  function updateCompactFlexVisibility() {
+    const exact = cExactBox.checked;
+    cFlexContainer.style.display = exact ? 'none' : 'flex';
+    cFlexDaysInput.disabled = exact;
+  }
+  cExactBox.addEventListener('change', updateCompactFlexVisibility);
+  document.addEventListener('DOMContentLoaded', updateCompactFlexVisibility);
 
   // Sample redemption data
   const redemptions = [
