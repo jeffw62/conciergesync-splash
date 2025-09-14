@@ -201,7 +201,8 @@
     font-size: 1rem;
     cursor: pointer;
     display: block;
-    margin: 0 auto;
+    margin-top: 12px;   /* spacing */
+    margin-left: 0;     /* left-justify */
   }
 
   /* ---------- Date + Exact Toggle ---------- */
@@ -209,8 +210,8 @@
     font-size: 0.85rem;
     color: #555;
     display: block;
-    width: 75%;       /* force match input width */
-    margin-left: 0;   /* keep it aligned with inputs */
+    width: 75%;       /* match input width */
+    margin-left: 0;
     margin-top: 4px;
     line-height: 1.4;
   }
@@ -252,36 +253,48 @@
   /* ---------- Compact (Power) Search ---------- */
   .compact-bar {
     display: none;
-    max-width: 950px;     /* narrower than full width */
+    max-width: 900px;
     margin: -80px auto 40px;
     background: rgba(255,255,255,0.95);
     border-radius: 12px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.15);
     padding: 20px;
-    flex-direction: column;
-    gap: 14px;
-    position: relative;
-    z-index: 3;
-  }
-  .compact-row {
-    display: flex;
     gap: 10px;
     flex-wrap: wrap;
-    align-items: center;
+    position: relative;
+    z-index: 3;
   }
   .compact-bar input, .compact-bar select {
     padding: 8px;
     border: 1px solid #ccc;
     border-radius: 4px;
+    margin: 5px;
+  }
+  .compact-date {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .compact-date input[type="number"] {
+    width: 50px;
+    padding: 4px 6px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+  .compact-row {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 10px;
   }
   .compact-bar .hint {
     font-size: 0.85rem;
     color: #555;
-    margin-left: 4px;
-  }
-  .flexrange input[type="number"] {
-    width: 50px;
-    padding: 4px 6px;
+    display: block;
+    margin-top: 4px;
+    line-height: 1.4;
+    width: 100%;
   }
 
   /* ---------- Table ---------- */
@@ -378,7 +391,7 @@
     </div>
   </div>
 
-  <!-- Step 2 + Step 3 stacked -->
+  <!-- Step 2 + Step 3 -->
   <div class="step routing">
     <h3>2&nbsp;Routing Preferences</h3>
     <label>Direct Non-stop</label>
@@ -489,27 +502,28 @@
   const cExactBox = document.getElementById('cExactDate');
   const cFlexContainer = document.getElementById('cFlexContainer');
   const cFlexDaysInput = document.getElementById('cFlexDays');
-  
   function updateCompactFlexVisibility() {
     const exact = cExactBox.checked;
     cFlexContainer.style.display = exact ? 'none' : 'flex';
     cFlexDaysInput.disabled = exact;
   }
-  
   cExactBox.addEventListener('change', updateCompactFlexVisibility);
   document.addEventListener('DOMContentLoaded', updateCompactFlexVisibility);
 
-  // Guided panel Exact date / flex days
+  // Guided Search Exact date / flex days
   const exactBox = document.getElementById('exactDate');
   const flexContainer = document.getElementById('flexContainer');
   const flexDaysInput = document.getElementById('flexDays');
-
   function updateFlexVisibility() {
     const exact = exactBox.checked;
     flexContainer.style.display = exact ? 'none' : 'flex';
     flexDaysInput.disabled = exact;
   }
-
+  function getFlexRange() {
+    if (exactBox.checked) return 0;
+    const n = parseInt(flexDaysInput.value || '3', 10);
+    return Math.max(1, Math.min(14, isNaN(n) ? 3 : n));
+  }
   exactBox.addEventListener('change', updateFlexVisibility);
   document.addEventListener('DOMContentLoaded', updateFlexVisibility);
 
@@ -522,4 +536,29 @@
   redemptions.forEach(r => { r.cpm = ((r.cashFare - r.fees) / r.points).toFixed(2); });
 
   function renderTable(data) {
-    const tbody = document.getElementById("results
+    const tbody = document.getElementById("resultsBody");
+    tbody.innerHTML = "";
+    data.forEach(r => {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${r.route}</td>
+        <td>${r.program}</td>
+        <td>${r.points.toLocaleString()}</td>
+        <td>$${r.cashFare.toLocaleString()}</td>
+        <td>$${r.fees.toLocaleString()}</td>
+        <td><strong>${r.cpm}¢</strong></td>
+        <td><button class="btn">Book</button></td>
+      `;
+      tbody.appendChild(tr);
+    });
+    if (data.length > 0) {
+      const best = data.reduce((a,b)=>parseFloat(a.cpm)>parseFloat(b.cpm)?a:b);
+      [...tbody.rows].forEach(row=>{
+        if(row.cells[0].innerText===best.route) row.classList.add("highlight");
+      });
+    }
+  }
+  renderTable(redemptions);
+</script>
+</body>
+</html>
