@@ -190,8 +190,7 @@
   }
 
   .search-btn {
-    width: 75%;
-    margin-top: 12px;
+    width: 75%;       /* match input field width */
     background: #bfa14a;
     color: #fff;
     padding: 12px;
@@ -199,14 +198,16 @@
     border-radius: 6px;
     font-size: 1rem;
     cursor: pointer;
-    text-align: left; /* left align */
+    display: block;
   }
 
   /* ---------- Date + Exact Toggle ---------- */
-  .date-wrap {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
+  .date-wrap .hint {
+    font-size: 0.85rem;
+    color: #555;
+    display: block;
+    max-width: 75%;   /* align with input fields */
+    margin-top: 4px;
   }
   .date-row {
     display: flex;
