@@ -281,6 +281,29 @@
     border-radius: 4px;
     margin: 5px;
   }
+  .compact-date {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .compact-date input[type="date"] {
+    padding: 6px 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+  .compact-date .flexrange {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.9rem;
+  }
+  .compact-date input[type="number"] {
+    width: 50px;
+    padding: 4px 6px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
 
   /* ---------- Table ---------- */
   .container {
@@ -404,6 +427,18 @@
 <div class="compact-bar" id="compactBar">
   <input type="text" placeholder="Origin (e.g. DFW)" id="cOrigin">
   <input type="text" placeholder="Destination (e.g. LHR)" id="cDest">
+
+  <!-- Date Selection -->
+  <div class="compact-date">
+    <input type="date" id="cDepartDate" />
+    <label class="exact-toggle">
+      <input type="checkbox" id="cExactDate"> Exact date only
+    </label>
+    <div class="flexrange" id="cFlexContainer">
+      ± <input type="number" id="cFlexDays" min="1" max="14" value="3"> days
+    </div>
+  </div>
+
   <select id="mcToggle">
     <option>Multiple Connections: Any</option>
     <option>No</option>
@@ -419,6 +454,7 @@
     <option>No</option>
     <option>Yes</option>
   </select>
+
   <button class="search-btn">Search</button>
 </div>
 
@@ -462,7 +498,21 @@
     searchPanel.style.display = spVisible ? "none" : "grid";
     compactBar.style.display = spVisible ? "flex" : "none";
   });
-
+  
+  // Power Search Exact date / flex days
+  const cExactBox = document.getElementById('cExactDate');
+  const cFlexContainer = document.getElementById('cFlexContainer');
+  const cFlexDaysInput = document.getElementById('cFlexDays');
+  
+  function updateCompactFlexVisibility() {
+    const exact = cExactBox.checked;
+    cFlexContainer.style.display = exact ? 'none' : 'flex';
+    cFlexDaysInput.disabled = exact;
+  }
+  
+  cExactBox.addEventListener('change', updateCompactFlexVisibility);
+  document.addEventListener('DOMContentLoaded', updateCompactFlexVisibility);
+  
   // Exact date / flex days behavior
   const exactBox = document.getElementById('exactDate');
   const flexContainer = document.getElementById('flexContainer');
