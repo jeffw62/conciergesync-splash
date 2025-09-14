@@ -189,10 +189,10 @@
     border-color: #bfa14a;
   }
   .toggle-group button[data-val="no"] {
-    margin-left: 20px;   /* push No button further right */
+    margin-left: 20px;
   }
   .search-btn {
-    width: 75%;       /* match input field width */
+    width: 75%;
     background: #bfa14a;
     color: #fff;
     padding: 12px;
@@ -201,8 +201,6 @@
     font-size: 1rem;
     cursor: pointer;
     display: block;
-    margin-top: 12px;   /* spacing */
-    margin-left: 0;     /* left-justify */
   }
 
   /* ---------- Date + Exact Toggle ---------- */
@@ -210,16 +208,10 @@
     font-size: 0.85rem;
     color: #555;
     display: block;
-    width: 75%;       /* match input width */
+    width: 75%;
     margin-left: 0;
     margin-top: 4px;
     line-height: 1.4;
-  }
-  .date-row {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    width: 100%;
   }
   .sub-row {
     display: flex;
@@ -260,27 +252,9 @@
     box-shadow: 0 4px 12px rgba(0,0,0,0.15);
     padding: 20px;
     gap: 10px;
-    flex-wrap: wrap;
+    flex-direction: column;
     position: relative;
     z-index: 3;
-  }
-  .compact-bar input, .compact-bar select {
-    padding: 8px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    margin: 5px;
-  }
-  .compact-date {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    flex-wrap: wrap;
-  }
-  .compact-date input[type="number"] {
-    width: 50px;
-    padding: 4px 6px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
   }
   .compact-row {
     display: flex;
@@ -288,12 +262,17 @@
     flex-wrap: wrap;
     margin-bottom: 10px;
   }
-  .compact-bar .hint {
+  .compact-bar input, .compact-bar select {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+  .compact-hint {
     font-size: 0.85rem;
     color: #555;
-    display: block;
-    margin-top: 4px;
-    line-height: 1.4;
+    margin: -5px 0 10px 0;
+  }
+  .compact-bar .search-btn {
     width: 100%;
   }
 
@@ -373,16 +352,13 @@
 
     <div class="date-wrap">
       <label for="departDate">Departure Date</label>
-      <div class="date-row">
-        <input type="date" id="departDate" />
-        <div class="sub-row">
-          <label class="exact-toggle">
-            <input type="checkbox" id="exactDate" />
-            Exact date only
-          </label>
-          <div class="flexrange" id="flexContainer">
-            ± <input type="number" id="flexDays" min="1" max="14" value="3"> days
-          </div>
+      <input type="date" id="departDate" />
+      <div class="sub-row">
+        <label class="exact-toggle">
+          <input type="checkbox" id="exactDate" /> Exact date only
+        </label>
+        <div class="flexrange" id="flexContainer">
+          ± <input type="number" id="flexDays" min="1" max="14" value="3"> days
         </div>
       </div>
       <small class="hint">
@@ -391,7 +367,7 @@
     </div>
   </div>
 
-  <!-- Step 2 + Step 3 -->
+  <!-- Step 2 + Step 3 stacked -->
   <div class="step routing">
     <h3>2&nbsp;Routing Preferences</h3>
     <label>Direct Non-stop</label>
@@ -420,10 +396,10 @@
   <div class="compact-row">
     <input type="text" placeholder="Origin (e.g. DFW)" id="cOrigin">
     <input type="text" placeholder="Destination (e.g. LHR)" id="cDest">
+    <input type="date" id="cDepartDate" />
   </div>
 
   <div class="compact-row">
-    <input type="date" id="cDepartDate" />
     <label class="exact-toggle">
       <input type="checkbox" id="cExactDate"> Exact date only
     </label>
@@ -432,9 +408,9 @@
     </div>
   </div>
 
-  <small class="hint">
+  <div class="compact-hint">
     If “Exact date only” is unchecked you can choose a ±-day window (1–14). Default is ±3 days.
-  </small>
+  </div>
 
   <div class="compact-row">
     <select id="dnsToggle">
@@ -498,7 +474,19 @@
     compactBar.style.display = spVisible ? "flex" : "none";
   });
 
-  // Power Search Exact date / flex days
+  // Guided Search Exact date
+  const exactBox = document.getElementById('exactDate');
+  const flexContainer = document.getElementById('flexContainer');
+  const flexDaysInput = document.getElementById('flexDays');
+  function updateFlexVisibility() {
+    const exact = exactBox.checked;
+    flexContainer.style.display = exact ? 'none' : 'flex';
+    flexDaysInput.disabled = exact;
+  }
+  exactBox.addEventListener('change', updateFlexVisibility);
+  document.addEventListener('DOMContentLoaded', updateFlexVisibility);
+
+  // Power Search Exact date
   const cExactBox = document.getElementById('cExactDate');
   const cFlexContainer = document.getElementById('cFlexContainer');
   const cFlexDaysInput = document.getElementById('cFlexDays');
@@ -509,23 +497,6 @@
   }
   cExactBox.addEventListener('change', updateCompactFlexVisibility);
   document.addEventListener('DOMContentLoaded', updateCompactFlexVisibility);
-
-  // Guided Search Exact date / flex days
-  const exactBox = document.getElementById('exactDate');
-  const flexContainer = document.getElementById('flexContainer');
-  const flexDaysInput = document.getElementById('flexDays');
-  function updateFlexVisibility() {
-    const exact = exactBox.checked;
-    flexContainer.style.display = exact ? 'none' : 'flex';
-    flexDaysInput.disabled = exact;
-  }
-  function getFlexRange() {
-    if (exactBox.checked) return 0;
-    const n = parseInt(flexDaysInput.value || '3', 10);
-    return Math.max(1, Math.min(14, isNaN(n) ? 3 : n));
-  }
-  exactBox.addEventListener('change', updateFlexVisibility);
-  document.addEventListener('DOMContentLoaded', updateFlexVisibility);
 
   // Sample redemption data
   const redemptions = [
@@ -546,17 +517,11 @@
         <td>${r.points.toLocaleString()}</td>
         <td>$${r.cashFare.toLocaleString()}</td>
         <td>$${r.fees.toLocaleString()}</td>
-        <td><strong>${r.cpm}¢</strong></td>
+        <td><strong>${r.cpm}</strong></td>
         <td><button class="btn">Book</button></td>
       `;
       tbody.appendChild(tr);
     });
-    if (data.length > 0) {
-      const best = data.reduce((a,b)=>parseFloat(a.cpm)>parseFloat(b.cpm)?a:b);
-      [...tbody.rows].forEach(row=>{
-        if(row.cells[0].innerText===best.route) row.classList.add("highlight");
-      });
-    }
   }
   renderTable(redemptions);
 </script>
