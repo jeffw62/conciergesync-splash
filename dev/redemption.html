@@ -115,14 +115,14 @@
 
   /* ---------- Guided Search Panel ---------- */
   .search-panel {
-    max-width: 1100px;
+    max-width: 900px;
     margin: -80px auto 40px;
     background: rgba(255,255,255,0.95);
     border-radius: 12px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.15);
     padding: 24px 20px;
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-columns: 1fr 1fr;
     gap: 20px;
     position: relative;
     z-index: 3;
@@ -170,7 +170,7 @@
   /* --- Toggle buttons --- */
   .toggle-group {
     display: flex;
-    justify-content: center; /* center align toggles */
+    justify-content: center;
     gap: 8px;
     margin-top: 2px;
   }
@@ -248,7 +248,7 @@
   /* ---------- Compact (Power) Search ---------- */
   .compact-bar {
     display: none;
-    max-width: 1100px;
+    max-width: 900px;
     margin: -20px auto 40px;
     background: rgba(255,255,255,0.95);
     border-radius: 12px;
@@ -358,28 +358,28 @@
     </div>
   </div>
 
-  <!-- Step 2 -->
+  <!-- Step 2 + 3 combined -->
   <div class="step" style="text-align:center;">
     <h3>2&nbsp;Routing Preferences</h3>
-    <label>Multiple Connections</label>
-    <div class="toggle-group" id="multiConn">
-      <button data-val="no">No</button>
-      <button data-val="yes">Yes</button>
-    </div>
+
     <label>Direct Non-stop</label>
     <div class="toggle-group" id="directStop">
-      <button data-val="no">No</button>
       <button data-val="yes">Yes</button>
+      <button data-val="no">No</button>
     </div>
+
+    <label>Multiple Connections</label>
+    <div class="toggle-group" id="multiConn">
+      <button data-val="yes">Yes</button>
+      <button data-val="no">No</button>
+    </div>
+
     <label>Positioning Flight Allowed</label>
     <div class="toggle-group" id="posFlight">
-      <button data-val="no">No</button>
       <button data-val="yes">Yes</button>
+      <button data-val="no">No</button>
     </div>
-  </div>
 
-  <!-- Step 3 -->
-  <div class="step">
     <h3>3&nbsp;Search</h3>
     <button class="search-btn">Search</button>
   </div>
@@ -389,20 +389,20 @@
 <div class="compact-bar" id="compactBar">
   <input type="text" placeholder="Origin (e.g. DFW)" id="cOrigin">
   <input type="text" placeholder="Destination (e.g. LHR)" id="cDest">
-  <select id="mcToggle">
-    <option>Multiple Connections: Any</option>
-    <option>No</option>
-    <option>Yes</option>
-  </select>
   <select id="dnsToggle">
     <option>Direct Non-stop: Any</option>
-    <option>No</option>
     <option>Yes</option>
+    <option>No</option>
+  </select>
+  <select id="mcToggle">
+    <option>Multiple Connections: Any</option>
+    <option>Yes</option>
+    <option>No</option>
   </select>
   <select id="pfToggle">
     <option>Positioning Flight: Any</option>
-    <option>No</option>
     <option>Yes</option>
+    <option>No</option>
   </select>
   <button class="search-btn">Search</button>
 </div>
