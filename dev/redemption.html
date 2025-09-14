@@ -122,7 +122,7 @@
     box-shadow: 0 4px 12px rgba(0,0,0,0.15);
     padding: 30px 20px;
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr;  /* three equal columns */
+    grid-template-columns: 1fr 1fr 1fr;
     gap: 20px;
     position: relative;
     z-index: 3;
@@ -153,7 +153,7 @@
   }
   .step input, .step select {
     width: 100%;
-    padding: 8px;                 /* unified padding for text/date */
+    padding: 8px;
     border: 1px solid #ccc;
     border-radius: 4px;
     font-family: inherit;
@@ -190,23 +190,26 @@
     border-radius: 6px;
     font-size: 1rem;
     cursor: pointer;
-    margin-top: auto; /* keeps button near bottom of column */
+    margin-top: auto;
   }
 
   /* ---------- Date + Exact Toggle ---------- */
   .date-row {
     display: flex;
     align-items: center;
-    justify-content: flex-start;
-    flex-wrap: wrap;
-    gap: 12px;
+    gap: 14px;
+    flex-wrap: nowrap;
     width: 100%;
     box-sizing: border-box;
+  }
+  .date-row input[type="date"] {
+    flex: 0 0 auto;
   }
   .exact-toggle {
     display: inline-flex;
     align-items: center;
     gap: 6px;
+    white-space: nowrap;
     font-weight: 500;
     cursor: pointer;
   }
@@ -214,31 +217,25 @@
     width: 16px;
     height: 16px;
   }
-  .date-row .hint,
-  .date-wrap .hint {
-    font-size: 0.85rem;
-    color: #555;
-  }
-
-  .flexrange {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 0.95rem;
-  }
   #flexContainer {
     display: inline-flex;
     align-items: center;
     gap: 6px;
+    white-space: nowrap;
   }
   #flexContainer input[type="number"] {
-    width: 64px;
+    width: 60px;
     padding: 6px 8px;
     border: 1px solid #ccc;
     border-radius: 4px;
     font-family: inherit;
     font-size: 1rem;
     box-sizing: border-box;
+  }
+  .date-row .hint,
+  .date-wrap .hint {
+    font-size: 0.85rem;
+    color: #555;
   }
 
   /* ---------- Compact (Power) Search ---------- */
@@ -452,7 +449,6 @@
     flexDaysInput.disabled = exact;
   }
 
-  // clamp and read
   function getFlexRange() {
     if (exactBox.checked) return 0;
     const n = parseInt(flexDaysInput.value || '3', 10);
