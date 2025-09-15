@@ -324,43 +324,42 @@
 
   /* --- Responsive Table (cards on mobile) --- */
   @media (max-width: 768px) {
-    table, thead, tbody, th, td, tr { display: block; }
-    thead { display: none; }
-
-    tr {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      margin-bottom: 15px;
-      border: 1px solid #ddd;
-      border-radius: 6px;
-      padding: 10px;
-      background: #fff;
-    }
-    td {
-      border: none;
-      padding: 8px;
-      background: #fafafa;
-      border-radius: 4px;
-    }
-    td::before {
-      content: attr(data-label);
-      font-weight: bold;
-      display: block;
-      margin-bottom: 4px;
-    }
-    td:last-child {
-      grid-column: span 2;
-      text-align: center;
-      background: none;
-    }
-    td .btn {
-      width: 100%;
-      max-width: 200px;
-      margin: 0 auto;
-      display: block;
-    }
+  table, thead, tbody, th, td, tr { display: block; }
+  thead { display: none; }
+  tr {
+    margin-bottom: 20px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 12px;
+    background: #fff;
   }
+  td {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 6px;
+    border: none;
+    border-bottom: 1px solid #eee;
+  }
+  td:last-child { border-bottom: none; }
+  td::before {
+    content: attr(data-label);
+    font-weight: 600;
+    color: #333;
+    flex: 1;
+    text-align: left;
+    padding-right: 10px;
+  }
+  td strong {
+    font-weight: 700;
+    color: #000;
+  }
+  td .btn {
+    width: 100%;
+    margin-top: 10px;
+    text-align: center;
+  }
+}
 
   /* ---------- Footer ---------- */
   #footer {
