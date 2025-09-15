@@ -279,26 +279,8 @@
   .compact-date-row {
     display: flex;
     align-items: center;
-    gap: 16px;    /* NEW spacing between date, checkbox, flex days */
+    gap: 14px;
     margin-bottom: 6px;
-    flex-wrap: wrap;
-  }
-  .compact-date-row input[type="date"] {
-    padding: 6px 10px;
-    font-size: 1rem;
-  }
-  .compact-date-row .exact-toggle {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-weight: 500;
-    white-space: nowrap;
-  }
-  .compact-date-row .flexrange {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    white-space: nowrap;
   }
   .compact-hint {
     font-size: 0.85rem;
@@ -340,6 +322,33 @@
     cursor: pointer;
   }
 
+  /* --- Responsive Table (cards on mobile) --- */
+  @media (max-width: 768px) {
+    table, thead, tbody, th, td, tr { display: block; }
+    thead { display: none; }
+    tr {
+      margin-bottom: 15px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      padding: 10px;
+      background: #fff;
+    }
+    td {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px;
+      border: none;
+      border-bottom: 1px solid #eee;
+    }
+    td:last-child { border-bottom: none; }
+    td::before {
+      content: attr(data-label);
+      font-weight: bold;
+      flex-basis: 50%;
+      text-align: left;
+    }
+  }
+
   /* ---------- Footer ---------- */
   #footer {
     position: relative;
@@ -378,13 +387,10 @@
   <!-- Step 1 -->
   <div class="step">
     <h3>1&nbsp;Enter Origin & Destination</h3>
-
     <label for="origin">Origin</label>
     <input type="text" id="origin" placeholder="e.g. DFW">
-
     <label for="destination">Destination</label>
     <input type="text" id="destination" placeholder="e.g. LHR">
-
     <div class="date-wrap">
       <label for="departDate">Departure Date</label>
       <input type="date" id="departDate" />
@@ -420,7 +426,6 @@
       <button data-val="yes">Yes</button>
       <button data-val="no">No</button>
     </div>
-
     <h3 style="margin-top:20px;">3&nbsp;Search</h3>
     <button class="search-btn">Search</button>
   </div>
@@ -432,11 +437,9 @@
   <div class="compact-row">
     <input type="text" placeholder="Origin (e.g. DFW)" id="cOrigin">
     <input type="text" placeholder="Destination (e.g. LHR)" id="cDest">
-  </div>
-
-  <!-- Row 2: Date + Exact toggle + flex days (inline, spaced) -->
-  <div class="compact-date-row">
     <input type="date" id="cDepartDate" />
+  </div>
+  <div class="compact-date-row">
     <label class="exact-toggle">
       <input type="checkbox" id="cExactDate"> Exact date only
     </label>
@@ -444,11 +447,9 @@
       ± <input type="number" id="cFlexDays" min="1" max="14" value="3"> days
     </div>
   </div>
-
   <div class="compact-hint">
     If “Exact date only” is unchecked you can choose a ±-day window (1–14). Default is ±3 days.
   </div>
-
   <div class="compact-row">
     <select id="dnsToggle">
       <option>Direct Non-stop: Any</option>
@@ -466,7 +467,6 @@
       <option>Yes</option>
     </select>
   </div>
-
   <button class="search-btn">Search</button>
 </div>
 
@@ -506,7 +506,6 @@
   const guidedToggle = document.getElementById("guidedToggle");
   const searchPanel = document.getElementById("searchPanel");
   const compactBar = document.getElementById("compactBar");
-
   powerToggle.addEventListener("click", () => {
     searchPanel.style.display = "none";
     compactBar.style.display = "flex";
@@ -554,13 +553,13 @@
     data.forEach(r => {
       const tr = document.createElement("tr");
       tr.innerHTML = `
-        <td>${r.route}</td>
-        <td>${r.program}</td>
-        <td>${r.points.toLocaleString()}</td>
-        <td>$${r.cashFare.toLocaleString()}</td>
-        <td>$${r.fees.toLocaleString()}</td>
-        <td><strong>${r.cpm}</strong></td>
-        <td><button class="btn">Book</button></td>
+        <td data-label="Route">${r.route}</td>
+        <td data-label="Program">${r.program}</td>
+        <td data-label="Points Needed">${r.points.toLocaleString()}</td>
+        <td data-label="Cash Price">$${r.cashFare.toLocaleString()}</td>
+        <td data-label="Fees">$${r.fees.toLocaleString()}</td>
+        <td data-label="Value (¢/mile)"><strong>${r.cpm}</strong></td>
+        <td data-label=""><button class="btn">Book</button></td>
       `;
       tbody.appendChild(tr);
     });
