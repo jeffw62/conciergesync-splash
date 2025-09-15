@@ -183,12 +183,28 @@
     cursor: pointer;
     -webkit-appearance: none;  /* reset iOS default date styles */
   }
-
-    .step input[type="date"]::before {
-      content: attr(placeholder);
-      color: #777;
-      margin-right: 6px;
-    }
+    /* ✅ Clean up duplicate placeholders on desktop date inputs */
+  .step input[type="date"]::-webkit-datetime-edit-text,
+  .step input[type="date"]::-webkit-datetime-edit-month-field,
+  .step input[type="date"]::-webkit-datetime-edit-day-field,
+  .step input[type="date"]::-webkit-datetime-edit-year-field {
+    color: transparent;         /* hide browser-injected mm/dd/yyyy */
+  }
+  
+  .step input[type="date"]::placeholder {
+    color: #999;                /* keep your placeholder visible */
+  }
+  
+  /* Firefox fix */
+  .step input[type="date"]::-moz-placeholder {
+    opacity: 1;
+  }
+  
+  .step input[type="date"]::before {
+    content: attr(placeholder);
+    color: #777;
+    margin-right: 6px;
+  }
 
   /* --- Toggle buttons --- */
   .toggle-group {
