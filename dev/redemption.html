@@ -333,15 +333,14 @@
     border-radius: 6px;
     padding: 12px;
     background: #fff;
-    display: grid;
-    grid-template-columns: 1fr 1fr;   /* 2 columns inside card */
-    gap: 8px 12px;                    /* spacing between tiles */
   }
 
-  td {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+  /* make the cells inside each row into a 2-column grid */
+  tr td {
+    display: inline-block;
+    width: 48%;            /* two per row */
+    margin: 1% 1%;
+    vertical-align: top;
     padding: 10px;
     border: 1px solid #eee;
     border-radius: 4px;
@@ -352,17 +351,18 @@
 
   td::before {
     content: attr(data-label);
+    display: block;
     font-weight: bold;
-    margin-right: 6px;
-    flex-shrink: 0;
+    margin-bottom: 4px;
   }
 
-  /* Make the button span full width at bottom */
+  /* Book button full width under both columns */
   td:last-child {
-    grid-column: span 2;
+    width: 98%;
+    margin: 8px auto 0;
     border: none;
     background: none;
-    justify-content: center;
+    text-align: center;
   }
 
   td .btn {
@@ -372,6 +372,7 @@
     font-size: 1rem;
   }
 }
+
 
   /* ---------- Footer ---------- */
   #footer {
