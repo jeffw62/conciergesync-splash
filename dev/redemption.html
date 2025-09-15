@@ -168,11 +168,11 @@
   }
   /* Force date inputs to look active */
   .step input[type="date"] {
-    width: 75%;            /* same as text inputs */
-    box-sizing: border-box; /* prevent overflow from padding/borders */
-    background-color: #fff; /* no gray */
-    color: #333;            /* text color */
-    cursor: pointer;        /* show it's clickable */
+    width: 75%;            /* match Origin/Destination */
+    box-sizing: border-box; /* account for padding/border */
+    background-color: #fff;
+    color: #333;
+    cursor: pointer;
   }
   
   .step input[type="date"]::before {
@@ -307,7 +307,7 @@
     display: block;
     font-size: 0.85rem;
     font-weight: 500;
-    margin: 4px 0;   /* tighter top + bottom */
+    margin: 2px 0 2px;  /* small gap top and bottom */
     color: #333;
   }
   .compact-bar input[type="text"],
