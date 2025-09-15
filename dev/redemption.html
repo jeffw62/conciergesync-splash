@@ -324,48 +324,39 @@
 
   /* --- Responsive Table (cards on mobile) --- */
   @media (max-width: 768px) {
-  table, thead, tbody, th, td, tr { display: block; }
-  thead { display: none; }
-
-  tr {
-    margin-bottom: 16px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    padding: 12px;
-    background: #fff;
+    table, thead, tbody, th, td, tr { display: block; }
+    thead { display: none; }
+    tr {
+      margin-bottom: 15px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      padding: 10px;
+      background: #fff;
+    }
+    td {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 12px;
+      border: none;
+      border-bottom: 1px solid #eee;
+      width: 95%;
+      margin: 0 auto;
+      box-sizing: border-box;
+    }
+    td:last-child { border-bottom: none; }
+    td::before {
+      content: attr(data-label);
+      font-weight: bold;
+      flex: 1;
+      text-align: left;
+    }
+    td .btn {
+      width: 100%;
+      padding: 12px;
+      font-size: 1rem;
+      margin-top: 8px;
+    }
   }
-
-  td {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 6px 4px;       /* tighter padding */
-    border: none;
-    border-bottom: 1px solid #eee;
-  }
-
-  td:last-child { border-bottom: none; }
-
-  td::before {
-    content: attr(data-label);
-    font-weight: 600;
-    color: #333;
-    flex: 1;
-    text-align: left;
-    padding-right: 10px;
-  }
-
-  td strong {
-    font-weight: 700;
-    color: #000;
-  }
-
-  td .btn {
-    width: 100%;
-    margin-top: 10px;
-    text-align: center;
-  }
-}
 
   /* ---------- Footer ---------- */
   #footer {
@@ -375,7 +366,7 @@
   }
 </style>
 </head>
-<body>
+  <body>
 
 <header>
   <div class="logo">
@@ -401,6 +392,8 @@
 <!-- Guided Search Panel -->
 <div class="search-panel" id="searchPanel">
   <span class="power-toggle" id="powerToggle">Power Search</span>
+
+  <!-- Step 1 -->
   <div class="step">
     <h3>1&nbsp;Enter Origin & Destination</h3>
     <label for="origin">Origin</label>
@@ -423,6 +416,8 @@
       </small>
     </div>
   </div>
+
+  <!-- Step 2 + Step 3 stacked -->
   <div class="step routing">
     <h3>2&nbsp;Routing Preferences</h3>
     <label>Direct Non-stop</label>
@@ -540,6 +535,18 @@
   }
   exactBox.addEventListener('change', updateFlexVisibility);
   document.addEventListener('DOMContentLoaded', updateFlexVisibility);
+
+  // Power Search Exact date
+  const cExactBox = document.getElementById('cExactDate');
+  const cFlexContainer = document.getElementById('cFlexContainer');
+  const cFlexDaysInput = document.getElementById('cFlexDays');
+  function updateCompactFlexVisibility() {
+    const exact = cExactBox.checked;
+    cFlexContainer.style.display = exact ? 'none' : 'flex';
+    cFlexDaysInput.disabled = exact;
+  }
+  cExactBox.addEventListener('change', updateCompactFlexVisibility);
+  document.addEventListener('DOMContentLoaded', updateCompactFlexVisibility);
 
   // Sample redemption data
   const redemptions = [
