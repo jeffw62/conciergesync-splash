@@ -216,22 +216,28 @@
   .sub-row {
     display: flex;
     align-items: center;
-    gap: 14px;
+    flex-wrap: wrap;   /* prevents overflow on small screens */
+    gap: 10px;
+    margin-top: 8px;
   }
-  .exact-toggle {
-    display: flex;
-    align-items: center;
-    gap: 6px;
+  
+  .sub-row input[type="checkbox"] {
+    margin: 0;
+  }
+  
+  .sub-row label {
+    font-size: 0.9rem;
     font-weight: 500;
     white-space: nowrap;
   }
-  .exact-toggle input { margin: 0; }
+  
   #flexContainer {
     display: flex;
     align-items: center;
     gap: 6px;
     white-space: nowrap;
   }
+  
   #flexContainer input[type="number"] {
     width: 60px;
     padding: 6px 8px;
@@ -412,10 +418,9 @@
       <label for="departDate">Departure Date</label>
       <input type="date" id="departDate" />
       <div class="sub-row">
-        <label class="exact-toggle">
-          <input type="checkbox" id="exactDate" /> Exact date only
-        </label>
-        <div class="flexrange" id="flexContainer">
+        <input type="checkbox" id="exactDate" />
+        <label for="exactDate">Exact date only</label>
+        <div id="flexContainer">
           ± <input type="number" id="flexDays" min="1" max="14" value="3"> days
         </div>
       </div>
