@@ -333,35 +333,43 @@
     border-radius: 6px;
     padding: 12px;
     background: #fff;
+    display: grid;
+    grid-template-columns: 1fr 1fr;   /* 2 columns inside card */
+    gap: 8px 12px;                    /* spacing between tiles */
   }
 
   td {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 8px 12px;
-    border: none;
-    border-bottom: 1px solid #eee;
-    max-width: 95%;          /* keep tile inside card */
-    margin: 0 auto;          /* center it */
+    padding: 10px;
+    border: 1px solid #eee;
+    border-radius: 4px;
+    background: #fafafa;
+    font-size: 0.95rem;
     box-sizing: border-box;
   }
-
-  td:last-child { border-bottom: none; }
 
   td::before {
     content: attr(data-label);
     font-weight: bold;
-    margin-right: 8px;
-    flex: 1;
+    margin-right: 6px;
+    flex-shrink: 0;
+  }
+
+  /* Make the button span full width at bottom */
+  td:last-child {
+    grid-column: span 2;
+    border: none;
+    background: none;
+    justify-content: center;
   }
 
   td .btn {
     width: 100%;
+    max-width: 220px;
     padding: 10px;
     font-size: 1rem;
-    margin-top: 10px;
-    display: block;
   }
 }
 
