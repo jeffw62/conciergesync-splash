@@ -168,9 +168,11 @@
   }
   /* Force date inputs to look active */
   .step input[type="date"] {
-    background-color: #fff;     /* no gray */
-    color: #333;                /* text color */
-    cursor: pointer;            /* show it's clickable */
+    width: 75%;            /* same as text inputs */
+    box-sizing: border-box; /* prevent overflow from padding/borders */
+    background-color: #fff; /* no gray */
+    color: #333;            /* text color */
+    cursor: pointer;        /* show it's clickable */
   }
   
   .step input[type="date"]::before {
@@ -305,13 +307,16 @@
     display: block;
     font-size: 0.85rem;
     font-weight: 500;
-    margin: 6px 0 2px;   /* tighter above, small gap below */
+    margin: 4px 0;   /* tighter top + bottom */
     color: #333;
   }
   .compact-bar input[type="text"],
   .compact-bar input[type="date"] {
     width: 100%;
     box-sizing: border-box;
+    padding: 8px;                 /* match Origin/Dest fields */
+    font-size: 1rem;              /* keep same text size */
+    line-height: normal;          /* avoid taller rendering */
   }
   
   /* ✅ fix for tiny gray date field */
