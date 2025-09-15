@@ -166,14 +166,13 @@
     color: #333;
     box-sizing: border-box;
   }
-  /* Force date inputs to look active */
-  .step input[type="date"] {
-    width: 75%;           /* take full width of parent container */
-    max-width: 75%;       /* prevent overflow */
-    box-sizing: border-box;/* account for padding/border */
-    background-color: #fff;
-    color: #333;
-    cursor: pointer;
+  /* ✅ Guided Search alignment fix */
+  .step input[type="text"],
+  .step input[type="date"],
+  .step select {
+    width: 100%;           
+    max-width: 100%;
+    box-sizing: border-box;
   }
   
   .step input[type="date"]::before {
