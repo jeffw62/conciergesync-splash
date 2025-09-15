@@ -335,26 +335,25 @@
     box-sizing: border-box;
   }
   td {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 8px 10px;
-    margin: 6px 0;              /* <-- space between rows/tiles */
-    background: #fafafa;        /* subtle background for separation */
-    border-radius: 4px;
+    display: block;           /* stack content */
+    padding: 4px 0;           /* light spacing only */
+    margin: 0;                /* remove vertical mini-tile gap */
+    background: none;         /* remove nested tile background */
+    border-radius: 0;         /* no rounded edges per line */
     box-sizing: border-box;
   }
-  td:last-child { border-bottom: none; }
+  
   td::before {
-    content: attr(data-label);
+    display: inline-block;    /* label inline with value */
+    width: 40%;               /* labels get some space */
     font-weight: bold;
   }
+  
   td .btn {
     width: 100%;
-    padding: 10px;
-    margin-top: 8px;
-    font-size: 0.95rem;
+    margin-top: 12px;         /* spacing above button */
   }
+
     /* --- Card wrapper spacing applied to the table itself --- */
   table {
     border: 1px solid #ddd;
