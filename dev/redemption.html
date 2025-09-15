@@ -323,42 +323,38 @@
   }
 
   /* --- Responsive Table (cards on mobile) --- */
+  /* --- Responsive Table (cards on mobile) --- */
   @media (max-width: 768px) {
-  table, thead, tbody, th, td, tr {
-    display: block;
-  }
-
+  table, thead, tbody, th, td, tr { display: block; }
   thead { display: none; }
-
   tr {
     margin-bottom: 20px;
     border: 1px solid #ddd;
     border-radius: 6px;
     background: #fff;
-    padding: 16px;
+    padding: 12px;              /* <-- padding inside wrapper */
     box-sizing: border-box;
   }
-
-  /* kill the mini-tiles */
   td {
-    display: inline;       /* inline text, not block rows */
-    padding: 0;
-    margin: 0;
-    background: none;
-    border: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 10px;
+    margin: 6px 0;              /* <-- space between rows/tiles */
+    background: #fafafa;        /* subtle background for separation */
+    border-radius: 4px;
+    box-sizing: border-box;
   }
-
+  td:last-child { border-bottom: none; }
   td::before {
-    content: none;         /* don’t insert labels */
+    content: attr(data-label);
+    font-weight: bold;
   }
-
-  /* keep the Book button clean at bottom */
   td .btn {
-    display: block;
     width: 100%;
-    margin-top: 12px;
-    padding: 12px;
-    font-size: 1rem;
+    padding: 10px;
+    margin-top: 8px;
+    font-size: 0.95rem;
   }
     /* --- Card wrapper spacing applied to the table itself --- */
   table {
