@@ -166,6 +166,18 @@
     color: #333;
     box-sizing: border-box;
   }
+  /* Force date inputs to look active */
+  .step input[type="date"] {
+    background-color: #fff;     /* no gray */
+    color: #333;                /* text color */
+    cursor: pointer;            /* show it's clickable */
+  }
+  
+  .step input[type="date"]::before {
+    content: attr(placeholder);
+    color: #777;
+    margin-right: 6px;
+  }
 
   /* --- Toggle buttons --- */
   .toggle-group {
@@ -416,7 +428,7 @@
     <input type="text" id="destination" placeholder="e.g. LHR">
     <div class="date-wrap">
       <label for="departDate">Departure Date</label>
-      <input type="date" id="departDate" />
+      <input type="date" id="departDate" placeholder="Select date" />
       <div class="sub-row">
         <input type="checkbox" id="exactDate" />
         <label for="exactDate">Exact date only</label>
