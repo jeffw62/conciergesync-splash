@@ -326,22 +326,26 @@
   @media (max-width: 768px) {
   table, thead, tbody, th, td, tr { display: block; }
   thead { display: none; }
+
   tr {
-    margin-bottom: 20px;
+    margin-bottom: 16px;
     border: 1px solid #ddd;
     border-radius: 8px;
     padding: 12px;
     background: #fff;
   }
+
   td {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 8px 6px;
+    padding: 6px 4px;       /* tighter padding */
     border: none;
     border-bottom: 1px solid #eee;
   }
+
   td:last-child { border-bottom: none; }
+
   td::before {
     content: attr(data-label);
     font-weight: 600;
@@ -350,10 +354,12 @@
     text-align: left;
     padding-right: 10px;
   }
+
   td strong {
     font-weight: 700;
     color: #000;
   }
+
   td .btn {
     width: 100%;
     margin-top: 10px;
