@@ -279,7 +279,7 @@
   .compact-date-row {
     display: flex;
     align-items: center;
-    gap: 16px;    /* NEW spacing between date, checkbox, flex days */
+    gap: 16px;
     margin-bottom: 6px;
     flex-wrap: wrap;
   }
@@ -346,9 +346,29 @@
     z-index: 0;
     margin-top: 60px;
   }
+
+  /* ---------- Mobile Fixes for Power Search ---------- */
+  @media (max-width: 600px) {
+    .compact-row,
+    .compact-date-row {
+      flex-direction: column;
+      align-items: stretch;
+    }
+    .compact-bar input,
+    .compact-bar select,
+    .compact-bar .search-btn {
+      width: 100%;
+    }
+    .compact-bar .search-btn {
+      min-width: 0;
+      align-self: stretch;
+    }
+  }
 </style>
 </head>
 <body>
+<!-- (rest of your HTML stays the same as safe-harbor) -->
+
 
 <header>
   <div class="logo">
