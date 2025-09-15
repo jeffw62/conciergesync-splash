@@ -323,8 +323,7 @@
   }
 
   /* --- Responsive Table (cards on mobile) --- */
-  /* --- Responsive Table (cards on mobile) --- */
-@media (max-width: 768px) {
+  @media (max-width: 768px) {
   table, thead, tbody, th, td, tr { display: block; }
   thead { display: none; }
   tr {
@@ -355,6 +354,16 @@
     padding: 10px;
     margin-top: 8px;
     font-size: 0.95rem;
+  }
+    /* --- Card wrapper spacing applied to the table itself --- */
+  table {
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    background: #fff;
+    margin: 12px auto;           /* adds breathing room outside */
+    padding: 12px;               /* adds breathing room inside */
+    box-sizing: border-box;
+    width: calc(100% - 24px);    /* prevents flush against screen edges */
   }
 }
 
