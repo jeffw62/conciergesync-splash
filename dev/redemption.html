@@ -166,28 +166,20 @@
     color: #333;
     box-sizing: border-box;
   }
-  /* Force date inputs to look active */
-.step input[type="date"] {
-  background-color: #fff;
-  color: #333;
-  cursor: pointer;
-  box-sizing: border-box;
-  }
-  
   /* ✅ Guided Search alignment fix */
   .step input[type="text"],
   .step input[type="date"],
   .step select {
-    width: 100%;           
-    max-width: 100%;
+    width: 75%;            /* match Origin/Destination */
+    max-width: 75%;
     box-sizing: border-box;
   }
-  
-  .step input[type="date"]::before {
-    content: attr(placeholder);
-    color: #777;
-    margin-right: 6px;
-  }
+    
+    .step input[type="date"]::before {
+      content: attr(placeholder);
+      color: #777;
+      margin-right: 6px;
+    }
 
   /* --- Toggle buttons --- */
   .toggle-group {
