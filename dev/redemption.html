@@ -166,15 +166,20 @@
     color: #333;
     box-sizing: border-box;
   }
-  /* ✅ Guided Search alignment fix */
-  .step input[type="text"],
-  .step input[type="date"],
-  .step select {
-    width: 75%;            /* match Origin/Destination */
+  /* ✅ Guided Search date alignment + style reset */
+  .step input[type="date"] {
+    width: 75%;                /* match Origin/Destination */
     max-width: 75%;
     box-sizing: border-box;
+    padding: 8px;              /* consistent padding */
+    font-size: 1rem;
+    line-height: normal;
+    background-color: #fff;    /* override iOS gray */
+    color: #333;
+    cursor: pointer;
+    -webkit-appearance: none;  /* reset iOS default date styles */
   }
-    
+
     .step input[type="date"]::before {
       content: attr(placeholder);
       color: #777;
