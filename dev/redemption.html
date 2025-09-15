@@ -336,45 +336,34 @@
   }
 
   td {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 12px;
     border: none;
-    padding: 8px;
+    border-bottom: 1px solid #eee;
+    max-width: 95%;          /* keep tile inside card */
+    margin: 0 auto;          /* center it */
+    box-sizing: border-box;
   }
 
-  /* Turn the row into a grid of mini-tiles */
-  tr {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-    gap: 8px;
-  }
-
-  td {
-    background: #f9f9f9;
-    border-radius: 4px;
-    padding: 8px;
-    text-align: center;
-  }
+  td:last-child { border-bottom: none; }
 
   td::before {
     content: attr(data-label);
-    display: block;
     font-weight: bold;
-    margin-bottom: 4px;
-    font-size: 0.85rem;
-    color: #333;
+    margin-right: 8px;
+    flex: 1;
   }
 
   td .btn {
     width: 100%;
-    padding: 8px 0;
-    font-size: 0.9rem;
-    background: #bfa14a;
-    color: #fff;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
+    padding: 10px;
+    font-size: 1rem;
+    margin-top: 10px;
+    display: block;
   }
 }
-
 
   /* ---------- Footer ---------- */
   #footer {
