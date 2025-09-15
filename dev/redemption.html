@@ -353,7 +353,23 @@
     font-weight: 500;
     white-space: nowrap;
   }
+  .sub-row {
+    display: flex;
+    align-items: center;  /* align checkbox + label vertically */
+    gap: 6px;             /* consistent space between them */
+  }
   
+  .sub-row input[type="checkbox"] {
+    margin: 0;            /* reset browser default spacing */
+  }
+  
+  .sub-row label {
+    margin: 0;
+    font-size: 0.9rem;    /* keep it consistent with other labels */
+    font-weight: 500;
+    color: #333;
+  }
+
   #cFlexContainer {
     display: flex;
     align-items: center;
@@ -508,7 +524,7 @@
     <div class="date-wrap">
       <label for="departDate">Departure Date</label>
       <input type="date" id="departDate" />
-      <div class="sub-row">
+      <div class="compact-date-row">
         <input type="checkbox" id="exactDate" />
         <label for="exactDate">Exact date only</label>
         <div id="flexContainer">
