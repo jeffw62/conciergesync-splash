@@ -333,19 +333,18 @@
     border-radius: 6px;
     padding: 12px;
     background: #fff;
+
+    /* NEW: make each row into a grid */
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
   }
 
-  /* make the cells inside each row into a 2-column grid */
-  tr td {
-    display: inline-block;
-    width: 48%;            /* two per row */
-    margin: 1% 1%;
-    vertical-align: top;
-    padding: 10px;
+  td {
+    background: #fafafa;
     border: 1px solid #eee;
     border-radius: 4px;
-    background: #fafafa;
-    font-size: 0.95rem;
+    padding: 10px;
     box-sizing: border-box;
   }
 
@@ -356,20 +355,20 @@
     margin-bottom: 4px;
   }
 
-  /* Book button full width under both columns */
+  /* Book button spans full width under grid */
   td:last-child {
-    width: 98%;
-    margin: 8px auto 0;
+    grid-column: span 2;
     border: none;
     background: none;
+    padding: 0;
     text-align: center;
   }
 
   td .btn {
     width: 100%;
-    max-width: 220px;
-    padding: 10px;
-    font-size: 1rem;
+    max-width: 240px;
+    margin: 8px auto 0;
+    display: block;
   }
 }
 
