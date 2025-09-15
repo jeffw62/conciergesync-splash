@@ -322,32 +322,41 @@
     cursor: pointer;
   }
 
-  /* --- Responsive Table (cards on mobile) --- */
-  @media (max-width: 768px) {
-    table, thead, tbody, th, td, tr { display: block; }
-    thead { display: none; }
-    tr {
-      margin-bottom: 15px;
-      border: 1px solid #ddd;
-      border-radius: 6px;
-      padding: 10px;
-      background: #fff;
-    }
-    td {
-      display: flex;
-      justify-content: space-between;
-      padding: 8px;
-      border: none;
-      border-bottom: 1px solid #eee;
-    }
-    td:last-child { border-bottom: none; }
-    td::before {
-      content: attr(data-label);
-      font-weight: bold;
-      flex-basis: 50%;
-      text-align: left;
-    }
+ /* Mobile card refinements */
+@media (max-width: 768px) {
+  table.responsive tr td {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 10px;
   }
+
+  table.responsive tr td::before {
+    flex: 0 0 40%;       /* label gets 40% */
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: #444;
+  }
+
+  table.responsive tr td {
+    flex: 1 0 60%;       /* value gets 60% */
+    text-align: right;
+    font-weight: 500;
+    font-size: 0.95rem;
+  }
+
+  /* Tighter button fit */
+  table.responsive tr td:last-child {
+    text-align: center;
+    padding-top: 8px;
+  }
+
+  table.responsive tr td:last-child .btn {
+    width: auto;
+    padding: 6px 14px;
+    font-size: 0.9rem;
+  }
+}
 
   /* ---------- Footer ---------- */
   #footer {
