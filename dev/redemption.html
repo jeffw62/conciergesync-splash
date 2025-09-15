@@ -323,42 +323,38 @@
   }
 
   /* --- Responsive Table (cards on mobile) --- */
-  @media (max-width: 768px) {
+  /* --- Responsive Table (cards on mobile) --- */
+@media (max-width: 768px) {
   table, thead, tbody, th, td, tr { display: block; }
   thead { display: none; }
   tr {
-    margin-bottom: 15px;
+    margin-bottom: 20px;
     border: 1px solid #ddd;
     border-radius: 6px;
-    padding: 10px;
     background: #fff;
-
-    /* NEW: grid layout inside each card */
-    display: grid;
-    grid-template-columns: repeat(2, 1fr); /* 2 columns */
-    gap: 10px;
+    padding: 12px;              /* <-- padding inside wrapper */
+    box-sizing: border-box;
   }
   td {
-    border: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 10px;
+    margin: 6px 0;              /* <-- space between rows/tiles */
+    background: #fafafa;        /* subtle background for separation */
     border-radius: 4px;
-    padding: 8px;
-    background: #fafafa;
-    display: block; /* each td is a mini-tile */
+    box-sizing: border-box;
   }
+  td:last-child { border-bottom: none; }
   td::before {
     content: attr(data-label);
-    display: block;
     font-weight: bold;
-    margin-bottom: 4px;
   }
-  td:last-child {
-    grid-column: span 2; /* Book button spans full width */
-    border: none;
-    background: none;
-    text-align: center;
-  }
-  td:last-child .btn {
+  td .btn {
     width: 100%;
+    padding: 10px;
+    margin-top: 8px;
+    font-size: 0.95rem;
   }
 }
 
