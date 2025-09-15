@@ -522,10 +522,19 @@
 <div class="compact-bar" id="compactBar">
   <span class="guided-toggle" id="guidedToggle">Guided Search</span>
   <div class="compact-row">
-    <input type="text" placeholder="Origin (e.g. DFW)" id="cOrigin">
-    <input type="text" placeholder="Destination (e.g. LHR)" id="cDest">
-    <input type="date" id="cDepartDate" placeholder="Select" />
-  </div>
+      <input type="text" placeholder="Origin (e.g. DFW)" id="cOrigin">
+      <input type="text" placeholder="Destination (e.g. LHR)" id="cDest">
+    </div>
+    
+    <div class="compact-row">
+      <label for="cDepartDate">Departure Date</label>
+      <input type="text" 
+             id="cDepartDate" 
+             placeholder="Select date" 
+             onfocus="this.type='date'" 
+             onblur="if(!this.value)this.type='text'" />
+    </div>
+
   <div class="compact-date-row">
       <input type="checkbox" id="cExactDate" />
       <label for="cExactDate">Exact date only</label>
