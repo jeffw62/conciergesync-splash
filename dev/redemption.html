@@ -305,7 +305,7 @@
     display: block;
     font-size: 0.85rem;
     font-weight: 500;
-    margin-bottom: 4px;
+    margin: 6px 0 2px;   /* tighter above, small gap below */
     color: #333;
   }
   .compact-bar input[type="text"],
@@ -493,7 +493,7 @@
     <input type="text" id="destination" placeholder="e.g. LHR">
     <div class="date-wrap">
       <label for="departDate">Departure Date</label>
-      <input type="date" id="departDate" placeholder="Select" />
+      <input type="date" id="departDate" placeholder="MM/DD/YYYY" />
       <div class="sub-row">
         <input type="checkbox" id="exactDate" />
         <label for="exactDate">Exact date only</label>
@@ -542,7 +542,7 @@
       <label for="cDepartDate">Departure Date</label>
       <input type="text" 
              id="cDepartDate" 
-             placeholder="Select date" 
+             placeholder="MM/DD/YYYY" 
              onfocus="this.type='date'" 
              onblur="if(!this.value)this.type='text'" />
     </div>
