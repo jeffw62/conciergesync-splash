@@ -286,8 +286,12 @@
   .compact-row {
     display: flex;
     gap: 10px;
-    flex-wrap: wrap;
-    margin-bottom: 10px;
+    flex-wrap: wrap;    /* wraps to next line cleanly */
+    justify-content: flex-start;
+  }
+  .compact-row select {
+    flex: 1;            /* makes them equal width */
+    min-width: 120px;   /* ensures readability on mobile */
   }
   .compact-bar input, .compact-bar select {
     padding: 8px;
@@ -297,14 +301,43 @@
   .compact-date-row {
     display: flex;
     align-items: center;
-    gap: 14px;
+    flex-wrap: wrap;  /* keeps it from breaking ugly on small screens */
+    gap: 10px;
     margin-bottom: 6px;
   }
+  
+  .compact-date-row input[type="checkbox"] {
+    margin: 0;
+  }
+  
+  .compact-date-row label {
+    font-size: 0.9rem;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+  
+  #cFlexContainer {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+  }
+  
+  #cFlexContainer input[type="number"] {
+    width: 60px;
+    padding: 6px 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-family: inherit;
+    font-size: 1rem;
+  }
+  
   .compact-hint {
     font-size: 0.85rem;
     color: #555;
     margin: 0 0 12px 0;
   }
+  
   .compact-bar .search-btn {
     width: auto;
     min-width: 180px;
@@ -471,16 +504,15 @@
   <div class="compact-row">
     <input type="text" placeholder="Origin (e.g. DFW)" id="cOrigin">
     <input type="text" placeholder="Destination (e.g. LHR)" id="cDest">
-    <input type="date" id="cDepartDate" />
+    <input type="date" id="cDepartDate" placeholder="Select" />
   </div>
   <div class="compact-date-row">
-    <label class="exact-toggle">
-      <input type="checkbox" id="cExactDate"> Exact date only
-    </label>
-    <div class="flexrange" id="cFlexContainer">
-      ± <input type="number" id="cFlexDays" min="1" max="14" value="3"> days
+      <input type="checkbox" id="cExactDate" />
+      <label for="cExactDate">Exact date only</label>
+      <div id="cFlexContainer">
+        ± <input type="number" id="cFlexDays" min="1" max="14" value="3"> days
+      </div>
     </div>
-  </div>
   <div class="compact-hint">
     If “Exact date only” is unchecked you can choose a ±-day window (1–14). Default is ±3 days.
   </div>
