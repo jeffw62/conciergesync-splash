@@ -323,7 +323,6 @@
   }
 
   /* --- Responsive Table (cards on mobile) --- */
-  /* --- Responsive Table (cards on mobile) --- */
   @media (max-width: 768px) {
   table, thead, tbody, th, td, tr { display: block; }
   thead { display: none; }
@@ -340,9 +339,9 @@
     justify-content: space-between;
     align-items: center;
     padding: 8px 10px;
-    margin: 6px 0;              /* <-- space between rows/tiles */
-    background: #fafafa;        /* subtle background for separation */
-    border-radius: 4px;
+    margin: 6px 0;
+    background: transparent;   /* <-- match wrapper */
+    border-radius: 0;          /* <-- no inner rounding */
     box-sizing: border-box;
   }
   td:last-child { border-bottom: none; }
