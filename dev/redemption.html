@@ -336,9 +336,13 @@
     td {
       display: flex;
       justify-content: space-between;
-      padding: 8px;
+      align-items: center;
+      padding: 6px 10px;
       border: none;
       border-bottom: 1px solid #eee;
+      width: 92%;              /* narrower than card */
+      margin: 6px auto;        /* centered inside card */
+      box-sizing: border-box;
     }
     td:last-child { border-bottom: none; }
     td::before {
@@ -346,6 +350,13 @@
       font-weight: bold;
       flex-basis: 50%;
       text-align: left;
+    }
+    td .btn {
+      width: auto;
+      padding: 8px 16px;
+      font-size: 0.9rem;
+      margin: 8px auto 0;
+      display: block;
     }
   }
 
