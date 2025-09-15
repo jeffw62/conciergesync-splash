@@ -324,29 +324,43 @@
 
   /* --- Responsive Table (cards on mobile) --- */
   @media (max-width: 768px) {
-  table, thead, tbody, th, td, tr { display: block; }
-  thead { display: none; }
-  tr {
-    margin-bottom: 15px;
-    border: 1px solid #ddd;
-    border-radius: 6px;
-    padding: 10px;
-    background: #fff;
-  }
-  td {
-    display: flex;
-    justify-content: space-between;
-    padding: 8px;
-    border: none;
-    border-bottom: 1px solid #eee;
-  }
-  td:last-child { border-bottom: none; }
-  td::before {
-    content: attr(data-label);
-    font-weight: bold;
-  }
-}
+    table, thead, tbody, th, td, tr { display: block; }
+    thead { display: none; }
 
+    tr {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 15px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      padding: 10px;
+      background: #fff;
+    }
+    td {
+      border: none;
+      padding: 8px;
+      background: #fafafa;
+      border-radius: 4px;
+    }
+    td::before {
+      content: attr(data-label);
+      font-weight: bold;
+      display: block;
+      margin-bottom: 4px;
+    }
+    td:last-child {
+      grid-column: span 2;
+      text-align: center;
+      background: none;
+    }
+    td .btn {
+      width: 100%;
+      max-width: 200px;
+      margin: 0 auto;
+      display: block;
+    }
+  }
 
   /* ---------- Footer ---------- */
   #footer {
@@ -382,8 +396,6 @@
 <!-- Guided Search Panel -->
 <div class="search-panel" id="searchPanel">
   <span class="power-toggle" id="powerToggle">Power Search</span>
-
-  <!-- Step 1 -->
   <div class="step">
     <h3>1&nbsp;Enter Origin & Destination</h3>
     <label for="origin">Origin</label>
@@ -406,8 +418,6 @@
       </small>
     </div>
   </div>
-
-  <!-- Step 2 + Step 3 stacked -->
   <div class="step routing">
     <h3>2&nbsp;Routing Preferences</h3>
     <label>Direct Non-stop</label>
@@ -525,18 +535,6 @@
   }
   exactBox.addEventListener('change', updateFlexVisibility);
   document.addEventListener('DOMContentLoaded', updateFlexVisibility);
-
-  // Power Search Exact date
-  const cExactBox = document.getElementById('cExactDate');
-  const cFlexContainer = document.getElementById('cFlexContainer');
-  const cFlexDaysInput = document.getElementById('cFlexDays');
-  function updateCompactFlexVisibility() {
-    const exact = cExactBox.checked;
-    cFlexContainer.style.display = exact ? 'none' : 'flex';
-    cFlexDaysInput.disabled = exact;
-  }
-  cExactBox.addEventListener('change', updateCompactFlexVisibility);
-  document.addEventListener('DOMContentLoaded', updateCompactFlexVisibility);
 
   // Sample redemption data
   const redemptions = [
